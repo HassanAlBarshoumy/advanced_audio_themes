@@ -57,7 +57,7 @@ NVDA menu → Audio Themes Studio (or NVDA+Shift+A then 's').
 This add-on consolidates several open-source NVDA community projects:
 
 - **Hassan AlBarshoumy** — Main developer, Audio Themes Studio, unified settings.
-- **Ahmed Sami** — Assistance and contributions.
+- **Ahmed Sami** — Original NV Sound typing sounds add-on; adapted and modified extensively for this project.
 - **Musharraf Omer** — Original Audio Themes 3D.
 - **Tony Malykh** — Earcons & Speech Rules, BrowserNav, SentenceNav.
 - **Austin Hicks & Bryan Smart** — Unspoken add-on.
