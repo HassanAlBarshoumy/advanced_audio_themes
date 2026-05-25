@@ -1,5 +1,12 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "opencode": {
+      "options": {
+        "apiKey": "{file:~/.config/opencode/.secrets/opencode-api-key}"
+      }
+    }
+  },
   "mcp": {
     "github": {
       "type": "remote",
