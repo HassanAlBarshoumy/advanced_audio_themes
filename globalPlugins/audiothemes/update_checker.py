@@ -77,7 +77,7 @@ def check_for_updates(parent=None):
     if parent is None:
         parent = wx.GetActiveWindow()
 
-    tag, download_url, _ = get_latest_release()
+    tag, download_url, _html_url = get_latest_release()
 
     if tag is None:
         wx.MessageBox(

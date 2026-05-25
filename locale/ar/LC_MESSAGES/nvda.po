@@ -2268,3 +2268,30 @@ msgstr ""
 
 msgid "(Plays 3D sound even if 3D mode is disabled)"
 msgstr "(يُشغل الصوت بوضع 3D، حتى وإن كان معطلاً من الإعدادات)"
+
+msgid "Check for &Updates..."
+msgstr "التحقق من وجود &تحديثات..."
+
+msgid "Could not check for updates. Please check your internet connection."
+msgstr "تعذر التحقق من وجود تحديثات. يرجى التحقق من اتصالك بالإنترنت."
+
+msgid "Update Check"
+msgstr "التحقق من التحديث"
+
+msgid "You are already running the latest version ({version})."
+msgstr "أنت تستخدم بالفعل أحدث إصدار ({version})."
+
+msgid "A new version is available: {tag}\n\nCurrent version: {current}\n\nWould you like to download and install the update?"
+msgstr "يتوفر إصدار جديد: {tag}\n\nالإصدار الحالي: {current}\n\nهل ترغب في تنزيل التحديث وتثبيته؟"
+
+msgid "Update Available"
+msgstr "تحديث متاح"
+
+msgid "Download complete. The add-on installation dialog will now open."
+msgstr "اكتمل التنزيل. سيتم الآن فتح مربع حوار تثبيت الإضافة."
+
+msgid "Failed to download the update: {error}"
+msgstr "فشل تنزيل التحديث: {error}"
+
+msgid "Unknown error"
+msgstr "خطأ غير معروف"

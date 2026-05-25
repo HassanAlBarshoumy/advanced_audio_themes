@@ -2259,3 +2259,30 @@ msgstr ""
 "\n"
 "تم دمج إضافة SentenceNav للتنقل بالجمل (Alt+أسهم).\n"
 "تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).\n"
+
+msgid "Check for &Updates..."
+msgstr "检查更新(&U)..."
+
+msgid "Could not check for updates. Please check your internet connection."
+msgstr "无法检查更新。请检查您的互联网连接。"
+
+msgid "Update Check"
+msgstr "更新检查"
+
+msgid "You are already running the latest version ({version})."
+msgstr "您已在使用最新版本 ({version})。"
+
+msgid "A new version is available: {tag}\n\nCurrent version: {current}\n\nWould you like to download and install the update?"
+msgstr "有新版本可用：{tag}\n\n当前版本：{current}\n\n您想下载并安装更新吗？"
+
+msgid "Update Available"
+msgstr "有可用更新"
+
+msgid "Download complete. The add-on installation dialog will now open."
+msgstr "下载完成。附加组件安装对话框现在将打开。"
+
+msgid "Failed to download the update: {error}"
+msgstr "下载更新失败：{error}"
+
+msgid "Unknown error"
+msgstr "未知错误"

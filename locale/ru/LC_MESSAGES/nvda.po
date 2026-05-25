@@ -2271,3 +2271,30 @@ msgstr ""
 "\n"
 "تم دمج إضافة SentenceNav للتنقل بالجمل (Alt+أسهم).\n"
 "تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).\n"
+
+msgid "Check for &Updates..."
+msgstr "Проверить &обновления..."
+
+msgid "Could not check for updates. Please check your internet connection."
+msgstr "Не удалось проверить наличие обновлений. Пожалуйста, проверьте подключение к интернету."
+
+msgid "Update Check"
+msgstr "Проверка обновлений"
+
+msgid "You are already running the latest version ({version})."
+msgstr "Вы уже используете последнюю версию ({version})."
+
+msgid "A new version is available: {tag}\n\nCurrent version: {current}\n\nWould you like to download and install the update?"
+msgstr "Доступна новая версия: {tag}\n\nТекущая версия: {current}\n\nХотите ли вы загрузить и установить обновление?"
+
+msgid "Update Available"
+msgstr "Доступно обновление"
+
+msgid "Download complete. The add-on installation dialog will now open."
+msgstr "Загрузка завершена. Сейчас откроется диалог установки дополнения."
+
+msgid "Failed to download the update: {error}"
+msgstr "Не удалось загрузить обновление: {error}"
+
+msgid "Unknown error"
+msgstr "Неизвестная ошибка"
