@@ -3,6 +3,7 @@ __pycache__/
 *.pyo
 *.egg-info/
 dist/
+*.nvda-addon
 build/
 *.egg
 .DS_Store

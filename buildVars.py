@@ -40,7 +40,7 @@ addon_info = {
 	# URL for the add-on documentation support
 	"addon_url": "https://t.me/HassanAlBarshoumy",
 	# URL for the add-on repository where the source code can be found
-	"addon_sourceURL": None,
+	"addon_sourceURL": "https://github.com/HassanAlBarshoumy/advanced_audio_themes",
 	# Documentation file name
 	"addon_docFileName": "readme.html",
 	# Minimum NVDA version supported (e.g. "2018.3")

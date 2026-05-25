@@ -19,6 +19,7 @@ import gui
 import nvwave
 
 from .handler import AudioThemesHandler, audiotheme_changed, THEMES_DIR
+from .update_checker import check_for_updates
 log = logging.getLogger(__name__)
 
 import addonHandler
@@ -273,10 +274,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
         configActionSizer = wx.BoxSizer(wx.HORIZONTAL)
         self.exportConfigButton = wx.Button(innerPanel, -1, _("E&xport Configuration..."))
         self.importConfigButton = wx.Button(innerPanel, -1, _("I&mport Configuration..."))
+        self.checkUpdatesButton = wx.Button(innerPanel, -1, _("Check for &Updates..."))
         configActionSizer.AddMany(
             [
                 (self.exportConfigButton, 1, wx.ALL, 5),
                 (self.importConfigButton, 1, wx.ALL, 5),
+                (self.checkUpdatesButton, 1, wx.ALL, 5),
             ]
         )
         innerSizer.Add(configActionSizer, 0, wx.ALIGN_CENTER | wx.ALL, 10)
@@ -323,6 +326,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         )
         self.Bind(wx.EVT_BUTTON, self.onExportConfig, self.exportConfigButton)
         self.Bind(wx.EVT_BUTTON, self.onImportConfig, self.importConfigButton)
+        self.Bind(wx.EVT_BUTTON, self.onCheckUpdates, self.checkUpdatesButton)
 
     def onTypingPackSelectionChanged(self, event):
         pack = self.typingPackCombobox.GetStringSelection()
@@ -1342,3 +1346,6 @@ class AudioThemesSettingsPanel(SettingsPanel):
                     wx.MessageBox(_("Comprehensive import completed successfully!"), _("Success"), style=wx.ICON_INFORMATION)
                 except Exception as e:
                     wx.MessageBox(_("Error importing configuration:\n{}").format(str(e)), _("Error"), style=wx.ICON_ERROR)
+
+    def onCheckUpdates(self, event):
+        check_for_updates(self)
