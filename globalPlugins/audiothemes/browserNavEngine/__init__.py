@@ -1,0 +1,1783 @@
+#-*- coding:utf-8 -*-
+#A part of the BrowserNav addon for NVDA
+#Copyright (C) 2017-2022 Tony Malykh
+#This file is covered by the GNU General Public License.
+#See the file LICENSE  for more details.
+
+# This addon allows to navigate documents by indentation or offset level.
+# In browsers you can navigate by object location on the screen.
+# Author: Tony Malykh <anton.malykh@gmail.com>
+# https://github.com/mltony/nvda-indent-nav/
+
+import addonHandler
+addonHandler.initTranslation()
+import api
+import browseMode
+from contextlib import ExitStack
+import controlTypes
+import config
+from . constants import *
+import core
+import ctypes
+import cursorManager
+import documentBase
+import editableText
+import functools
+import globalPluginHandler
+import gui
+from gui.settingsDialogs import SettingsPanel
+import inputCore
+import itertools
+import keyboardHandler
+from logHandler import log
+import math
+import nvwave
+import NVDAHelper
+import operator
+import os
+import re
+import scriptHandler
+from scriptHandler import script
+import speech
+import struct
+import sys
+import textInfos
+import threading
+import time
+import tones
+import types
+import ui
+from . import utils
+from virtualBuffers.gecko_ia2 import Gecko_ia2_TextInfo
+import virtualBuffers
+import wave
+import weakref
+import winUser
+import wx
+from wx.stc import StyledTextCtrl
+
+from . addonConfig import *
+from . beeper import *
+from . import quickJump
+from . import clipboard
+from .editor import EditTextDialog
+
+from comtypes import COMError
+import NVDAObjects.IAccessible
+import IAccessibleHandler
+from NVDAObjects.UIA import UIA
+import UIAHandler
+import globalVars
+from gui import nvdaControls
+import extensionPoints
+
+debug = False
+def mylog(s):
+    if debug:
+        from logHandler import log as _log
+        _log.debug(str(s))
+
+
+def myAssert(condition):
+    if not condition:
+        raise RuntimeError("Assertion failed")
+
+try:
+    REASON_CARET = controlTypes.REASON_CARET
+except AttributeError:
+    REASON_CARET = controlTypes.OutputReason.CARET
+
+
+
+def pairUpOld(iterator):
+    second = "Hello world!"
+    while second is not None:
+        try:
+            first = iterator.__next__()
+        except StopIteration:
+            return
+        try:
+            second = iterator.__next__()
+        except StopIteration:
+            second = None
+        yield first, second
+
+def pairUp(l):
+    for i in range(0, len(l), 2):
+        try:
+            yield (l[i], l[i+1])
+        except IndexError:
+            yield (l[i], None)
+            return
+def initConfiguration():
+    confspec = {
+        "crackleVolume" : "integer( default=25, min=0, max=100)",
+        "beepVolume" : "integer( default=60, min=0, max=100)",
+        "noNextTextChimeVolume" : "integer( default=50, min=0, max=100)",
+        "noNextTextMessage" : "boolean( default=True)",
+        "browserMode" : "integer( default=0, min=0, max=2)",
+        "useFontFamily" : "boolean( default=True)",
+        "useColor" : "boolean( default=True)",
+        "useBackgroundColor" : "boolean( default=True)",
+        "useBoldItalic" : "boolean( default=True)",
+        "marks" : "string( default='(^upvote$|^up vote$)')",
+        "skipEmptyParagraphs" : "boolean( default=True)",
+        "skipEmptyLines" : "boolean( default=True)",
+        "skipChimeVolume" : "integer( default=25, min=0, max=100)",
+        "skipRegex" : "string( default='(^Hide or report this$)')",
+        "tableNavigateToCell" : "boolean( default=True)",
+        "verticalAlignmentMargin" : "integer( default=2, min=0, max=10000)",
+    }
+    config.conf.spec["browsernav"] = confspec
+
+browseModeGestures = {
+    "kb:NVDA+Alt+DownArrow" :"moveToNextSibling",
+}
+
+
+
+addonHandler.initTranslation()
+initConfiguration()
+
+class SettingsDialog(SettingsPanel):
+    # Translators: Title for the settings dialog
+    title = _("BrowserNav Settings")
+
+    def __init__(self, *args, **kwargs):
+        super(SettingsDialog, self).__init__(*args, **kwargs)
+
+    def makeSettings(self, settingsSizer):
+        sHelper = gui.guiHelper.BoxSizerHelper(self, sizer=settingsSizer)
+      # crackleVolumeSlider
+        sizer=wx.BoxSizer(wx.HORIZONTAL)
+        # Translators: volume of crackling slider
+        label=wx.StaticText(self,wx.ID_ANY,label=_("Crackling volume"))
+        slider=wx.Slider(self, wx.NewId(), minValue=0,maxValue=100)
+        slider.SetValue(getConfig("crackleVolume"))
+        sizer.Add(label)
+        sizer.Add(slider)
+        settingsSizer.Add(sizer)
+        self.crackleVolumeSlider = slider
+      # beep volume slider
+        sizer=wx.BoxSizer(wx.HORIZONTAL)
+        # Translators: volume of beeping  slider
+        label=wx.StaticText(self,wx.ID_ANY,label=_("Beeping volume (Beeping)"))
+        slider=wx.Slider(self, wx.NewId(), minValue=0,maxValue=100)
+        slider.SetValue(getConfig("beepVolume"))
+        sizer.Add(label)
+        sizer.Add(slider)
+        settingsSizer.Add(sizer)
+        self.beepVolumeSlider = slider
+
+      # noNextTextChimeVolumeSlider
+        sizer=wx.BoxSizer(wx.HORIZONTAL)
+        # Translators: End of document chime volume
+        label=wx.StaticText(self,wx.ID_ANY,label=_("Volume of the No Next Text chime"))
+        slider=wx.Slider(self, wx.NewId(), minValue=0,maxValue=100)
+        slider.SetValue(getConfig("noNextTextChimeVolume"))
+        sizer.Add(label)
+        sizer.Add(slider)
+        settingsSizer.Add(sizer)
+        self.noNextTextChimeVolumeSlider = slider
+
+      # Checkboxes
+        # Translators: Checkbox that controls spoken message when no next or previous text paragraph is available in the document
+        label = _("Read an error message instead of playing a chime")
+        self.noNextTextMessageCheckbox = sHelper.addItem(wx.CheckBox(self, label=label))
+        self.noNextTextMessageCheckbox.Value = getConfig("noNextTextMessage")
+
+        # Translators: Checkbox that controls whether font family should be used for style
+        label = _("Speak font family")
+        self.useFontFamilyCheckBox = sHelper.addItem(wx.CheckBox(self, label=label))
+        self.useFontFamilyCheckBox.Value = getConfig("useFontFamily")
+
+        # Translators: Checkbox that controls whether font color should be used for style
+        label = _("Speak font color")
+        self.useColorCheckBox = sHelper.addItem(wx.CheckBox(self, label=label))
+        self.useColorCheckBox.Value = getConfig("useColor")
+
+        # Translators: Checkbox that controls whether background color should be used for style
+        label = _("Speak background color")
+        self.useBackgroundColorCheckBox = sHelper.addItem(wx.CheckBox(self, label=label))
+        self.useBackgroundColorCheckBox.Value = getConfig("useBackgroundColor")
+
+        # Translators: Checkbox that controls whether bold and italic should be used for style
+        label = _("Speak bold and italic text")
+        self.useBoldItalicCheckBox = sHelper.addItem(wx.CheckBox(self, label=label))
+        self.useBoldItalicCheckBox.Value = getConfig("useBoldItalic")
+
+        label = _("Navigate to table cells by pressing T and Shift+T")
+        self.tableNavigateToCellCheckBox = sHelper.addItem(wx.CheckBox(self, label=label))
+        self.tableNavigateToCellCheckBox.Value = getConfig("tableNavigateToCell")
+
+
+
+      # skipChimeVolumeSlider
+        sizer=wx.BoxSizer(wx.HORIZONTAL)
+        # Translators: volume of skip chime slider
+        label=wx.StaticText(self,wx.ID_ANY,label=_("Volume of Skip Clutter (skipClutter) chime"))
+        slider=wx.Slider(self, wx.NewId(), minValue=0,maxValue=100)
+        slider.SetValue(getConfig("skipChimeVolume"))
+        sizer.Add(label)
+        sizer.Add(slider)
+        settingsSizer.Add(sizer)
+        self.skipChimeVolumeSlider = slider
+      # Vertical alignment margin edit box
+        label = _("Vertical margin between paragraphs")
+        self.verticalMarginSpinControl = sHelper.addLabeledControl(
+            label,
+            nvdaControls.SelectOnFocusSpinCtrl,
+            min=0,
+            max=10000,
+            initial=getConfig("verticalAlignmentMargin"),
+        )
+
+    def onSave(self):
+        config.conf["browsernav"]["crackleVolume"] = self.crackleVolumeSlider.Value
+        config.conf["browsernav"]["beepVolume"] = self.beepVolumeSlider.Value
+        config.conf["browsernav"]["noNextTextChimeVolume"] = self.noNextTextChimeVolumeSlider.Value
+        config.conf["browsernav"]["noNextTextMessage"] = self.noNextTextMessageCheckbox.Value
+        config.conf["browsernav"]["useFontFamily"] = self.useFontFamilyCheckBox.Value
+        config.conf["browsernav"]["useColor"] = self.useColorCheckBox.Value
+        config.conf["browsernav"]["useBackgroundColor"] = self.useBackgroundColorCheckBox.Value
+        config.conf["browsernav"]["useBoldItalic"] = self.useBoldItalicCheckBox.Value
+        config.conf["browsernav"]["tableNavigateToCell"] = self.tableNavigateToCellCheckBox.Value
+        config.conf["browsernav"]["skipChimeVolume"] = self.skipChimeVolumeSlider.Value
+        config.conf["browsernav"]["verticalAlignmentMargin"] = self.verticalMarginSpinControl.GetValue()
+
+
+def getMode():
+    return getConfig("browserMode")
+
+# Browse mode constants:
+BROWSE_MODES = [
+    _("horizontal offset"),
+    _("font size"),
+    _("font size and same style"),
+]
+margin_eq = lambda x,y : abs(x-y) <= getConfig("verticalAlignmentMargin")
+margin_lt = lambda x,y : (y - x) > getConfig("verticalAlignmentMargin")
+margin_gt = lambda x,y : (x - y) > getConfig("verticalAlignmentMargin")
+PARENT_OPERATORS = [operator.lt, operator.gt, operator.gt]
+CHILD_OPERATORS = [operator.gt, operator.lt, operator.lt]
+OPERATOR_STRINGS = {
+    operator.lt: _("smaller"),
+    margin_lt: _("smaller"),
+    operator.gt: _("greater"),
+    margin_gt: _("greater"),
+}
+# Just some random unicode character that is not likely to appear anywhere.
+# This character is used for semi-accessible jupyter edit box automation.
+controlCharacter = "➉" # U+2789, Dingbat circled sans-serif digit ten
+
+# This function is a fixed version of fromName function.
+# As of v2020.3 it doesn't work correctly for gestures containing letters when the default locale on the computer is set to non-Latin, such as Russian.
+import vkCodes
+en_us_input_Hkl = 1033 + (1033 << 16)
+def fromNameEnglish(name):
+    """Create an instance given a key name.
+    @param name: The key name.
+    @type name: str
+    @return: A gesture for the specified key.
+    @rtype: L{KeyboardInputGesture}
+    """
+    keyNames = name.split("+")
+    keys = []
+    for keyName in keyNames:
+        if keyName == "plus":
+            # A key name can't include "+" except as a separator.
+            keyName = "+"
+        if keyName == keyboardHandler.VK_WIN:
+            vk = winUser.VK_LWIN
+            ext = False
+        elif keyName.lower() == keyboardHandler.VK_NVDA.lower():
+            vk, ext = keyboardHandler.getNVDAModifierKeys()[0]
+        elif len(keyName) == 1:
+            ext = False
+            requiredMods, vk = winUser.VkKeyScanEx(keyName, en_us_input_Hkl)
+            if requiredMods & 1:
+                keys.append((winUser.VK_SHIFT, False))
+            if requiredMods & 2:
+                keys.append((winUser.VK_CONTROL, False))
+            if requiredMods & 4:
+                keys.append((winUser.VK_MENU, False))
+            # Not sure whether we need to support the Hankaku modifier (& 8).
+        else:
+            vk, ext = vkCodes.byName[keyName.lower()]
+            if ext is None:
+                ext = False
+        keys.append((vk, ext))
+
+    if not keys:
+        raise ValueError
+
+    return keyboardHandler.KeyboardInputGesture(keys[:-1], vk, 0, ext)
+
+def fromNameSmart(name):
+    try:
+        return keyboardHandler.KeyboardInputGesture.fromName(name)
+    except Exception:
+        log.error(f"Couldn't resolve {name} keystroke using system default locale.", exc_info=True)
+    try:
+        return fromNameEnglish(name)
+    except Exception:
+        log.error(f"Couldn't resolve {name} keystroke using English default locale.", exc_info=True)
+    return None
+
+def getControlKeyGesture(key, vkCode):
+    try:
+        return keyboardHandler.KeyboardInputGesture.fromName(f"Control+{key}")
+    except LookupError:
+        # This happens if vk code  fails to resolve, when current keyboard layout is for example Russian
+        return keyboardHandler.KeyboardInputGesture(modifiers={(winUser.VK_CONTROL, False)}, vkCode=vkCode, scanCode=0, isExtended=False)
+
+kbdControlC = getControlKeyGesture("c", 67)
+kbdControlV = getControlKeyGesture("v", 86)
+kbdControlA = getControlKeyGesture("a", 65)
+kbdControlHome = fromNameSmart("Control+Home")
+kbdControlShiftHome = fromNameSmart("Control+Shift+Home")
+kbdControlShiftDown = fromNameSmart("Control+Shift+DownArrow")
+kbdShiftRight = fromNameSmart("Shift+RightArrow")
+kbdControlEnd = fromNameSmart("Control+End")
+kbdDelete = fromNameSmart("Delete")
+kbdLeft = fromNameSmart("LeftArrow")
+kbdRight = fromNameSmart("RightArrow")
+kbdUp = fromNameSmart("UpArrow")
+kbdDown = fromNameSmart("DownArrow")
+
+class NoSelectionError(Exception):
+    def __init__(self, *args, **kwargs):
+        super(NoSelectionError, self).__init__(*args, **kwargs)
+
+class EditBoxUpdateError(Exception):
+    def __init__(self, *args, **kwargs):
+        super(EditBoxUpdateError, self).__init__(*args, **kwargs)
+
+jupyterUpdateInProgress = False
+
+originalExecuteGesture = None
+blockBeeper = Beeper()
+blockKeysUntil = 0
+def preExecuteGesture(selfself, gesture, *args, **kwargs):
+    global blockKeysUntil
+    now = time.time()
+    if now < blockKeysUntil:
+        # Block this keystroke!
+        blockBeeper.fancyBeep("DG#", length=100, left=50, right=50)
+        return
+    return originalExecuteGesture(selfself, gesture, *args, **kwargs)
+
+def blockAllKeys(timeoutSeconds):
+    global blockKeysUntil
+    now = time.time()
+    if blockKeysUntil > now:
+        raise Exception("Keys are already blocked")
+    blockKeysUntil =now  + timeoutSeconds
+    beeper.fancyBeep("CDGA", length=int(1000 * timeoutSeconds), left=5, right=5)
+
+def unblockAllKeys():
+    global blockKeysUntil
+    blockKeysUntil = 0
+    beeper.stop()
+
+def getSimpleHorizontalOffset(textInfo):
+    try:
+        obj = textInfo.NVDAObjectAtStart
+        x = obj.location[0]
+        return x
+    except Exception:
+        return None
+
+def getFontSize(textInfo, formatting):
+    try:
+        size =float( formatting["font-size"].replace("pt", ""))
+        return size
+    except Exception:
+        return 0
+
+def extractRoles(textInfo):
+    result = set()
+    fields = textInfo.getTextWithFields()
+    for field in fields:
+        try:
+            role = field.field['role']
+        except Exception:
+            continue
+        result.add(role)
+    return result
+
+def isRolePresent(textInfo, roles):
+    formatConfig=config.conf['documentFormatting']
+    fields = textInfo.getTextWithFields(formatConfig)
+    for field in fields:
+        try:
+            role = field.field['role']
+        except Exception:
+            continue
+        if role in roles:
+            return True
+    return False
+def getFormatting(info):
+    formatField=textInfos.FormatField()
+    formatConfig=config.conf['documentFormatting']
+    for field in info.getTextWithFields(formatConfig):
+        #if isinstance(field,textInfos.FieldCommand): and isinstance(field.field,textInfos.FormatField):
+        try:
+            formatField.update(field.field)
+        except Exception:
+            pass
+    return formatField
+
+def getBeepTone(textInfo):
+    mode = getConfig("browserMode")
+    if mode == 0:
+        offset = getSimpleHorizontalOffset(textInfo)
+        width = api.getDesktopObject().location.right
+        MAX_ALLOWED_OCTAVES = 3
+        octave_pixels = width/MAX_ALLOWED_OCTAVES
+        base_freq = speech.IDT_BASE_FREQUENCY
+        tone = base_freq * (2 ** (offset/octave_pixels))
+        return tone
+    elif mode in [1,2]:
+        size = getFontSize(textInfo, getFormatting(textInfo))
+        # Larger fonts should map onto lower tones, so computing inverse here
+        tone = 3000/size
+        return tone
+    else:
+        raise Exception(f'Unknown mode {mode}')
+lastTone = 0
+lastTextInfo = None
+
+
+
+def sonifyTextInfo(textInfo, oldTextInfo=None, includeCrackle=False):
+    if textInfo is None:
+        return
+    return sonifyTextInfoImpl(textInfo, oldTextInfo, includeCrackle)
+quickJump.sonifyTextInfo = sonifyTextInfo
+def sonifyTextInfoImpl(textInfo, lastTextInfo, includeCrackle):
+    w = lambda: scriptHandler.isScriptWaiting()
+    beepVolume=getConfig("beepVolume")
+    if beepVolume > 0:
+        if w():return
+
+        global lastTone
+        try:
+            tone = getBeepTone(textInfo)
+        except Exception:
+            return
+        tone = max(tone, 10)
+        tone = min(tone, 20000)
+
+        if tone != lastTone:
+            tones.beep(tone, 50, left=beepVolume, right=beepVolume)
+        lastTone = tone
+
+    if (
+        includeCrackle
+        and lastTextInfo is not None
+        and getConfig("crackleVolume") > 0
+        and isinstance(textInfo, Gecko_ia2_TextInfo)
+        and isinstance(lastTextInfo, Gecko_ia2_TextInfo)
+        and lastTextInfo.obj == textInfo.obj
+    ):
+        if w():return
+        lastTextInfo = lastTextInfo.copy()
+        lastTextInfo.expand(textInfos.UNIT_PARAGRAPH)
+        t1, t2 = textInfo, lastTextInfo
+        if textInfo.compareEndPoints(lastTextInfo, 'startToStart') == 0:
+            return
+        if textInfo.compareEndPoints(lastTextInfo, 'startToStart') > 0:
+            t1,t2 = t2,t1
+        if False:
+            # Old method, more precise, but seems to be causing a deadlock within NVDA with very low frequency - once every couple of days, so very difficult to debug
+            span = t1.copy()
+            span.setEndPoint(t2, 'endToEnd')
+            if span._endOffset - span._startOffset > 100000:
+                paragraphs = 50
+            else:
+                paragraphs = len(list(span.getTextInChunks(textInfos.UNIT_PARAGRAPH)))
+        else:
+            # new simplified way:
+            paragraphs = (t2._endOffset - t1._startOffset) // 20
+        paragraphs = max(0, paragraphs - 2)
+        initialDelay = 0 if beepVolume==0 else 50
+        beeper.simpleCrackle(paragraphs, volume=getConfig("crackleVolume"), initialDelay=initialDelay)
+
+originalCaretMovementScriptHelper = None
+originalQuickNavScript = None
+originalTableScriptHelper = None
+original_set_selection = None
+def preCaretMovementScriptHelper(self, gesture,unit, direction=None,posConstant=textInfos.POSITION_SELECTION, *args, **kwargs):
+    oldSelection = self.selection
+    if (
+        (
+            quickJump.isSkipClutterEnabledForThisUnit(unit)
+        )
+        and direction is not None
+        and posConstant==textInfos.POSITION_SELECTION
+        and not isinstance(self,textInfos.DocumentWithPageTurns)
+        and not scriptHandler.willSayAllResume(gesture)
+    ):
+        quickJump.caretMovementWithAutoSkip(self, gesture,unit, direction,posConstant, *args, **kwargs)
+    else:
+        originalCaretMovementScriptHelper(self, gesture, unit, direction, posConstant, *args, **kwargs)
+    if unit not in {textInfos.UNIT_CHARACTER, textInfos.UNIT_WORD}:
+        sonifyTextInfo(self.selection)
+
+def preQuickNavScript(self,gesture, itemType, direction, errorMessage, readUnit, *args, **kwargs):
+    oldSelection = self.selection
+    result = originalQuickNavScript(self,gesture, itemType, direction, errorMessage, readUnit, *args, **kwargs)
+    if itemType == 'table' and getConfig("tableNavigateToCell"):
+        info = self.selection.copy()
+        info.collapse()
+        info.expand(textInfos.UNIT_PARAGRAPH)
+        roles = extractRoles(info)
+        if (
+            controlTypes.Role.TABLE in roles
+            and controlTypes.Role.TABLECELL not in roles
+            and controlTypes.Role.TABLECOLUMNHEADER not in roles
+        ):
+            info.move(textInfos.UNIT_PARAGRAPH, 1)
+            info.expand(textInfos.UNIT_PARAGRAPH)
+            roles = extractRoles(info)
+            if (
+                controlTypes.Role.TABLE in roles
+                and (
+                    controlTypes.Role.TABLECELL in roles
+                    or controlTypes.Role.TABLECOLUMNHEADER in roles
+                )
+            ):
+                self._set_selection(info, reason=controlTypes.OutputReason.QUICKNAV)
+                speech.speakTextInfo(info, reason=controlTypes.OutputReason.QUICKNAV)
+
+    sonifyTextInfo(self.selection, oldTextInfo=oldSelection, includeCrackle=True)
+    return result
+
+def preTableScriptHelper(self, *args, **kwargs):
+    oldSelection = self.selection
+    result = originalTableScriptHelper(self, *args, **kwargs)
+    sonifyTextInfo(self.selection)
+    return result
+
+selectionHistory = {}
+selectionHistoryLock = threading.Lock()
+def purgeSelectionHistory():
+    # Purge expired entries
+    global selectionHistory
+    selectionHistory = {
+        k:v
+        for k,v in selectionHistory.items()
+        if k() is not None
+    }
+def pre_set_selection(self, info):
+    try:
+        sh = self.selectionHistory
+    except AttributeError:
+        sh = SelectionHistory()
+        self.selectionHistory = sh
+    sh.append(info)
+    return original_set_selection(self, info)
+
+class SelectionHistory:
+    def __init__(self):
+        self.entries = []
+        self.ptr = -1
+
+    def append(self, info):
+        if not isinstance(info, Gecko_ia2_TextInfo):
+            return
+        try:
+            del self.entries[self.ptr + 1:]
+        except IndexError:
+            pass
+        info = info.copy()
+        info.expand(textInfos.UNIT_PARAGRAPH)
+        self.entries.append(info._startOffset)
+        self.ptr = len(self.entries)
+
+    def goBack(self, info):
+        currentInfo = info.copy()
+        currentInfo.expand(textInfos.UNIT_PARAGRAPH)
+        historicalInfo = currentInfo.copy()
+        while self.ptr > 0:
+            self.ptr -= 1
+            offset = self.entries[self.ptr]
+            historicalInfo._startOffset = historicalInfo._endOffset = offset
+            historicalInfo.expand(textInfos.UNIT_PARAGRAPH)
+            if not currentInfo.isOverlapping(historicalInfo):
+                return historicalInfo
+        raise IndexError()
+
+
+def browserNavPopup(selfself,gesture):
+    self = selfself
+    gui.mainFrame.prePopup()
+    try:
+        frame = wx.Frame(None, -1,"Fake popup frame", pos=(1, 1),size=(1, 1))
+        menu = wx.Menu()
+        menu.AppendMenu(wx.ID_ANY, _("&Bookmark"), quickJump.makeBookmarkSubmenu(self, frame))
+        menu.AppendMenu(wx.ID_ANY, _("&Website"), quickJump.makeWebsiteSubmenu(self, frame))
+        frame.Bind(
+            wx.EVT_MENU_CLOSE,
+            lambda evt: frame.Close()
+        )
+        frame.Show()
+
+        wx.CallAfter(lambda: frame.PopupMenu(menu))
+    finally:
+        gui.mainFrame.postPopup()
+
+def getFocusedURL():
+    focus = api.getFocusObject()
+    if isinstance(focus, UIA):
+        if False:
+            # UIA Chromium or Edge
+            # Unfortunately, there appears to be no easy way to obtain URL directly from UIA. Code below for document constnat identifier just returns some numeric constant.
+            # Googling returns ways to find address bar and read URL from it.
+            # We will keep it in mind for the future if current way changes.
+            # However, we prefer falling back to IA2 since address bar is not necessarily visible.
+            # using def _get_documentConstantIdentifier from NVDAObjects/UIA/chromium.py
+            return obj.parent._getUIACacheablePropertyValue(UIAHandler.UIA_AutomationIdPropertyId)
+        # Retrieve topmost IA2 object in the window
+        obj = utils.getIA2DocumentInThread()
+        if obj is None:
+            return None
+        try:
+            return obj.IAccessibleObject.accValue(0)
+        except COMError:
+            return None
+    elif isinstance(focus, NVDAObjects.IAccessible.IAccessible):
+        document = utils.getIA2Document()
+        if document is not None:
+            # Chrome, Firefox, Thunderbird
+            # Using def _get_documentConstantIdentifier from virtualBuffers/gecko_ia2.py.
+            try:
+                return document.IAccessibleObject.accValue(0)
+            except COMError:
+                pass
+        return None
+    else:
+        return None
+
+globalUpdateUrlCounter = 0
+globalVars.currentURL = None
+def getCurrentURL():
+    return globalVars.currentURL
+
+
+api.getCurrentURL = getCurrentURL
+api.postFocusOrURLChange = extensionPoints.Action()
+updateURLLock = threading.Lock()
+def updateURLIfChanged():
+    newURL = getFocusedURL()
+    if globalVars.currentURL != newURL:
+        api.postFocusOrURLChange.notify()
+    globalVars.currentURL = newURL
+URL_WATCH_DELAYS_MS = [300, 700, 2000, 7000]
+def watchURLAsync(localUpdateUrlCounter, delays=None):
+    delays = delays or URL_WATCH_DELAYS_MS
+    for delayMs in delays:
+        yield delayMs
+        with updateURLLock:
+            global globalUpdateUrlCounter
+            if globalUpdateUrlCounter != localUpdateUrlCounter:
+                return
+            updateURLIfChanged()
+
+def watchURL(initialDelayMs=None):
+    with updateURLLock:
+        global globalUpdateUrlCounter
+        globalUpdateUrlCounter += 1
+        localUpdateUrlCounter = globalUpdateUrlCounter
+        updateURLIfChanged()
+    utils.executeAsynchronously(watchURLAsync(localUpdateUrlCounter, None))
+
+originalSetFocusObject = None
+originalVirtualBufferHandleUpdate = None
+def bnSetFocusObject(obj):
+    result = originalSetFocusObject(obj)
+    watchURL()
+    api.postFocusOrURLChange.notify()
+    return result
+
+def bnVirtualBufferHandleUpdate(self):
+    result = originalVirtualBufferHandleUpdate(self)
+    watchURL()
+    quickJump.onVirtualBufferUpdate(self)
+    return result
+
+originalSpeakTextInfo = None
+def bnSpeakTextInfo(info, *args, **kwargs):
+    return  originalSpeakTextInfo(quickJump.adjustTextInfoForSpeech(info), *args, **kwargs)
+
+class BrowserNavMixin:
+    """Mixin providing BrowserNav's indentation/style/QuickJump navigation.
+    Inherit alongside globalPluginHandler.GlobalPlugin in the main plugin."""
+    _bn_scriptCategory = _("BrowserNav")
+    beeper = Beeper()
+
+    def initBrowserNav(self):
+        """Call from the main GlobalPlugin.__init__ to wire up BrowserNav."""
+        self.injectBrowseModeKeystrokes()
+        self.lastJupyterText = ""
+        global originalExecuteGesture, originalCaretMovementScriptHelper, originalQuickNavScript, originalTableScriptHelper, original_set_selection
+        originalExecuteGesture = inputCore.InputManager.executeGesture
+        inputCore.InputManager.executeGesture = preExecuteGesture
+        originalCaretMovementScriptHelper = cursorManager.CursorManager._caretMovementScriptHelper
+        cursorManager.CursorManager._caretMovementScriptHelper = preCaretMovementScriptHelper
+        originalQuickNavScript = browseMode.BrowseModeTreeInterceptor._quickNavScript
+        browseMode.BrowseModeTreeInterceptor._quickNavScript = preQuickNavScript
+        originalTableScriptHelper = documentBase.DocumentWithTableNavigation._tableMovementScriptHelper
+        documentBase.DocumentWithTableNavigation._tableMovementScriptHelper = preTableScriptHelper
+        original_set_selection = cursorManager.CursorManager._set_selection
+        cursorManager.CursorManager._set_selection = pre_set_selection
+        editableText.EditableText.script_editInBrowserNav = lambda selfself, gesture: self.script_editJupyter(gesture, selfself)
+        editableText.EditableText._EditableText__gestures['kb:NVDA+E'] = 'editInBrowserNav'
+        quickJump.original_event_gainFocus = browseMode.BrowseModeDocumentTreeInterceptor.event_gainFocus
+        browseMode.BrowseModeDocumentTreeInterceptor.event_gainFocus = quickJump.new_event_gainFocus
+        quickJump.originalShouldPassThrough = browseMode.BrowseModeTreeInterceptor.shouldPassThrough
+        browseMode.BrowseModeTreeInterceptor.shouldPassThrough = quickJump.newShouldPassThrough
+        quickJump.original_event_treeInterceptor_gainFocus = browseMode.BrowseModeDocumentTreeInterceptor.event_treeInterceptor_gainFocus
+        browseMode.BrowseModeDocumentTreeInterceptor.event_treeInterceptor_gainFocus = quickJump.pre_event_treeInterceptor_gainFocus
+        quickJump.originalGetAlternativeScript = browseMode.BrowseModeDocumentTreeInterceptor.getAlternativeScript
+        browseMode.BrowseModeDocumentTreeInterceptor.getAlternativeScript = quickJump.postGetAlternativeScript
+
+        # Safe Live Region hook: verify existence before injection (NVDA 2026.1+ compat)
+        if hasattr(NVDAHelper, 'nvdaControllerInternal_reportLiveRegion'):
+            quickJump.originalReportLiveRegion = NVDAHelper.nvdaControllerInternal_reportLiveRegion
+            NVDAHelper.nvdaControllerInternal_reportLiveRegion = quickJump.newReportLiveRegion
+            log.debug("BrowserNav: Live Region Python-level hook installed.")
+        else:
+            quickJump.originalReportLiveRegion = None
+            log.debug("BrowserNav: nvdaControllerInternal_reportLiveRegion not available in NVDAHelper; Live Region hook disabled.")
+        # Destructive GC patches removed to ensure NVDA core stability
+        global originalSetFocusObject, originalVirtualBufferHandleUpdate
+        originalSetFocusObject = api.setFocusObject
+        api.setFocusObject = bnSetFocusObject
+        originalVirtualBufferHandleUpdate = virtualBuffers.VirtualBuffer._handleUpdate
+        virtualBuffers.VirtualBuffer._handleUpdate = bnVirtualBufferHandleUpdate
+        global originalSpeakTextInfo
+        originalSpeakTextInfo = speech.speakTextInfo
+        speech.speakTextInfo = bnSpeakTextInfo
+        # Register QuickJump settings panel removed - now in settings.py tabs
+
+    def terminateBrowserNav(self):
+        """Call from the main GlobalPlugin.terminate to restore BrowserNav patches."""
+        from contextlib import suppress
+        cursorManager.CursorManager._caretMovementScriptHelper = originalCaretMovementScriptHelper
+        inputCore.InputManager.executeGesture = originalExecuteGesture
+        browseMode.BrowseModeTreeInterceptor._quickNavScript = originalQuickNavScript
+        documentBase.DocumentWithTableNavigation._tableMovementScriptHelper = originalTableScriptHelper
+        cursorManager.CursorManager._set_selection = original_set_selection
+        browseMode.BrowseModeDocumentTreeInterceptor.event_gainFocus = quickJump.original_event_gainFocus
+        browseMode.BrowseModeDocumentTreeInterceptor.getAlternativeScript = quickJump.originalGetAlternativeScript
+        browseMode.BrowseModeTreeInterceptor.shouldPassThrough = quickJump.originalShouldPassThrough
+        browseMode.BrowseModeDocumentTreeInterceptor.event_treeInterceptor_gainFocus = quickJump.original_event_treeInterceptor_gainFocus
+        # Safe Live Region unhook: only restore if the hook was successfully installed
+        if getattr(quickJump, 'originalReportLiveRegion', None) is not None:
+            NVDAHelper.nvdaControllerInternal_reportLiveRegion = quickJump.originalReportLiveRegion
+        
+        api.setFocusObject = originalSetFocusObject
+        virtualBuffers.VirtualBuffer._handleUpdate = originalVirtualBufferHandleUpdate
+        speech.speakTextInfo = originalSpeakTextInfo
+        
+
+    def maybeAdjustOperator(self, op):
+        mode = getConfig("browserMode")
+        margin = getConfig("verticalAlignmentMargin")
+        if mode != 0 or margin == 0:
+            return op
+        if op == operator.eq:
+            return margin_eq
+        elif op == operator.lt:
+            return margin_lt
+        elif op == operator.gt:
+            return margin_gt
+        else:
+            raise RuntimeError
+
+    def script_moveToNextSibling(self, gesture, selfself):
+        mode = getMode()
+        # Translators: error message if next sibling couldn't be found
+        errorMessage = _("No next paragraph with the same {mode} in the document").format(
+            mode=BROWSE_MODES[mode])
+        self.moveInBrowser(1, errorMessage, self.maybeAdjustOperator(operator.eq), selfself)
+
+    def script_moveToPreviousSibling(self, gesture, selfself):
+        mode = getMode()
+        # Translators: error message if previous sibling couldn't be found
+        errorMessage = _("No previous paragraph with the same {mode} in the document").format(
+            mode=BROWSE_MODES[mode])
+        self.moveInBrowser(-1, errorMessage, self.maybeAdjustOperator(operator.eq), selfself)
+
+    def script_moveToParent(self, gesture, selfself):
+        mode = getMode()
+        op = self.maybeAdjustOperator(PARENT_OPERATORS[mode])
+        # Translators: error message if parent could not be found
+        errorMessage = _("No previous paragraph  with {qualifier} {mode} in the document").format(
+            mode=BROWSE_MODES[mode],
+            qualifier=OPERATOR_STRINGS[op])
+        self.moveInBrowser(-1, errorMessage, op, selfself)
+
+    def script_moveToNextParent(self, gesture, selfself):
+        mode = getMode()
+        op = self.maybeAdjustOperator(PARENT_OPERATORS[mode])
+        # Translators: error message if parent could not be found
+        errorMessage = _("No next paragraph  with {qualifier} {mode} in the document").format(
+            mode=BROWSE_MODES[mode],
+            qualifier=OPERATOR_STRINGS[op])
+        self.moveInBrowser(1, errorMessage, op, selfself)
+
+
+    def script_moveToChild(self, gesture, selfself):
+        mode = getMode()
+        op = self.maybeAdjustOperator(CHILD_OPERATORS[mode])
+        # Translators: error message if child could not be found
+        errorMessage = _("No next paragraph  with {qualifier} {mode} in the document").format(
+            mode=BROWSE_MODES[mode],
+            qualifier=OPERATOR_STRINGS[op])
+        self.moveInBrowser(1, errorMessage, op, selfself)
+
+    def script_moveToPreviousChild(self, gesture, selfself):
+        mode = getMode()
+        op = self.maybeAdjustOperator(CHILD_OPERATORS[mode])
+        # Translators: error message if child could not be found
+        errorMessage = _("No previous paragraph  with {qualifier} {mode} in the document").format(
+            mode=BROWSE_MODES[mode],
+            qualifier=OPERATOR_STRINGS[op])
+        self.moveInBrowser(-1, errorMessage, op, selfself)
+
+    def script_rotor(self, gesture, selfself):
+        mode = getMode()
+        mode = (mode + 1) % len(BROWSE_MODES)
+        setConfig("browserMode", mode)
+        ui.message(_("BrowserNav navigates by ") + BROWSE_MODES[mode])
+
+    def generateBrowseModeExtractors(self, selfself):
+        textInfo = selfself.selection
+        geckoMode = isinstance(textInfo, Gecko_ia2_TextInfo)
+        #geckoMode = False
+        if geckoMode:
+            document = utils.getIA2Document(textInfo)
+            documentHolder = utils.DocumentHolder(document)
+        mode = getConfig("browserMode")
+        if mode == 0:
+            # horizontal offset
+            extractFormattingFunc = lambda x: None
+            if geckoMode:
+                extractIndentFunc = lambda textInfo,x: utils.getGeckoParagraphIndent(textInfo, documentHolder)
+            else:
+                extractIndentFunc= lambda textInfo,x: getSimpleHorizontalOffset(textInfo)
+            extractStyleFunc = lambda x,y: None
+        elif mode in [1,2]:
+            extractFormattingFunc = lambda textInfo: getFormatting(textInfo)
+            extractIndentFunc = getFontSize
+            if mode == 1:
+                # Font size only
+                extractStyleFunc = lambda textInfo, formatting: None
+            else:
+                # Both font fsize and style
+                extractStyleFunc = lambda textInfo, formatting: self.formattingToStyle(formatting)
+        return (
+            extractFormattingFunc,
+            extractIndentFunc,
+            extractStyleFunc
+        )
+
+    def formattingToStyle(self, formatting):
+        result = []
+        if getConfig("useFontFamily"):
+            result.append(formatting.get("font-family", None))
+        if getConfig("useColor"):
+            result.append(formatting.get("color", None))
+        if getConfig("useBackgroundColor"):
+            result.append(formatting.get("background-color", None))
+        if getConfig("useBoldItalic"):
+            result.append(formatting.get("bold", None))
+            result.append(formatting.get("italic", None))
+        return tuple(result)
+
+    def moveInBrowser(self, increment, errorMessage, op, selfself):
+        (
+            extractFormattingFunc,
+            extractIndentFunc,
+            extractStyleFunc
+        ) = self.generateBrowseModeExtractors(selfself)
+
+        textInfo = selfself.selection.copy()
+        textInfo.collapse()
+        mylog(f"start: {textInfo.text}")
+        textInfo.expand(textInfos.UNIT_PARAGRAPH)
+        origFormatting = extractFormattingFunc(textInfo)
+        origIndent = extractIndentFunc(textInfo, origFormatting)
+        origStyle = extractStyleFunc(textInfo, origFormatting)
+        mylog(f"origIndent={str(origIndent)}")
+        distance = 0
+        while True:
+            result =textInfo.move(textInfos.UNIT_PARAGRAPH, increment)
+            if result == 0:
+                return endOfDocument(errorMessage)
+            textInfo.expand(textInfos.UNIT_PARAGRAPH)
+            text = textInfo.text
+            if speech.isBlank(text):
+                continue
+            formatting = extractFormattingFunc(textInfo)
+            indent = extractIndentFunc(textInfo, formatting)
+            style = extractStyleFunc(textInfo, formatting)
+            mylog(f'@{distance} text: {textInfo.text}')
+            mylog(f'indent={str(indent)}')
+            if style == origStyle:
+                mylog("Styles math!")
+                if op(indent, origIndent):
+                    self.beeper.simpleCrackle(distance, volume=getConfig("crackleVolume"))
+                    speech.speakTextInfo(textInfo, reason=REASON_CARET)
+                    textInfo.collapse()
+                    textInfo.updateCaret()
+                    selfself.selection = textInfo
+                    return
+            distance += 1
+
+    def findByRole(self, direction, roles, errorMessage, newMethod=False):
+        focus = api.getFocusObject().treeInterceptor
+        textInfo = focus.makeTextInfo(textInfos.POSITION_CARET)
+        textInfo.expand(textInfos.UNIT_PARAGRAPH)
+        distance = 0
+        while True:
+            distance += 1
+            textInfo.collapse()
+            result = textInfo.move(textInfos.UNIT_PARAGRAPH, direction)
+            if result == 0:
+                endOfDocument(errorMessage)
+                return
+            textInfo.expand(textInfos.UNIT_PARAGRAPH)
+            if not newMethod:
+                obj = textInfo.NVDAObjectAtStart
+                testResult =  obj is not None and obj.role in roles
+            else:
+                testResult = isRolePresent(textInfo, roles)
+            if testResult:
+                textInfo.updateCaret()
+                self.beeper.simpleCrackle(distance, volume=getConfig("crackleVolume"))
+                speech.speakTextInfo(textInfo, reason=REASON_CARET)
+                textInfo.collapse()
+                focus._set_selection(textInfo)
+                return
+
+    def scrollToAll(self, direction, message):
+        ui.message(message)
+        focus = api.getFocusObject().treeInterceptor
+        textInfo = focus.makeTextInfo(textInfos.POSITION_CARET)
+        textInfo.expand(textInfos.UNIT_PARAGRAPH)
+        textInfo.collapse()
+        distance = 0
+        while True:
+            distance += 1
+            #textInfo.collapse()
+            result = textInfo.move(textInfos.UNIT_PARAGRAPH, direction)
+            if result == 0:
+                ui.message(_("Done."))
+                return
+            #textInfo.expand(textInfos.UNIT_PARAGRAPH)
+            textInfo.NVDAObjectAtStart.scrollIntoView()
+
+    #blacklistKeys = {"_startOfNode", "_endOfNode"}
+    whitelistKeys = "color,font-family,font-size,bold,italic,strikethrough,underline".split(",")
+    def compareFormatFields(self, f1, f2):
+        if False:
+          for key in set(f1.keys()).union(set(f2.keys())).difference(self.blacklistKeys):
+            try:
+                if f1[key] != f2[key]:
+                    mylog(f"Inequality during comparison; key={key} f1={f1[key]} f2={f2[key]}")
+                    return False
+            except KeyError:
+                mylog(f"KeyError during comparison; key={key} f1={key in f1} f2={key in f2}")
+                return False
+        for key in self.whitelistKeys:
+            if key not in f1 and key not in f2:
+                continue
+            try:
+                if f1[key] != f2[key]:
+                    return False
+            except KeyError:
+                mylog(f"KeyError during comparison; key={key} f1={key in f1} f2={key in f2}")
+                return False
+
+        return True
+
+    def findFormatChange(self, selfself, direction, errorMessage):
+        mylog(f"findFormatChange direction={direction}")
+        caretInfo = selfself.makeTextInfo(textInfos.POSITION_CARET)
+        caretInfo.collapse()
+        paragraphInfo = caretInfo.copy()
+        paragraphInfo.expand(textInfos.UNIT_PARAGRAPH)
+        textInfo = paragraphInfo.copy()
+        paragraphInfo.collapse()
+        textInfo.setEndPoint(caretInfo, 'startToStart' if direction > 0 else "endToEnd")
+        formatConfig=config.conf['documentFormatting']
+        formatInfo = caretInfo.copy()
+        formatInfo.move(textInfos.UNIT_CHARACTER, 1, endPoint="end")
+        fields = formatInfo.getTextWithFields(formatConfig)
+        fields = [field
+            for field in fields
+            if (
+                isinstance(field, textInfos.FieldCommand)
+                and field.command == 'formatChange'
+            )
+        ]
+        if len(fields) == 0:
+            raise Exception("No formatting information available at the cursor!")
+        originalFormat = fields[0]
+        mylog(f"originalFormat={originalFormat}")
+        while True:
+            fields = textInfo.getTextWithFields(formatConfig)
+            fields = [field
+                for field in fields
+                if (
+                    isinstance(field, textInfos.FieldCommand)
+                    and field.command == 'formatChange'
+                )
+                or isinstance(field, str)
+            ]
+            if len(fields) == 0:
+                # This happens if curssor at the beginning of paragraph and we're moving back. Well, just go directly to the previous paragraph, nothing to do in this one.
+                pass
+            else:
+                if not  isinstance(fields[0], textInfos.FieldCommand):
+                    raise Exception("No formatting information found at cursor!")
+                if not isinstance(fields[-1], str):
+                    raise Exception("Formatting information found in the end - unexpected!")
+                if direction < 0:
+                    # First we swap the order of each format-string pair
+                    # Second we invert the whole list
+                    mylog("Inverting for backward search")
+                    mylog(f"fields={fields}")
+                    newFields = []
+                    for (p1, p2) in pairUp([
+                        (k, list(g))
+                        for (k, g) in itertools.groupby(fields, key=type)
+                    ]):
+                        mylog(f"p2={p2}")
+                        (k1, g1) = p1
+                        g1 = list(g1)
+                        mylog(f"p1={p1}")
+                        mylog(f"g1={g1}")
+                        if   k1 != textInfos.FieldCommand:
+                            raise Exception("Corrupted order of format fields!")
+                        if p2 is not None:
+                            mylog("p2 is not None")
+                            (k2, g2) = p2
+                            if k2 != str:
+                                raise Exception("Corrupted order of format fields!")
+                            newFields.extend(list(g2)[::-1])
+                            mylog("After extending g2")
+                            mylog(str(newFields))
+                        newFields.extend(list(g1)[::-1])
+                        mylog("After extending g1")
+                        mylog(str(newFields))
+
+                    mylog("Before inversion")
+                    mylog("\n".join(map(str, fields)))
+                    fields = newFields[::-1]
+                    mylog("After inversion")
+                    mylog("\n".join(map(str, fields)))
+                    mylog("###")
+
+                adjustment = 0
+                beginAdjustment = endAdjustment = None
+                for field in fields:
+                    if isinstance(field, textInfos.FieldCommand):
+                        mylog(f"Field: {field}")
+                        #if field != originalFormat:
+                        if not self.compareFormatFields(field.field, originalFormat.field):
+                            #Bingo! But we still need to keep going to find the end of that piece with different formatting
+                            beginAdjustment = adjustment
+                            mylog(f"beginAdjustment={beginAdjustment}")
+                    elif isinstance(field, str):
+                        mylog(f"'{field}'")
+                        oldAdjustment = adjustment
+                        adjustment += len(field)
+                        mylog(f"old={oldAdjustment} adjustment={adjustment}")
+                        if beginAdjustment is not None:
+                            # Now really bingo!
+                            endAdjustment = adjustment
+                            mylog(f"endAdjustment={endAdjustment}")
+                            break
+                    else:
+                        raise Exception("Impossible!")
+                if beginAdjustment is not None:
+                    # Found format change in this paragraph
+                    if endAdjustment is None:
+                        raise Exception("Found the beginning of format change, but failed to find the end!")
+                    caretInfo.move(textInfos.UNIT_CHARACTER, direction * beginAdjustment)
+                    caretInfo.move(textInfos.UNIT_CHARACTER, direction * (endAdjustment - beginAdjustment), endPoint="end" if direction > 0 else "start")
+                    caretInfo.updateCaret()
+                    selfself.selection = caretInfo
+                    speech.speakTextInfo(caretInfo, reason=REASON_CARET)
+                    return
+            if True:
+                # Now move to the next paragraph
+                mylog("nextParagraph!")
+                if direction < 0:
+                    # If moving back, then position caret at the beginning of the following paragraph, since we'll be computing adjustment from the end
+                    caretInfo = paragraphInfo.copy()
+                result = paragraphInfo.move(textInfos.UNIT_PARAGRAPH, direction)
+                if result == 0:
+                    endOfDocument(_("No next format change!"))
+                    return
+                textInfo = paragraphInfo.copy()
+                textInfo.expand(textInfos.UNIT_PARAGRAPH)
+                mylog(f"paragraph: {textInfo.text}")
+                if direction > 0:
+                    caretInfo = paragraphInfo.copy()
+
+
+
+    def findByControlField(self, direction, role, errorMessage):
+        def getUniqueId(info):
+            fields = info.getTextWithFields()
+            for field in fields:
+                if (
+                    isinstance(field, textInfos.FieldCommand)
+                    and field.command == "controlStart"
+                    and "role" in field.field
+                    and field.field['role'] == role
+                ):
+                    return field.field.get('uniqueID', 0)
+            return None
+        focus = api.getFocusObject().treeInterceptor
+        textInfo = focus.makeTextInfo(textInfos.POSITION_CARET)
+        textInfo.expand(textInfos.UNIT_PARAGRAPH)
+        originalId = getUniqueId(textInfo)
+        distance = 0
+        while True:
+            distance += 1
+            textInfo.collapse()
+            result = textInfo.move(textInfos.UNIT_PARAGRAPH, direction)
+            if result == 0:
+                endOfDocument(errorMessage)
+                return
+            textInfo.expand(textInfos.UNIT_PARAGRAPH)
+            newId = getUniqueId(textInfo)
+            if newId is not None and (newId != originalId):
+                textInfo.updateCaret()
+                self.beeper.simpleCrackle(distance, volume=getConfig("crackleVolume"))
+                speech.speakTextInfo(textInfo, reason=REASON_CARET)
+                textInfo.collapse()
+                focus._set_selection(textInfo)
+                return
+
+    def script_editJupyter(self, gesture, selfself):
+        global jupyterUpdateInProgress
+        if jupyterUpdateInProgress:
+            ui.message_("Jupyter cell update in progress!")
+            self.beeper.fancyBeep("AF#", length=100, left=20, right=20)
+            return
+        fg=winUser.getForegroundWindow()
+        focus = api.getFocusObject()
+        appName = focus.appModule.appName
+        if appName == 'nvda':
+            ui.message(_("Cannot edit in this window."))
+            return
+        fastChromeMode = appName == 'chrome'
+        slowFirefoxMode = appName == 'firefox'
+        url = api.getCurrentURL()
+        hackerRankMode =  re.search(r"^https://www.hackerrank.com/", url or "") is not None
+        googleCollabMode =  re.search(r"^https://colab.research.google.com/", url or "") is not None
+        if isinstance(selfself, editableText.EditableText):
+            obj = selfself
+        elif not config.conf["virtualBuffers"]["autoFocusFocusableElements"]:
+            # We need to temporarily disable NVDA setting "Browse Mode > Automatic focus mode for focus changes"
+            # Since we are going to focus current editable and don't want to enter focus mode.
+            originalAutoPassThrough = config.conf["virtualBuffers"]["autoPassThroughOnFocusChange"]
+            config.conf["virtualBuffers"]["autoPassThroughOnFocusChange"] = False
+            with ExitStack() as stack:
+                # return original value upon exiting this function
+                # Actually sometimes focus events come in delayed, so we need to wait still a little longer, hence delaying for 1 second after exiting.
+                def restoreAutoPassThrough():
+                    config.conf["virtualBuffers"]["autoPassThroughOnFocusChange"] =             originalAutoPassThrough
+                def restoreAutoPassThroughDelayed():
+                    core.callLater(1000, restoreAutoPassThrough)
+                stack.callback(restoreAutoPassThroughDelayed)
+
+            selfself._focusLastFocusableObject()
+            try:
+                obj = selfself._lastFocusableObj
+            except AttributeError:
+                obj = selfself.currentFocusableNVDAObject
+            timeout = time.time() + 2
+            # Wait until the element we'd like to focus is actually focused
+            while True:
+                if time.time() > timeout:
+                    raise EditBoxUpdateError(_("Timeout while trying to focus current edit box."))
+                focus = api.getFocusObject()
+                if obj.IA2UniqueID == focus.IA2UniqueID:
+                    break
+                time.sleep(10/1000) # sleep a bit to make sure that this object has properly focused
+                api.processPendingEvents(processEventQueue=True)
+        else:
+            obj=selfself.currentNVDAObject
+        if obj.role != ROLE_EDITABLETEXT:
+            ui.message(_("Not editable"))
+            return
+        uniqueID = obj.IA2UniqueID
+        self.startInjectingKeystrokes()
+        try:
+            kbdLeft.send()
+            kbdRight.send()
+            kbdControlShiftHome.send()
+            preText = self.getSelection()
+            kbdControlA.send()
+            text = self.getSelection()
+            kbdControlHome.send()
+        except NoSelectionError as e:
+            self.endInjectingKeystrokes()
+            core.callLater(
+                100,
+                speech.speak,
+                [_("Cannot copy text out of edit box. Please make sure edit box is not empty and not read-only!")],
+            )
+            raise e
+        finally:
+            self.endInjectingKeystrokes()
+        if (uniqueID is not None) and (uniqueID != 0):
+            focus = api.getFocusObject()
+            if uniqueID != focus.IA2UniqueID:
+                message = _("Warning! While copying text out of edit box, focused elementon the page has changed. Please try again.")
+                gui.messageBox(message)
+                return
+        if (len(text) == 0) or len(preText) == 0:
+            ui.message("Failed to copy text from semi-accessible edit-box. Please make sure edit box is not empty.")
+            return
+        preLines = preText.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+        cursorLine = len(preLines) - 1
+        cursorColumn = len(preLines[-1])
+        def getFocusObjectVerified():
+                focus = api.getFocusObject()
+                if focus.role != ROLE_EDITABLETEXT:
+                    raise EditBoxUpdateError(_("Browser state has changed. Focused element is not an edit box. Role: %d.") % focus.role)
+                if (uniqueID is not None) and (uniqueID != 0):
+                    if uniqueID != focus.IA2UniqueID:
+                        raise EditBoxUpdateError(_("Browser state has changed. Different element on the page is now focused."))
+                return focus
+
+        def makeVkInput(vkCodes):
+            result = []
+            if not isinstance(vkCodes, list):
+                vkCodes = [vkCodes]
+            for vk in vkCodes:
+                input = winUser.Input(type=winUser.INPUT_KEYBOARD)
+                input.ii.ki.wVk = vk
+                result.append(input)
+            for vk in reversed(vkCodes):
+                input = winUser.Input(type=winUser.INPUT_KEYBOARD)
+                input.ii.ki.wVk = vk
+                input.ii.ki.dwFlags = winUser.KEYEVENTF_KEYUP
+                result.append(input)
+            return result
+
+        def goToPosition(lineNum, columnNum):
+            # This function is too slow for line numbers > 1000.
+            # This is probably due to slow performance of Python's marshalling complex arguments to native Windows DLL
+            # This is a good candidate to rewrite in a native code and supply in a tiny DLL file
+            mylog(f"Pressing arrows to go to line={lineNum}, col={columnNum}")
+            inputs = []
+            inputs.extend(makeVkInput(winUser.VK_DOWN) * lineNum)
+            inputs.extend(makeVkInput(winUser.VK_RIGHT) * columnNum)
+            with keyboardHandler.ignoreInjection():
+                winUser.SendInput(inputs)
+
+        def updateText(result, text, hasChanged, cursorLine, cursorColumn, keystroke):
+            mylog(f"hasChanged={hasChanged}")
+            global jupyterUpdateInProgress
+            jupyterUpdateInProgress = True
+            self.lastJupyterText = text
+            timeoutSeconds = 5
+            timeout = time.time() + timeoutSeconds
+            blockAllKeys(timeoutSeconds)
+            try:
+              # step 1. wait for all modifiers to be released
+                try:
+                    yield from utils.waitForModifiersToBeReleased(5)
+                except TimeoutError as e:
+                    raise EditBoxUpdateError(_("Timed out during release modifiers stage"), e)
+              # Step 2: switch back to that browser window
+                while  winUser.getForegroundWindow() != fg:
+                    if time.time() > timeout:
+                        raise EditBoxUpdateError(_("Timed out during switch to browser window stage"))
+                    winUser.setForegroundWindow(fg)
+                    winUser.setFocus(fg)
+                    yield 1
+              # Step 2.1: Ensure that the browser window is fully focused.
+                if True:
+                    # This is needed sometimes for Firefox - switching to it takes hundreds of milliseconds, especially when jupyter cells are large.
+                    # This also proves necessary for Chrome on some websites like Jupyter
+                    obj.setFocus()
+                    #step21timeout = time.time() + 1 # Leave 1 second for this step
+                    goodCounter = 0
+                    roles = []
+                    kbdControlHome.send()
+                    while True:
+                        if time.time() > timeout:
+                            raise EditBoxUpdateError(_("Timed out during switch to window stage"))
+                        focus = api.getFocusObject()
+                        roles.append(focus.role)
+                        if focus.role in [
+                            ROLE_PANE,
+                            ROLE_FRAME,
+                            ROLE_DOCUMENT,
+                        ]:
+                            # All good, Firefox is burning cpu, keep sleeping!
+                            yield 10
+                            goodCounter = 0
+                            continue
+                        elif focus.role == ROLE_EDITABLETEXT:
+                            goodCounter += 1
+                            if goodCounter > 10:
+                                tones.beep(1000, 100)
+                                break
+                            yield 10
+                        else:
+                            raise EditBoxUpdateError(_("Error during switch to window stage, focused element role is %d") % focus.role)
+              # Step 2.2: Ensure that the same edit box is focused
+                if (uniqueID is not None) and (uniqueID != 0):
+                    focus = api.getFocusObject()
+                    if uniqueID != focus.IA2UniqueID:
+                        mesage = _("Error! When switching back to browser window, a different edit box is focused.")
+                        raise EditBoxUpdateError(message)
+
+              # Step 3: start sending keys
+                self.startInjectingKeystrokes()
+                try:
+                    shortTextMode = len(text) < 5
+                    if not shortTextMode:
+                        firstChar = text[0]
+                  # Step 3.1. Select all and paste
+                    if hasChanged:
+                        self.copyToClip(text)
+                        kbdControlA.send()
+                        if hackerRankMode:
+                            # For some reason there is a race condition in Hacker Rank. Sleep to work around.
+                            time.sleep(0.1)
+                        elif googleCollabMode:
+                            # Say hi to awesome Google engineers too
+                            time.sleep(0.3)
+                        kbdControlV.send()
+                  # Step 3.2. Select first character and copy to clip and wait to assure that edit box has processed the previous paste
+                    if  hasChanged and not shortTextMode:
+                        kbdControlHome.send()
+                        kbdShiftRight.send()
+                        kbdControlC.send()
+                  # Step 3.3: Position cursor to synchronize with edit text window cursor
+                    kbdControlHome.send()
+                    goToPosition(cursorLine, cursorColumn)
+                  # Step 3.4: Wait for clipbord to be updated to make sure we can flush clipboard
+                    if False:
+                        if  hasChanged and not shortTextMode:
+                            while True:
+                                yield 1
+                                if time.time() > timeout:
+                                    raise EditBoxUpdateError(_("Timed out during single-character control+C stage"))
+                                try:
+                                    newText = api.getClipData()
+                                except PermissionError:
+                                    continue
+                                if text != newText:
+                                    break
+                        else:
+                            # For very short texts just sleep a bit longer
+                            yield 100
+                finally:
+                    if False:
+                      # Step 3.3. Sleep for a bit more just to make sure things have propagated - in short text mode only.
+                      # Apparently if we don't sleep, then either the previous value with ` would be used sometimes,
+                      # or it will paste the original contents of clipboard.
+                        if  hasChanged and shortTextMode:
+                            core.callLater(
+                                500,
+                                self.endInjectingKeystrokes
+                            )
+                        else:
+                            self.endInjectingKeystrokes()
+                    def watchAndRestoreClipboard():
+                        if not hasChanged:
+                            return
+                        if shortTextMode:
+                            yield 1000
+                            self.endInjectingKeystrokes()
+                            return
+                        t0 = time.time()
+                        timeout = t0 + 3
+                        newLineRegexp = re.compile(r"[\r\n]+")
+                        while time.time() <= timeout:
+                            yield 20
+                            try:
+                                newText = api.getClipData()
+                            except PermissionError:
+                                continue
+                            if newText == text:
+                                # still same text in clipboard => wait a bit longer
+                                continue
+                            elif (
+                                newText == firstChar
+                                or (
+                                    newLineRegexp.match(firstChar) is not None
+                                    and newLineRegexp.match(newText) is not None
+                                )
+                            ):
+                                # Bingo! First char has appeared in clipboard. Restoring original clipboard state and exiting
+                                result = clipboard.deleteEntryFromClipboardHistory(firstChar, maxEntries=1)
+                                if False and result:
+                                    core.callLater(1000, tones.beep, 100, 1000)
+                                self.endInjectingKeystrokes()
+                                return
+                            else:
+                                # Something else found in clipboard - likely user has already copied something there. So just exit without restoring state
+                                log.error(f"asdf something else in clipboard!")
+                                log.error(f"text='{text}'")
+                                log.error(f"newText='{newText}'")
+                                log.error(f"firstChar='{firstChar}'")
+                                return
+                        log.error(f"asdf Timeout")
+                    utils.executeAsynchronously(watchAndRestoreClipboard())
+                    
+              # Step 4: send the original keystroke, e.g. Control+Enter
+                if keystroke is not None:
+                    keystroke.send()
+              # Step 4.2: Verify again that the right edit box is focused
+                if (uniqueID is not None) and (uniqueID != 0):
+                    focus = api.getFocusObject()
+                    if uniqueID != focus.IA2UniqueID:
+                        message = _("Error! Focused element on the page has changed while pasting updated text. Possibly content of a different edit box has changed. Please inspect edit boxes manually and undo if needed.")
+                        raise EditBoxUpdateError(message)
+
+            except EditBoxUpdateError as e:
+                tones.player.stop()
+                unblockAllKeys()
+                jupyterUpdateInProgress = False
+                #self.copyToClip(text)
+                message = ("BrowserNav failed to update edit box.")
+                message += "\n" + str(e)
+                message += "\n" + _("Last edited text has been copied to the clipboard.")
+                gui.messageBox(message)
+            finally:
+                unblockAllKeys()
+                jupyterUpdateInProgress = False
+
+        self.popupEditTextDialog(
+            text, cursorLine, cursorColumn,
+            lambda result, text, hasChanged, cursorLine, cursorColumn, keystroke: utils.executeAsynchronously(updateText(result, text, hasChanged, cursorLine, cursorColumn, keystroke))
+        )
+
+    def script_copyJupyterText(self, gesture, selfself):
+        if len(self.lastJupyterText) > 0:
+            self.copyToClip(self.lastJupyterText)
+            ui.message(_("Last Jupyter text has been copied to clipboard."))
+        else:
+            ui.message(_("No last Jupyter text., or last Jupyter text is empty."))
+
+    def startInjectingKeystrokes(self):
+        self.restoreKeyboardState()
+        try:
+            self.clipboardBackup = api.getClipData()
+        except OSError as e:
+            core.callLater(
+                100,
+                speech.speak,
+                [_("Failed to read clipboard data. Please make sure clipboard is not empty - copy some text to clipboard.")],
+            )
+            raise e
+
+    def endInjectingKeystrokes(self):
+        self.copyToClip(self.clipboardBackup)
+
+    def restoreKeyboardState(self):
+        """
+        Most likely this class is called from within a gesture. This means that Some of the modifiers, like
+        Shift, Control, Alt are pressed at the moment.
+        We need to virtually release them in order to send other keystrokes to VSCode.
+        """
+        modifiers = [winUser.VK_LCONTROL, winUser.VK_RCONTROL,
+            winUser.VK_LSHIFT, winUser.VK_RSHIFT, winUser.VK_LMENU,
+            winUser.VK_RMENU, winUser.VK_LWIN, winUser.VK_RWIN, ]
+        for k in modifiers:
+            if winUser.getKeyState(k) & 32768:
+                winUser.keybd_event(k, 0, 2, 0)
+
+    def copyToClip(self, text):
+        lastException = None
+        for i in range(10):
+            try:
+                clipboard.ephemeralCopyToClip(text)
+                return
+            except PermissionError as e:
+                lastException = e
+                wx.Yield()
+                continue
+        raise Exception(lastException)
+
+    def getSelection(self):
+        self.copyToClip(controlCharacter)
+        t0 = time.time()
+        timeout = t0+3
+        lastControlCTimestamp = 0
+        while True:
+            if time.time() - lastControlCTimestamp > 1:
+                lastControlCTimestamp = time.time()
+                kbdControlC.send()
+            if time.time() > timeout:
+                raise NoSelectionError("Time out while trying to copy data out of application.")
+
+            try:
+                data = api.getClipData()
+            except PermissionError:
+                wx.Yield()
+                continue
+            if data != controlCharacter:
+                # Sleep for testing - otherwise clipboard history doesn't even notice new item
+                #time.sleep(1)
+                #core.callLater(1000, clipboard.deleteEntryFromClipboardHistory, data)
+                result = clipboard.deleteEntryFromClipboardHistory(data, maxEntries=1)
+                # self.endInjectingKeystrokes() will be called outside 
+                if False and  result:
+                    core.callLater(1000, tones.beep, 1000, 1000)
+                return data
+            wx.Yield()
+            time.sleep(10/1000)
+
+    def popupEditTextDialog(self, text, cursorLine, cursorColumn, onTextComplete):
+        gui.mainFrame.prePopup()
+        d = EditTextDialog(gui.mainFrame, text, cursorLine, cursorColumn, onTextComplete)
+        result = d.Show()
+        gui.mainFrame.postPopup()
+
+    def script_toggleOption(self, gesture, selfself, option, messages):
+        setConfig(option, not getConfig(option))
+        message = messages[int(getConfig(option))]
+        ui.message(message)
+
+    def script_goBack(self, gesture, selfself):
+        try:
+            sh = selfself.selectionHistory
+        except AttributeError:
+            endOfDocument(_("No cursor history available"))
+            return
+        try:
+            info = sh.goBack(selfself.selection)
+        except  IndexError:
+            endOfDocument(_("Cannot go back any more"))
+            return
+        expandInfo = info.copy()
+        expandInfo.expand(textInfos.UNIT_PARAGRAPH)
+        speech.speakTextInfo(expandInfo, unit=textInfos.UNIT_PARAGRAPH, reason=REASON_CARET)
+        original_set_selection(selfself, info)
+
+    def injectBrowseModeKeystroke(self, keystrokes, funcName, script=None, doc=None):
+        gp = self
+        cls = browseMode.BrowseModeTreeInterceptor
+        scriptFuncName = "script_" + funcName
+        if script is None:
+            gpFunc = getattr(gp, scriptFuncName)
+            script = lambda selfself, gesture: gpFunc(gesture, selfself)
+        script.__name__ = scriptFuncName
+        script.category = "BrowserNav"
+        if doc is not None:
+            script.__doc__ = doc
+        setattr(cls, scriptFuncName, script)
+        if not isinstance(keystrokes, list):
+            keystrokes = [keystrokes]
+        for keystroke in keystrokes:
+            cls._BrowseModeTreeInterceptor__gestures[keystroke] = funcName
+
+    def injectBrowseModeKeystrokes(self):
+      # Indentation navigation
+        self.injectBrowseModeKeystroke(
+            "kb:NVDA+Alt+DownArrow",
+            "moveToNextSibling",
+            doc=_("Moves to next sibling in browser"))
+        self.injectBrowseModeKeystroke(
+            "kb:NVDA+Alt+UpArrow",
+            "moveToPreviousSibling",
+            doc=_("Moves to previous sibling in browser"))
+        self.injectBrowseModeKeystroke(
+            ["kb:NVDA+Alt+LeftArrow"],
+            "moveToParent",
+            doc=_("Moves to next parent in browser"))
+        self.injectBrowseModeKeystroke(
+            ["kb:NVDA+Control+Alt+LeftArrow"],
+            "moveToNextParent",
+            doc=_("Moves to next parent in browser"))
+        self.injectBrowseModeKeystroke(
+            ["kb:NVDA+Alt+RightArrow"],
+            "moveToChild",
+            doc=_("Moves to next child in browser"))
+        self.injectBrowseModeKeystroke(
+            ["kb:NVDA+Control+Alt+RightArrow"],
+            "moveToPreviousChild",
+            doc=_("Moves to previous child in browser"))
+      #Rotor
+        self.injectBrowseModeKeystroke(
+            "kb:NVDA+O",
+            "rotor",
+            doc=_("Adjusts BrowserNav rotor"))
+
+      # QuickJump 1 bookmarks
+        self.injectBrowseModeKeystroke(
+            "kb:J",
+            "quickJumpForward",
+            script=lambda selfself, gesture: quickJump.quickJump(selfself, gesture, quickJump.BookmarkCategory.QUICK_JUMP, 1,  _("No next QuickJump result. To configure QuickJump rules, please go to BrowserNav settings in NVDA configuration window.")),
+            doc=_("QuickJump forward according to BrowserNav QuickJump bookmarks; please check browserNav configuration panel for the list of bookmarks."))
+        self.injectBrowseModeKeystroke(
+            "kb:Shift+J",
+            "quickJumpBack",
+            script=lambda selfself, gesture: quickJump.quickJump(selfself, gesture, quickJump.BookmarkCategory.QUICK_JUMP, -1,  _("No next QuickJump result. To configure QuickJump rules, please go to BrowserNav settings in NVDA configuration window.")),
+            doc=_("QuickJump back according to BrowserNav QuickJump bookmarks; please check browserNav configuration panel for the list of bookmarks."))
+      # AutoClick
+        self.injectBrowseModeKeystroke(
+            "kb:Alt+J",
+            "autoClick",
+            script=lambda selfself, gesture: quickJump.autoClick(selfself, gesture, quickJump.BookmarkCategory.QUICK_CLICK),
+            doc=_("AutoClick  according to BrowserNav AutoClick bookmark; please check browserNav configuration panel for the list of bookmarks."))
+        self.injectBrowseModeKeystroke(
+            [],
+            "autoClick2",
+            script=lambda selfself, gesture: quickJump.autoClick(selfself, gesture, quickJump.BookmarkCategory.QUICK_CLICK_2),
+            doc=_("AutoClick  according to BrowserNav AutoClick2 bookmark; please check browserNav configuration panel for the list of bookmarks."))
+        self.injectBrowseModeKeystroke(
+            [],
+            "autoClick3",
+            script=lambda selfself, gesture: quickJump.autoClick(selfself, gesture, quickJump.BookmarkCategory.QUICK_CLICK_3),
+            doc=_("AutoClick  according to BrowserNav AutoClick3 bookmark; please check browserNav configuration panel for the list of bookmarks."))
+      # Hierarchical
+        for letter in "`1234567890":
+            try:
+                level = int(letter)
+                if level == 0:
+                    level = 10
+                levelStr = _("at level {level}").format(level=level)
+            except ValueError:
+                level = None
+                levelStr = ""
+            self.injectBrowseModeKeystroke(
+                f"kb:Alt+{letter}",
+                f"hierarchicalQuickJumpForward{level}",
+                script=lambda selfself, gesture, level=level, levelStr=levelStr: quickJump.hierarchicalQuickJump(
+                    selfself,
+                    gesture,
+                    quickJump.BookmarkCategory.HIERARCHICAL,
+                    direction=1,
+                    level=level - 1 if level is not None else None,
+                    unbounded=False,
+                    errorMsg=_("No next hierarchical bookmark {levelStr}").format(levelStr=levelStr)
+                ),
+                doc=_("Jump to next hierarchical bookmark {levelStr}; please check browserNav configuration panel for hierarchical bookmark configuration.").format(
+                    levelStr=levelStr
+                ))
+            self.injectBrowseModeKeystroke(
+                f"kb:Alt+Shift+{letter}",
+                f"hierarchicalQuickJumpBack{level}",
+                script=lambda selfself, gesture, level=level, levelStr=levelStr: quickJump.hierarchicalQuickJump(
+                    selfself,
+                    gesture,
+                    quickJump.BookmarkCategory.HIERARCHICAL,
+                    direction=-1,
+                    level=level - 1 if level is not None else None,
+                    unbounded=False,
+                    errorMsg=_("No previous hierarchical bookmark {levelStr}").format(levelStr=levelStr)
+                ),
+                doc=_("Jump to previous hierarchical bookmark {levelStr}; please check browserNav configuration panel for hierarchical bookmark configuration.").format(
+                    levelStr=levelStr
+                ))
+      # quick_speak
+        self.injectBrowseModeKeystroke(
+            "kb:Control+J",
+            "quickSpeak",
+            script=lambda selfself, gesture: quickJump.autoClick(selfself, gesture, quickJump.BookmarkCategory.QUICK_SPEAK),
+            doc=_("QuickSpeak  according to BrowserNav QuickSpeak bookmark; please check browserNav configuration panel for the list of bookmarks."))
+
+      # Scroll all:
+        self.injectBrowseModeKeystroke(
+            "kb:\\",
+            "scrollAllForward",
+            script=lambda selfself, gesture: self.scrollToAll(
+                direction=1,
+                message=_("Scrolling forward. This may load more elements on the page.")),
+            doc=_("Scroll to all possible elements forward"))
+        self.injectBrowseModeKeystroke(
+            "kb:Shift+\\",
+            "scrollAllBackward",
+            script=lambda selfself, gesture: self.scrollToAll(
+                direction=-1,
+                message=_("Scrolling backward. This may load more elements on the page.")),
+            doc=_("Scroll to all possible elements backward"))
+
+      # Edit Jupyter
+        self.injectBrowseModeKeystroke(
+            "kb:NVDA+E",
+            "editJupyter",
+            script=lambda selfself, gesture: self.script_editJupyter(gesture, selfself),
+            doc=_("Edit semi-accessible edit box."))
+        self.injectBrowseModeKeystroke(
+            "kb:NVDA+Control+E",
+            "copyJupyterText",
+            script=lambda selfself, gesture: self.script_copyJupyterText(gesture, selfself),
+            doc=_("Copy the last text from semi-accessible edit box to clipboard."))
+      # Toggle skip clutter
+        self.injectBrowseModeKeystroke(
+            "kb:Control+/",
+            "toggleSkipEmptyParagraphs",
+            script=lambda selfself, gesture: self.script_toggleOption(
+                gesture,
+                selfself,
+                "skipEmptyParagraphs",
+                [
+                    _("Skip clutter off for paragraph navigation"),
+                    _("Skip clutter on for paragraph navigation"),
+                ]
+            ),
+            doc=_("Toggle skip clutter for paragraph navigation"))
+        self.injectBrowseModeKeystroke(
+            "kb:/",
+            "toggleSkipEmptyLines",
+            script=lambda selfself, gesture: self.script_toggleOption(
+                gesture,
+                selfself,
+                "skipEmptyLines",
+                [
+                    _("Skip clutter off for line navigation"),
+                    _("Skip clutter on for line navigation"),
+                ]
+            ),
+            doc=_("Toggle skip clutter for line navigation"))
+      # Go back in browse mode
+        self.injectBrowseModeKeystroke(
+            "kb:NVDA+Shift+LeftArrow",
+            "goBack",
+            script=lambda selfself, gesture: self.script_goBack(
+                gesture,
+                selfself,
+            ),
+            doc=_("Experimental: go back to the previous location of cursor in current document"))
+        self.injectBrowseModeKeystroke(
+            "kb:NVDA+J",
+            "browserNavPopup",
+            script=lambda selfself, gesture: browserNavPopup(
+                selfself,
+                gesture,
+            ),
+            doc=_("Show BrowserNav popup menu."))
+            
+    @script(description=_("Speak current URL."), gestures=['kb:NVDA+shift+l'])
+    def script_speakCurrentURL(self, gesture):
+        #return quickJump.testOverwriteSiteDialog()
+        #url = getFocusedURL()
+        url = api.getCurrentURL()
+        if url is None:
+            ui.message(_("No URL"))
+            return
+        count=scriptHandler.getLastScriptRepeatCount()
+        if count >= 1:
+            api.copyToClip(url)
+            ui.message(_("Copied to clipboard: {}").format(url))
+        else:
+            ui.message(url)

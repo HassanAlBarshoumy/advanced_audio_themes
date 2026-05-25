@@ -1,0 +1,2261 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: advanced_audio_themes 1.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-05-24 12:00+0000\n"
+"PO-Revision-Date: 2026-05-24 12:00+0000\n"
+"Last-Translator: AI <ai@example.com>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid " - Copy"
+msgstr " - Copy"
+
+msgid "&About"
+msgstr "&About"
+
+msgid "&Add"
+msgstr "&Add"
+
+msgid "&Add Profile"
+msgstr "&Add Profile"
+
+msgid "&Add..."
+msgstr "&Add..."
+
+msgid "&Attributes (space separated list):"
+msgstr "&Attributes (space separated list):"
+
+msgid "&Audio Themes Studio"
+msgstr "&Audio Themes Studio"
+
+msgid "&Beep"
+msgstr "嘟嘟声 (&B)"
+
+msgid "&Bookmark"
+msgstr "&Bookmark"
+
+msgid "&Bookmarks"
+msgstr "&Bookmarks"
+
+msgid "&Browse"
+msgstr "&Browse"
+
+msgid "&Browse..."
+msgstr "浏览 (&B)"
+
+msgid "&Built in wave"
+msgstr "内置音效 (&B)"
+
+msgid "&Category:"
+msgstr "分类 (&C)"
+
+msgid "&Change..."
+msgstr "&Change..."
+
+msgid "&Close"
+msgstr "关闭(&C)"
+
+msgid "&Comment"
+msgstr "注释 (&C)"
+
+msgid "&Display name (optional)"
+msgstr "&Display name (optional)"
+
+msgid "&Download & Install"
+msgstr "下载并安装(&D)"
+
+msgid "&Edit"
+msgstr "编辑 (&E)"
+
+msgid "&Edit site"
+msgstr "&Edit site"
+
+msgid "&Focus mode"
+msgstr "&Focus mode"
+
+msgid "&Import website from file"
+msgstr "&Import website from file"
+
+msgid "&Keep original"
+msgstr "保持原样(&L)"
+
+msgid "&Live Preview"
+msgstr "实时预览(&L)"
+
+msgid "&Live region mode"
+msgstr "&Live region mode"
+
+msgid "&Match type"
+msgstr "&Match type"
+
+msgid "&Pattern"
+msgstr "模式 (&P)"
+
+msgid "&Preview"
+msgstr "预览(&P)"
+
+msgid "&Prosody"
+msgstr "韵律 (&P)"
+
+msgid "&Prosody name:"
+msgstr "韵律名称(&P)"
+
+msgid "&Record from Microphone"
+msgstr "从麦克风录音(&R)"
+
+msgid "&Refresh"
+msgstr "刷新(&R)"
+
+msgid "&Remove"
+msgstr "&Remove"
+
+msgid "&Remove Profile"
+msgstr "&Remove Profile"
+
+msgid "&Remove bookmark"
+msgstr "&Remove bookmark"
+
+msgid "&Remove site"
+msgstr "&Remove site"
+
+msgid "&Replacement pattern"
+msgstr "替换模式(&R)"
+
+msgid "&Rules"
+msgstr "规则 (&R)"
+
+msgid "&Save"
+msgstr "&Save"
+
+msgid "&Search rules:"
+msgstr "&Search rules:"
+
+msgid "&Site this bookmark belongs to:"
+msgstr "&Site this bookmark belongs to:"
+
+msgid "&Sites"
+msgstr "&Sites"
+
+msgid "&Sort"
+msgstr "&Sort"
+
+msgid "&Stop Recording"
+msgstr "停止录音(&S)"
+
+msgid "&Test, press twice for repeated sound"
+msgstr "测试，连按两次可重复发出声音 (&T)"
+
+msgid "&Text"
+msgstr "文本(&T)"
+
+msgid "&Tone"
+msgstr "音调 (&T)"
+
+msgid "&Type"
+msgstr "类型 (&T)"
+
+msgid "&URL"
+msgstr "&URL"
+
+msgid "&Version (optional for exported bookmarks)"
+msgstr "&Version (optional for exported bookmarks)"
+
+msgid "&Wave file"
+msgstr "Wav 文件 (&W)"
+
+msgid "&Wave:"
+msgstr "内置音效 (&W)"
+
+msgid "&Website"
+msgstr "&Website"
+
+msgid "&Website name"
+msgstr "&Website name"
+
+msgid "&Websites"
+msgstr "&Websites"
+
+msgid "3D Spatial (Stereo)"
+msgstr "3D Spatial (Stereo)"
+
+msgid "A pattern is required."
+msgstr "此方案名称无效，请重新输入。"
+
+msgid "About Audio Theme"
+msgstr "About Audio Theme"
+
+msgid "Add &New..."
+msgstr "Add &New..."
+
+msgid "Add &audio rule"
+msgstr "添加声音规则 (&A)"
+
+msgid "Add App Profile"
+msgstr "Add App Profile"
+
+msgid "Add Sound"
+msgstr "Add Sound"
+
+msgid "Add audio rule"
+msgstr "添加声音规则"
+
+msgid "Added '{item} to matched attributes edit box.'"
+msgstr "Added '{item} to matched attributes edit box.'"
+
+msgid "Adjusts BrowserNav rotor"
+msgstr "Adjusts BrowserNav rotor"
+
+msgid "Advanced Audio Themes"
+msgstr "Advanced Audio Themes"
+
+msgid "Advanced Browser Navigation (BrowserNav)"
+msgstr "Advanced Browser Navigation (BrowserNav)"
+
+msgid "All Supported Audio Formats"
+msgstr "All Supported Audio Formats"
+
+msgid "All of the fields are required. Exiting..."
+msgstr "All of the fields are required. Exiting..."
+
+msgid "All rules disabled"
+msgstr "All rules disabled"
+
+msgid "All rules enabled"
+msgstr "All rules enabled"
+
+msgid "Always"
+msgstr "Always"
+
+msgid ""
+"Another website with this name already exists. Please choose a different "
+"name."
+msgstr ""
+"Another website with this name already exists. Please choose a different "
+"name."
+
+msgid "App Profiles"
+msgstr "App Profiles"
+
+msgid "Application (e.g. chrome.exe)"
+msgstr "Application (e.g. chrome.exe)"
+
+msgid "Application executable name (e.g. notepad.exe):"
+msgstr "Application executable name (e.g. notepad.exe):"
+
+msgid "Audio Ducking (lower volume when NVDA speaks)"
+msgstr "Audio Ducking (lower volume when NVDA speaks)"
+
+msgid "Audio Engine"
+msgstr "Audio Engine"
+
+msgid "Audio Output Mode:"
+msgstr "Audio Output Mode:"
+
+msgid "Audio Sonar"
+msgstr "Audio Sonar"
+
+msgid ""
+"Audio Sonar: Sweeps the active window to create an audio map of its "
+"elements."
+msgstr ""
+"Audio Sonar: Sweeps the active window to create an audio map of its "
+"elements."
+
+msgid "Audio Theme"
+msgstr "Audio Theme"
+
+msgid "Audio Theme Package (*.atp)|*.atp"
+msgstr "Audio Theme Package (*.atp)|*.atp"
+
+msgid "Audio Theme Packages"
+msgstr "Audio Theme Packages"
+
+msgid "Audio Theme:"
+msgstr "Audio Theme:"
+
+msgid "Audio Themes Commands"
+msgstr "Audio Themes Commands"
+
+msgid "Audio Themes Configuration (*.atcfg)|*.atcfg"
+msgstr "Audio Themes Configuration (*.atcfg)|*.atcfg"
+
+msgid "Audio Themes NG"
+msgstr "Audio Themes NG"
+
+msgid "Audio Themes Studio"
+msgstr "Audio Themes Studio"
+
+msgid "Audio Themes: Earcons & Speech Rules"
+msgstr "Audio Themes: Earcons & Speech Rules"
+
+msgid "Audio beacon dropped at current location"
+msgstr "Audio beacon dropped at current location"
+
+msgid "Audio beacon removed"
+msgstr "Audio beacon removed"
+
+msgid "Audio preview failed."
+msgstr "音频预览失败。"
+
+msgid "Audio rule Error"
+msgstr "声音规则错误"
+
+msgid ""
+"Audio theme successfully installed. You can now select it from the themes "
+"menu."
+msgstr "音频主题安装成功。您现在可以从主题菜单中选择它。"
+
+msgid "Audio theme: {theme}"
+msgstr "Audio theme: {theme}"
+
+msgid "Audio themes"
+msgstr "Audio themes"
+
+msgid ""
+"Audio themes command layer. Press this then a command key (e.g. h for help)."
+msgstr ""
+"Audio themes command layer. Press this then a command key (e.g. h for help)."
+
+msgid "Audio themes disabled"
+msgstr "Audio themes disabled"
+
+msgid "Audio themes enabled"
+msgstr "Audio themes enabled"
+
+msgid "Audio themes volume"
+msgstr "Audio themes volume"
+
+msgid "Audio themes volume:"
+msgstr "Audio themes volume:"
+
+msgid ""
+"AutoClick  according to BrowserNav AutoClick bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"AutoClick  according to BrowserNav AutoClick bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+
+msgid ""
+"AutoClick  according to BrowserNav AutoClick2 bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"AutoClick  according to BrowserNav AutoClick2 bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+
+msgid ""
+"AutoClick  according to BrowserNav AutoClick3 bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"AutoClick  according to BrowserNav AutoClick3 bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+
+msgid "AutoSpeak disabled"
+msgstr "AutoSpeak disabled"
+
+msgid "AutoSpeak mode"
+msgstr "AutoSpeak mode"
+
+msgid "Automatically detect and speak changes to this bookmark"
+msgstr "Automatically detect and speak changes to this bookmark"
+
+msgid "Available BrowserNav websites"
+msgstr "Available BrowserNav websites"
+
+msgid ""
+"Available attributes in current paragraph (press space to add to current "
+"bookmark):"
+msgstr ""
+"Available attributes in current paragraph (press space to add to current "
+"bookmark):"
+
+msgid "Beep on every focus event"
+msgstr "Beep on every focus event"
+
+msgid "Beep on every successful autoClick"
+msgstr "Beep on every successful autoClick"
+
+msgid "Beep on every update from live region"
+msgstr "Beep on every update from live region"
+
+msgid "Beeping sound volume:"
+msgstr "提示音量:"
+
+msgid "Beeping volume (Beeping)"
+msgstr "提示音量 (Beeping)"
+
+msgid "Blacklist applications for sentence navigation (comma separated):"
+msgstr "Blacklist applications for sentence navigation (comma separated):"
+
+msgid "Blank announcement"
+msgstr "空白提示"
+
+msgid "Bold"
+msgstr "粗体"
+
+msgid "Bookmark Entry Error"
+msgstr "Bookmark Entry Error"
+
+msgid "Bookmark Entry error"
+msgstr "Bookmark Entry error"
+
+msgid "Bookmark Entry warning"
+msgstr "Bookmark Entry warning"
+
+msgid "Bookmark Error"
+msgstr "Bookmark Error"
+
+msgid "Bookmark enabled"
+msgstr "Bookmark enabled"
+
+msgid "Bookmark entry error"
+msgstr "Bookmark entry error"
+
+msgid "Bookmark points to non-focusable NVDA object, cannot click it."
+msgstr "Bookmark points to non-focusable NVDA object, cannot click it."
+
+msgid "Bookmark store communication error"
+msgstr "Bookmark store communication error"
+
+msgid ""
+"Bookmarks that span across paragraphs is not supported by BrowserNav. Please"
+" clear the selection or select something within a single paragraph."
+msgstr ""
+"Bookmarks that span across paragraphs is not supported by BrowserNav. Please"
+" clear the selection or select something within a single paragraph."
+
+msgid ""
+"Both hierarchical and numeric script bookmarks are configured for this "
+"website. This is not supported; please disable either hierarchical or "
+"numeric script bookmarks."
+msgstr ""
+"Both hierarchical and numeric script bookmarks are configured for this "
+"website. This is not supported; please disable either hierarchical or "
+"numeric script bookmarks."
+
+msgid ""
+"Browser state has changed. Different element on the page is now focused."
+msgstr ""
+"Browser state has changed. Different element on the page is now focused."
+
+msgid ""
+"Browser state has changed. Focused element is not an edit box. Role: %d."
+msgstr ""
+"Browser state has changed. Focused element is not an edit box. Role: %d."
+
+msgid "BrowserNav"
+msgstr "BrowserNav"
+
+msgid "BrowserNav QuickSearch websites and bookmarks"
+msgstr "BrowserNav QuickSearch websites and bookmarks"
+
+msgid "BrowserNav Settings"
+msgstr "BrowserNav设置"
+
+msgid ""
+"BrowserNav error: inconsistent indents in the document. Recomputing indents,"
+" please try again."
+msgstr ""
+"BrowserNav error: inconsistent indents in the document. Recomputing indents,"
+" please try again."
+
+msgid "BrowserNav navigates by "
+msgstr "BrowserNav navigates by "
+
+msgid "BrowserNav temporary action configured only for this website."
+msgstr "BrowserNav temporary action configured only for this website."
+
+msgid ""
+"BrowserNav warning: Two or more sites matching this URL are configured to "
+"perform autoClick on load. This is not supported."
+msgstr ""
+"BrowserNav warning: Two or more sites matching this URL are configured to "
+"perform autoClick on load. This is not supported."
+
+msgid "BrowserNav website import conflict"
+msgstr "BrowserNav website import conflict"
+
+msgid "C&hime:"
+msgstr "C&hime:"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Cannot combine tilde with digits for numeric script!"
+msgstr "Cannot combine tilde with digits for numeric script!"
+
+msgid ""
+"Cannot copy text out of edit box. Please make sure edit box is not empty and"
+" not read-only!"
+msgstr ""
+"Cannot copy text out of edit box. Please make sure edit box is not empty and"
+" not read-only!"
+
+msgid "Cannot edit in this window."
+msgstr "Cannot edit in this window."
+
+msgid "Cannot go back any more"
+msgstr "Cannot go back any more"
+
+msgid "Capital letters (no spaces):"
+msgstr "Capital letters (no spaces):"
+
+msgid "Category"
+msgstr "Category"
+
+msgid "Centered (Mono)"
+msgstr "Centered (Mono)"
+
+msgid "Character"
+msgstr "字符"
+
+msgid "Characters"
+msgstr "符号"
+
+msgid "Chime &category:"
+msgstr "Chime &category:"
+
+msgid "Choose an audio file"
+msgstr "Choose an audio file"
+
+msgid "Choose an audio theme package"
+msgstr "Choose an audio theme package"
+
+msgid "Clicked {n} objects."
+msgstr "Clicked {n} objects."
+
+msgid ""
+"Comprehensive export completed successfully!\n"
+"Includes: settings, rules, themes, typing sounds, and earcon sounds."
+msgstr ""
+"Comprehensive export completed successfully!\n"
+"Includes: settings, rules, themes, typing sounds, and earcon sounds."
+
+msgid "Comprehensive import completed successfully!"
+msgstr "Comprehensive import completed successfully!"
+
+msgid "Concise state reporting"
+msgstr "简洁状态朗读"
+
+msgid ""
+"Configure specific audio themes to automatically activate when certain "
+"applications are focused."
+msgstr ""
+"Configure specific audio themes to automatically activate when certain "
+"applications are focused."
+
+msgid "Confirm Quit"
+msgstr "Confirm Quit"
+
+msgid "Connecting to store..."
+msgstr "正在连接到商店..."
+
+msgid "Copied to clipboard: {}"
+msgstr "Copied to clipboard: {}"
+
+msgid "Copy the last text from semi-accessible edit box to clipboard."
+msgstr "Copy the last text from semi-accessible edit box to clipboard."
+
+msgid "Could not copy file {src} to directory {dst}."
+msgstr "Could not copy file {src} to directory {dst}."
+
+msgid "Could not load website from {}: {}"
+msgstr "Could not load website from {}: {}"
+
+msgid "Could not save website to {}: {}"
+msgstr "Could not save website to {}: {}"
+
+msgid "Crackling sound volume (during navigation):"
+msgstr "导航时的噼啪声提示音量:"
+
+msgid "Crackling volume"
+msgstr "噼啪声提示音量"
+
+msgid "Create &New Audio Theme"
+msgstr "Create &New Audio Theme"
+
+msgid "Create a new audio theme package from scratch"
+msgstr "Create a new audio theme package from scratch"
+
+msgid "Create new bookmark from current paragraph for site {site}"
+msgstr "Create new bookmark from current paragraph for site {site}"
+
+msgid "Create new website for domain %s"
+msgstr "Create new website for domain %s"
+
+msgid "Create new website with custom URL matching options"
+msgstr "Create new website with custom URL matching options"
+
+msgid "Creating New Theme - {name}"
+msgstr "Creating New Theme - {name}"
+
+msgid "Current object has no location"
+msgstr "Current object has no location"
+
+msgid "Current selection spans across multiple paragraphs."
+msgstr "Current selection spans across multiple paragraphs."
+
+msgid "Custom &Keystroke"
+msgstr "Custom &Keystroke"
+
+msgid "Custom &Keystroke: %s"
+msgstr "Custom &Keystroke: %s"
+
+msgid "Custom Display Name (optional)"
+msgstr "Custom Display Name (optional)"
+
+msgid "Custom Text"
+msgstr "Custom Text"
+
+msgid "Customize &Existing Audio Theme"
+msgstr "Customize &Existing Audio Theme"
+
+msgid "Customize an installed audio theme with your prefered  sounds."
+msgstr "Customize an installed audio theme with your prefered  sounds."
+
+msgid "Customize announcement format per role:"
+msgstr "Customize announcement format per role:"
+
+msgid "Cycle Audio Themes"
+msgstr "Cycle Audio Themes"
+
+msgid "Cycle Typing Sounds"
+msgstr "Cycle Typing Sounds"
+
+msgid "Cycles through available audio themes."
+msgstr "Cycles through available audio themes."
+
+msgid "Cycles through available typing sound packs."
+msgstr "Cycles through available typing sound packs."
+
+msgid "D&uplicate"
+msgstr "D&uplicate"
+
+msgid "Damping"
+msgstr "Damping"
+
+msgid "Damping:"
+msgstr "Damping:"
+
+msgid "Debug &beep mode"
+msgstr "Debug &beep mode"
+
+msgid "Decrease Audio Themes Volume"
+msgstr "Decrease Audio Themes Volume"
+
+msgid "Decreases the audio themes volume by 5 percent."
+msgstr "Decreases the audio themes volume by 5 percent."
+
+msgid "Default &Keystroke: %s"
+msgstr "Default &Keystroke: %s"
+
+msgid "Default (name, role then state)"
+msgstr "Default (name, role then state)"
+
+msgid "Delay before initial autoClick in milliseconds:"
+msgstr "Delay before initial autoClick in milliseconds:"
+
+msgid "Delay between recurring autoClicks  in milliseconds:"
+msgstr "Delay between recurring autoClicks  in milliseconds:"
+
+msgid "Deselect All"
+msgstr "Deselect All"
+
+msgid "Dictionary Entry Error"
+msgstr "字典输入错误"
+
+msgid "Disable (&toggle)"
+msgstr "禁用 (&T)"
+
+msgid "Disable A&ll"
+msgstr "Disable A&ll"
+
+msgid "Disable Audio Themes in these applications (comma separated):"
+msgstr "Disable Audio Themes in these applications (comma separated):"
+
+msgid "Disable PhoneticPuntuation in applications (comma-separated list)"
+msgstr "在以下应用程序中禁用语音规则（以逗号分隔）"
+
+msgid "Disable audio themes"
+msgstr "Disable audio themes"
+
+msgid "Disable typing sounds"
+msgstr "Disable typing sounds"
+
+msgid "Disabled"
+msgstr "禁用"
+
+msgid "Do not speak anything"
+msgstr "Do not speak anything"
+
+msgid "Domain"
+msgstr "Domain"
+
+msgid "Done."
+msgstr "Done."
+
+msgid "Download failed."
+msgstr "下载失败。"
+
+msgid "Downloading audio preview..."
+msgstr "正在下载音频预览..."
+
+msgid "Downloading... Please wait"
+msgstr "正在下载... 请稍候"
+
+msgid "Dry Level"
+msgstr "Dry Level"
+
+msgid "Dry Level:"
+msgstr "Dry Level:"
+
+msgid "Ducked Volume (%):"
+msgstr "Ducked Volume (%):"
+
+msgid "Duration in milliseconds:"
+msgstr "持续时间(毫秒)"
+
+msgid "E&xport Configuration..."
+msgstr "E&xport Configuration..."
+
+msgid "E&xport as .atp..."
+msgstr "E&xport as .atp..."
+
+msgid "E&xport site and all bookmarks"
+msgstr "E&xport site and all bookmarks"
+
+msgid "Earcons & Speech Rules"
+msgstr "Earcons & Speech Rules"
+
+msgid "Earcons and Speech Rules add-on"
+msgstr "耳标和语音规则插件"
+
+msgid "Earcons and Speech Rules off"
+msgstr "关闭耳标和语音规则"
+
+msgid "Earcons and Speech Rules on"
+msgstr "开启耳标和语音规则"
+
+msgid "Earcons and speech rules add-on Error"
+msgstr "耳标和语音规则插件错误"
+
+msgid "Edit &Description"
+msgstr "Edit &Description"
+
+msgid "Edit &bookmarks"
+msgstr "Edit &bookmarks"
+
+msgid "Edit &script in new window; press Control+Enter when Done."
+msgstr "Edit &script in new window; press Control+Enter when Done."
+
+msgid "Edit audio rule"
+msgstr "编辑声音规则"
+
+msgid ""
+"Edit bookmark {bookmark} of category {category} that doesn't match "
+"formatting for current paragraph from site {site}"
+msgstr ""
+"Edit bookmark {bookmark} of category {category} that doesn't match "
+"formatting for current paragraph from site {site}"
+
+msgid "Edit bookmarks for %s"
+msgstr "Edit bookmarks for %s"
+
+msgid "Edit browserNav bookmark"
+msgstr "Edit browserNav bookmark"
+
+msgid "Edit existing website %s"
+msgstr "Edit existing website %s"
+
+msgid ""
+"Edit perfect match bookmark {bookmark} of category {category} from site "
+"{site}"
+msgstr ""
+"Edit perfect match bookmark {bookmark} of category {category} from site "
+"{site}"
+
+msgid "Edit semi-accessible edit box."
+msgstr "Edit semi-accessible edit box."
+
+msgid "Edit site configuration"
+msgstr "Edit site configuration"
+
+msgid "Edit site description"
+msgstr "Edit site description"
+
+msgid "Edit spoken text"
+msgstr "Edit spoken text"
+
+msgid "Edit text"
+msgstr "Edit text"
+
+msgid "Editing Audio Theme: {name}"
+msgstr "Editing Audio Theme: {name}"
+
+msgid "Editing script for %s"
+msgstr "Editing script for %s"
+
+msgid "Effect"
+msgstr "音效文件"
+
+msgid "Enable (&toggle)"
+msgstr "启用 (&T)"
+
+msgid "Enable A&ll"
+msgstr "Enable A&ll"
+
+msgid "Enable Audio Themes"
+msgstr "Enable Audio Themes"
+
+msgid "Enable RAM Caching (Improves performance and latency)"
+msgstr "Enable RAM Caching (Improves performance and latency)"
+
+msgid "Enable Reverb"
+msgstr "Enable Reverb"
+
+msgid "Enable audio themes"
+msgstr "Enable audio themes"
+
+msgid "Enable experimental support for Word and WordPad"
+msgstr "Enable experimental support for Word and WordPad"
+
+msgid "Enable recurrent auto click"
+msgstr "Enable recurrent auto click"
+
+msgid "Enable recurrent auto speak of "
+msgstr "Enable recurrent auto speak of "
+
+msgid "Enable spatial typing sounds (simulates a physical keyboard)"
+msgstr "Enable spatial typing sounds (simulates a physical keyboard)"
+
+msgid "Enable typing sounds"
+msgstr "Enable typing sounds"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid ""
+"End adjustment in millis - positive for early cut off, negative for extra "
+"pause in the end"
+msgstr "播放结束时调整（以毫秒为单位的时长）：正值表示提前停止，负值表示延时停止"
+
+msgid "End adjustment must be a number."
+msgstr "结束时调整必须是一个数字。"
+
+msgid "Enter Theme Information"
+msgstr "Enter Theme Information"
+
+msgid "Error"
+msgstr "Error"
+
+msgid "Error during installation."
+msgstr "安装过程中出错。"
+
+msgid "Error during switch to window stage, focused element role is %d"
+msgstr "Error during switch to window stage, focused element role is %d"
+
+msgid ""
+"Error exporting configuration:\n"
+"{}"
+msgstr ""
+"Error exporting configuration:\n"
+"{}"
+
+msgid ""
+"Error importing configuration:\n"
+"{}"
+msgstr ""
+"Error importing configuration:\n"
+"{}"
+
+msgid ""
+"Error initializing some text rules of Earcons and Speech Rules add-on since they contain URL filter.\n"
+"URL detection feature requires BrowserNav v2.6.2 or later add-on to be installed.\n"
+"However it is either not installed, or failed to initialize.\n"
+"Please install the latest BrowserNav add-on from add-on store and restart NVDA.\n"
+"In the mean time all text rules with URL filter will be disabled.\n"
+msgstr ""
+"初始化耳标与语音规则插件的部分文本规则时发生错误，因其包含URL匹配规则。\n"
+"URL检测功能需安装BrowserNav v2.6.2或更高版本插件，但当前未检测到该插件或其初始化失败。\n"
+"请从插件商店安装最新版BrowserNav插件并重启NVDA。在此期间，所有含URL匹配的文本规则将被禁用。\n"
+
+msgid ""
+"Error retrieving contents of BrowserNav bookmark store: {}.\n"
+"Please check your Internet connectivity and try again.\n"
+msgstr ""
+"Error retrieving contents of BrowserNav bookmark store: {}.\n"
+"Please check your Internet connectivity and try again.\n"
+
+msgid ""
+"Error! Focused element on the page has changed while pasting updated text. "
+"Possibly content of a different edit box has changed. Please inspect edit "
+"boxes manually and undo if needed."
+msgstr ""
+"Error! Focused element on the page has changed while pasting updated text. "
+"Possibly content of a different edit box has changed. Please inspect edit "
+"boxes manually and undo if needed."
+
+msgid ""
+"Error! When switching back to browser window, a different edit box is "
+"focused."
+msgstr ""
+"Error! When switching back to browser window, a different edit box is "
+"focused."
+
+msgid ""
+"Error: you have entered URL filter for this rule.\n"
+"URL detection feature requires BrowserNav v2.6.2 or later add-on to be installed.\n"
+"However it is either not installed, or failed to initialize.\n"
+"Please install the latest BrowserNav add-on from add-on store and restart NVDA.\n"
+"Alternatively, please clear URL regex field to enable this rule on all web sites.\n"
+msgstr ""
+"错误\n"
+" ：当前规则已设置URL匹配。 URL检测功能需要安装BrowserNav v2.6.2或更新版本插件，但该插件未安装或初始化失败。 请从插件商店安装最新版BrowserNav插件并重启NVDA，或清空URL正则表达式字段以在所有网站启用此规则。\n"
+
+msgid "Exact URL match"
+msgstr "Exact URL match"
+
+msgid "Exact paragraph match"
+msgstr "Exact paragraph match"
+
+msgid "Exceptional abbreviations (space separated):"
+msgstr "Exceptional abbreviations (space separated):"
+
+msgid ""
+"Experimental: go back to the previous location of cursor in current document"
+msgstr ""
+"Experimental: go back to the previous location of cursor in current document"
+
+msgid "Export Audio Themes Configuration"
+msgstr "Export Audio Themes Configuration"
+
+msgid "Failed to compile regular expression: %s"
+msgstr "Failed to compile regular expression: %s"
+
+msgid "Failed to connect to store. Check your internet connection."
+msgstr "连接商店失败。请检查您的网络连接。"
+
+msgid "Failed to open settings. Please open through NVDA Preferences."
+msgstr "Failed to open settings. Please open through NVDA Preferences."
+
+msgid ""
+"Failed to read clipboard data. Please make sure clipboard is not empty - "
+"copy some text to clipboard."
+msgstr ""
+"Failed to read clipboard data. Please make sure clipboard is not empty - "
+"copy some text to clipboard."
+
+msgid "File exists"
+msgstr "File exists"
+
+msgid "File {} already exists. Would you like to replace it?"
+msgstr "File {} already exists. Would you like to replace it?"
+
+msgid "Filter URL regex"
+msgstr "正则表达式匹配 URL"
+
+msgid "Filter applications regex"
+msgstr "正则表达式匹配应用名称"
+
+msgid "Filter window title regex"
+msgstr "正则表达式匹配窗口标题"
+
+msgid "First Item"
+msgstr "First Item"
+
+msgid "Font size"
+msgstr "字体大小"
+
+msgid "Format"
+msgstr "格式"
+
+msgid "Full width phrase breakers:"
+msgstr "Full width phrase breakers:"
+
+msgid "Full width sentence breakers:"
+msgstr "Full width sentence breakers:"
+
+msgid "General"
+msgstr "General"
+
+msgid "Global announcement format for all elements:"
+msgstr "Global announcement format for all elements:"
+
+msgid "Go to line"
+msgstr "Go to line"
+
+msgid "Go to line:"
+msgstr "Go to line:"
+
+msgid "Heading"
+msgstr "标题"
+
+msgid "Heading level"
+msgstr "标题级别"
+
+msgid "Heading level 1"
+msgstr "1级标题"
+
+msgid "Heading level 2"
+msgstr "2级标题"
+
+msgid "Heading level 3"
+msgstr "3级标题"
+
+msgid "Heading level 4"
+msgstr "4级标题"
+
+msgid "Heading level 5"
+msgstr "5级标题"
+
+msgid "Heading level 6"
+msgstr "6级标题"
+
+msgid "Hello"
+msgstr "你好"
+
+msgid "Hierarchical quick jump"
+msgstr "Hierarchical quick jump"
+
+msgid "Highlighted"
+msgstr "高亮"
+
+msgid "I&mport Configuration..."
+msgstr "I&mport Configuration..."
+
+msgid "Ignore all focus events - good for websites that misuse focus events"
+msgstr "Ignore all focus events - good for websites that misuse focus events"
+
+msgid "Import Audio Themes Configuration"
+msgstr "Import Audio Themes Configuration"
+
+msgid "Import Themes"
+msgstr "Import Themes"
+
+msgid "Import website from bookmar&k store"
+msgstr "Import website from bookmar&k store"
+
+msgid "Increase Audio Themes Volume"
+msgstr "Increase Audio Themes Volume"
+
+msgid "Increases the audio themes volume by 5 percent."
+msgstr "Increases the audio themes volume by 5 percent."
+
+msgid "Installation successful!"
+msgstr "安装成功！"
+
+msgid ""
+"Invalid keystroke %s: Cannot use keystrokes with shift modifier for "
+"quickJump bookmarks!"
+msgstr ""
+"Invalid keystroke %s: Cannot use keystrokes with shift modifier for "
+"quickJump bookmarks!"
+
+msgid "Invalid keystroke %s: cannot overload essential  NVDA keystrokes!"
+msgstr "Invalid keystroke %s: cannot overload essential  NVDA keystrokes!"
+
+msgid "Invalid level for numeric script: '{level}'"
+msgstr "Invalid level for numeric script: '{level}'"
+
+msgid "Invalid regular expression"
+msgstr "Invalid regular expression"
+
+msgid "Invalid regular expression."
+msgstr "正则表达式无效。"
+
+msgid ""
+"Invalid replacement pattern: {}\n"
+"Plesae use curly braces {} as a format placeholder; please don't use any other curly braces in replacement string."
+msgstr ""
+"无效替换模式：{}\n"
+"请使用花括号{}作为格式占位符，替换字符串中请勿包含其他花括号。"
+
+msgid "Invalid wav file."
+msgstr "wav 文件无效。"
+
+msgid "Italic"
+msgstr "斜体"
+
+msgid ""
+"Jump to next hierarchical bookmark {levelStr}; please check browserNav "
+"configuration panel for hierarchical bookmark configuration."
+msgstr ""
+"Jump to next hierarchical bookmark {levelStr}; please check browserNav "
+"configuration panel for hierarchical bookmark configuration."
+
+msgid ""
+"Jump to previous hierarchical bookmark {levelStr}; please check browserNav "
+"configuration panel for hierarchical bookmark configuration."
+msgstr ""
+"Jump to previous hierarchical bookmark {levelStr}; please check browserNav "
+"configuration panel for hierarchical bookmark configuration."
+
+msgid "Keep default NVDA focus behavior"
+msgstr "Keep default NVDA focus behavior"
+
+msgid "Keep existing website definition, but overwrite all &bookmarks"
+msgstr "Keep existing website definition, but overwrite all &bookmarks"
+
+msgid "Keep original text"
+msgstr "Keep original text"
+
+msgid "Keystroke reset to default"
+msgstr "Keystroke reset to default"
+
+msgid "Last Item"
+msgstr "Last Item"
+
+msgid "Last Jupyter text has been copied to clipboard."
+msgstr "Last Jupyter text has been copied to clipboard."
+
+msgid "Last edited text has been copied to the clipboard."
+msgstr "Last edited text has been copied to the clipboard."
+
+msgid "Level {announceLevel}"
+msgstr "Level {announceLevel}"
+
+msgid "Line number must be a positive integer!"
+msgstr "Line number must be a positive integer!"
+
+msgid "Lower case letters (no spaces):"
+msgstr "Lower case letters (no spaces):"
+
+msgid "Match all sites (domain field ignored) "
+msgstr "Match all sites (domain field ignored) "
+
+msgid "Match domain and its subdomains"
+msgstr "Match domain and its subdomains"
+
+msgid "Match domain name"
+msgstr "Match domain name"
+
+msgid "Match empty URL only, that is pages without URL"
+msgstr "Match empty URL only, that is pages without URL"
+
+msgid "Match substring in URL"
+msgstr "Match substring in URL"
+
+msgid "Match type"
+msgstr "Match type"
+
+msgid "Maximum font size or heading level"
+msgstr "最大字号或标题级别"
+
+msgid "Maximum prosody offset"
+msgstr "最大韵律偏移"
+
+msgid "Minimum font size or heading level"
+msgstr "最小字号或标题级别"
+
+msgid ""
+"Minimum numeric value must be strictly less than maximum numeric value."
+msgstr "最小值必须严格小于最大值。"
+
+msgid "Minimum prosody offset"
+msgstr "最小韵律偏移"
+
+msgid "Miscellaneous"
+msgstr "Miscellaneous"
+
+msgid "Move &down"
+msgstr "下移 (&D)"
+
+msgid "Move &up"
+msgstr "上移 (&U)"
+
+msgid "Move to next paragraph containing text."
+msgstr "Move to next paragraph containing text."
+
+msgid "Move to previous paragraph containing text."
+msgstr "Move to previous paragraph containing text."
+
+msgid "Moves to next child in browser"
+msgstr "Moves to next child in browser"
+
+msgid "Moves to next parent in browser"
+msgstr "Moves to next parent in browser"
+
+msgid "Moves to next sibling in browser"
+msgstr "Moves to next sibling in browser"
+
+msgid "Moves to previous child in browser"
+msgstr "Moves to previous child in browser"
+
+msgid "Moves to previous sibling in browser"
+msgstr "Moves to previous sibling in browser"
+
+msgid "Mute live regions"
+msgstr "Mute live regions"
+
+msgid "Name"
+msgstr "Name"
+
+msgid ""
+"Name: {name}\n"
+"Author: {author}\n"
+"\n"
+"{summary}"
+msgstr ""
+"Name: {name}\n"
+"Author: {author}\n"
+"\n"
+"{summary}"
+
+msgid "Navigate to table cells by pressing T and Shift+T"
+msgstr "通过按T和Shift+T导航到表格单元格"
+
+msgid "Negative state"
+msgstr "否定状态"
+
+msgid "Negative states"
+msgstr "否定状态"
+
+msgid "Never"
+msgstr "Never"
+
+msgid "New Notification Sound"
+msgstr "New Notification Sound"
+
+msgid "Next Audio Theme"
+msgstr "Next Audio Theme"
+
+msgid ""
+"Next paragraph not found: current position is at the end of the document."
+msgstr ""
+"Next paragraph not found: current position is at the end of the document."
+
+msgid "No Audio Themes"
+msgstr "No Audio Themes"
+
+msgid "No URL"
+msgstr "No URL"
+
+msgid "No audio themes available"
+msgstr "No audio themes available"
+
+msgid "No beeps"
+msgstr "No beeps"
+
+msgid "No bookmarks matched!"
+msgstr "No bookmarks matched!"
+
+msgid "No cursor history available"
+msgstr "No cursor history available"
+
+msgid "No heading level information"
+msgstr "No heading level information"
+
+msgid ""
+"No hierarchical quickJump bookmarks configured for current website. Please "
+"add QuickJump bookmarks in BrowserNav settings in NVDA settings window."
+msgstr ""
+"No hierarchical quickJump bookmarks configured for current website. Please "
+"add QuickJump bookmarks in BrowserNav settings in NVDA settings window."
+
+msgid ""
+"No hierarchical quickJump bookmarks or numeric script bookmarks configured "
+"for current website. Please add QuickJump bookmarks in BrowserNav settings "
+"in NVDA settings window."
+msgstr ""
+"No hierarchical quickJump bookmarks or numeric script bookmarks configured "
+"for current website. Please add QuickJump bookmarks in BrowserNav settings "
+"in NVDA settings window."
+
+msgid "No indent announcement"
+msgstr "无缩进提示"
+
+msgid "No last Jupyter text., or last Jupyter text is empty."
+msgstr "No last Jupyter text., or last Jupyter text is empty."
+
+msgid "No match!"
+msgstr "No match!"
+
+msgid "No more sentences chime volume:"
+msgstr "No more sentences chime volume:"
+
+msgid "No more text units chime volume:"
+msgstr "No more text units chime volume:"
+
+msgid ""
+"No next QuickJump result. To configure QuickJump rules, please go to "
+"BrowserNav settings in NVDA configuration window."
+msgstr ""
+"No next QuickJump result. To configure QuickJump rules, please go to "
+"BrowserNav settings in NVDA configuration window."
+
+msgid "No next format change!"
+msgstr "No next format change!"
+
+msgid "No next hierarchical bookmark {levelStr}"
+msgstr "No next hierarchical bookmark {levelStr}"
+
+msgid "No next paragraph  with {qualifier} {mode} in the document"
+msgstr "No next paragraph  with {qualifier} {mode} in the document"
+
+msgid "No next paragraph with text"
+msgstr "No next paragraph with text"
+
+msgid "No next paragraph with the same {mode} in the document"
+msgstr "No next paragraph with the same {mode} in the document"
+
+msgid "No next phrase"
+msgstr "没有下一个短语"
+
+msgid "No next sentence"
+msgstr "没有下一个句子"
+
+msgid "No previous hierarchical bookmark {levelStr}"
+msgstr "No previous hierarchical bookmark {levelStr}"
+
+msgid "No previous paragraph  with {qualifier} {mode} in the document"
+msgstr "No previous paragraph  with {qualifier} {mode} in the document"
+
+msgid "No previous paragraph with text"
+msgstr "No previous paragraph with text"
+
+msgid "No previous paragraph with the same {mode} in the document"
+msgstr "No previous paragraph with the same {mode} in the document"
+
+msgid "No previous phrase"
+msgstr "没有上一个短语"
+
+msgid "No previous sentence"
+msgstr "没有上一个句子"
+
+msgid ""
+"No quickJump bookmarks configured for current website. Please add QuickJump "
+"bookmarks in BrowserNav settings in NVDA settings window."
+msgstr ""
+"No quickJump bookmarks configured for current website. Please add QuickJump "
+"bookmarks in BrowserNav settings in NVDA settings window."
+
+msgid "No sites are configured for current URL."
+msgstr "No sites are configured for current URL."
+
+msgid "No typing sound packs available"
+msgstr "No typing sound packs available"
+
+msgid ""
+"No {category} bookmarks configured for current website. Please add "
+"{category} bookmarks in BrowserNav settings in NVDA settings window."
+msgstr ""
+"No {category} bookmarks configured for current website. Please add "
+"{category} bookmarks in BrowserNav settings in NVDA settings window."
+
+msgid "Not editable"
+msgstr "Not editable"
+
+msgid ""
+"Note: These settings adjust the audio feedback for SentenceNav, TextNav, and"
+" BrowserNav integrations."
+msgstr ""
+"Note: These settings adjust the audio feedback for SentenceNav, TextNav, and"
+" BrowserNav integrations."
+
+msgid "Numeric Script"
+msgstr "Numeric Script"
+
+msgid ""
+"Numeric Script - script that can consume a numeric argument by pressing "
+"Alt+digits"
+msgstr ""
+"Numeric Script - script that can consume a numeric argument by pressing "
+"Alt+digits"
+
+msgid "Numeric format"
+msgstr "数值格式"
+
+msgid "Numeric text formatting"
+msgstr "数值格式"
+
+msgid "OK"
+msgstr "OK"
+
+msgid ""
+"Offset in paragraphs - select a value to place the cursor on following or "
+"preceding paragraph from the bookmark match:"
+msgstr ""
+"Offset in paragraphs - select a value to place the cursor on following or "
+"preceding paragraph from the bookmark match:"
+
+msgid "Ogg audio files"
+msgstr "Ogg audio files"
+
+msgid "Other audio rule"
+msgstr "其他声音规则"
+
+msgid "Other audio rules"
+msgstr "其他声音规则"
+
+msgid "Out of container"
+msgstr "离开容器"
+
+msgid "Over&write existing website definition"
+msgstr "Over&write existing website definition"
+
+msgid "P&review"
+msgstr "P&review"
+
+msgid "Paragraph boundary chime volume:"
+msgstr "Paragraph boundary chime volume:"
+
+msgid "Paragraph crackle volume:"
+msgstr "Paragraph crackle volume:"
+
+msgid ""
+"Pass raw text through to synth. Typically you want to enable this only for "
+"punctuation marks and disable for all other rules."
+msgstr "将原文本传递给合成器。通常而言，您可能只希望为标点符号启用此功能，而对于其他规则都可以禁用。"
+
+msgid "Pattern"
+msgstr "模式"
+
+msgid "Pattern &match type:"
+msgstr "Pattern &match type:"
+
+msgid "Pattern cannot be empty!"
+msgstr "Pattern cannot be empty!"
+
+msgid "Perform autoClick on page load automatically:"
+msgstr "Perform autoClick on page load automatically:"
+
+msgid "Perform autoSpeak (live region) for:"
+msgstr "Perform autoSpeak (live region) for:"
+
+msgid ""
+"Phonetic punctuation add-on has been renamed to Earcons and Speech Rules.\n"
+"We have automatically migrated all your phonetic punctuation rules to Earcons and Speech Rules add-on, so no further action is required.\n"
+"Please feel free to explore add-on settings to discover new features.\n"
+msgstr ""
+"语音标点插件已重命名为耳标和语音规则。\n"
+"\n"
+"我们已自动将您的所有语音标点规则迁移到耳标和语音规则插件，因此无需采取进一步操作。\n"
+"\n"
+"请随意探索插件设置以发现更多新功能。\n"
+
+msgid "Phrase breakers:"
+msgstr "Phrase breakers:"
+
+msgid "Plain text not found: tried to search for '{text}' {direction}."
+msgstr "Plain text not found: tried to search for '{text}' {direction}."
+
+msgid "Play chime when bookmark appears on the page"
+msgstr "Play chime when bookmark appears on the page"
+
+msgid "Play chime when bookmark disappears from the page"
+msgstr "Play chime when bookmark disappears from the page"
+
+msgid "Play chime when text matched by bookmark changes"
+msgstr "Play chime when text matched by bookmark changes"
+
+msgid "Play sounds in 3D mode"
+msgstr "Play sounds in 3D mode"
+
+msgid "Play typing sounds only in edit boxes"
+msgstr "Play typing sounds only in edit boxes"
+
+msgid "Please create a new site configuration in site submenu."
+msgstr "Please create a new site configuration in site submenu."
+
+msgid "Please enter a single character as pattern."
+msgstr "请输入单字符。"
+
+msgid ""
+"Please enter a version in order to  export this website.\n"
+"We recommend to use date-based versions, like v2025.01.31.\n"
+msgstr ""
+"Please enter a version in order to  export this website.\n"
+"We recommend to use date-based versions, like v2025.01.31.\n"
+
+msgid "Please enter website name in order to export it."
+msgstr "Please enter website name in order to export it."
+
+msgid "Press desired keystroke now"
+msgstr "Press desired keystroke now"
+
+msgid ""
+"Pressing it once toggles audio themes on and off. Pressing twice toggles "
+"typing sounds."
+msgstr ""
+"Pressing it once toggles audio themes on and off. Pressing twice toggles "
+"typing sounds."
+
+msgid "Preview finished."
+msgstr "预览完成。"
+
+msgid "Previous Audio Theme"
+msgstr "Previous Audio Theme"
+
+msgid ""
+"Previous paragraph not found: current position is at the beginning of the "
+"document."
+msgstr ""
+"Previous paragraph not found: current position is at the beginning of the "
+"document."
+
+msgid "Prosody offset cannot be zero."
+msgstr "韵律偏移不能为 0。"
+
+msgid "Prosody offset:"
+msgstr "韵律偏移："
+
+msgid "Protected Edit Field"
+msgstr "Protected Edit Field"
+
+msgid "Quick speak"
+msgstr "Quick speak"
+
+msgid "Quick speak 2"
+msgstr "Quick speak 2"
+
+msgid "QuickClick"
+msgstr "QuickClick"
+
+msgid "QuickClick2"
+msgstr "QuickClick2"
+
+msgid "QuickClick3"
+msgstr "QuickClick3"
+
+msgid "QuickJump"
+msgstr "QuickJump"
+
+msgid "QuickJump - assigned to J by default"
+msgstr "QuickJump - assigned to J by default"
+
+msgid ""
+"QuickJump back according to BrowserNav QuickJump bookmarks; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"QuickJump back according to BrowserNav QuickJump bookmarks; please check "
+"browserNav configuration panel for the list of bookmarks."
+
+msgid ""
+"QuickJump forward according to BrowserNav QuickJump bookmarks; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"QuickJump forward according to BrowserNav QuickJump bookmarks; please check "
+"browserNav configuration panel for the list of bookmarks."
+
+msgid "QuickJump2"
+msgstr "QuickJump2"
+
+msgid "QuickJump3"
+msgstr "QuickJump3"
+
+msgid "QuickNav item not found: tried to search for '{text}' {direction}."
+msgstr "QuickNav item not found: tried to search for '{text}' {direction}."
+
+msgid "QuickSearch & Bookmarks"
+msgstr "QuickSearch & Bookmarks"
+
+msgid ""
+"QuickSpeak  according to BrowserNav QuickSpeak bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"QuickSpeak  according to BrowserNav QuickSpeak bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+
+msgid "Re&move rule"
+msgstr "删除 (&M)"
+
+msgid "React to focus event, but prevent entering focus mode"
+msgstr "React to focus event, but prevent entering focus mode"
+
+msgid "Read an error message instead of playing a chime"
+msgstr "读取错误消息而不是播放提示音"
+
+msgid "Reconstruct sentences across paragraphs:"
+msgstr "Reconstruct sentences across paragraphs:"
+
+msgid "Regex match of URL"
+msgstr "Regex match of URL"
+
+msgid "Regex paragraph match"
+msgstr "Regex paragraph match"
+
+msgid "Regex search"
+msgstr "Regex search"
+
+msgid "Regexp text not found: tried to search for '{text}' {direction}."
+msgstr "Regexp text not found: tried to search for '{text}' {direction}."
+
+msgid ""
+"Regular expression pattern matches empty string. This is not allowed. Please"
+" change the pattern."
+msgstr "正则表达式不允许匹配空字符串，请更改。"
+
+msgid "Remove Audio Theme"
+msgstr "Remove Audio Theme"
+
+msgid "Report the object under the cursor with full 3D audio coordinates."
+msgstr "Report the object under the cursor with full 3D audio coordinates."
+
+msgid "Reverb"
+msgstr "Reverb"
+
+msgid "Role"
+msgstr "角色"
+
+msgid "Role and state, then name"
+msgstr "Role and state, then name"
+
+msgid "Role and state, then name (Role State Label)"
+msgstr "Role and state, then name (Role State Label)"
+
+msgid "Roles"
+msgstr "角色"
+
+msgid "Room Size"
+msgstr "Room Size"
+
+msgid "Room Size:"
+msgstr "Room Size:"
+
+msgid "Rotate global speech order"
+msgstr "Rotate global speech order"
+
+msgid "Rotates the global speech order format."
+msgstr "Rotates the global speech order format."
+
+msgid "Rule disabled"
+msgstr "规则已禁用"
+
+msgid "Rule enabled"
+msgstr "启用该规则"
+
+msgid "Same indent and style"
+msgstr "Same indent and style"
+
+msgid "Save Audio Theme Package"
+msgstr "Save Audio Theme Package"
+
+msgid "Save this website under a different &name"
+msgstr "Save this website under a different &name"
+
+msgid "Script"
+msgstr "Script"
+
+msgid "Script compilation failed "
+msgstr "Script compilation failed "
+
+msgid "Script: runs a custom Python script"
+msgstr "Script: runs a custom Python script"
+
+msgid "Scroll to all possible elements backward"
+msgstr "Scroll to all possible elements backward"
+
+msgid "Scroll to all possible elements forward"
+msgstr "Scroll to all possible elements forward"
+
+msgid "Scrolling backward. This may load more elements on the page."
+msgstr "Scrolling backward. This may load more elements on the page."
+
+msgid "Scrolling forward. This may load more elements on the page."
+msgstr "Scrolling forward. This may load more elements on the page."
+
+msgid "Search for a role:"
+msgstr "Search for a role:"
+
+msgid "Select All"
+msgstr "Select All"
+
+msgid "Select An Audio Theme"
+msgstr "Select An Audio Theme"
+
+msgid "Select Roles..."
+msgstr "Select Roles..."
+
+msgid "Select Spoken Roles"
+msgstr "Select Spoken Roles"
+
+msgid "Select a theme to edit or remix:"
+msgstr "Select a theme to edit or remix:"
+
+msgid "Select an audio themes command to execute:"
+msgstr "Select an audio themes command to execute:"
+
+msgid ""
+"Select the roles you want NVDA to speak (if the global speak roles setting "
+"is enabled):"
+msgstr ""
+"Select the roles you want NVDA to speak (if the global speak roles setting "
+"is enabled):"
+
+msgid "Select theme:"
+msgstr "Select theme:"
+
+msgid "Select wav file:"
+msgstr "选择 Wav 文件："
+
+msgid "Sentence Navigation (Alt+Arrows)"
+msgstr "Sentence Navigation (Alt+Arrows)"
+
+msgid "Sentence breakers:"
+msgstr "Sentence breakers:"
+
+msgid ""
+"Sets an audio beacon at the current navigator object. Navigate around to "
+"hear a sonar ping relative to this beacon."
+msgstr ""
+"Sets an audio beacon at the current navigator object. Navigate around to "
+"hear a sonar ping relative to this beacon."
+
+msgid "Show BrowserNav popup menu."
+msgstr "Show BrowserNav popup menu."
+
+msgid "Shows audio themes commands help."
+msgstr "Shows audio themes commands help."
+
+msgid "Site Entry Error"
+msgstr "Site Entry Error"
+
+msgid "Skip Clutter chime volume:"
+msgstr "Skip Clutter chime volume:"
+
+msgid "Skip Wikipedia references in sentence endings"
+msgstr "Skip Wikipedia references in sentence endings"
+
+msgid "Skip clutter off for line navigation"
+msgstr "Skip clutter off for line navigation"
+
+msgid "Skip clutter off for paragraph navigation"
+msgstr "Skip clutter off for paragraph navigation"
+
+msgid "Skip clutter on for line navigation"
+msgstr "Skip clutter on for line navigation"
+
+msgid "Skip clutter on for paragraph navigation"
+msgstr "Skip clutter on for paragraph navigation"
+
+msgid "SkipClutter"
+msgstr "SkipClutter"
+
+msgid ""
+"SkipClutter - will automatically skip this paragraph or line when navigating"
+" via Control+Up/Down or Up/Down keystrokes; must match the whole paragraph. "
+"or "
+msgstr ""
+"SkipClutter - will automatically skip this paragraph or line when navigating"
+" via Control+Up/Down or Up/Down keystrokes; must match the whole paragraph. "
+"or "
+
+msgid "Skippable punctuation:"
+msgstr "Skippable punctuation:"
+
+msgid "Smart Volume Normalization"
+msgstr "Smart Volume Normalization"
+
+msgid ""
+"Smart spatial positioning (maps characters to their exact physical keys)"
+msgstr ""
+"Smart spatial positioning (maps characters to their exact physical keys)"
+
+msgid "Smooth 3D Panning (Glide effect for moving objects)"
+msgstr "Smooth 3D Panning (Glide effect for moving objects)"
+
+msgid "Smooth Envelope (Fade In/Out to prevent popping)"
+msgstr "Smooth Envelope (Fade In/Out to prevent popping)"
+
+msgid "Sound For:"
+msgstr "Sound For:"
+
+msgid "Speak Object 3D Coordinates"
+msgstr "Speak Object 3D Coordinates"
+
+msgid "Speak background color"
+msgstr "朗读背景颜色"
+
+msgid "Speak bold and italic text"
+msgstr "朗读粗体和斜体文本"
+
+msgid "Speak changed paragraphs"
+msgstr "Speak changed paragraphs"
+
+msgid "Speak current URL."
+msgstr "Speak current URL."
+
+msgid "Speak current heading level"
+msgstr "Speak current heading level"
+
+msgid "Speak current heading level."
+msgstr "读出当前标题级别。"
+
+msgid "Speak font color"
+msgstr "朗读字体颜色"
+
+msgid "Speak font family"
+msgstr "朗读字体系列"
+
+msgid "Speak formatted text"
+msgstr "Speak formatted text"
+
+msgid "Speak live regions"
+msgstr "Speak live regions"
+
+msgid "Speak message when no more text units found"
+msgstr "Speak message when no more text units found"
+
+msgid "Speak only changed words (diff)"
+msgstr "Speak only changed words (diff)"
+
+msgid "Speak roles during say all"
+msgstr "Speak roles during say all"
+
+msgid "Speak roles such as button, edit box , link etc. "
+msgstr "Speak roles such as button, edit box , link etc. "
+
+msgid "Speech Action"
+msgstr "Speech Action"
+
+msgid "Speech Order"
+msgstr "Speech Order"
+
+msgid "Speech order: Default (Name, Role, State)"
+msgstr "Speech order: Default (Name, Role, State)"
+
+msgid "Speech order: Role, State, Name"
+msgstr "Speech order: Role, State, Name"
+
+msgid "Speech order: State, Name"
+msgstr "Speech order: State, Name"
+
+msgid "Spoken &message when bookmark is found:"
+msgstr "Spoken &message when bookmark is found:"
+
+msgid ""
+"Start adjustment in millis - positive to cut off start, negative for extra "
+"pause in the beginning."
+msgstr "开始实调整（以毫秒为单位的时长）-正值表示截断播放，负值表示延时播放，0为不调整。"
+
+msgid "Start adjustment must be a number."
+msgstr "开始时调整必须是一个数字。"
+
+msgid "State"
+msgstr "状态"
+
+msgid "State, then name"
+msgstr "State, then name"
+
+msgid "State, then name (State Label)"
+msgstr "State, then name (State Label)"
+
+msgid "States"
+msgstr "状态"
+
+msgid "Status"
+msgstr "状态"
+
+msgid "Store URL:"
+msgstr "商店网址:"
+
+msgid "Strikethrough"
+msgstr "删除线"
+
+msgid "Substring paragraph match"
+msgstr "Substring paragraph match"
+
+msgid "Success"
+msgstr "Success"
+
+msgid "Suppress aria label announcements for landmarks and regions"
+msgstr "Suppress aria label announcements for landmarks and regions"
+
+msgid "Suppress aria name announcements for editables and combo boxes"
+msgstr "Suppress aria name announcements for editables and combo boxes"
+
+msgid "Suppress aria role text announcements"
+msgstr "Suppress aria role text announcements"
+
+msgid "Suppress descriptions"
+msgstr "Suppress descriptions"
+
+msgid "Suppress this state in non-verbose mode."
+msgstr "在非详细状态模式下禁止读出该状态。"
+
+msgid "Suppress tree level announcements"
+msgstr "Suppress tree level announcements"
+
+msgid "Switches to the next audio theme."
+msgstr "Switches to the next audio theme."
+
+msgid "Switches to the previous audio theme."
+msgstr "Switches to the previous audio theme."
+
+msgid "T&est rule"
+msgstr "T&est rule"
+
+msgid "Text Navigation (Alt+Shift+Arrows)"
+msgstr "Text Navigation (Alt+Shift+Arrows)"
+
+msgid "Text formatting"
+msgstr "文本格式"
+
+msgid "Text regular expression pattern"
+msgstr "匹配的正则表达式"
+
+msgid "Text regular expressions"
+msgstr "文本正则表达式"
+
+msgid "TextNav error: Infinite loop"
+msgstr "TextNav error: Infinite loop"
+
+msgid "Theme Author"
+msgstr "Theme Author"
+
+msgid "Theme Description"
+msgstr "Theme Description"
+
+msgid "Theme Name"
+msgstr "Theme Name"
+
+msgid "Theme Sounds"
+msgstr "Theme Sounds"
+
+msgid "Theme Studio"
+msgstr "Theme Studio"
+
+msgid "Theme Studio - "
+msgstr "Theme Studio - "
+
+msgid "Themes Store"
+msgstr "主题商店"
+
+msgid "Themes successfully fetched. Select a theme:"
+msgstr "主题获取成功。请选择一个主题:"
+
+msgid ""
+"There is already a website with this name. Please enter a different name."
+msgstr ""
+"There is already a website with this name. Please enter a different name."
+
+msgid ""
+"This can not be undone.\n"
+"Are you sure you  want to remove audio theme {name}?"
+msgstr ""
+"This can not be undone.\n"
+"Are you sure you  want to remove audio theme {name}?"
+
+msgid ""
+"This package contains audio themes.\n"
+"Do you want to overwrite existing themes with the same name?"
+msgstr ""
+"This package contains audio themes.\n"
+"Do you want to overwrite existing themes with the same name?"
+
+msgid "This site is a duplicate of another existing site %s"
+msgstr "This site is a duplicate of another existing site %s"
+
+msgid "This value is already used in another rule."
+msgstr ""
+"错误\n"
+" ：该值已被其他规则使用。"
+
+msgid "This website doesn't have a name. Cannot import it."
+msgstr "This website doesn't have a name. Cannot import it."
+
+msgid "This website doesn't have a version. Cannot import it."
+msgstr "This website doesn't have a version. Cannot import it."
+
+msgid "Timed out during release modifiers stage"
+msgstr "Timed out during release modifiers stage"
+
+msgid "Timed out during single-character control+C stage"
+msgstr "Timed out during single-character control+C stage"
+
+msgid "Timed out during switch to browser window stage"
+msgstr "Timed out during switch to browser window stage"
+
+msgid "Timed out during switch to window stage"
+msgstr "Timed out during switch to window stage"
+
+msgid "Timeout while trying to focus current edit box."
+msgstr "Timeout while trying to focus current edit box."
+
+msgid "Toggle"
+msgstr "切换(&t)"
+
+msgid "Toggle Audio Beacon"
+msgstr "Toggle Audio Beacon"
+
+msgid "Toggle Audio Themes"
+msgstr "Toggle Audio Themes"
+
+msgid "Toggle Earcons and Speech Rules"
+msgstr "Toggle Earcons and Speech Rules"
+
+msgid "Toggle Earcons and Speech Rules."
+msgstr "耳标和语音规则切换。"
+
+msgid "Toggle Typing Sounds"
+msgstr "Toggle Typing Sounds"
+
+msgid "Toggle skip clutter for line navigation"
+msgstr "Toggle skip clutter for line navigation"
+
+msgid "Toggle skip clutter for paragraph navigation"
+msgstr "Toggle skip clutter for paragraph navigation"
+
+msgid "Toggle state verbosity"
+msgstr "Toggle state verbosity"
+
+msgid "Toggle state verbosity reporting."
+msgstr "详细状态朗读切换。"
+
+msgid "Toggles typing sounds on and off."
+msgstr "Toggles typing sounds on and off."
+
+msgid "Total: {total} | Enabled: {enabled} | Disabled: {disabled}"
+msgstr "Total: {total} | Enabled: {enabled} | Disabled: {disabled}"
+
+msgid "Trim silence from beginning and end of sounds"
+msgstr "Trim silence from beginning and end of sounds"
+
+msgid "Type"
+msgstr "类型"
+
+msgid "Typing Sound Pack"
+msgstr "Typing Sound Pack"
+
+msgid "Typing Sound Pack (optional):"
+msgstr "Typing Sound Pack (optional):"
+
+msgid "Typing Sounds"
+msgstr "Typing Sounds"
+
+msgid "Typing sound pack:"
+msgstr "Typing sound pack:"
+
+msgid "Typing sounds disabled"
+msgstr "Typing sounds disabled"
+
+msgid "Typing sounds enabled"
+msgstr "Typing sounds enabled"
+
+msgid "Typing sounds volume:"
+msgstr "Typing sounds volume:"
+
+msgid "Typing sounds: {pack}"
+msgstr "Typing sounds: {pack}"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Underline"
+msgstr "下划线"
+
+msgid "Use global setting"
+msgstr "Use global setting"
+
+msgid "Use speech synthesizer volume"
+msgstr "Use speech synthesizer volume"
+
+msgid "Verbose state reporting"
+msgstr "详细状态朗读"
+
+msgid "Version"
+msgstr "Version"
+
+msgid "Vertical margin between paragraphs"
+msgstr "段落之间的垂直边距"
+
+msgid "Volume"
+msgstr "音量"
+
+msgid "Volume of Skip Clutter (skipClutter) chime"
+msgstr "跳过杂乱 (skipClutter) 提示音量"
+
+msgid "Volume of the No Next Text chime"
+msgstr "没有下一个文本提示音的音量"
+
+msgid "Volume {vol}"
+msgstr "Volume {vol}"
+
+msgid ""
+"Warning! While copying text out of edit box, focused elementon the page has "
+"changed. Please try again."
+msgstr ""
+"Warning! While copying text out of edit box, focused elementon the page has "
+"changed. Please try again."
+
+msgid ""
+"Warning: you are about to create or update a skip clutter bookmark. If your "
+"pattern is too generic, it might hide significant part of your website. For "
+"example, if you specify a single whitespace as pattern and substring match, "
+"then all paragraphs containing at least a single whitespace would disappear."
+" Please make sure you understand how skip clutter works and how to undo this"
+" change if you have to. Would you like to continue?"
+msgstr ""
+"Warning: you are about to create or update a skip clutter bookmark. If your "
+"pattern is too generic, it might hide significant part of your website. For "
+"example, if you specify a single whitespace as pattern and substring match, "
+"then all paragraphs containing at least a single whitespace would disappear."
+" Please make sure you understand how skip clutter works and how to undo this"
+" change if you have to. Would you like to continue?"
+
+msgid ""
+"Warning: you are about to move this bookmark to site %(new_site)s. This "
+"bookmark will disappear from the old site %(old_site)s. Would you like to "
+"proceed?"
+msgstr ""
+"Warning: you are about to move this bookmark to site %(new_site)s. This "
+"bookmark will disappear from the old site %(old_site)s. Would you like to "
+"proceed?"
+
+msgid ""
+"Warning: you are trying to  move this bookmark to site %(new_site)s. However"
+" it already contains a bookmark with the same UUID. This is not supported. "
+"Please create a new bookmark instead."
+msgstr ""
+"Warning: you are trying to  move this bookmark to site %(new_site)s. However"
+" it already contains a bookmark with the same UUID. This is not supported. "
+"Please create a new bookmark instead."
+
+msgid "Wav file"
+msgstr "Wave文件"
+
+msgid "Wav file not found."
+msgstr "Wav 文件不存在。"
+
+msgid "Wave audio files"
+msgstr "Wave audio files"
+
+msgid "Web Page Loaded"
+msgstr "Web Page Loaded"
+
+msgid "Website export Error"
+msgstr "Website export Error"
+
+msgid ""
+"Welcome To The Audio Themes Studio:\n"
+"Here you can create new audio themes and package them for sharing with others.\n"
+"You can also customize anyone of your installed audio themes with your own sounds."
+msgstr ""
+"Welcome To The Audio Themes Studio:\n"
+"Here you can create new audio themes and package them for sharing with others.\n"
+"You can also customize anyone of your installed audio themes with your own sounds."
+
+msgid "Wet Level"
+msgstr "Wet Level"
+
+msgid "Wet Level:"
+msgstr "Wet Level:"
+
+msgid "Width"
+msgstr "Width"
+
+msgid "Width:"
+msgstr "Width:"
+
+msgid "Wrong domain format. An example is: en.wikipedia.com "
+msgstr "Wrong domain format. An example is: en.wikipedia.com "
+
+msgid "Wrong line number"
+msgstr "Wrong line number"
+
+msgid "Wrong regex"
+msgstr "Wrong regex"
+
+msgid ""
+"You already have website {} in your BrowserNav configuration.\n"
+"Existing site version: {}.\n"
+"To be imported site version: {}.\n"
+"What would you like to do?"
+msgstr ""
+"You already have website {} in your BrowserNav configuration.\n"
+"Existing site version: {}.\n"
+"To be imported site version: {}.\n"
+"What would you like to do?"
+
+msgid ""
+"You do not have any audio themes installed.\n"
+"Please install or create an audio theme first."
+msgstr ""
+"You do not have any audio themes installed.\n"
+"Please install or create an audio theme first."
+
+msgid "You must specify blank domain for this match option."
+msgstr "You must specify blank domain for this match option."
+
+msgid "You must specify non-empty string as domain"
+msgstr "You must specify non-empty string as domain"
+
+msgid "You must specify prosody offset."
+msgstr "必须输入韵律偏移值。"
+
+msgid ""
+"You will lose all of the changes you have made.\n"
+"Are you sure you want to quit this dialog?"
+msgstr ""
+"You will lose all of the changes you have made.\n"
+"Are you sure you want to quit this dialog?"
+
+msgid "at level {level}"
+msgstr "at level {level}"
+
+msgid "backward"
+msgstr "backward"
+
+msgid "duration must be an integer between 0 and 60000"
+msgstr "持续时间必须是 0 到 60000 之间的整数"
+
+msgid "font size"
+msgstr "font size"
+
+msgid "font size and same style"
+msgstr "font size and same style"
+
+msgid "forward"
+msgstr "forward"
+
+msgid "greater"
+msgstr "greater"
+
+msgid "horizontal offset"
+msgstr "horizontal offset"
+
+msgid "no indent"
+msgstr "无缩进"
+
+msgid "out of"
+msgstr "离开"
+
+msgid "prosody offset must be an integer between -100 and 100"
+msgstr "韵律偏移必须是 0 到 100 之间的整数"
+
+msgid "smaller"
+msgstr "smaller"
+
+msgid "tone must be an integer between 0 and 50000"
+msgstr "音调必须是 0 到 50000 之间的整数"
+
+msgid "world"
+msgstr "世界"
+
+msgid "{roleText} level {level}"
+msgstr "{roleText} 级别 {level}"
+
+msgid ""
+"استكمال العمل على إضافة سمات الصوت (Audio Themes)، مع إضافة دعم للإصدارات الأحدث من NVDA.\n"
+"تقوم هذه الإضافة بإنشاء عرض صوتي افتراضي يشغل أصواتاً عند التركيز أو التنقل بين العناصر.\n"
+"كما تتيح لك الإضافة تفعيل، تثبيت، إزالة، تحرير، إنشاء، وتوزيع حزم السمات الصوتية.\n"
+"\n"
+"تم دمجها مع إضافة Earcons and Speech rules:\n"
+"تسمح بإعداد أصوات مخصصة للكلمات، الأحرف، أنواع العناصر، الحالات، ومعلومات التنسيق.\n"
+"\n"
+"تم دمج إضافة SentenceNav للتنقل بالجمل (Alt+أسهم).\n"
+"تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).\n"
+msgstr ""
+"استكمال العمل على إضافة سمات الصوت (Audio Themes)، مع إضافة دعم للإصدارات الأحدث من NVDA.\n"
+"تقوم هذه الإضافة بإنشاء عرض صوتي افتراضي يشغل أصواتاً عند التركيز أو التنقل بين العناصر.\n"
+"كما تتيح لك الإضافة تفعيل، تثبيت، إزالة، تحرير، إنشاء، وتوزيع حزم السمات الصوتية.\n"
+"\n"
+"تم دمجها مع إضافة Earcons and Speech rules:\n"
+"تسمح بإعداد أصوات مخصصة للكلمات، الأحرف، أنواع العناصر، الحالات، ومعلومات التنسيق.\n"
+"\n"
+"تم دمج إضافة SentenceNav للتنقل بالجمل (Alt+أسهم).\n"
+"تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).\n"

@@ -1,0 +1,1145 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: advanced_audio_themes 9.0.0\n"
+"Report-Msgid-Bugs-To:     <https://t.me/HassanAlBarshoumy>\n"
+"POT-Creation-Date: 2026-05-06 00:09+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: globalPlugins\audiothemes\common.py:41
+msgid "Text regular expressions"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:42
+msgid "Characters"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:43
+msgid "Roles"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:44
+msgid "States"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:45
+msgid "Negative states"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:46
+msgid "Text formatting"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:47
+msgid "Numeric text formatting"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:48
+msgid "Other audio rules"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:52
+msgid "Text regular expression pattern"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:53
+msgid "Character"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:54
+msgid "Role"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:55
+msgid "State"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:56
+msgid "Negative state"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:57
+msgid "Format"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:58
+msgid "Numeric format"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:59
+msgid "Other audio rule"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:79
+msgid "Bold"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:80
+msgid "Italic"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:81
+msgid "Underline"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:82
+msgid "Strikethrough"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:83
+msgid "Heading"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:84
+msgid "Highlighted"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:85
+msgid "Heading level 1"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:86
+msgid "Heading level 2"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:87
+msgid "Heading level 3"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:88
+msgid "Heading level 4"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:89
+msgid "Heading level 5"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:90
+msgid "Heading level 6"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:98
+msgid "Font size"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:99
+msgid "Heading level"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:108
+msgid "Out of container"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:109
+msgid "Blank announcement"
+msgstr ""
+
+#: globalPlugins\audiothemes\common.py:110
+msgid "No indent announcement"
+msgstr ""
+
+#: globalPlugins\audiothemes\frenzy.py:873
+msgid "out of"
+msgstr ""
+
+#. Translators: The file type to be shown in a dialog used to browse for audio files.
+#: globalPlugins\audiothemes\handler.py:35
+msgid "Ogg audio files"
+msgstr ""
+
+#. Translators: The file type to be shown in a dialog used to browse for audio files.
+#: globalPlugins\audiothemes\handler.py:37
+msgid "Wave audio files"
+msgstr ""
+
+#. Translators: The label of the sound which will be played when focusing a protected edit control.
+#: globalPlugins\audiothemes\handler.py:74
+msgid "Protected Edit Field"
+msgstr ""
+
+#. Translators: The label of the sound which will be played when focusing the first item in a list.
+#: globalPlugins\audiothemes\handler.py:76
+msgid "First Item"
+msgstr ""
+
+#. Translators: The label of the sound which will be played when focusing the last item in a list.
+#: globalPlugins\audiothemes\handler.py:78
+msgid "Last Item"
+msgstr ""
+
+#. Translators: The label of the sound which will be played when a help balloon or a toast is shown.
+#: globalPlugins\audiothemes\handler.py:80
+msgid "New Notification Sound"
+msgstr ""
+
+#. Translators: The label of the sound which will be played when a web page is loaded.
+#: globalPlugins\audiothemes\handler.py:82
+msgid "Web Page Loaded"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuation.py:339
+msgid ""
+"Phonetic punctuation add-on has been renamed to Earcons and Speech Rules.\n"
+"We have automatically migrated all your phonetic punctuation rules to "
+"Earcons and Speech Rules add-on, so no further action is required.\n"
+"Please feel free to explore add-on settings to discover new features.\n"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuation.py:343
+msgid "Earcons and Speech Rules add-on"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuation.py:379
+msgid ""
+"Error initializing some text rules of Earcons and Speech Rules add-on since "
+"they contain URL filter.\n"
+"URL detection feature requires BrowserNav v2.6.2 or later add-on to be "
+"installed.\n"
+"However it is either not installed, or failed to initialize.\n"
+"Please install the latest BrowserNav add-on from add-on store and restart "
+"NVDA.\n"
+"In the mean time all text rules with URL filter will be disabled.\n"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuation.py:385
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:433
+msgid "Earcons and speech rules add-on Error"
+msgstr ""
+
+#. Translators: This is spoken when the given line has no indentation.
+#: globalPlugins\audiothemes\phoneticPunctuation.py:867
+msgid "no indent"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:53
+msgid "&Built in wave"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:54
+msgid "&Wave file"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:55
+msgid "&Beep"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:56
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:57
+msgid "&Prosody"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:58
+msgid "&Text"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:59
+msgid "&Keep original"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:67
+msgid "Edit audio rule"
+msgstr ""
+
+#. Translators: label for pattern  edit field in add Audio Rule dialog.
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:117
+msgid "&Pattern"
+msgstr ""
+
+#. Translators: label for rule_enabled  checkbox in add audio rule dialog.
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:131
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:854
+msgid "Rule enabled"
+msgstr ""
+
+#. Translators: label for enable passthrough checkbox
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:135
+msgid ""
+"Pass raw text through to synth. Typically you want to enable this only for "
+"punctuation marks and disable for all other rules."
+msgstr ""
+
+#. Translators:  label for type selector radio buttons in add audio rule dialog
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:140
+msgid "&Type"
+msgstr ""
+
+#. Translators: built in wav category  combo box
+#. Translators: frenzy type combo box
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:157
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:739
+msgid "&Category:"
+msgstr ""
+
+#. Translators: built in wav file combo box
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:167
+msgid "&Wave:"
+msgstr ""
+
+#. Translators: wav file edit box
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:179
+msgid "Wav file"
+msgstr ""
+
+#. Translators: This is the button to browse for wav file
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:184
+msgid "&Browse..."
+msgstr ""
+
+#. Volume slider
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:188
+msgid "Volume"
+msgstr ""
+
+#. Speech Behavior Radio Box
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:196
+msgid "Do not speak anything"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:196
+msgid "Keep original text"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:196
+msgid "Edit spoken text"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:197
+msgid "Speech Action"
+msgstr ""
+
+#. Custom Speech Text
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:204
+msgid "Custom Text"
+msgstr ""
+
+#. Translators: label for adjust start
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:210
+msgid ""
+"Start adjustment in millis - positive to cut off start, negative for extra "
+"pause in the beginning."
+msgstr ""
+
+#. Translators: label for adjust end
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:215
+msgid ""
+"End adjustment in millis - positive for early cut off, negative for extra "
+"pause in the end"
+msgstr ""
+
+#. Translators: label for tone
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:220
+msgid "&Tone"
+msgstr ""
+
+#. Translators: label for duration
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:225
+msgid "Duration in milliseconds:"
+msgstr ""
+
+#. Translators: prosody name comboBox
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:230
+msgid "&Prosody name:"
+msgstr ""
+
+#. Translators: label for prosody offset
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:240
+msgid "Prosody offset:"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:246
+msgid "Minimum font size or heading level"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:251
+msgid "Maximum font size or heading level"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:256
+msgid "Minimum prosody offset"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:261
+msgid "Maximum prosody offset"
+msgstr ""
+
+#. Text replacement edit box
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:278
+msgid "&Replacement pattern"
+msgstr ""
+
+#. suppressStateClutter checkbox
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:282
+msgid "Suppress this state in non-verbose mode."
+msgstr ""
+
+#. Translators: label for comment edit box
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:286
+msgid "&Comment"
+msgstr ""
+
+#. Translators: This is the button to test audio rule
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:289
+msgid "&Test, press twice for repeated sound"
+msgstr ""
+
+#. application name filter regex
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:293
+msgid "Filter applications regex"
+msgstr ""
+
+#. Window title filter regex
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:296
+msgid "Filter window title regex"
+msgstr ""
+
+#. URL filter regex
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:299
+msgid "Filter URL regex"
+msgstr ""
+
+#. Translators: This is an error message to let the user know that the pattern field is not valid.
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:396
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:441
+msgid "A pattern is required."
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:396
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:403
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:407
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:421
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:441
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:445
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:460
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:468
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:476
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:483
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:495
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:505
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:512
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:524
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:536
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:554
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:558
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:562
+msgid "Dictionary Entry Error"
+msgstr ""
+
+#. Translators: Invalid regular expression
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:403
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:421
+msgid "Invalid regular expression."
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:407
+msgid ""
+"Regular expression pattern matches empty string. This is not allowed. Please "
+"change the pattern."
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:427
+msgid ""
+"Error: you have entered URL filter for this rule.\n"
+"URL detection feature requires BrowserNav v2.6.2 or later add-on to be "
+"installed.\n"
+"However it is either not installed, or failed to initialize.\n"
+"Please install the latest BrowserNav add-on from add-on store and restart "
+"NVDA.\n"
+"Alternatively, please clear URL regex field to enable this rule on all web "
+"sites.\n"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:445
+msgid "Please enter a single character as pattern."
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:460
+msgid "Minimum numeric value must be strictly less than maximum numeric value."
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:468
+msgid "This value is already used in another rule."
+msgstr ""
+
+#. Translators: wav file not found
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:476
+msgid "Wav file not found."
+msgstr ""
+
+#. Translators: Invalid wav file
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:483
+msgid "Invalid wav file."
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:494
+msgid ""
+"Invalid replacement pattern: {}\n"
+"Plesae use curly braces {} as a format placeholder; please don't use any "
+"other curly braces in replacement string."
+msgstr ""
+
+#. Translators: Invalid regular expression
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:505
+msgid "Start adjustment must be a number."
+msgstr ""
+
+#. Translators: Invalid regular expression
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:512
+msgid "End adjustment must be a number."
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:524
+msgid "tone must be an integer between 0 and 50000"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:536
+msgid "duration must be an integer between 0 and 60000"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:554
+msgid "prosody offset must be an integer between -100 and 100"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:558
+msgid "You must specify prosody offset."
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:562
+msgid "Prosody offset cannot be zero."
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:603
+msgid "Error creating audio rule: {e}"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:604
+msgid "Audio rule Error"
+msgstr ""
+
+#. Translators: browse wav file message
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:620
+msgid "Select wav file:"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:641
+msgid "Hello"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:642
+msgid "world"
+msgstr ""
+
+#. Translators: Title for the settings dialog
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:729
+msgid "Audio Themes: Earcons & Speech Rules"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:752
+msgid "&Rules"
+msgstr ""
+
+#. Translators: The label for a column in symbols list used to identify a symbol.
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:762
+msgid "Pattern"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:763
+msgid "Status"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:764
+msgid "Type"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:765
+msgid "Effect"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:770
+msgid "Toggle"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:772
+msgid "Move &up"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:774
+msgid "Move &down"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:776
+msgid "Add &audio rule"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:778
+msgid "&Edit"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:780
+msgid "Re&move rule"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:784
+msgid "Disable PhoneticPuntuation in applications (comma-separated list)"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:799
+msgid "Enabled"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:799
+msgid "Disabled"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:844
+msgid "Disable (&toggle)"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:846
+msgid "Enable (&toggle)"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:856
+msgid "Rule disabled"
+msgstr ""
+
+#: globalPlugins\audiothemes\phoneticPunctuationGui.py:862
+msgid "Add audio rule"
+msgstr ""
+
+#: globalPlugins\audiothemes\sentenceNavEngine.py:655
+msgid "لا توجد جملة تالية"
+msgstr ""
+
+#: globalPlugins\audiothemes\sentenceNavEngine.py:670
+msgid "لا توجد جملة سابقة"
+msgstr ""
+
+#: globalPlugins\audiothemes\sentenceNavEngine.py:686
+msgid "لا يوجد مقطع تالي"
+msgstr ""
+
+#: globalPlugins\audiothemes\sentenceNavEngine.py:695
+msgid "لا يوجد مقطع سابق"
+msgstr ""
+
+#: globalPlugins\audiothemes\sentenceNavEngine.py:705
+msgid "Move to next paragraph containing text."
+msgstr ""
+
+#: globalPlugins\audiothemes\sentenceNavEngine.py:709
+msgid "No next paragraph with text"
+msgstr ""
+
+#: globalPlugins\audiothemes\sentenceNavEngine.py:711
+msgid "Move to previous paragraph containing text."
+msgstr ""
+
+#: globalPlugins\audiothemes\sentenceNavEngine.py:715
+msgid "No previous paragraph with text"
+msgstr ""
+
+#: globalPlugins\audiothemes\sentenceNavEngine.py:739
+msgid "TextNav error: Infinite loop"
+msgstr ""
+
+#. Translators: Title for the settings panel in NVDA's multi-category settings
+#: globalPlugins\audiothemes\settings.py:32
+#: globalPlugins\audiothemes\__init__.py:69
+msgid "Audio Themes NG"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:40
+msgid "General"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:45
+msgid "Reverb"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:50
+msgid "Earcons & Speech Rules"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:55
+msgid "Miscellaneous"
+msgstr ""
+
+#. Translators: label for the checkbox to enable or disable audio themes
+#: globalPlugins\audiothemes\settings.py:64
+#: globalPlugins\audiothemes\__init__.py:280
+msgid "Enable audio themes"
+msgstr ""
+
+#. Translators: label for a combobox containing a list of installed audio themes
+#: globalPlugins\audiothemes\settings.py:67
+msgid "Select theme:"
+msgstr ""
+
+#. Translators: label for a button to show info about an audio theme
+#: globalPlugins\audiothemes\settings.py:70
+msgid "&About"
+msgstr ""
+
+#. Translators: label for a button to remove an audio theme
+#: globalPlugins\audiothemes\settings.py:72
+msgid "&Remove"
+msgstr ""
+
+#. Translators: label for a button to add a new audio theme
+#: globalPlugins\audiothemes\settings.py:74
+msgid "Add &New..."
+msgstr ""
+
+#. Translators: label for a button to open the themes store
+#: globalPlugins\audiothemes\settings.py:76
+msgid "متجر الثيمات (Themes Store)"
+msgstr ""
+
+#. Translators: label for a checkbox to toggle the 3D mode
+#: globalPlugins\audiothemes\settings.py:78
+msgid "Play sounds in 3D mode"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:81
+msgid "Speak roles such as button, edit box , link etc. "
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:85
+msgid "Speak roles during say all"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:89
+msgid "Use speech synthesizer volume"
+msgstr ""
+
+#. Translators: label for a slider to set the volume of this add-on
+#: globalPlugins\audiothemes\settings.py:92
+msgid "Audio themes volume:"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:94
+msgid "Audio themes volume"
+msgstr ""
+
+#. Unspoken Stability and UX Features
+#: globalPlugins\audiothemes\settings.py:130
+msgid "تسريع الأداء (تخزين الأصوات في الذاكرة لتخفيف الضغط)"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:131
+msgid "تسوية مستوى الصوت التلقائية (منع الأصوات المزعجة)"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:132
+msgid "تنعيم أطراف الصوت (منع طقطقة السماعات)"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:133
+msgid "توزيع مكاني 3D انسيابي للصوت"
+msgstr ""
+
+#. Typing Sounds Group
+#: globalPlugins\audiothemes\settings.py:145
+msgid "Typing Sounds"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:146
+#: globalPlugins\audiothemes\__init__.py:287
+msgid "Enable typing sounds"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:147
+msgid "Play typing sounds only in edit boxes"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:148
+msgid "Typing sounds volume:"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:151
+msgid "Typing sound pack:"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:173
+msgid "E&xport Configuration..."
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:174
+msgid "I&mport Configuration..."
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:223
+msgid "Enable Reverb"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:226
+msgid "Room Size:"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:227
+msgid "Room Size"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:233
+msgid "Damping:"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:234
+msgid "Damping"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:240
+msgid "Wet Level:"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:241
+msgid "Wet Level"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:247
+msgid "Dry Level:"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:248
+msgid "Dry Level"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:254
+msgid "Width:"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:255
+msgid "Width"
+msgstr ""
+
+#. --- Sentence navigation group ---
+#: globalPlugins\audiothemes\settings.py:282
+msgid "التنقل عبر الجمل (Alt+الأسهم)"
+msgstr ""
+
+#. Paragraph chime volume
+#: globalPlugins\audiothemes\settings.py:285
+msgid "مستوى التنبيه الصوتي عند عبور حدود الفقرة:"
+msgstr ""
+
+#. No next sentence chime
+#: globalPlugins\audiothemes\settings.py:291
+msgid "مستوى التنبيه الصوتي عند عدم وجود جمل إضافية:"
+msgstr ""
+
+#. Speak formatted text
+#: globalPlugins\audiothemes\settings.py:297
+msgid "نطق النص المنسق"
+msgstr ""
+
+#. Enable in Word
+#: globalPlugins\audiothemes\settings.py:301
+msgid "تفعيل الدعم التجريبي لبرامج Word و WordPad (يلغي وظائف NVDA الافتراضية)"
+msgstr ""
+
+#. Break on Wiki References
+#: globalPlugins\audiothemes\settings.py:305
+msgid "تجاوز مراجع ويكيبيديا عند تحديد نهاية الجملة"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:310
+msgid "دائماً"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:310
+msgid "نفس المسافة البادئة والنمط"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:310
+msgid "مطلقاً"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:311
+msgid "إعادة بناء الجمل عبر الفقرات:"
+msgstr ""
+
+#. Sentence breakers
+#: globalPlugins\audiothemes\settings.py:317
+msgid "محددات نهاية الجملة:"
+msgstr ""
+
+#. Full width sentence breakers
+#: globalPlugins\audiothemes\settings.py:323
+msgid "محددات نهاية الجملة (عرض كامل):"
+msgstr ""
+
+#. Phrase breakers
+#: globalPlugins\audiothemes\settings.py:329
+msgid "محددات المقاطع:"
+msgstr ""
+
+#. Full width phrase breakers
+#: globalPlugins\audiothemes\settings.py:335
+msgid "محددات المقاطع (عرض كامل):"
+msgstr ""
+
+#. Skippable punctuation
+#: globalPlugins\audiothemes\settings.py:341
+msgid "علامات الترقيم القابلة للتخطي:"
+msgstr ""
+
+#. Capital letters
+#: globalPlugins\audiothemes\settings.py:347
+msgid "الأحرف الكبيرة (بدون مسافات):"
+msgstr ""
+
+#. Lower case letters
+#: globalPlugins\audiothemes\settings.py:353
+msgid "الأحرف الصغيرة (بدون مسافات):"
+msgstr ""
+
+#. Exceptional abbreviations
+#: globalPlugins\audiothemes\settings.py:359
+msgid "الاختصارات الاستثنائية (مفصولة بمسافة):"
+msgstr ""
+
+#. Blacklist
+#: globalPlugins\audiothemes\settings.py:365
+msgid "تعطيل التنقل عبر الجمل في التطبيقات التالية (مفصولة بفاصلة):"
+msgstr ""
+
+#. --- Text navigation group ---
+#: globalPlugins\audiothemes\settings.py:373
+msgid "التنقل عبر الفقرات النصية (Alt+Shift+الأسهم)"
+msgstr ""
+
+#. Crackling Volume
+#: globalPlugins\audiothemes\settings.py:376
+msgid "مستوى صوت الطقطقة للفقرات:"
+msgstr ""
+
+#. No next text chime
+#: globalPlugins\audiothemes\settings.py:382
+msgid "مستوى التنبيه الصوتي عند عدم وجود فقرة نصية:"
+msgstr ""
+
+#. Speak error message
+#: globalPlugins\audiothemes\settings.py:388
+msgid "نطق رسالة عند عدم وجود فقرة نصية"
+msgstr ""
+
+#. --- BrowserNav navigation group ---
+#: globalPlugins\audiothemes\settings.py:395
+msgid "التنقل المتقدم في المتصفح (BrowserNav)"
+msgstr ""
+
+#. Crackling volume
+#: globalPlugins\audiothemes\settings.py:398
+msgid "مستوى صوت الطقطقة (أثناء التنقل):"
+msgstr ""
+
+#. Beep volume
+#: globalPlugins\audiothemes\settings.py:404
+msgid "مستوى التنبيه المستمر (Beeping):"
+msgstr ""
+
+#. Skip Clutter volume
+#: globalPlugins\audiothemes\settings.py:410
+msgid "مستوى التنبيه عند تجاوز الفوضى (Skip Clutter):"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:419
+msgid ""
+"تستخدم إضافة SentenceNav اختصار Alt+Up/Down للتنقل بين الجمل، و Alt+Win+Up/"
+"Down للتنقل بين المقاطع.\n"
+"تستخدم إضافة TextNav اختصار Alt+Shift+Up/Down للتنقل عبر الفقرات النصية.\n"
+"تستخدم إضافة BrowserNav اختصار NVDA+Alt+Arrows للتنقل المتقدم في المتصفح.\n"
+"أزرار الأسهم العادية تحتفظ بسلوك NVDA الافتراضي."
+msgstr ""
+
+#. Translators: content of a message box containing theme information
+#: globalPlugins\audiothemes\settings.py:624
+msgid ""
+"Name: {name}\n"
+"Author: {author}\n"
+"\n"
+"{summary}"
+msgstr ""
+
+#. Translators: title for a message containing theme information
+#: globalPlugins\audiothemes\settings.py:628
+msgid "About Audio Theme"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:642
+msgid ""
+"This can not be undone.\n"
+"Are you sure you  want to remove audio theme {name}?"
+msgstr ""
+
+#. Translators: title of a message asking the user to confirm the removal of an audio theme
+#: globalPlugins\audiothemes\settings.py:645
+msgid "Remove Audio Theme"
+msgstr ""
+
+#. Translators: the title of a file dialog to browse to an audio theme package
+#: globalPlugins\audiothemes\settings.py:656
+msgid "Choose an audio theme package"
+msgstr ""
+
+#. Translators: theme file type description
+#: globalPlugins\audiothemes\settings.py:658
+msgid "Audio Theme Packages"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:700
+msgid "Export Audio Themes Configuration"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:701
+#: globalPlugins\audiothemes\settings.py:740
+msgid "Audio Themes Configuration (*.atcfg)|*.atcfg"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:729
+msgid ""
+"Comprehensive export completed successfully!\n"
+"Includes: settings, rules, themes, typing sounds, and earcon sounds."
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:729
+#: globalPlugins\audiothemes\settings.py:810
+msgid "Success"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:731
+msgid ""
+"Error exporting configuration:\n"
+"{}"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:731
+#: globalPlugins\audiothemes\settings.py:812
+msgid "Error"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:739
+msgid "Import Audio Themes Configuration"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:778
+msgid ""
+"This package contains audio themes.\n"
+"Do you want to overwrite existing themes with the same name?"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:779
+msgid "Import Themes"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:810
+msgid "Comprehensive import completed successfully!"
+msgstr ""
+
+#: globalPlugins\audiothemes\settings.py:812
+msgid ""
+"Error importing configuration:\n"
+"{}"
+msgstr ""
+
+#. Translators: label for the audio themes studio menu item
+#: globalPlugins\audiothemes\__init__.py:137
+msgid "&Audio Themes Studio"
+msgstr ""
+
+#. Translators: title for the audio themes studio dialog
+#: globalPlugins\audiothemes\__init__.py:216
+msgid "Audio Themes Studio"
+msgstr ""
+
+#: globalPlugins\audiothemes\__init__.py:219
+msgid "Report the object under the cursor with full 3D audio coordinates."
+msgstr ""
+
+#: globalPlugins\audiothemes\__init__.py:282
+msgid "Disable audio themes"
+msgstr ""
+
+#: globalPlugins\audiothemes\__init__.py:289
+msgid "Disable typing sounds"
+msgstr ""
+
+#: globalPlugins\audiothemes\__init__.py:290
+msgid ""
+"Pressing it once toggles audio themes on and off. Pressing twice toggles "
+"typing sounds."
+msgstr ""
+
+#: globalPlugins\audiothemes\__init__.py:380
+msgid "Toggle Earcons and Speech Rules."
+msgstr ""
+
+#: globalPlugins\audiothemes\__init__.py:386
+msgid "Earcons and Speech Rules on"
+msgstr ""
+
+#: globalPlugins\audiothemes\__init__.py:388
+msgid "Earcons and Speech Rules off"
+msgstr ""
+
+#: globalPlugins\audiothemes\__init__.py:391
+msgid "Toggle state verbosity reporting."
+msgstr ""
+
+#: globalPlugins\audiothemes\__init__.py:397
+msgid "Verbose state reporting"
+msgstr ""
+
+#: globalPlugins\audiothemes\__init__.py:399
+msgid "Concise state reporting"
+msgstr ""
+
+#: globalPlugins\audiothemes\__init__.py:403
+msgid "Speak current heading level."
+msgstr ""
+
+#: globalPlugins\audiothemes\__init__.py:427
+msgid "{roleText} level {level}"
+msgstr ""
+
+#: globalPlugins\audiothemes\__init__.py:430
+msgid "No heading level information"
+msgstr ""
+
+#. Add-on summary, usually the user visible name of the addon.
+#. Translators: Summary for this add-on to be shown
+#. on installation and add-on information.
+#: buildVars.py:22
+msgid "Audio Themes NG & Phonetic Punctuation"
+msgstr ""
+
+#. Add-on description
+#. Translators: Long description to be shown for this add-on
+#. on add-on information from add-ons manager
+#: buildVars.py:26
+msgid ""
+"استكمال العمل على إضافة سمات الصوت (Audio Themes)، مع إضافة دعم للإصدارات "
+"الأحدث من NVDA.\n"
+"تقوم هذه الإضافة بإنشاء عرض صوتي افتراضي يشغل أصواتاً عند التركيز أو التنقل "
+"بين العناصر.\n"
+"كما تتيح لك الإضافة تفعيل، تثبيت، إزالة، تحرير، إنشاء، وتوزيع حزم السمات "
+"الصوتية.\n"
+"\n"
+"تم دمجها مع إضافة Earcons and Speech rules:\n"
+"تسمح بإعداد أصوات مخصصة للكلمات، الأحرف، أنواع العناصر، الحالات، ومعلومات "
+"التنسيق.\n"
+"\n"
+"تم دمج إضافة SentenceNav للتنقل بالجمل (Alt+أسهم).\n"
+"تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).\n"
+msgstr ""

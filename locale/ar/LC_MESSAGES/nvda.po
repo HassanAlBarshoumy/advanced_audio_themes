@@ -1,0 +1,2270 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: advanced_audio_themes 1.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-05-24 12:00+0000\n"
+"PO-Revision-Date: 2026-05-24 12:00+0000\n"
+"Last-Translator: AI <ai@example.com>\n"
+"Language-Team: ar <LL@li.org>\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid " - Copy"
+msgstr " - نسخة"
+
+msgid "&About"
+msgstr "&حول"
+
+msgid "&Add"
+msgstr "&يضيف"
+
+msgid "&Add Profile"
+msgstr "&إضافة ملف تعريف"
+
+msgid "&Add..."
+msgstr "إ&ضافة..."
+
+msgid "&Attributes (space separated list):"
+msgstr "&السمات (قائمة مفصولة بمسافات):"
+
+msgid "&Audio Themes Studio"
+msgstr "ا&ستوديو السمات الصوتية"
+
+msgid "&Beep"
+msgstr "&صافرة"
+
+msgid "&Bookmark"
+msgstr "&إشارة مرجعية"
+
+msgid "&Bookmarks"
+msgstr "&الإشارات المرجعية"
+
+msgid "&Browse"
+msgstr "ا&ستعراض"
+
+msgid "&Browse..."
+msgstr "ا&ستعراض..."
+
+msgid "&Built in wave"
+msgstr "موجة م&دمجة"
+
+msgid "&Category:"
+msgstr "ال&فئة:"
+
+msgid "&Change..."
+msgstr "&تغيير..."
+
+msgid "&Close"
+msgstr "إغلاق (Close)"
+
+msgid "&Comment"
+msgstr "ت&عليق"
+
+msgid "&Display name (optional)"
+msgstr "&الاسم المعروض (اختياري)"
+
+msgid "&Download & Install"
+msgstr "تنزيل وتثبيت (Download & Install)"
+
+msgid "&Edit"
+msgstr "ت&عديل"
+
+msgid "&Edit site"
+msgstr "&تحرير الموقع"
+
+msgid "&Focus mode"
+msgstr "&وضع التركيز"
+
+msgid "&Import website from file"
+msgstr "&استيراد موقع الويب من ملف"
+
+msgid "&Keep original"
+msgstr "الإ&بقاء على الأصلي"
+
+msgid "&Live Preview"
+msgstr "معاينة الصوت (Live Preview)"
+
+msgid "&Live region mode"
+msgstr "&وضع المنطقة المباشرة"
+
+msgid "&Match type"
+msgstr "&نوع المطابقة"
+
+msgid "&Pattern"
+msgstr "الن&مط"
+
+msgid "&Preview"
+msgstr "معاينة (&Preview)"
+
+msgid "&Prosody"
+msgstr "ن&برة"
+
+msgid "&Prosody name:"
+msgstr "اسم الن&برة:"
+
+msgid "&Record from Microphone"
+msgstr "تسجيل من الميكروفون (&Record)"
+
+msgid "&Refresh"
+msgstr "تحديث (Refresh)"
+
+msgid "&Remove"
+msgstr "إ&زالة"
+
+msgid "&Remove Profile"
+msgstr "&إزالة الملف الشخصي"
+
+msgid "&Remove bookmark"
+msgstr "&إزالة الإشارة المرجعية"
+
+msgid "&Remove site"
+msgstr "&إزالة الموقع"
+
+msgid "&Replacement pattern"
+msgstr "نمط الا&ستبدال"
+
+msgid "&Rules"
+msgstr "ال&قواعد"
+
+msgid "&Save"
+msgstr "ح&فظ"
+
+msgid "&Search rules:"
+msgstr "&قواعد البحث:"
+
+msgid "&Site this bookmark belongs to:"
+msgstr "&الموقع الذي تنتمي إليه هذه الإشارة المرجعية:"
+
+msgid "&Sites"
+msgstr "&المواقع"
+
+msgid "&Sort"
+msgstr "&نوع"
+
+msgid "&Stop Recording"
+msgstr "إيقاف التسجيل (&Stop)"
+
+msgid "&Test, press twice for repeated sound"
+msgstr "ا&ختبار، اضغط مرتين لتكرار الصوت"
+
+msgid "&Text"
+msgstr "ن&ص"
+
+msgid "&Tone"
+msgstr "الن&غمة"
+
+msgid "&Type"
+msgstr "الن&وع"
+
+msgid "&URL"
+msgstr "&عنوان URL"
+
+msgid "&Version (optional for exported bookmarks)"
+msgstr "&الإصدار (اختياري للإشارات المرجعية المصدرة)"
+
+msgid "&Wave file"
+msgstr "ملف &صوتي"
+
+msgid "&Wave:"
+msgstr "الم&وجة:"
+
+msgid "&Website"
+msgstr "&موقع إلكتروني"
+
+msgid "&Website name"
+msgstr "&اسم موقع الويب"
+
+msgid "&Websites"
+msgstr "&مواقع الويب"
+
+msgid "3D Spatial (Stereo)"
+msgstr "مكاني ثلاثي الأبعاد (ستيريو)"
+
+msgid "A pattern is required."
+msgstr "النمط مطلوب."
+
+msgid "About Audio Theme"
+msgstr "حول السمة الصوتية"
+
+msgid "Add &New..."
+msgstr "إ&ضافة جديد..."
+
+msgid "Add &audio rule"
+msgstr "إضافة &قاعدة صوتية"
+
+msgid "Add App Profile"
+msgstr "إضافة ملف تعريف التطبيق"
+
+msgid "Add Sound"
+msgstr "إضافة صوت"
+
+msgid "Add audio rule"
+msgstr "إضافة قاعدة صوتية"
+
+msgid "Added '{item} to matched attributes edit box.'"
+msgstr "تمت إضافة \"{item}\" إلى مربع تعديل السمات المطابقة.'"
+
+msgid "Adjusts BrowserNav rotor"
+msgstr "يضبط دوار BrowserNav"
+
+msgid "Advanced Audio Themes"
+msgstr "سمات الصوت المتقدمة"
+
+msgid "Advanced Browser Navigation (BrowserNav)"
+msgstr "التنقل المتقدم في المتصفح (BrowserNav)"
+
+msgid "All Supported Audio Formats"
+msgstr "جميع صيغ الصوت المدعومة"
+
+msgid "All of the fields are required. Exiting..."
+msgstr "جميع الحقول مطلوبة. جارِ الإنهاء..."
+
+msgid "All rules disabled"
+msgstr "تم تعطيل كافة القواعد"
+
+msgid "All rules enabled"
+msgstr "تم تمكين كافة القواعد"
+
+msgid "Always"
+msgstr "دائماً"
+
+msgid ""
+"Another website with this name already exists. Please choose a different "
+"name."
+msgstr "يوجد موقع ويب آخر بهذا الاسم بالفعل. الرجاء اختيار اسم مختلف."
+
+msgid "App Profiles"
+msgstr "ملفات تعريف التطبيق"
+
+msgid "Application (e.g. chrome.exe)"
+msgstr "التطبيق (مثل chrome.exe)"
+
+msgid "Application executable name (e.g. notepad.exe):"
+msgstr "الاسم القابل للتنفيذ للتطبيق (على سبيل المثال، notepad.exe):"
+
+msgid "Audio Ducking (lower volume when NVDA speaks)"
+msgstr "خفض مستوى الصوت (خفض مستوى الصوت عندما يتحدث NVDA)"
+
+msgid "Audio Engine"
+msgstr "محرك الصوت"
+
+msgid "Audio Output Mode:"
+msgstr "وضع إخراج الصوت:"
+
+msgid "Audio Sonar"
+msgstr "السونار الصوتي"
+
+msgid ""
+"Audio Sonar: Sweeps the active window to create an audio map of its "
+"elements."
+msgstr "السونار الصوتي: يقوم بمسح النافذة النشطة لإنشاء خريطة صوتية لعناصرها."
+
+msgid "Audio Theme"
+msgstr "موضوع الصوت"
+
+msgid "Audio Theme Package (*.atp)|*.atp"
+msgstr "حزمة سمة صوتية (*.atp)|*.atp"
+
+msgid "Audio Theme Packages"
+msgstr "حزم السمات الصوتية"
+
+msgid "Audio Theme:"
+msgstr "موضوع الصوت:"
+
+msgid "Audio Themes Commands"
+msgstr "أوامر السمات الصوتية"
+
+msgid "Audio Themes Configuration (*.atcfg)|*.atcfg"
+msgstr "إعدادات السمات الصوتية (*.atcfg)|*.atcfg"
+
+msgid "Audio Themes NG"
+msgstr "سمات الصوت المتقدمة"
+
+msgid "Audio Themes Studio"
+msgstr "استوديو السمات الصوتية"
+
+msgid "Audio Themes: Earcons & Speech Rules"
+msgstr "سمات الصوت: قواعد النطق والأصوات"
+
+msgid "Audio beacon dropped at current location"
+msgstr "تم إسقاط الإشارة الصوتية في الموقع الحالي"
+
+msgid "Audio beacon removed"
+msgstr "تمت إزالة الإشارة الصوتية"
+
+msgid "Audio preview failed."
+msgstr "فشلت المعاينة الصوتية."
+
+msgid "Audio rule Error"
+msgstr "خطأ في القاعدة الصوتية"
+
+msgid ""
+"Audio theme successfully installed. You can now select it from the themes "
+"menu."
+msgstr "تم تثبيت الثيم الصوتي بنجاح. يمكنك اختياره الآن من قائمة الثيمات."
+
+msgid "Audio theme: {theme}"
+msgstr "موضوع الصوت: {theme}"
+
+msgid "Audio themes"
+msgstr "السمات الصوتية"
+
+msgid ""
+"Audio themes command layer. Press this then a command key (e.g. h for help)."
+msgstr "طبقة أوامر السمات الصوتية. اضغط هذا ثم مفتاح الأمر (مثل h للمساعدة)."
+
+msgid "Audio themes disabled"
+msgstr "تم تعطيل موضوعات الصوت"
+
+msgid "Audio themes enabled"
+msgstr "تم تمكين سمات الصوت"
+
+msgid "Audio themes volume"
+msgstr "مستوى صوت السمات"
+
+msgid "Audio themes volume:"
+msgstr "مستوى صوت السمات:"
+
+msgid ""
+"AutoClick  according to BrowserNav AutoClick bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"النقر التلقائي وفقًا للإشارة المرجعية لـ BrowserNav AutoClick؛ يرجى التحقق "
+"من لوحة تكوين browserNav للحصول على قائمة الإشارات المرجعية."
+
+msgid ""
+"AutoClick  according to BrowserNav AutoClick2 bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"النقر التلقائي وفقًا للإشارة المرجعية BrowserNav AutoClick2؛ يرجى التحقق من "
+"لوحة تكوين browserNav للحصول على قائمة الإشارات المرجعية."
+
+msgid ""
+"AutoClick  according to BrowserNav AutoClick3 bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"النقر التلقائي وفقًا للإشارة المرجعية BrowserNav AutoClick3؛ يرجى التحقق من "
+"لوحة تكوين browserNav للحصول على قائمة الإشارات المرجعية."
+
+msgid "AutoSpeak disabled"
+msgstr "تم تعطيل التحدث التلقائي"
+
+msgid "AutoSpeak mode"
+msgstr "وضع التحدث التلقائي"
+
+msgid "Automatically detect and speak changes to this bookmark"
+msgstr "اكتشاف التغييرات في هذه الإشارة المرجعية ونطقها تلقائيًا"
+
+msgid "Available BrowserNav websites"
+msgstr "مواقع BrowserNav المتاحة"
+
+msgid ""
+"Available attributes in current paragraph (press space to add to current "
+"bookmark):"
+msgstr ""
+"السمات المتوفرة في الفقرة الحالية (اضغط على مسافة للإضافة إلى الإشارة "
+"المرجعية الحالية):"
+
+msgid "Beep on every focus event"
+msgstr "زمارة على كل حدث التركيز"
+
+msgid "Beep on every successful autoClick"
+msgstr "صوت تنبيه عند كل نقرة تلقائية ناجحة"
+
+msgid "Beep on every update from live region"
+msgstr "زمارة على كل تحديث من المنطقة الحية"
+
+msgid "Beeping sound volume:"
+msgstr "مستوى التنبيه المستمر (Beeping):"
+
+msgid "Beeping volume (Beeping)"
+msgstr "مستوى صوت التنبيه المستمر (Beeping)"
+
+msgid "Blacklist applications for sentence navigation (comma separated):"
+msgstr "تطبيقات القائمة السوداء للتنقل بين الجمل (مفصولة بفواصل):"
+
+msgid "Blank announcement"
+msgstr "إعلان فارغ"
+
+msgid "Bold"
+msgstr "عريض"
+
+msgid "Bookmark Entry Error"
+msgstr "خطأ في إدخال الإشارة المرجعية"
+
+msgid "Bookmark Entry error"
+msgstr "خطأ في إدخال الإشارة المرجعية"
+
+msgid "Bookmark Entry warning"
+msgstr "تحذير من إدخال الإشارة المرجعية"
+
+msgid "Bookmark Error"
+msgstr "خطأ في الإشارة المرجعية"
+
+msgid "Bookmark enabled"
+msgstr "تم تمكين الإشارة المرجعية"
+
+msgid "Bookmark entry error"
+msgstr "خطأ في إدخال الإشارة المرجعية"
+
+msgid "Bookmark points to non-focusable NVDA object, cannot click it."
+msgstr ""
+"الإشارة المرجعية تشير إلى كائن NVDA غير قابل للتركيز، ولا يمكن النقر عليه."
+
+msgid "Bookmark store communication error"
+msgstr "خطأ في الاتصال بمتجر الإشارة المرجعية"
+
+msgid ""
+"Bookmarks that span across paragraphs is not supported by BrowserNav. Please"
+" clear the selection or select something within a single paragraph."
+msgstr ""
+"الإشارات المرجعية التي تمتد عبر الفقرات غير مدعومة من قبل BrowserNav. الرجاء"
+" مسح التحديد أو تحديد شيء ما ضمن فقرة واحدة."
+
+msgid ""
+"Both hierarchical and numeric script bookmarks are configured for this "
+"website. This is not supported; please disable either hierarchical or "
+"numeric script bookmarks."
+msgstr ""
+"تم تكوين كل من الإشارات المرجعية النصية الهرمية والرقمية لهذا الموقع. هذا "
+"غير معتمد؛ يرجى تعطيل الإشارات المرجعية للبرنامج النصي الهرمي أو الرقمي."
+
+msgid ""
+"Browser state has changed. Different element on the page is now focused."
+msgstr "لقد تغيرت حالة المتصفح. يتم الآن التركيز على عنصر مختلف في الصفحة."
+
+msgid ""
+"Browser state has changed. Focused element is not an edit box. Role: %d."
+msgstr ""
+"لقد تغيرت حالة المتصفح. العنصر الذي تم التركيز عليه ليس مربع تحرير. الدور: "
+"%د."
+
+msgid "BrowserNav"
+msgstr "متصفح التنقل"
+
+msgid "BrowserNav QuickSearch websites and bookmarks"
+msgstr "مواقع الويب والإشارات المرجعية الخاصة بـ BrowserNav QuickSearch"
+
+msgid "BrowserNav Settings"
+msgstr "إعدادات BrowserNav"
+
+msgid ""
+"BrowserNav error: inconsistent indents in the document. Recomputing indents,"
+" please try again."
+msgstr ""
+"خطأ BrowserNav: مسافات بادئة غير متناسقة في المستند. يتم الآن إعادة حساب "
+"المسافات البادئة، يرجى المحاولة مرة أخرى."
+
+msgid "BrowserNav navigates by "
+msgstr "يتنقل BrowserNav بواسطة"
+
+msgid "BrowserNav temporary action configured only for this website."
+msgstr "تم تكوين الإجراء المؤقت BrowserNav لموقع الويب هذا فقط."
+
+msgid ""
+"BrowserNav warning: Two or more sites matching this URL are configured to "
+"perform autoClick on load. This is not supported."
+msgstr ""
+"تحذير BrowserNav: تم تكوين موقعين أو أكثر يطابقان عنوان URL هذا لإجراء النقر"
+" التلقائي عند التحميل. هذا غير معتمد."
+
+msgid "BrowserNav website import conflict"
+msgstr "تعارض استيراد موقع BrowserNav"
+
+msgid "C&hime:"
+msgstr "ال&نغمة:"
+
+msgid "Cancel"
+msgstr "إلغاء"
+
+msgid "Cannot combine tilde with digits for numeric script!"
+msgstr "لا يمكن دمج التلدة مع الأرقام للبرنامج النصي الرقمي!"
+
+msgid ""
+"Cannot copy text out of edit box. Please make sure edit box is not empty and"
+" not read-only!"
+msgstr ""
+"لا يمكن نسخ النص من مربع التحرير. الرجاء التأكد من أن مربع التعديل ليس "
+"فارغًا وليس للقراءة فقط!"
+
+msgid "Cannot edit in this window."
+msgstr "لا يمكن التحرير في هذه النافذة."
+
+msgid "Cannot go back any more"
+msgstr "لا يمكن العودة أكثر من ذلك"
+
+msgid "Capital letters (no spaces):"
+msgstr "الحروف الكبيرة (بدون مسافات):"
+
+msgid "Category"
+msgstr "فئة"
+
+msgid "Centered (Mono)"
+msgstr "توسيط (أحادي)"
+
+msgid "Character"
+msgstr "شخصية"
+
+msgid "Characters"
+msgstr "الأحرف"
+
+msgid "Chime &category:"
+msgstr "الرنين والفئة:"
+
+msgid "Choose an audio file"
+msgstr "اختيار ملف صوتي"
+
+msgid "Choose an audio theme package"
+msgstr "اختيار حزمة سمة صوتية"
+
+msgid "Clicked {n} objects."
+msgstr "تم النقر على {n} من الكائنات."
+
+msgid ""
+"Comprehensive export completed successfully!\n"
+"Includes: settings, rules, themes, typing sounds, and earcon sounds."
+msgstr ""
+"تم التصدير الشامل بنجاح!\n"
+"يشمل: الإعدادات، القواعد، السمات، أصوات الكتابة، وأصوات الإشعارات.تم التصدير الشامل بنجاح!\n"
+"يشمل: الإعدادات، والقواعد، والسمات، وأصوات الكتابة، وأصوات الرموز."
+
+msgid "Comprehensive import completed successfully!"
+msgstr "تم الاستيراد الشامل بنجاح!"
+
+msgid "Concise state reporting"
+msgstr "نطق الحالات بإيجاز"
+
+msgid ""
+"Configure specific audio themes to automatically activate when certain "
+"applications are focused."
+msgstr ""
+"قم بتكوين سمات صوتية محددة لتنشيطها تلقائيًا عند التركيز على تطبيقات معينة."
+
+msgid "Confirm Quit"
+msgstr "تأكيد الإنهاء"
+
+msgid "Connecting to store..."
+msgstr "جاري الاتصال بالمتجر..."
+
+msgid "Copied to clipboard: {}"
+msgstr "تم النسخ إلى الحافظة: {}"
+
+msgid "Copy the last text from semi-accessible edit box to clipboard."
+msgstr ""
+"انسخ النص الأخير من مربع التحرير شبه الذي يمكن الوصول إليه إلى الحافظة."
+
+msgid "Could not copy file {src} to directory {dst}."
+msgstr "تعذر نسخ الملف {src} إلى الدليل {dst}."
+
+msgid "Could not load website from {}: {}"
+msgstr "تعذر تحميل موقع الويب من {}: {}"
+
+msgid "Could not save website to {}: {}"
+msgstr "تعذر حفظ موقع الويب في {}: {}"
+
+msgid "Crackling sound volume (during navigation):"
+msgstr "مستوى صوت الطقطقة (أثناء التنقل):"
+
+msgid "Crackling volume"
+msgstr "مستوى صوت الطقطقة"
+
+msgid "Create &New Audio Theme"
+msgstr "إنشاء سمة صوتية &جديدة"
+
+msgid "Create a new audio theme package from scratch"
+msgstr "إنشاء حزمة سمة صوتية جديدة من البداية"
+
+msgid "Create new bookmark from current paragraph for site {site}"
+msgstr "إنشاء إشارة مرجعية جديدة من الفقرة الحالية للموقع {site}"
+
+msgid "Create new website for domain %s"
+msgstr "إنشاء موقع ويب جديد للمجال %s"
+
+msgid "Create new website with custom URL matching options"
+msgstr "قم بإنشاء موقع ويب جديد بخيارات مطابقة عنوان URL المخصصة"
+
+msgid "Creating New Theme - {name}"
+msgstr "إنشاء سمة جديدة - {name}"
+
+msgid "Current object has no location"
+msgstr "الكائن الحالي ليس له موقع"
+
+msgid "Current selection spans across multiple paragraphs."
+msgstr "يمتد التحديد الحالي عبر فقرات متعددة."
+
+msgid "Custom &Keystroke"
+msgstr "مخصص وضغطة المفاتيح"
+
+msgid "Custom &Keystroke: %s"
+msgstr "&ضغط المفاتيح المخصص: %s"
+
+msgid "Custom Display Name (optional)"
+msgstr "اسم العرض المخصص (اختياري)"
+
+msgid "Custom Text"
+msgstr "النص المخصص"
+
+msgid "Customize &Existing Audio Theme"
+msgstr "ت&خصيص سمة صوتية حالية"
+
+msgid "Customize an installed audio theme with your prefered  sounds."
+msgstr "تخصيص سمة صوتية مثبتة بأصواتك المفضلة."
+
+msgid "Customize announcement format per role:"
+msgstr "تخصيص تنسيق الإعلان لكل دور:"
+
+msgid "Cycle Audio Themes"
+msgstr "دورة مواضيع الصوت"
+
+msgid "Cycle Typing Sounds"
+msgstr "أصوات دورة الكتابة"
+
+msgid "Cycles through available audio themes."
+msgstr "التنقل عبر السمات الصوتية المتاحة."
+
+msgid "Cycles through available typing sound packs."
+msgstr "التنقل عبر حزم الصوت المتاحة للكتابة."
+
+msgid "D&uplicate"
+msgstr "ت&كرار"
+
+msgid "Damping"
+msgstr "التخميد"
+
+msgid "Damping:"
+msgstr "التخميد:"
+
+msgid "Debug &beep mode"
+msgstr "وضع التصحيح والصافرة"
+
+msgid "Decrease Audio Themes Volume"
+msgstr "خفض مستوى صوت السمات الصوتية"
+
+msgid "Decreases the audio themes volume by 5 percent."
+msgstr "خفض مستوى صوت السمات بمقدار 5 بالمئة."
+
+msgid "Default &Keystroke: %s"
+msgstr "&ضغط المفاتيح الافتراضي: %s"
+
+msgid "Default (name, role then state)"
+msgstr "الافتراضي (الاسم والدور ثم الحالة)"
+
+msgid "Delay before initial autoClick in milliseconds:"
+msgstr "التأخير قبل النقر التلقائي الأولي بالمللي ثانية:"
+
+msgid "Delay between recurring autoClicks  in milliseconds:"
+msgstr "التأخير بين النقرات التلقائية المتكررة بالمللي ثانية:"
+
+msgid "Deselect All"
+msgstr "قم بإلغاء تحديد الكل"
+
+msgid "Dictionary Entry Error"
+msgstr "خطأ في إدخال القاموس"
+
+msgid "Disable (&toggle)"
+msgstr "تعطيل (ت&بديل)"
+
+msgid "Disable A&ll"
+msgstr "تعطيل أ&ل"
+
+msgid "Disable Audio Themes in these applications (comma separated):"
+msgstr "إيقاف الثيمات الصوتية في هذه البرامج (مفصولة بفاصلة):"
+
+msgid "Disable PhoneticPuntuation in applications (comma-separated list)"
+msgstr "تعطيل النطق الصوتي في التطبيقات (قائمة مفصولة بفاصلة)"
+
+msgid "Disable audio themes"
+msgstr "تعطيل السمات الصوتية"
+
+msgid "Disable typing sounds"
+msgstr "تعطيل أصوات الكتابة"
+
+msgid "Disabled"
+msgstr "معطلة"
+
+msgid "Do not speak anything"
+msgstr "عدم نطق أي شيء"
+
+msgid "Domain"
+msgstr "اِختِصاص"
+
+msgid "Done."
+msgstr "منتهي."
+
+msgid "Download failed."
+msgstr "فشل التحميل."
+
+msgid "Downloading audio preview..."
+msgstr "جاري تحميل المعاينة الصوتية..."
+
+msgid "Downloading... Please wait"
+msgstr "جاري التحميل... الرجاء الانتظار"
+
+msgid "Dry Level"
+msgstr "مستوى الصوت الأصلي"
+
+msgid "Dry Level:"
+msgstr "مستوى الصوت الأصلي:"
+
+msgid "Ducked Volume (%):"
+msgstr "الحجم المنخفض (%):"
+
+msgid "Duration in milliseconds:"
+msgstr "المدة بالمللي ثانية:"
+
+msgid "E&xport Configuration..."
+msgstr "ت&صدير الإعدادات..."
+
+msgid "E&xport as .atp..."
+msgstr "&تصدير كملف .atp..."
+
+msgid "E&xport site and all bookmarks"
+msgstr "&تصدير الموقع وجميع الإشارات المرجعية"
+
+msgid "Earcons & Speech Rules"
+msgstr "قواعد النطق والأصوات"
+
+msgid "Earcons and Speech Rules add-on"
+msgstr "الوظيفة الإضافية لرموز الأذن وقواعد الكلام"
+
+msgid "Earcons and Speech Rules off"
+msgstr "قواعد النطق والأصوات معطلة"
+
+msgid "Earcons and Speech Rules on"
+msgstr "قواعد النطق والأصوات مفعلة"
+
+msgid "Earcons and speech rules add-on Error"
+msgstr "خطأ في إضافة قواعد النطق والأصوات"
+
+msgid "Edit &Description"
+msgstr "التعديل والوصف"
+
+msgid "Edit &bookmarks"
+msgstr "تحرير &الإشارات المرجعية"
+
+msgid "Edit &script in new window; press Control+Enter when Done."
+msgstr ""
+"تحرير & البرنامج النصي في نافذة جديدة؛ اضغط على Control+Enter عند الانتهاء."
+
+msgid "Edit audio rule"
+msgstr "تعديل قاعدة صوتية"
+
+msgid ""
+"Edit bookmark {bookmark} of category {category} that doesn't match "
+"formatting for current paragraph from site {site}"
+msgstr ""
+"تحرير الإشارة المرجعية {bookmark} للفئة {category} التي لا تتطابق مع تنسيق "
+"الفقرة الحالية من الموقع {site}"
+
+msgid "Edit bookmarks for %s"
+msgstr "تحرير الإشارات المرجعية لـ %s"
+
+msgid "Edit browserNav bookmark"
+msgstr "تحرير إشارة المتصفح المرجعية"
+
+msgid "Edit existing website %s"
+msgstr "تحرير موقع الويب الموجود %s"
+
+msgid ""
+"Edit perfect match bookmark {bookmark} of category {category} from site "
+"{site}"
+msgstr ""
+"تعديل الإشارة المرجعية ذات المطابقة التامة {bookmark} للفئة {category} من "
+"الموقع {site}"
+
+msgid "Edit semi-accessible edit box."
+msgstr "تحرير مربع التحرير شبه الذي يمكن الوصول إليه."
+
+msgid "Edit site configuration"
+msgstr "تحرير تكوين الموقع"
+
+msgid "Edit site description"
+msgstr "تحرير وصف الموقع"
+
+msgid "Edit spoken text"
+msgstr "تعديل النص المنطوق"
+
+msgid "Edit text"
+msgstr "تحرير النص"
+
+msgid "Editing Audio Theme: {name}"
+msgstr "تعديل السمة الصوتية: {name}"
+
+msgid "Editing script for %s"
+msgstr "تحرير البرنامج النصي لـ %s"
+
+msgid "Effect"
+msgstr "التأثير"
+
+msgid "Enable (&toggle)"
+msgstr "تفعيل (ت&بديل)"
+
+msgid "Enable A&ll"
+msgstr "تمكين أ&ل"
+
+msgid "Enable Audio Themes"
+msgstr "تمكين سمات الصوت"
+
+msgid "Enable RAM Caching (Improves performance and latency)"
+msgstr "تسريع الأداء (تخزين الأصوات في الذاكرة لتخفيف الضغط)"
+
+msgid "Enable Reverb"
+msgstr "تمكين الصدى"
+
+msgid "Enable audio themes"
+msgstr "تمكين السمات الصوتية"
+
+msgid "Enable experimental support for Word and WordPad"
+msgstr "تمكين الدعم التجريبي لبرنامجي Word وWordPad"
+
+msgid "Enable recurrent auto click"
+msgstr "تمكين النقر التلقائي المتكرر"
+
+msgid "Enable recurrent auto speak of "
+msgstr "تمكين التحدث التلقائي المتكرر"
+
+msgid "Enable spatial typing sounds (simulates a physical keyboard)"
+msgstr "تمكين أصوات الكتابة المكانية (تحاكي لوحة المفاتيح الفعلية)"
+
+msgid "Enable typing sounds"
+msgstr "تمكين أصوات الكتابة"
+
+msgid "Enabled"
+msgstr "مفعلة"
+
+msgid ""
+"End adjustment in millis - positive for early cut off, negative for extra "
+"pause in the end"
+msgstr ""
+"تعديل النهاية بالمللي ثانية - موجب للاقتطاع المبكر، سالب لإضافة توقف مؤقت."
+
+msgid "End adjustment must be a number."
+msgstr "تعديل النهاية يجب أن يكون رقما."
+
+msgid "Enter Theme Information"
+msgstr "أدخل معلومات السمة"
+
+msgid "Error"
+msgstr "خطأ"
+
+msgid "Error during installation."
+msgstr "خطأ أثناء تثبيت الثيم."
+
+msgid "Error during switch to window stage, focused element role is %d"
+msgstr ""
+"حدث خطأ أثناء التبديل إلى مرحلة النافذة، دور العنصر الذي تم التركيز عليه هو "
+"%d"
+
+msgid ""
+"Error exporting configuration:\n"
+"{}"
+msgstr ""
+"خطأ في تصدير التكوين:\n"
+"{}"
+
+msgid ""
+"Error importing configuration:\n"
+"{}"
+msgstr ""
+"خطأ في استيراد التكوين:\n"
+"{}"
+
+msgid ""
+"Error initializing some text rules of Earcons and Speech Rules add-on since they contain URL filter.\n"
+"URL detection feature requires BrowserNav v2.6.2 or later add-on to be installed.\n"
+"However it is either not installed, or failed to initialize.\n"
+"Please install the latest BrowserNav add-on from add-on store and restart NVDA.\n"
+"In the mean time all text rules with URL filter will be disabled.\n"
+msgstr ""
+"حدث خطأ أثناء تهيئة بعض القواعد النصية للوظيفة الإضافية Earcons وSpeech Rules نظرًا لأنها تحتوي على مرشح URL.\n"
+"تتطلب ميزة الكشف عن عنوان URL تثبيت BrowserNav v2.6.2 أو الوظيفة الإضافية الأحدث.\n"
+"ومع ذلك، إما أنه لم يتم تثبيته، أو أنه فشل في التهيئة.\n"
+"برجاء تثبيت أحدث إضافة BrowserNav من متجر الإضافات ثم إعادة تشغيل NVDA.\n"
+"في هذه الأثناء، سيتم تعطيل جميع قواعد النص التي تحتوي على مرشح URL."
+
+msgid ""
+"Error retrieving contents of BrowserNav bookmark store: {}.\n"
+"Please check your Internet connectivity and try again.\n"
+msgstr ""
+"حدث خطأ أثناء استرداد محتويات مخزن الإشارات المرجعية لـ BrowserNav: {}.\n"
+"الرجاء التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى."
+
+msgid ""
+"Error! Focused element on the page has changed while pasting updated text. "
+"Possibly content of a different edit box has changed. Please inspect edit "
+"boxes manually and undo if needed."
+msgstr ""
+"خطأ! لقد تغير العنصر الذي تم التركيز عليه في الصفحة أثناء لصق النص المحدث. "
+"من المحتمل أن يكون محتوى مربع تحرير مختلف قد تغير. الرجاء فحص مربعات التحرير"
+" يدويًا والتراجع عنها إذا لزم الأمر."
+
+msgid ""
+"Error! When switching back to browser window, a different edit box is "
+"focused."
+msgstr ""
+"خطأ! عند التبديل مرة أخرى إلى نافذة المتصفح، يتم التركيز على مربع تحرير "
+"مختلف."
+
+msgid ""
+"Error: you have entered URL filter for this rule.\n"
+"URL detection feature requires BrowserNav v2.6.2 or later add-on to be installed.\n"
+"However it is either not installed, or failed to initialize.\n"
+"Please install the latest BrowserNav add-on from add-on store and restart NVDA.\n"
+"Alternatively, please clear URL regex field to enable this rule on all web sites.\n"
+msgstr ""
+"خطأ: لقد أدخلت مرشح رابط لهذه القاعدة.\n"
+"ميزة كشف الروابط تتطلب تثبيت إضافة BrowserNav الإصدار 2.6.2 أو أحدث.\n"
+"ولكنها إما غير مثبتة، أو فشلت في التهيئة.\n"
+"يرجى تثبيت أحدث إصدار من إضافة BrowserNav من متجر الإضافات وإعادة تشغيل NVDA.\n"
+"أو بدلا من ذلك، امسح حقل تصفية الرابط لتفعيل هذه القاعدة على جميع المواقع.\n"
+
+msgid "Exact URL match"
+msgstr "مطابقة عنوان URL تمامًا"
+
+msgid "Exact paragraph match"
+msgstr "مطابقة الفقرة بالضبط"
+
+msgid "Exceptional abbreviations (space separated):"
+msgstr "الاختصارات الاستثنائية (مفصولة بمسافة):"
+
+msgid ""
+"Experimental: go back to the previous location of cursor in current document"
+msgstr "تجريبي: الرجوع إلى الموقع السابق للمؤشر في المستند الحالي"
+
+msgid "Export Audio Themes Configuration"
+msgstr "تصدير إعدادات السمات الصوتية"
+
+msgid "Failed to compile regular expression: %s"
+msgstr "فشل تجميع التعبير العادي: %s"
+
+msgid "Failed to connect to store. Check your internet connection."
+msgstr "فشل الاتصال بالمتجر. تأكد من الإنترنت."
+
+msgid "Failed to open settings. Please open through NVDA Preferences."
+msgstr "فشل في فتح الإعدادات. يرجى فتحه من خلال تفضيلات NVDA."
+
+msgid ""
+"Failed to read clipboard data. Please make sure clipboard is not empty - "
+"copy some text to clipboard."
+msgstr ""
+"فشل في قراءة بيانات الحافظة. الرجاء التأكد من أن الحافظة ليست فارغة - انسخ "
+"بعض النص إلى الحافظة."
+
+msgid "File exists"
+msgstr "الملف موجود"
+
+msgid "File {} already exists. Would you like to replace it?"
+msgstr "الملف {} موجود بالفعل. هل ترغب في استبداله؟"
+
+msgid "Filter URL regex"
+msgstr "تصفية الرابط (تعبير نظامي)"
+
+msgid "Filter applications regex"
+msgstr "تصفية التطبيقات (تعبير نظامي)"
+
+msgid "Filter window title regex"
+msgstr "تصفية عنوان النافذة (تعبير نظامي)"
+
+msgid "First Item"
+msgstr "العنصر الأول"
+
+msgid "Font size"
+msgstr "حجم الخط"
+
+msgid "Format"
+msgstr "شكل"
+
+msgid "Full width phrase breakers:"
+msgstr "قواطع العبارة ذات العرض الكامل:"
+
+msgid "Full width sentence breakers:"
+msgstr "قواطع الجملة ذات العرض الكامل:"
+
+msgid "General"
+msgstr "عام"
+
+msgid "Global announcement format for all elements:"
+msgstr "تنسيق الإعلان العالمي لجميع العناصر:"
+
+msgid "Go to line"
+msgstr "اذهب إلى السطر"
+
+msgid "Go to line:"
+msgstr "انتقل إلى السطر:"
+
+msgid "Heading"
+msgstr "عنوان"
+
+msgid "Heading level"
+msgstr "مستوى العنوان"
+
+msgid "Heading level 1"
+msgstr "مستوى العنوان 1"
+
+msgid "Heading level 2"
+msgstr "مستوى العنوان 2"
+
+msgid "Heading level 3"
+msgstr "مستوى العنوان 3"
+
+msgid "Heading level 4"
+msgstr "مستوى العنوان 4"
+
+msgid "Heading level 5"
+msgstr "مستوى العنوان 5"
+
+msgid "Heading level 6"
+msgstr "مستوى العنوان 6"
+
+msgid "Hello"
+msgstr "مرحبا"
+
+msgid "Hierarchical quick jump"
+msgstr "القفزة السريعة الهرمية"
+
+msgid "Highlighted"
+msgstr "أبرز"
+
+msgid "I&mport Configuration..."
+msgstr "ا&ستيراد الإعدادات..."
+
+msgid "Ignore all focus events - good for websites that misuse focus events"
+msgstr ""
+"تجاهل جميع أحداث التركيز - وهو أمر جيد لمواقع الويب التي تسيء استخدام أحداث "
+"التركيز"
+
+msgid "Import Audio Themes Configuration"
+msgstr "استيراد إعدادات السمات الصوتية"
+
+msgid "Import Themes"
+msgstr "استيراد السمات"
+
+msgid "Import website from bookmar&k store"
+msgstr "استيراد موقع الويب من متجر bookmark&k"
+
+msgid "Increase Audio Themes Volume"
+msgstr "زيادة حجم الموضوعات الصوتية"
+
+msgid "Increases the audio themes volume by 5 percent."
+msgstr "رفع مستوى صوت السمات بمقدار 5 بالمئة."
+
+msgid "Installation successful!"
+msgstr "تم التثبيت بنجاح!"
+
+msgid ""
+"Invalid keystroke %s: Cannot use keystrokes with shift modifier for "
+"quickJump bookmarks!"
+msgstr ""
+"ضغطة مفتاح غير صالحة %s: لا يمكن استخدام ضغطات المفاتيح مع معدّل Shift "
+"لإشارات QuickJump!"
+
+msgid "Invalid keystroke %s: cannot overload essential  NVDA keystrokes!"
+msgstr ""
+"ضغطة مفتاح غير صالحة %s: لا يمكن تحميل ضغطات مفاتيح NVDA الأساسية بشكل زائد!"
+
+msgid "Invalid level for numeric script: '{level}'"
+msgstr "مستوى غير صالح للبرنامج النصي الرقمي: '{level}'"
+
+msgid "Invalid regular expression"
+msgstr "تعبير عادي غير صالح"
+
+msgid "Invalid regular expression."
+msgstr "تعبير نظامي غير صالح."
+
+msgid ""
+"Invalid replacement pattern: {}\n"
+"Plesae use curly braces {} as a format placeholder; please don't use any other curly braces in replacement string."
+msgstr ""
+"نمط الاستبدال غير صالح: {}\n"
+"تستخدم Plesae الأقواس المتعرجة {} كعنصر نائب للتنسيق؛ يرجى عدم استخدام أي أقواس متعرجة أخرى في السلسلة البديلة."
+
+msgid "Invalid wav file."
+msgstr "ملف صوتي غير صالح."
+
+msgid "Italic"
+msgstr "مائل"
+
+msgid ""
+"Jump to next hierarchical bookmark {levelStr}; please check browserNav "
+"configuration panel for hierarchical bookmark configuration."
+msgstr ""
+"انتقل إلى الإشارة المرجعية الهرمية التالية {levelStr}؛ يرجى التحقق من لوحة "
+"تكوين browserNav لتكوين الإشارات المرجعية الهرمية."
+
+msgid ""
+"Jump to previous hierarchical bookmark {levelStr}; please check browserNav "
+"configuration panel for hierarchical bookmark configuration."
+msgstr ""
+"انتقل إلى الإشارة المرجعية الهرمية السابقة {levelStr}؛ يرجى التحقق من لوحة "
+"تكوين browserNav لتكوين الإشارات المرجعية الهرمية."
+
+msgid "Keep default NVDA focus behavior"
+msgstr "حافظ على سلوك التركيز الافتراضي لـ NVDA"
+
+msgid "Keep existing website definition, but overwrite all &bookmarks"
+msgstr "احتفظ بتعريف موقع الويب الحالي، ولكن استبدل كافة الإشارات المرجعية"
+
+msgid "Keep original text"
+msgstr "الإبقاء على النص الأصلي"
+
+msgid "Keystroke reset to default"
+msgstr "إعادة تعيين ضغطات المفاتيح إلى الوضع الافتراضي"
+
+msgid "Last Item"
+msgstr "العنصر الأخير"
+
+msgid "Last Jupyter text has been copied to clipboard."
+msgstr "تم نسخ نص Jupyter الأخير إلى الحافظة."
+
+msgid "Last edited text has been copied to the clipboard."
+msgstr "تم نسخ آخر نص تم تحريره إلى الحافظة."
+
+msgid "Level {announceLevel}"
+msgstr "المستوى {announceLevel}"
+
+msgid "Line number must be a positive integer!"
+msgstr "يجب أن يكون رقم السطر عددًا صحيحًا موجبًا!"
+
+msgid "Lower case letters (no spaces):"
+msgstr "الحروف الصغيرة (بدون مسافات):"
+
+msgid "Match all sites (domain field ignored) "
+msgstr "مطابقة جميع المواقع (تم تجاهل حقل المجال)"
+
+msgid "Match domain and its subdomains"
+msgstr "مطابقة المجال ونطاقاته الفرعية"
+
+msgid "Match domain name"
+msgstr "تطابق اسم المجال"
+
+msgid "Match empty URL only, that is pages without URL"
+msgstr "تطابق عنوان URL الفارغ فقط، أي الصفحات التي لا تحتوي على عنوان URL"
+
+msgid "Match substring in URL"
+msgstr "مطابقة السلسلة الفرعية في URL"
+
+msgid "Match type"
+msgstr "نوع المطابقة"
+
+msgid "Maximum font size or heading level"
+msgstr "الحد الأعلى لحجم الخط أو مستوى العنوان"
+
+msgid "Maximum prosody offset"
+msgstr "الحد الأعلى لإزاحة النبرة"
+
+msgid "Minimum font size or heading level"
+msgstr "الحد الأدنى لحجم الخط أو مستوى العنوان"
+
+msgid ""
+"Minimum numeric value must be strictly less than maximum numeric value."
+msgstr "يجب أن تكون القيمة الرقمية الدنيا أقل تماما من القيمة الرقمية القصوى."
+
+msgid "Minimum prosody offset"
+msgstr "الحد الأدنى لإزاحة النبرة"
+
+msgid "Miscellaneous"
+msgstr "متفرقات"
+
+msgid "Move &down"
+msgstr "نقل للأ&سفل"
+
+msgid "Move &up"
+msgstr "نقل للأ&على"
+
+msgid "Move to next paragraph containing text."
+msgstr "الانتقال إلى الفقرة التالية التي تحتوي على النص."
+
+msgid "Move to previous paragraph containing text."
+msgstr "الانتقال إلى الفقرة السابقة التي تحتوي على النص."
+
+msgid "Moves to next child in browser"
+msgstr "ينتقل إلى الطفل التالي في المتصفح"
+
+msgid "Moves to next parent in browser"
+msgstr "ينتقل إلى الوالد التالي في المتصفح"
+
+msgid "Moves to next sibling in browser"
+msgstr "ينتقل إلى الأخ التالي في المتصفح"
+
+msgid "Moves to previous child in browser"
+msgstr "ينتقل إلى الطفل السابق في المتصفح"
+
+msgid "Moves to previous sibling in browser"
+msgstr "ينتقل إلى الأخوة السابقين في المتصفح"
+
+msgid "Mute live regions"
+msgstr "كتم المناطق الحية"
+
+msgid "Name"
+msgstr "اسم"
+
+msgid ""
+"Name: {name}\n"
+"Author: {author}\n"
+"\n"
+"{summary}"
+msgstr ""
+"الاسم: {name}\n"
+"المؤلف: {author}\n"
+"\n"
+"{summary}"
+
+msgid "Navigate to table cells by pressing T and Shift+T"
+msgstr "التنقل بين خلايا الجداول بضغط حرف T و Shift+T."
+
+msgid "Negative state"
+msgstr "حالة سلبية"
+
+msgid "Negative states"
+msgstr "الحالات السلبية"
+
+msgid "Never"
+msgstr "أبداً"
+
+msgid "New Notification Sound"
+msgstr "صوت تنبيه جديد"
+
+msgid "Next Audio Theme"
+msgstr "موضوع الصوت التالي"
+
+msgid ""
+"Next paragraph not found: current position is at the end of the document."
+msgstr ""
+"لم يتم العثور على الفقرة التالية: الموضع الحالي موجود في نهاية المستند."
+
+msgid "No Audio Themes"
+msgstr "لا توجد سمات صوتية"
+
+msgid "No URL"
+msgstr "لا يوجد عنوان URL"
+
+msgid "No audio themes available"
+msgstr "لا توجد مواضيع صوتية متاحة"
+
+msgid "No beeps"
+msgstr "لا الصفافير"
+
+msgid "No bookmarks matched!"
+msgstr "لا توجد إشارات مرجعية متطابقة!"
+
+msgid "No cursor history available"
+msgstr "لا يوجد سجل للمؤشر متاح"
+
+msgid "No heading level information"
+msgstr "لا توجد معلومات عن مستوى العنوان"
+
+msgid ""
+"No hierarchical quickJump bookmarks configured for current website. Please "
+"add QuickJump bookmarks in BrowserNav settings in NVDA settings window."
+msgstr ""
+"لم يتم تكوين إشارات مرجعية سريعة هرمية لموقع الويب الحالي. الرجاء إضافة "
+"إشارات QuickJump في إعدادات BrowserNav في نافذة إعدادات NVDA."
+
+msgid ""
+"No hierarchical quickJump bookmarks or numeric script bookmarks configured "
+"for current website. Please add QuickJump bookmarks in BrowserNav settings "
+"in NVDA settings window."
+msgstr ""
+"لا توجد إشارات مرجعية سريعة هرمية أو إشارات مرجعية نصية رقمية تم تكوينها "
+"لموقع الويب الحالي. الرجاء إضافة إشارات QuickJump في إعدادات BrowserNav في "
+"نافذة إعدادات NVDA."
+
+msgid "No indent announcement"
+msgstr "لا يوجد إعلان المسافة البادئة"
+
+msgid "No last Jupyter text., or last Jupyter text is empty."
+msgstr "لا يوجد نص Jupyter الأخير، أو أن نص Jupyter الأخير فارغ."
+
+msgid "No match!"
+msgstr "لا يوجد تطابق!"
+
+msgid "No more sentences chime volume:"
+msgstr "لا مزيد من الجمل حجم الرنين:"
+
+msgid "No more text units chime volume:"
+msgstr "لا مزيد من وحدات النص حجم الرنين:"
+
+msgid ""
+"No next QuickJump result. To configure QuickJump rules, please go to "
+"BrowserNav settings in NVDA configuration window."
+msgstr ""
+"لا توجد نتيجة QuickJump التالية. لضبط قواعد QuickJump، برجاء الانتقال إلى "
+"إعدادات BrowserNav في نافذة ضبط NVDA."
+
+msgid "No next format change!"
+msgstr "لا يوجد تغيير في التنسيق التالي!"
+
+msgid "No next hierarchical bookmark {levelStr}"
+msgstr "لا توجد إشارة مرجعية هرمية تالية {levelStr}"
+
+msgid "No next paragraph  with {qualifier} {mode} in the document"
+msgstr "لا توجد فقرة تالية تحتوي على {qualifier} {mode} في المستند"
+
+msgid "No next paragraph with text"
+msgstr "لا توجد فقرة تالية تحتوي على نص"
+
+msgid "No next paragraph with the same {mode} in the document"
+msgstr "لا توجد فقرة تالية بنفس {mode} في المستند"
+
+msgid "No next phrase"
+msgstr "لا يوجد مقطع تالي"
+
+msgid "No next sentence"
+msgstr "لا توجد جملة تالية"
+
+msgid "No previous hierarchical bookmark {levelStr}"
+msgstr "لا توجد إشارة مرجعية هرمية سابقة {levelStr}"
+
+msgid "No previous paragraph  with {qualifier} {mode} in the document"
+msgstr "لا توجد فقرة سابقة تحتوي على {qualifier} {mode} في المستند"
+
+msgid "No previous paragraph with text"
+msgstr "لا توجد فقرة سابقة تحتوي على نص"
+
+msgid "No previous paragraph with the same {mode} in the document"
+msgstr "لا توجد فقرة سابقة بنفس {mode} في المستند"
+
+msgid "No previous phrase"
+msgstr "لا يوجد مقطع سابق"
+
+msgid "No previous sentence"
+msgstr "لا توجد جملة سابقة"
+
+msgid ""
+"No quickJump bookmarks configured for current website. Please add QuickJump "
+"bookmarks in BrowserNav settings in NVDA settings window."
+msgstr ""
+"لم يتم تكوين أي إشارات مرجعية لـ QuickJump لموقع الويب الحالي. الرجاء إضافة "
+"إشارات QuickJump في إعدادات BrowserNav في نافذة إعدادات NVDA."
+
+msgid "No sites are configured for current URL."
+msgstr "لم يتم تكوين أي مواقع لعنوان URL الحالي."
+
+msgid "No typing sound packs available"
+msgstr "لا تتوفر حزم صوتية للكتابة"
+
+msgid ""
+"No {category} bookmarks configured for current website. Please add "
+"{category} bookmarks in BrowserNav settings in NVDA settings window."
+msgstr ""
+"لم يتم تكوين إشارات مرجعية {category} لموقع الويب الحالي. الرجاء إضافة "
+"الإشارات المرجعية {category} في إعدادات BrowserNav في نافذة إعدادات NVDA."
+
+msgid "Not editable"
+msgstr "غير قابلة للتحرير"
+
+msgid ""
+"Note: These settings adjust the audio feedback for SentenceNav, TextNav, and"
+" BrowserNav integrations."
+msgstr ""
+"ملاحظة: تقوم هذه الإعدادات بضبط التعليقات الصوتية لعمليات تكامل SentenceNav "
+"وTextNav وBrowserNav."
+
+msgid "Numeric Script"
+msgstr "البرنامج النصي الرقمي"
+
+msgid ""
+"Numeric Script - script that can consume a numeric argument by pressing "
+"Alt+digits"
+msgstr ""
+"البرنامج النصي الرقمي - برنامج نصي يمكنه استهلاك وسيطة رقمية بالضغط على "
+"Alt+أرقام"
+
+msgid "Numeric format"
+msgstr "التنسيق الرقمي"
+
+msgid "Numeric text formatting"
+msgstr "تنسيق النص الرقمي"
+
+msgid "OK"
+msgstr "موافق"
+
+msgid ""
+"Offset in paragraphs - select a value to place the cursor on following or "
+"preceding paragraph from the bookmark match:"
+msgstr ""
+"الإزاحة في الفقرات - حدد قيمة لوضع المؤشر على الفقرة التالية أو السابقة من "
+"مطابقة الإشارة المرجعية:"
+
+msgid "Ogg audio files"
+msgstr "ملفات صوتية Ogg"
+
+msgid "Other audio rule"
+msgstr "حكم صوتية أخرى"
+
+msgid "Other audio rules"
+msgstr "قواعد الصوت الأخرى"
+
+msgid "Out of container"
+msgstr "خارج الحاوية"
+
+msgid "Over&write existing website definition"
+msgstr "استبدال وكتابة تعريف موقع الويب الحالي"
+
+msgid "P&review"
+msgstr "ف&مراجعة"
+
+msgid "Paragraph boundary chime volume:"
+msgstr "حجم صوت رنين حدود الفقرة:"
+
+msgid "Paragraph crackle volume:"
+msgstr "حجم فرقعة الفقرة:"
+
+msgid ""
+"Pass raw text through to synth. Typically you want to enable this only for "
+"punctuation marks and disable for all other rules."
+msgstr ""
+"تمرير النص الخام للمحرك الصوتي. عادة يفضل تفعيل هذا فقط لعلامات الترقيم "
+"وتعطيله لبقية القواعد."
+
+msgid "Pattern"
+msgstr "النمط"
+
+msgid "Pattern &match type:"
+msgstr "النمط ونوع المطابقة:"
+
+msgid "Pattern cannot be empty!"
+msgstr "لا يمكن أن يكون النمط فارغًا!"
+
+msgid "Perform autoClick on page load automatically:"
+msgstr "قم بإجراء النقر التلقائي عند تحميل الصفحة تلقائيًا:"
+
+msgid "Perform autoSpeak (live region) for:"
+msgstr "إجراء التحدث التلقائي (المنطقة المباشرة) لـ:"
+
+msgid ""
+"Phonetic punctuation add-on has been renamed to Earcons and Speech Rules.\n"
+"We have automatically migrated all your phonetic punctuation rules to Earcons and Speech Rules add-on, so no further action is required.\n"
+"Please feel free to explore add-on settings to discover new features.\n"
+msgstr ""
+"تمت إعادة تسمية الوظيفة الإضافية لعلامات الترقيم الصوتية إلى Earcons وقواعد الكلام.\n"
+"لقد قمنا تلقائيًا بترحيل جميع قواعد علامات الترقيم الصوتية الخاصة بك إلى الوظيفة الإضافية Earcons وSpeech Rules، لذلك لا يلزم اتخاذ أي إجراء آخر.\n"
+"لا تتردد في استكشاف إعدادات الوظائف الإضافية لاكتشاف الميزات الجديدة."
+
+msgid "Phrase breakers:"
+msgstr "قواطع العبارات:"
+
+msgid "Plain text not found: tried to search for '{text}' {direction}."
+msgstr "لم يتم العثور على نص عادي: حاول البحث عن '{text}' {direction}."
+
+msgid "Play chime when bookmark appears on the page"
+msgstr "قم بتشغيل الرنين عندما تظهر الإشارة المرجعية على الصفحة"
+
+msgid "Play chime when bookmark disappears from the page"
+msgstr "قم بتشغيل الرنين عندما تختفي الإشارة المرجعية من الصفحة"
+
+msgid "Play chime when text matched by bookmark changes"
+msgstr "قم بتشغيل الرنين عندما يتطابق النص مع تغييرات الإشارة المرجعية"
+
+msgid "Play sounds in 3D mode"
+msgstr "تشغيل الأصوات في وضع ثلاثي الأبعاد"
+
+msgid "Play typing sounds only in edit boxes"
+msgstr "تشغيل أصوات الكتابة في مربعات التحرير فقط"
+
+msgid "Please create a new site configuration in site submenu."
+msgstr "الرجاء إنشاء تكوين موقع جديد في القائمة الفرعية للموقع."
+
+msgid "Please enter a single character as pattern."
+msgstr "يرجى إدخال حرف واحد فقط كنمط."
+
+msgid ""
+"Please enter a version in order to  export this website.\n"
+"We recommend to use date-based versions, like v2025.01.31.\n"
+msgstr ""
+"الرجاء إدخال نسخة لتصدير هذا الموقع.\n"
+"نوصي باستخدام الإصدارات المستندة إلى التاريخ، مثل v2025.01.31."
+
+msgid "Please enter website name in order to export it."
+msgstr "الرجاء إدخال اسم الموقع من أجل تصديره."
+
+msgid "Press desired keystroke now"
+msgstr "اضغط على ضغطة المفتاح المطلوبة الآن"
+
+msgid ""
+"Pressing it once toggles audio themes on and off. Pressing twice toggles "
+"typing sounds."
+msgstr ""
+"الضغط عليه مرة واحدة يبدل تشغيل السمات الصوتية أو إيقافها. الضغط مرتين يبدل "
+"أصوات الكتابة.الضغط مرة واحدة يبدل تشغيل وإيقاف السمات الصوتية. الضغط مرتين "
+"يبدل أصوات الكتابة."
+
+msgid "Preview finished."
+msgstr "تمت المعاينة."
+
+msgid "Previous Audio Theme"
+msgstr "موضوع الصوت السابق"
+
+msgid ""
+"Previous paragraph not found: current position is at the beginning of the "
+"document."
+msgstr "لم يتم العثور على الفقرة السابقة: الموضع الحالي في بداية المستند."
+
+msgid "Prosody offset cannot be zero."
+msgstr "لا يمكن أن تكون إزاحة النبرة صفرا."
+
+msgid "Prosody offset:"
+msgstr "إزاحة النبرة:"
+
+msgid "Protected Edit Field"
+msgstr "حقل تحرير محمي"
+
+msgid "Quick speak"
+msgstr "تحدث بسرعة"
+
+msgid "Quick speak 2"
+msgstr "التحدث السريع 2"
+
+msgid "QuickClick"
+msgstr "انقر سريعا"
+
+msgid "QuickClick2"
+msgstr "النقر السريع2"
+
+msgid "QuickClick3"
+msgstr "النقر السريع3"
+
+msgid "QuickJump"
+msgstr "قفزة سريعة"
+
+msgid "QuickJump - assigned to J by default"
+msgstr "QuickJump - يتم تعيينه إلى J بشكل افتراضي"
+
+msgid ""
+"QuickJump back according to BrowserNav QuickJump bookmarks; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"QuickJump مرة أخرى وفقًا للإشارات المرجعية لـ BrowserNav QuickJump؛ يرجى "
+"التحقق من لوحة تكوين browserNav للحصول على قائمة الإشارات المرجعية."
+
+msgid ""
+"QuickJump forward according to BrowserNav QuickJump bookmarks; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"QuickJump للأمام وفقًا للإشارات المرجعية لـ BrowserNav QuickJump؛ يرجى "
+"التحقق من لوحة تكوين browserNav للحصول على قائمة الإشارات المرجعية."
+
+msgid "QuickJump2"
+msgstr "QuickJump2"
+
+msgid "QuickJump3"
+msgstr "QuickJump3"
+
+msgid "QuickNav item not found: tried to search for '{text}' {direction}."
+msgstr "لم يتم العثور على عنصر QuickNav: حاول البحث عن '{text}' {direction}."
+
+msgid "QuickSearch & Bookmarks"
+msgstr "البحث السريع والإشارات المرجعية"
+
+msgid ""
+"QuickSpeak  according to BrowserNav QuickSpeak bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"QuickSpeak وفقًا لإشارة BrowserNav QuickSpeak المرجعية؛ يرجى التحقق من لوحة "
+"تكوين browserNav للحصول على قائمة الإشارات المرجعية."
+
+msgid "Re&move rule"
+msgstr "ح&ذف القاعدة"
+
+msgid "React to focus event, but prevent entering focus mode"
+msgstr "الرد على حدث التركيز، ولكن منع الدخول في وضع التركيز"
+
+msgid "Read an error message instead of playing a chime"
+msgstr "قراءة رسالة خطأ بدلا من تشغيل صوت التنبيه"
+
+msgid "Reconstruct sentences across paragraphs:"
+msgstr "إعادة بناء الجمل عبر الفقرات:"
+
+msgid "Regex match of URL"
+msgstr "مطابقة التعبير العادي لعنوان URL"
+
+msgid "Regex paragraph match"
+msgstr "مطابقة الفقرة Regex"
+
+msgid "Regex search"
+msgstr "بحث ريجكس"
+
+msgid "Regexp text not found: tried to search for '{text}' {direction}."
+msgstr ""
+"لم يتم العثور على نص التعبير العادي: حاولت البحث عن '{text}' {direction}."
+
+msgid ""
+"Regular expression pattern matches empty string. This is not allowed. Please"
+" change the pattern."
+msgstr ""
+"نمط التعبير النظامي يطابق نصا فارغا. هذا غير مسموح به. يرجى تغيير النمط."
+
+msgid "Remove Audio Theme"
+msgstr "إزالة السمة الصوتية"
+
+msgid "Report the object under the cursor with full 3D audio coordinates."
+msgstr "الإبلاغ عن العنصر تحت المؤشر مع إحداثيات الصوت ثلاثية الأبعاد."
+
+msgid "Reverb"
+msgstr "الصدى"
+
+msgid "Role"
+msgstr "دور"
+
+msgid "Role and state, then name"
+msgstr "الدور والحالة، ثم الاسم"
+
+msgid "Role and state, then name (Role State Label)"
+msgstr "الدور والحالة، ثم الاسم (تسمية حالة الدور)"
+
+msgid "Roles"
+msgstr "الأدوار"
+
+msgid "Room Size"
+msgstr "حجم الغرفة"
+
+msgid "Room Size:"
+msgstr "حجم الغرفة:"
+
+msgid "Rotate global speech order"
+msgstr "تدوير ترتيب الكلام العالمي"
+
+msgid "Rotates the global speech order format."
+msgstr "لتدوير تنسيق ترتيب الكلام العام."
+
+msgid "Rule disabled"
+msgstr "تم تعطيل القاعدة"
+
+msgid "Rule enabled"
+msgstr "تم تفعيل القاعدة"
+
+msgid "Same indent and style"
+msgstr "نفس المسافة البادئة والأسلوب"
+
+msgid "Save Audio Theme Package"
+msgstr "حفظ حزمة السمة الصوتية"
+
+msgid "Save this website under a different &name"
+msgstr "احفظ موقع الويب هذا باسم &اسم مختلف"
+
+msgid "Script"
+msgstr "البرنامج النصي"
+
+msgid "Script compilation failed "
+msgstr "فشل تجميع البرنامج النصي"
+
+msgid "Script: runs a custom Python script"
+msgstr "البرنامج النصي: يقوم بتشغيل برنامج نصي مخصص لبيثون"
+
+msgid "Scroll to all possible elements backward"
+msgstr "قم بالتمرير إلى جميع العناصر الممكنة للخلف"
+
+msgid "Scroll to all possible elements forward"
+msgstr "قم بالتمرير إلى جميع العناصر الممكنة للأمام"
+
+msgid "Scrolling backward. This may load more elements on the page."
+msgstr "التمرير للخلف. قد يؤدي هذا إلى تحميل المزيد من العناصر على الصفحة."
+
+msgid "Scrolling forward. This may load more elements on the page."
+msgstr ""
+"التمرير إلى الأمام. قد يؤدي هذا إلى تحميل المزيد من العناصر على الصفحة."
+
+msgid "Search for a role:"
+msgstr "البحث عن دور:"
+
+msgid "Select All"
+msgstr "حدد الكل"
+
+msgid "Select An Audio Theme"
+msgstr "حدد سمة صوتية"
+
+msgid "Select Roles..."
+msgstr "حدد الأدوار..."
+
+msgid "Select Spoken Roles"
+msgstr "حدد الأدوار المنطوقة"
+
+msgid "Select a theme to edit or remix:"
+msgstr "حدد سمة لتحريرها أو إعادة مزجها:"
+
+msgid "Select an audio themes command to execute:"
+msgstr "حدد أمر سمات صوتية لتنفيذه:"
+
+msgid ""
+"Select the roles you want NVDA to speak (if the global speak roles setting "
+"is enabled):"
+msgstr ""
+"حدد الأدوار التي تريد أن ينطقها NVDA (في حالة تفعيل إعداد أدوار التحدث "
+"العامة):"
+
+msgid "Select theme:"
+msgstr "اختر السمة:"
+
+msgid "Select wav file:"
+msgstr "اختيار ملف صوتي:"
+
+msgid "Sentence Navigation (Alt+Arrows)"
+msgstr "التنقل بين الجملة (Alt+الأسهم)"
+
+msgid "Sentence breakers:"
+msgstr "قواطع الجملة:"
+
+msgid ""
+"Sets an audio beacon at the current navigator object. Navigate around to "
+"hear a sonar ping relative to this beacon."
+msgstr ""
+"يضبط إشارة صوتية على كائن المستكشف الحالي. قم بالتنقل لسماع صوت السونار "
+"المتعلق بهذه المنارة."
+
+msgid "Show BrowserNav popup menu."
+msgstr "إظهار القائمة المنبثقة BrowserNav."
+
+msgid "Shows audio themes commands help."
+msgstr "عرض مساعدة أوامر السمات الصوتية."
+
+msgid "Site Entry Error"
+msgstr "خطأ في دخول الموقع"
+
+msgid "Skip Clutter chime volume:"
+msgstr "تخطي مستوى صوت الفوضى:"
+
+msgid "Skip Wikipedia references in sentence endings"
+msgstr "تخطي مراجع ويكيبيديا في نهايات الجملة"
+
+msgid "Skip clutter off for line navigation"
+msgstr "تخطي الفوضى للتنقل عبر الخط"
+
+msgid "Skip clutter off for paragraph navigation"
+msgstr "تخطي الفوضى للتنقل بين الفقرات"
+
+msgid "Skip clutter on for line navigation"
+msgstr "تخطي الفوضى للتنقل عبر الخط"
+
+msgid "Skip clutter on for paragraph navigation"
+msgstr "تخطي الفوضى للتنقل بين الفقرات"
+
+msgid "SkipClutter"
+msgstr "سكيبكلتر"
+
+msgid ""
+"SkipClutter - will automatically skip this paragraph or line when navigating"
+" via Control+Up/Down or Up/Down keystrokes; must match the whole paragraph. "
+"or "
+msgstr ""
+"SkipClutter - سيتم تخطي هذه الفقرة أو السطر تلقائيًا عند التنقل عبر ضغطات "
+"المفاتيح Control+Up/Down أو Up/Down؛ يجب أن تتطابق مع الفقرة بأكملها. أو"
+
+msgid "Skippable punctuation:"
+msgstr "علامات الترقيم القابلة للتخطي:"
+
+msgid "Smart Volume Normalization"
+msgstr "تسوية مستوى الصوت التلقائية (منع الأصوات المزعجة)"
+
+msgid ""
+"Smart spatial positioning (maps characters to their exact physical keys)"
+msgstr "تحديد المواقع المكانية الذكية (تعيين الأحرف لمفاتيحها الفعلية بالضبط)"
+
+msgid "Smooth 3D Panning (Glide effect for moving objects)"
+
+msgid "Smooth Envelope (Fade In/Out to prevent popping)"
+msgstr "تنعيم أطراف الصوت (منع طقطقة السماعات)"
+
+msgid "Sound For:"
+msgstr "صوت لعنصر:"
+
+msgid "Speak Object 3D Coordinates"
+msgstr "تحدث إحداثيات الكائن ثلاثية الأبعاد"
+
+msgid "Speak background color"
+msgstr "قراءة لون الخلفية"
+
+msgid "Speak bold and italic text"
+msgstr "قراءة النص الغامق والمائل"
+
+msgid "Speak changed paragraphs"
+msgstr "تحدث بالفقرات المتغيرة"
+
+msgid "Speak current URL."
+msgstr "نطق عنوان URL الحالي."
+
+msgid "Speak current heading level"
+msgstr "نطق مستوى العنوان الحالي"
+
+msgid "Speak current heading level."
+msgstr "نطق مستوى العنوان الحالي."
+
+msgid "Speak font color"
+msgstr "قراءة لون الخط"
+
+msgid "Speak font family"
+msgstr "قراءة نوع الخط"
+
+msgid "Speak formatted text"
+msgstr "نطق النص المنسق"
+
+msgid "Speak live regions"
+msgstr "تحدث المناطق الحية"
+
+msgid "Speak message when no more text units found"
+msgstr "نطق الرسالة عند عدم العثور على المزيد من الوحدات النصية"
+
+msgid "Speak only changed words (diff)"
+msgstr "نطق الكلمات التي تم تغييرها فقط (فرق)"
+
+msgid "Speak roles during say all"
+msgstr "نطق الوظائف أثناء قراءة الكل"
+
+msgid "Speak roles such as button, edit box , link etc. "
+msgstr "نطق الوظائف مثل الزر ومربع التحرير والرابط وغيرها"
+
+msgid "Speech Action"
+msgstr "إجراء النطق"
+
+msgid "Speech Order"
+msgstr "ترتيب النطق"
+
+msgid "Speech order: Default (Name, Role, State)"
+msgstr "ترتيب الكلام: افتراضي (الاسم، الدور، الحالة)"
+
+msgid "Speech order: Role, State, Name"
+msgstr "ترتيب النطق: الدور، الحالة، الاسم"
+
+msgid "Speech order: State, Name"
+msgstr "ترتيب الكلام: الحالة، الاسم"
+
+msgid "Spoken &message when bookmark is found:"
+msgstr "نطق ورسالة عند العثور على الإشارة المرجعية:"
+
+msgid ""
+"Start adjustment in millis - positive to cut off start, negative for extra "
+"pause in the beginning."
+msgstr ""
+"تعديل البداية بالمللي ثانية - موجب لاقتطاع البداية، سالب لإضافة توقف مؤقت."
+
+msgid "Start adjustment must be a number."
+msgstr "تعديل البداية يجب أن يكون رقما."
+
+msgid "State"
+msgstr "ولاية"
+
+msgid "State, then name"
+msgstr "الحالة، ثم الاسم"
+
+msgid "State, then name (State Label)"
+msgstr "الولاية ثم الاسم (تسمية الولاية)"
+
+msgid "States"
+msgstr "الحالات"
+
+msgid "Status"
+msgstr "الحالة"
+
+msgid "Store URL:"
+msgstr "رابط المتجر (Store URL):"
+
+msgid "Strikethrough"
+msgstr "يتوسطه خط"
+
+msgid "Substring paragraph match"
+msgstr "مطابقة فقرة السلسلة الفرعية"
+
+msgid "Success"
+msgstr "نجاح"
+
+msgid "Suppress aria label announcements for landmarks and regions"
+msgstr "منع إعلانات تصنيفات النغمات للمعالم والمناطق"
+
+msgid "Suppress aria name announcements for editables and combo boxes"
+msgstr ""
+"منع إعلانات أسماء النغمات للعناصر القابلة للتحرير ومربعات التحرير والسرد"
+
+msgid "Suppress aria role text announcements"
+msgstr "قمع الإعلانات النصية لدور الأغنية"
+
+msgid "Suppress descriptions"
+msgstr "قمع الأوصاف"
+
+msgid "Suppress this state in non-verbose mode."
+msgstr "إخفاء هذه الحالة في الوضع غير المفصل."
+
+msgid "Suppress tree level announcements"
+msgstr "منع الإعلانات على مستوى الشجرة"
+
+msgid "Switches to the next audio theme."
+msgstr "الانتقال إلى السمة الصوتية التالية."
+
+msgid "Switches to the previous audio theme."
+msgstr "الانتقال إلى السمة الصوتية السابقة."
+
+msgid "T&est rule"
+msgstr "&قاعدة الاختبار"
+
+msgid "Text Navigation (Alt+Shift+Arrows)"
+msgstr "التنقل عبر النص (Alt+Shift+الأسهم)"
+
+msgid "Text formatting"
+msgstr "تنسيق النص"
+
+msgid "Text regular expression pattern"
+msgstr "نمط التعبير العادي للنص"
+
+msgid "Text regular expressions"
+msgstr "التعبيرات العادية للنص"
+
+msgid "TextNav error: Infinite loop"
+msgstr "خطأ TextNav: حلقة لا نهائية"
+
+msgid "Theme Author"
+msgstr "مؤلف السمة"
+
+msgid "Theme Description"
+msgstr "وصف السمة"
+
+msgid "Theme Name"
+msgstr "اسم السمة"
+
+msgid "Theme Sounds"
+msgstr "أصوات السمة"
+
+msgid "Theme Studio"
+msgstr "استوديو الموضوع"
+
+msgid "Theme Studio - "
+msgstr "استوديو الموضوع -"
+
+msgid "Themes Store"
+msgstr "متجر الثيمات الصوتية (Themes Store)"
+
+msgid "Themes successfully fetched. Select a theme:"
+msgstr "تم جلب الثيمات بنجاح. اختر ثيماً:"
+
+msgid ""
+"There is already a website with this name. Please enter a different name."
+msgstr ""
+"يوجد بالفعل موقع على شبكة الإنترنت بهذا الاسم. الرجاء إدخال اسم مختلف."
+
+msgid ""
+"This can not be undone.\n"
+"Are you sure you  want to remove audio theme {name}?"
+msgstr ""
+"لا يمكن التراجع عن هذا.\n"
+"هل أنت متأكد أنك تريد إزالة موضوع الصوت {name}؟"
+
+msgid ""
+"This package contains audio themes.\n"
+"Do you want to overwrite existing themes with the same name?"
+msgstr ""
+"هذه الحزمة تحتوي على سمات صوتية.\n"
+"هل تريد استبدال السمات الحالية التي تحمل نفس الاسم؟تحتوي هذه الحزمة على سمات صوتية.\n"
+"هل تريد استبدال السمات الموجودة بنفس الاسم؟"
+
+msgid "This site is a duplicate of another existing site %s"
+msgstr "هذا الموقع هو نسخة مكررة من موقع آخر موجود %s"
+
+msgid "This value is already used in another rule."
+msgstr "هذه القيمة مستخدمة بالفعل في قاعدة أخرى."
+
+msgid "This website doesn't have a name. Cannot import it."
+msgstr "هذا الموقع ليس لديه اسم. لا يمكن استيراده."
+
+msgid "This website doesn't have a version. Cannot import it."
+msgstr "هذا الموقع ليس لديه نسخة. لا يمكن استيراده."
+
+msgid "Timed out during release modifiers stage"
+msgstr "انتهت المهلة أثناء مرحلة معدّلات الإصدار"
+
+msgid "Timed out during single-character control+C stage"
+msgstr "انتهت المهلة أثناء مرحلة التحكم بالحرف الواحد + C"
+
+msgid "Timed out during switch to browser window stage"
+msgstr "انتهت المهلة أثناء التبديل إلى مرحلة نافذة المتصفح"
+
+msgid "Timed out during switch to window stage"
+msgstr "انتهت المهلة أثناء التبديل إلى مرحلة النافذة"
+
+msgid "Timeout while trying to focus current edit box."
+msgstr "انتهت المهلة أثناء محاولة التركيز على مربع التحرير الحالي."
+
+msgid "Toggle"
+msgstr "تبديل"
+
+msgid "Toggle Audio Beacon"
+msgstr "تبديل منارة الصوت"
+
+msgid "Toggle Audio Themes"
+msgstr "تبديل السمات الصوتية"
+
+msgid "Toggle Earcons and Speech Rules"
+msgstr "تبديل Earcons وقواعد الكلام"
+
+msgid "Toggle Earcons and Speech Rules."
+msgstr "تبديل قواعد النطق والأصوات."
+
+msgid "Toggle Typing Sounds"
+msgstr "تبديل أصوات الكتابة"
+
+msgid "Toggle skip clutter for line navigation"
+msgstr "تبديل تخطي الفوضى للتنقل عبر الخط"
+
+msgid "Toggle skip clutter for paragraph navigation"
+msgstr "تبديل تخطي الفوضى للتنقل بين الفقرات"
+
+msgid "Toggle state verbosity"
+msgstr "تبديل مستوى تفصيل الحالات"
+
+msgid "Toggle state verbosity reporting."
+msgstr "تبديل مستوى تفصيل نطق الحالات."
+
+msgid "Toggles typing sounds on and off."
+msgstr "تبديل أصوات الكتابة وإيقافها."
+
+msgid "Total: {total} | Enabled: {enabled} | Disabled: {disabled}"
+msgstr "الإجمالي: {total} | ممكّن: {enabled} | معطل: {disabled}"
+
+msgid "Trim silence from beginning and end of sounds"
+msgstr "- قطع الصمت من بداية الأصوات ونهايتها"
+
+msgid "Type"
+msgstr "النوع"
+
+msgid "Typing Sound Pack"
+msgstr "كتابة حزمة الصوت"
+
+msgid "Typing Sound Pack (optional):"
+msgstr "حزمة صوت الكتابة (اختياري):"
+
+msgid "Typing Sounds"
+msgstr "أصوات الكتابة"
+
+msgid "Typing sound pack:"
+msgstr "حزمة أصوات الكتابة:"
+
+msgid "Typing sounds disabled"
+msgstr "أصوات الكتابة معطلة"
+
+msgid "Typing sounds enabled"
+msgstr "تم تمكين أصوات الكتابة"
+
+msgid "Typing sounds volume:"
+msgstr "مستوى صوت الكتابة:"
+
+msgid "Typing sounds: {pack}"
+msgstr "أصوات الكتابة: {pack}"
+
+msgid "URL"
+msgstr "عنوان URL"
+
+msgid "Underline"
+msgstr "تسطير"
+
+msgid "Use global setting"
+msgstr "استخدم الإعداد العالمي"
+
+msgid "Use speech synthesizer volume"
+msgstr "استخدام مستوى صوت محرك النطق"
+
+msgid "Verbose state reporting"
+msgstr "نطق الحالات بالتفصيل"
+
+msgid "Version"
+msgstr "إصدار"
+
+msgid "Vertical margin between paragraphs"
+msgstr "الهامش العمودي بين الفقرات"
+
+msgid "Volume"
+msgstr "مستوى الصوت"
+
+msgid "Volume of Skip Clutter (skipClutter) chime"
+msgstr "مستوى التنبيه الخاص بتخطي المحتوى (skipClutter)"
+
+msgid "Volume of the No Next Text chime"
+msgstr "مستوى التنبيه الصوتي عند عدم وجود جمل إضافية"
+
+msgid "Volume {vol}"
+msgstr "مستوى الصوت {vol}"
+
+msgid ""
+"Warning! While copying text out of edit box, focused elementon the page has "
+"changed. Please try again."
+msgstr ""
+"تحذير! أثناء نسخ النص من مربع التحرير، تغير العنصر الذي تم التركيز عليه في "
+"الصفحة. يرجى المحاولة مرة أخرى."
+
+msgid ""
+"Warning: you are about to create or update a skip clutter bookmark. If your "
+"pattern is too generic, it might hide significant part of your website. For "
+"example, if you specify a single whitespace as pattern and substring match, "
+"then all paragraphs containing at least a single whitespace would disappear."
+" Please make sure you understand how skip clutter works and how to undo this"
+" change if you have to. Would you like to continue?"
+msgstr ""
+"تحذير: أنت على وشك إنشاء أو تحديث إشارة مرجعية لتخطي الفوضى. إذا كان النمط "
+"الخاص بك عامًا جدًا، فقد يؤدي إلى إخفاء جزء كبير من موقع الويب الخاص بك. على"
+" سبيل المثال، إذا قمت بتحديد مسافة بيضاء واحدة لمطابقة النمط والسلسلة "
+"الفرعية، فستختفي جميع الفقرات التي تحتوي على مسافة بيضاء واحدة على الأقل. "
+"يرجى التأكد من فهمك لكيفية عمل تخطي الفوضى وكيفية التراجع عن هذا التغيير إذا"
+" كان عليك ذلك. هل ترغب في الاستمرار؟"
+
+msgid ""
+"Warning: you are about to move this bookmark to site %(new_site)s. This "
+"bookmark will disappear from the old site %(old_site)s. Would you like to "
+"proceed?"
+msgstr ""
+"تحذير: أنت على وشك نقل هذه الإشارة المرجعية إلى الموقع %(new_site)s. ستختفي "
+"هذه الإشارة المرجعية من الموقع القديم %(old_site)s. هل ترغب في المتابعة؟"
+
+msgid ""
+"Warning: you are trying to  move this bookmark to site %(new_site)s. However"
+" it already contains a bookmark with the same UUID. This is not supported. "
+"Please create a new bookmark instead."
+msgstr ""
+"تحذير: أنت تحاول نقل هذه الإشارة المرجعية إلى الموقع %(new_site)s. ومع ذلك، "
+"فهو يحتوي بالفعل على إشارة مرجعية بنفس UUID. هذا غير معتمد. الرجاء إنشاء "
+"إشارة مرجعية جديدة بدلاً من ذلك."
+
+msgid "Wav file"
+msgstr "ملف صوتي"
+
+msgid "Wav file not found."
+msgstr "ملف الصوت غير موجود."
+
+msgid "Wave audio files"
+msgstr "ملفات صوتية Wave"
+
+msgid "Web Page Loaded"
+msgstr "تم تحميل صفحة الويب"
+
+msgid "Website export Error"
+msgstr "خطأ في تصدير الموقع"
+
+msgid ""
+"Welcome To The Audio Themes Studio:\n"
+"Here you can create new audio themes and package them for sharing with others.\n"
+"You can also customize anyone of your installed audio themes with your own sounds."
+msgstr ""
+"مرحباً بك في استوديو السمات الصوتية:\n"
+"هنا يمكنك إنشاء سمات صوتية جديدة وتعبئتها لمشاركتها مع الآخرين.\n"
+"يمكنك أيضاً تخصيص أي من سماتك الصوتية المثبتة باستخدام أصواتك الخاصة."
+
+msgid "Wet Level"
+msgstr "مستوى الصدى"
+
+msgid "Wet Level:"
+msgstr "مستوى الصدى:"
+
+msgid "Width"
+msgstr "العرض"
+
+msgid "Width:"
+msgstr "العرض:"
+
+msgid "Wrong domain format. An example is: en.wikipedia.com "
+msgstr "تنسيق المجال خاطئ. مثال على ذلك: en.wikipedia.com"
+
+msgid "Wrong line number"
+msgstr "رقم السطر خاطئ"
+
+msgid "Wrong regex"
+msgstr "تعبير عادي خاطئ"
+
+msgid ""
+"You already have website {} in your BrowserNav configuration.\n"
+"Existing site version: {}.\n"
+"To be imported site version: {}.\n"
+"What would you like to do?"
+msgstr ""
+"لديك موقع ويب {} بالفعل في تكوين BrowserNav الخاص بك.\n"
+"إصدار الموقع الحالي: {}.\n"
+"إصدار الموقع المراد استيراده: {}.\n"
+"ماذا تريد أن تفعل؟"
+
+msgid ""
+"You do not have any audio themes installed.\n"
+"Please install or create an audio theme first."
+msgstr ""
+"ليس لديك أية سمات صوتية مثبتة.\n"
+"الرجاء تثبيت أو إنشاء سمة صوتية أولاً."
+
+msgid "You must specify blank domain for this match option."
+msgstr "يجب عليك تحديد مجال فارغ لخيار المطابقة هذا."
+
+msgid "You must specify non-empty string as domain"
+msgstr "يجب عليك تحديد سلسلة غير فارغة كمجال"
+
+msgid "You must specify prosody offset."
+msgstr "يجب تحديد إزاحة النبرة."
+
+msgid ""
+"You will lose all of the changes you have made.\n"
+"Are you sure you want to quit this dialog?"
+msgstr ""
+"سوف تفقد كافة التغييرات التي قمت بها.\n"
+"هل أنت متأكد أنك تريد إنهاء مربع الحوار هذا؟"
+
+msgid "at level {level}"
+msgstr "في المستوى {level}"
+
+msgid "backward"
+msgstr "إلى الوراء"
+
+msgid "duration must be an integer between 0 and 60000"
+msgstr "يجب أن تكون المدة عددا صحيحا بين 0 و 60000"
+
+msgid "font size"
+msgstr "حجم الخط"
+
+msgid "font size and same style"
+msgstr "حجم الخط ونفس النمط"
+
+msgid "forward"
+msgstr "إلى الأمام"
+
+msgid "greater"
+msgstr "أكبر"
+
+msgid "horizontal offset"
+msgstr "إزاحة أفقية"
+
+msgid "no indent"
+msgstr "لا مسافة بادئة"
+
+msgid "out of"
+msgstr "خارج"
+
+msgid "prosody offset must be an integer between -100 and 100"
+msgstr "يجب أن تكون إزاحة النبرة عددا صحيحا بين -100 و 100"
+
+msgid "smaller"
+msgstr "الأصغر"
+
+msgid "tone must be an integer between 0 and 50000"
+msgstr "يجب أن تكون النغمة عددا صحيحا بين 0 و 50000"
+
+msgid "world"
+msgstr "بالعالم"
+
+msgid "{roleText} level {level}"
+msgstr "{roleText} المستوى {level}"
+
+msgid ""
+"استكمال العمل على إضافة سمات الصوت (Audio Themes)، مع إضافة دعم للإصدارات الأحدث من NVDA.\n"
+"تقوم هذه الإضافة بإنشاء عرض صوتي افتراضي يشغل أصواتاً عند التركيز أو التنقل بين العناصر.\n"
+"كما تتيح لك الإضافة تفعيل، تثبيت، إزالة، تحرير، إنشاء، وتوزيع حزم السمات الصوتية.\n"
+"\n"
+"تم دمجها مع إضافة Earcons and Speech rules:\n"
+"تسمح بإعداد أصوات مخصصة للكلمات، الأحرف، أنواع العناصر، الحالات، ومعلومات التنسيق.\n"
+"\n"
+"تم دمج إضافة SentenceNav للتنقل بالجمل (Alt+أسهم).\n"
+"تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).\n"
+msgstr ""
+"استكمال العمل على إضافة سمات الصوت (السمات الصوتية)، مع إضافة دعم لإصدارات LAN من NVDA.\n"
+"تقوم هذه الإضافة بعرض صوتي مختلف بشكل خاص عند التركيز أو الاستجابة بين العناصر.\n"
+"كما يضيف لك الإضافة تفعيل، تثبيت، إزالة، تحرير، إنشاء، تقسيم حزم العلامات الصوتية.\n"
+"\n"
+"تم دمجها مع إضافة رموز الأذن وقواعد الكلام:\n"
+"تتيح أصوات مخصصة للكلمات، أنواع العناصر، الحالات، ومعلومات جديدة.\n"
+"\n"
+"تم دمج اضافة SentenceNav للتنقل بالجمل (Alt+أسهم).\n"
+"تم دمج إضافة BrowserNav للتصفح المتقدم في المتصفح (NVDA+Alt+أسهم)."
+
+msgid "(Plays 3D sound even if 3D mode is disabled)"
+msgstr "(يُشغل الصوت بوضع 3D، حتى وإن كان معطلاً من الإعدادات)"

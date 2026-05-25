@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>Audio Themes NG & Phonetic Punctuation 9.0.0</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style media="screen">
+@charset "utf-8";
+body { 
+font-family : Verdana, Arial, Helvetica, Sans-serif;
+line-height: 1.2em;
+} 
+h1, h2 {text-align: center}
+dt { 
+font-weight : bold; 
+float : left; 
+width: 10%;
+clear: left
+} 
+dd { 
+margin : 0 0 0.4em 0; 
+float : left;
+width: 90%;
+display: block;
+} 
+p { clear : both; 
+} 
+a { text-decoration : underline; 
+} 
+:active { 
+text-decoration : none; 
+}
+a:focus, a:hover {outline: solid}
+</style>
+</head>
+<body>
+<h1 id="audio-themes-ng-phonetic-punctuation">Audio Themes NG &amp; Phonetic Punctuation</h1>
+<p>This add-on provides an immersive audio experience for NVDA screen reader users by playing sounds for various UI events. It allows for the creation, installation, and customization of audio themes, enhancing the auditory feedback from the user interface.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li><strong>Audio effects:</strong> Plays sounds for UI events such as focusing on controls, navigating lists, and more.</li>
+<li><strong>3D Audio:</strong> Utilizes Steam Audio to provide 3D positional audio, giving a sense of where controls are on the screen.</li>
+<li><strong>Reverb:</strong> Adds reverb effects to the audio for a more immersive experience.</li>
+<li><strong>Customizable Themes:</strong> Allows users to create, install, and switch between different audio themes.</li>
+<li><strong>Audio Themes Studio V2:</strong> A built-in tool to create new audio themes or edit existing ones directly from the microphone or via drag &amp; drop.</li>
+<li><strong>Advanced Typing Sounds:</strong> Simulates physical keyboard typing with spatial audio positioning, dynamic velocity volume adjustments, and smart key mapping for special keys (Enter, Backspace, Space, Shift, Ctrl, Alt).</li>
+<li><strong>Audio Beacon / Sonar:</strong> Drop a spatial audio beacon at any location on the screen and navigate around to hear real-time sonar pings guiding you relative to the beacon.</li>
+<li><strong>Advanced Navigation:</strong> Integrated SentenceNav and BrowserNav engines for seamless text and web navigation without conflicting arrow keys.</li>
+</ul>
+<h2 id="development-credits">Development &amp; Credits</h2>
+<p>This add-on was exclusively developed, consolidated, and translated by <strong>Hassan AlBarshoumy</strong>.</p>
+<p>All code refactoring, structural consolidations, and GUI integrations (including the Audio Themes Studio V2 and unified Settings dialogs) were performed to ensure maximum stability and compatibility with NVDA 2026.1+. </p>
+<ul>
+<li><strong>Developer:</strong> Hassan AlBarshoumy</li>
+<li><strong>Contact &amp; Updates:</strong> <a href="https://t.me/HassanAlBarshoumy">https://t.me/HassanAlBarshoumy</a></li>
+</ul>
+<h2 id="installation">Installation</h2>
+<ol>
+<li>Download the latest release of the add-on from Hassan&rsquo;s official channel.</li>
+<li>Open the downloaded <code>.nvda-addon</code> file.</li>
+<li>NVDA will ask you to confirm the installation. Choose &ldquo;Yes&rdquo;.</li>
+<li>Restart NVDA to complete the installation.</li>
+</ol>
+<h2 id="how-to-use">How to Use</h2>
+<h3 id="enablingdisabling-audio-themes">Enabling/Disabling Audio Themes</h3>
+<p>You can enable or disable the audio themes feature in NVDA&rsquo;s settings:</p>
+<ol>
+<li>Open the NVDA menu (NVDA+N).</li>
+<li>Go to &ldquo;Preferences&rdquo; -&gt; &ldquo;Settings&rdquo;.</li>
+<li>In the settings dialog, select the &ldquo;Audio Themes&rdquo; category.</li>
+<li>Check or uncheck the &ldquo;Enable audio themes&rdquo; checkbox.</li>
+</ol>
+<h3 id="selecting-and-managing-themes">Selecting and Managing Themes</h3>
+<p>In the &ldquo;Audio Themes&rdquo; settings panel, you can:</p>
+<ul>
+<li><strong>Select a theme:</strong> Choose from the list of installed audio themes.</li>
+<li><strong>Add a new theme:</strong> Click the &ldquo;Add New&hellip;&rdquo; button to install a theme from an <code>.atp</code> file.</li>
+<li><strong>Remove a theme:</strong> Select a theme and click the &ldquo;Remove&rdquo; button.</li>
+<li><strong>About a theme:</strong> Click the &ldquo;About&rdquo; button to see information about the selected theme.</li>
+</ul>
+<h3 id="using-the-audio-themes-studio-v2">Using the Audio Themes Studio V2</h3>
+<p>The Audio Themes Studio allows you to create and edit audio themes. To open the studio:</p>
+<ol>
+<li>Open the NVDA menu (NVDA+N).</li>
+<li>Select &ldquo;Audio Themes Studio&rdquo;.</li>
+</ol>
+<p>In the studio, you can:</p>
+<ul>
+<li><strong>Create a new audio theme:</strong> This will guide you through the process of creating a new theme from scratch.</li>
+<li><strong>Customize an existing audio theme:</strong> Select this option to modify the sounds of an installed theme.</li>
+<li><strong>Record from Microphone:</strong> You can now natively record your voice or any sound directly from your microphone to be assigned to a UI event!</li>
+<li><strong>Drag &amp; Drop:</strong> You can drag and drop audio files directly into the Studio window to assign them rapidly.</li>
+</ul>
+<h3 id="exporting-your-theme">Exporting Your Theme</h3>
+<p>After creating or editing a theme, you can export it as an <code>.atp</code> file to share it with others. You can find the export option in the editing screen.</p>
+<h2 id="advanced-rules-phonetic-punctuation">Advanced Rules &amp; Phonetic Punctuation</h2>
+<p>Earcons and Speech Rules allow NVDA to play earcons as well as other speech effects, such as prosody changes.</p>
+<h3 id="usage">Usage</h3>
+<ol>
+<li>Make sure the add-on is enabled. Press NVDA+Alt+P to toggle it.</li>
+<li>Rules can be configured via a dialog box in NVDA preferences menu.</li>
+<li>By default you will have a set of predefined audio rules.</li>
+<li>The rules are saved in a file called <code>earconsAndSpeechRules.json</code> in your NVDA user configuration directory.</li>
+</ol>
+<h3 id="keyboard-commands">Keyboard Commands</h3>
+<ul>
+<li><strong>NVDA+Alt+N:</strong> Toggle Audio Themes on/off. Press twice quickly to toggle Typing Sounds.</li>
+<li><strong>NVDA+Alt+T:</strong> Cycle through available Audio Themes.</li>
+<li><strong>NVDA+Alt+Y:</strong> Cycle through available Typing Sound packs.</li>
+<li><strong>NVDA+Alt+K:</strong> Toggle Typing Sounds on/off.</li>
+<li><strong>NVDA+Shift+B:</strong> Drop/Remove an Audio Beacon at the current navigator object.</li>
+<li><strong>NVDA+Shift+A:</strong> Enter Audio Themes Command Layer (press this, then a command key such as 'h' for help, 't' to toggle themes, 'p' to toggle rules, 's' to toggle state verbosity, 'c' to speak heading level, 'o' to rotate speech order).</li>
+<li><strong>NVDA+Alt+P:</strong> Toggle earcons and sound speech rules add-on.</li>
+<li><strong>NVDA+Alt+[ (left bracket):</strong> Toggle concise state reporting mode.</li>
+<li><strong>NVDA+H:</strong> Speak current heading level.</li>
+<li><strong>NVDA+Tab:</strong> Report the object under the cursor with full 3D audio coordinates.</li>
+<li><strong>Alt+Arrows:</strong> Advanced Sentence/Phrase Navigation.</li>
+<li><strong>NVDA+Alt+Arrows:</strong> Advanced Web Navigation (BrowserNav).</li>
+</ul>
+<h2 id="support">Support</h2>
+<p>For any issues, requests, or bug reports, please refer to the official contact point:<br />
+<strong><a href="https://t.me/HassanAlBarshoumy">Hassan AlBarshoumy&rsquo;s Telegram</a></strong></p>
+</body>
+</html>

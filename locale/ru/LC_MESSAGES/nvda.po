@@ -1,0 +1,2273 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: advanced_audio_themes 1.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-05-24 12:00+0000\n"
+"PO-Revision-Date: 2026-05-24 12:00+0000\n"
+"Last-Translator: AI <ai@example.com>\n"
+"Language-Team: ru <LL@li.org>\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid " - Copy"
+msgstr " - Copy"
+
+msgid "&About"
+msgstr "&О теме"
+
+msgid "&Add"
+msgstr "&Add"
+
+msgid "&Add Profile"
+msgstr "&Add Profile"
+
+msgid "&Add..."
+msgstr "&Добавить..."
+
+msgid "&Attributes (space separated list):"
+msgstr "&Attributes (space separated list):"
+
+msgid "&Audio Themes Studio"
+msgstr "Студия &Звуковых тем"
+
+msgid "&Beep"
+msgstr "&Beep"
+
+msgid "&Bookmark"
+msgstr "&Bookmark"
+
+msgid "&Bookmarks"
+msgstr "&Bookmarks"
+
+msgid "&Browse"
+msgstr "&Обзор"
+
+msgid "&Browse..."
+msgstr "&Browse..."
+
+msgid "&Built in wave"
+msgstr "&Built in wave"
+
+msgid "&Category:"
+msgstr "&Category:"
+
+msgid "&Change..."
+msgstr "&Изменить..."
+
+msgid "&Close"
+msgstr "&Закрыть"
+
+msgid "&Comment"
+msgstr "&Comment"
+
+msgid "&Display name (optional)"
+msgstr "&Display name (optional)"
+
+msgid "&Download & Install"
+msgstr "&Скачать и установить"
+
+msgid "&Edit"
+msgstr "&Edit"
+
+msgid "&Edit site"
+msgstr "&Edit site"
+
+msgid "&Focus mode"
+msgstr "&Focus mode"
+
+msgid "&Import website from file"
+msgstr "&Import website from file"
+
+msgid "&Keep original"
+msgstr "&Keep original"
+
+msgid "&Live Preview"
+msgstr "&Предварительный просмотр в реальном времени"
+
+msgid "&Live region mode"
+msgstr "&Live region mode"
+
+msgid "&Match type"
+msgstr "&Match type"
+
+msgid "&Pattern"
+msgstr "&Pattern"
+
+msgid "&Preview"
+msgstr "&Предварительный просмотр"
+
+msgid "&Prosody"
+msgstr "&Prosody"
+
+msgid "&Prosody name:"
+msgstr "&Prosody name:"
+
+msgid "&Record from Microphone"
+msgstr "&Запись с микрофона"
+
+msgid "&Refresh"
+msgstr "&Обновить"
+
+msgid "&Remove"
+msgstr "&Удалить"
+
+msgid "&Remove Profile"
+msgstr "&Remove Profile"
+
+msgid "&Remove bookmark"
+msgstr "&Remove bookmark"
+
+msgid "&Remove site"
+msgstr "&Remove site"
+
+msgid "&Replacement pattern"
+msgstr "&Replacement pattern"
+
+msgid "&Rules"
+msgstr "&Rules"
+
+msgid "&Save"
+msgstr "&Сохранить"
+
+msgid "&Search rules:"
+msgstr "&Search rules:"
+
+msgid "&Site this bookmark belongs to:"
+msgstr "&Site this bookmark belongs to:"
+
+msgid "&Sites"
+msgstr "&Sites"
+
+msgid "&Sort"
+msgstr "&Sort"
+
+msgid "&Stop Recording"
+msgstr "&Остановить запись"
+
+msgid "&Test, press twice for repeated sound"
+msgstr "&Test, press twice for repeated sound"
+
+msgid "&Text"
+msgstr "&Text"
+
+msgid "&Tone"
+msgstr "&Tone"
+
+msgid "&Type"
+msgstr "&Type"
+
+msgid "&URL"
+msgstr "&URL"
+
+msgid "&Version (optional for exported bookmarks)"
+msgstr "&Version (optional for exported bookmarks)"
+
+msgid "&Wave file"
+msgstr "&Wave file"
+
+msgid "&Wave:"
+msgstr "&Wave:"
+
+msgid "&Website"
+msgstr "&Website"
+
+msgid "&Website name"
+msgstr "&Website name"
+
+msgid "&Websites"
+msgstr "&Websites"
+
+msgid "3D Spatial (Stereo)"
+msgstr "3D Spatial (Stereo)"
+
+msgid "A pattern is required."
+msgstr "A pattern is required."
+
+msgid "About Audio Theme"
+msgstr "Об аудио теме"
+
+msgid "Add &New..."
+msgstr "Добавить &новую..."
+
+msgid "Add &audio rule"
+msgstr "Add &audio rule"
+
+msgid "Add App Profile"
+msgstr "Add App Profile"
+
+msgid "Add Sound"
+msgstr "Добавить звук"
+
+msgid "Add audio rule"
+msgstr "Add audio rule"
+
+msgid "Added '{item} to matched attributes edit box.'"
+msgstr "Added '{item} to matched attributes edit box.'"
+
+msgid "Adjusts BrowserNav rotor"
+msgstr "Adjusts BrowserNav rotor"
+
+msgid "Advanced Audio Themes"
+msgstr "Advanced Audio Themes"
+
+msgid "Advanced Browser Navigation (BrowserNav)"
+msgstr "Advanced Browser Navigation (BrowserNav)"
+
+msgid "All Supported Audio Formats"
+msgstr "Все поддерживаемые аудиоформаты"
+
+msgid "All of the fields are required. Exiting..."
+msgstr "Все поля обязательны для заполнения. Выход..."
+
+msgid "All rules disabled"
+msgstr "All rules disabled"
+
+msgid "All rules enabled"
+msgstr "All rules enabled"
+
+msgid "Always"
+msgstr "Always"
+
+msgid ""
+"Another website with this name already exists. Please choose a different "
+"name."
+msgstr ""
+"Another website with this name already exists. Please choose a different "
+"name."
+
+msgid "App Profiles"
+msgstr "App Profiles"
+
+msgid "Application (e.g. chrome.exe)"
+msgstr "Application (e.g. chrome.exe)"
+
+msgid "Application executable name (e.g. notepad.exe):"
+msgstr "Application executable name (e.g. notepad.exe):"
+
+msgid "Audio Ducking (lower volume when NVDA speaks)"
+msgstr "Audio Ducking (lower volume when NVDA speaks)"
+
+msgid "Audio Engine"
+msgstr "Audio Engine"
+
+msgid "Audio Output Mode:"
+msgstr "Audio Output Mode:"
+
+msgid "Audio Sonar"
+msgstr "Audio Sonar"
+
+msgid ""
+"Audio Sonar: Sweeps the active window to create an audio map of its "
+"elements."
+msgstr ""
+"Audio Sonar: Sweeps the active window to create an audio map of its "
+"elements."
+
+msgid "Audio Theme"
+msgstr "Audio Theme"
+
+msgid "Audio Theme Package (*.atp)|*.atp"
+msgstr "Пакет аудио темы (*.atp)|*.atp"
+
+msgid "Audio Theme Packages"
+msgstr "Пакеты аудио тем"
+
+msgid "Audio Theme:"
+msgstr "Audio Theme:"
+
+msgid "Audio Themes Commands"
+msgstr "Audio Themes Commands"
+
+msgid "Audio Themes Configuration (*.atcfg)|*.atcfg"
+msgstr "Audio Themes Configuration (*.atcfg)|*.atcfg"
+
+msgid "Audio Themes NG"
+msgstr "Audio Themes NG"
+
+msgid "Audio Themes Studio"
+msgstr "Студия звуковых тем"
+
+msgid "Audio Themes: Earcons & Speech Rules"
+msgstr "Audio Themes: Earcons & Speech Rules"
+
+msgid "Audio beacon dropped at current location"
+msgstr "Audio beacon dropped at current location"
+
+msgid "Audio beacon removed"
+msgstr "Audio beacon removed"
+
+msgid "Audio preview failed."
+msgstr "Ошибка предварительного просмотра."
+
+msgid "Audio rule Error"
+msgstr "Audio rule Error"
+
+msgid ""
+"Audio theme successfully installed. You can now select it from the themes "
+"menu."
+msgstr ""
+"Аудио тема успешно установлена. Теперь вы можете выбрать её в меню тем."
+
+msgid "Audio theme: {theme}"
+msgstr "Audio theme: {theme}"
+
+msgid "Audio themes"
+msgstr "Аудио темы"
+
+msgid ""
+"Audio themes command layer. Press this then a command key (e.g. h for help)."
+msgstr ""
+"Audio themes command layer. Press this then a command key (e.g. h for help)."
+
+msgid "Audio themes disabled"
+msgstr "Audio themes disabled"
+
+msgid "Audio themes enabled"
+msgstr "Audio themes enabled"
+
+msgid "Audio themes volume"
+msgstr "Громкость аудио тем"
+
+msgid "Audio themes volume:"
+msgstr "Громкость аудио тем:"
+
+msgid ""
+"AutoClick  according to BrowserNav AutoClick bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"AutoClick  according to BrowserNav AutoClick bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+
+msgid ""
+"AutoClick  according to BrowserNav AutoClick2 bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"AutoClick  according to BrowserNav AutoClick2 bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+
+msgid ""
+"AutoClick  according to BrowserNav AutoClick3 bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"AutoClick  according to BrowserNav AutoClick3 bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+
+msgid "AutoSpeak disabled"
+msgstr "AutoSpeak disabled"
+
+msgid "AutoSpeak mode"
+msgstr "AutoSpeak mode"
+
+msgid "Automatically detect and speak changes to this bookmark"
+msgstr "Automatically detect and speak changes to this bookmark"
+
+msgid "Available BrowserNav websites"
+msgstr "Available BrowserNav websites"
+
+msgid ""
+"Available attributes in current paragraph (press space to add to current "
+"bookmark):"
+msgstr ""
+"Available attributes in current paragraph (press space to add to current "
+"bookmark):"
+
+msgid "Beep on every focus event"
+msgstr "Beep on every focus event"
+
+msgid "Beep on every successful autoClick"
+msgstr "Beep on every successful autoClick"
+
+msgid "Beep on every update from live region"
+msgstr "Beep on every update from live region"
+
+msgid "Beeping sound volume:"
+msgstr "Громкость звукового сигнала:"
+
+msgid "Beeping volume (Beeping)"
+msgstr "Громкость звукового сигнала (Beeping)"
+
+msgid "Blacklist applications for sentence navigation (comma separated):"
+msgstr "Blacklist applications for sentence navigation (comma separated):"
+
+msgid "Blank announcement"
+msgstr "Blank announcement"
+
+msgid "Bold"
+msgstr "Bold"
+
+msgid "Bookmark Entry Error"
+msgstr "Bookmark Entry Error"
+
+msgid "Bookmark Entry error"
+msgstr "Bookmark Entry error"
+
+msgid "Bookmark Entry warning"
+msgstr "Bookmark Entry warning"
+
+msgid "Bookmark Error"
+msgstr "Bookmark Error"
+
+msgid "Bookmark enabled"
+msgstr "Bookmark enabled"
+
+msgid "Bookmark entry error"
+msgstr "Bookmark entry error"
+
+msgid "Bookmark points to non-focusable NVDA object, cannot click it."
+msgstr "Bookmark points to non-focusable NVDA object, cannot click it."
+
+msgid "Bookmark store communication error"
+msgstr "Bookmark store communication error"
+
+msgid ""
+"Bookmarks that span across paragraphs is not supported by BrowserNav. Please"
+" clear the selection or select something within a single paragraph."
+msgstr ""
+"Bookmarks that span across paragraphs is not supported by BrowserNav. Please"
+" clear the selection or select something within a single paragraph."
+
+msgid ""
+"Both hierarchical and numeric script bookmarks are configured for this "
+"website. This is not supported; please disable either hierarchical or "
+"numeric script bookmarks."
+msgstr ""
+"Both hierarchical and numeric script bookmarks are configured for this "
+"website. This is not supported; please disable either hierarchical or "
+"numeric script bookmarks."
+
+msgid ""
+"Browser state has changed. Different element on the page is now focused."
+msgstr ""
+"Browser state has changed. Different element on the page is now focused."
+
+msgid ""
+"Browser state has changed. Focused element is not an edit box. Role: %d."
+msgstr ""
+"Browser state has changed. Focused element is not an edit box. Role: %d."
+
+msgid "BrowserNav"
+msgstr "BrowserNav"
+
+msgid "BrowserNav QuickSearch websites and bookmarks"
+msgstr "BrowserNav QuickSearch websites and bookmarks"
+
+msgid "BrowserNav Settings"
+msgstr "Настройки BrowserNav"
+
+msgid ""
+"BrowserNav error: inconsistent indents in the document. Recomputing indents,"
+" please try again."
+msgstr ""
+"BrowserNav error: inconsistent indents in the document. Recomputing indents,"
+" please try again."
+
+msgid "BrowserNav navigates by "
+msgstr "BrowserNav navigates by "
+
+msgid "BrowserNav temporary action configured only for this website."
+msgstr "BrowserNav temporary action configured only for this website."
+
+msgid ""
+"BrowserNav warning: Two or more sites matching this URL are configured to "
+"perform autoClick on load. This is not supported."
+msgstr ""
+"BrowserNav warning: Two or more sites matching this URL are configured to "
+"perform autoClick on load. This is not supported."
+
+msgid "BrowserNav website import conflict"
+msgstr "BrowserNav website import conflict"
+
+msgid "C&hime:"
+msgstr "C&hime:"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "Cannot combine tilde with digits for numeric script!"
+msgstr "Cannot combine tilde with digits for numeric script!"
+
+msgid ""
+"Cannot copy text out of edit box. Please make sure edit box is not empty and"
+" not read-only!"
+msgstr ""
+"Cannot copy text out of edit box. Please make sure edit box is not empty and"
+" not read-only!"
+
+msgid "Cannot edit in this window."
+msgstr "Cannot edit in this window."
+
+msgid "Cannot go back any more"
+msgstr "Cannot go back any more"
+
+msgid "Capital letters (no spaces):"
+msgstr "Capital letters (no spaces):"
+
+msgid "Category"
+msgstr "Category"
+
+msgid "Centered (Mono)"
+msgstr "Centered (Mono)"
+
+msgid "Character"
+msgstr "Character"
+
+msgid "Characters"
+msgstr "Characters"
+
+msgid "Chime &category:"
+msgstr "Chime &category:"
+
+msgid "Choose an audio file"
+msgstr "Выберите аудиофайл"
+
+msgid "Choose an audio theme package"
+msgstr "Выберите пакет аудио темы"
+
+msgid "Clicked {n} objects."
+msgstr "Clicked {n} objects."
+
+msgid ""
+"Comprehensive export completed successfully!\n"
+"Includes: settings, rules, themes, typing sounds, and earcon sounds."
+msgstr ""
+"Comprehensive export completed successfully!\n"
+"Includes: settings, rules, themes, typing sounds, and earcon sounds."
+
+msgid "Comprehensive import completed successfully!"
+msgstr "Comprehensive import completed successfully!"
+
+msgid "Concise state reporting"
+msgstr "Concise state reporting"
+
+msgid ""
+"Configure specific audio themes to automatically activate when certain "
+"applications are focused."
+msgstr ""
+"Configure specific audio themes to automatically activate when certain "
+"applications are focused."
+
+msgid "Confirm Quit"
+msgstr "Подтвердите выход"
+
+msgid "Connecting to store..."
+msgstr "Подключение к магазину..."
+
+msgid "Copied to clipboard: {}"
+msgstr "Copied to clipboard: {}"
+
+msgid "Copy the last text from semi-accessible edit box to clipboard."
+msgstr "Copy the last text from semi-accessible edit box to clipboard."
+
+msgid "Could not copy file {src} to directory {dst}."
+msgstr "Не удалось скопировать файл {src} в каталог {dst}."
+
+msgid "Could not load website from {}: {}"
+msgstr "Could not load website from {}: {}"
+
+msgid "Could not save website to {}: {}"
+msgstr "Could not save website to {}: {}"
+
+msgid "Crackling sound volume (during navigation):"
+msgstr "Громкость звука треска (при навигации):"
+
+msgid "Crackling volume"
+msgstr "Громкость треска"
+
+msgid "Create &New Audio Theme"
+msgstr "Создать &новую аудио тему"
+
+msgid "Create a new audio theme package from scratch"
+msgstr "Создать новый пакет аудио темы с нуля"
+
+msgid "Create new bookmark from current paragraph for site {site}"
+msgstr "Create new bookmark from current paragraph for site {site}"
+
+msgid "Create new website for domain %s"
+msgstr "Create new website for domain %s"
+
+msgid "Create new website with custom URL matching options"
+msgstr "Create new website with custom URL matching options"
+
+msgid "Creating New Theme - {name}"
+msgstr "Создание новой темы - {name}"
+
+msgid "Current object has no location"
+msgstr "Current object has no location"
+
+msgid "Current selection spans across multiple paragraphs."
+msgstr "Current selection spans across multiple paragraphs."
+
+msgid "Custom &Keystroke"
+msgstr "Custom &Keystroke"
+
+msgid "Custom &Keystroke: %s"
+msgstr "Custom &Keystroke: %s"
+
+msgid "Custom Display Name (optional)"
+msgstr "Custom Display Name (optional)"
+
+msgid "Custom Text"
+msgstr "Custom Text"
+
+msgid "Customize &Existing Audio Theme"
+msgstr "Настроить &существующую аудио тему"
+
+msgid "Customize an installed audio theme with your prefered  sounds."
+msgstr "Настроить установленную аудио тему с помощью предпочитаемых звуков."
+
+msgid "Customize announcement format per role:"
+msgstr "Customize announcement format per role:"
+
+msgid "Cycle Audio Themes"
+msgstr "Cycle Audio Themes"
+
+msgid "Cycle Typing Sounds"
+msgstr "Cycle Typing Sounds"
+
+msgid "Cycles through available audio themes."
+msgstr "Cycles through available audio themes."
+
+msgid "Cycles through available typing sound packs."
+msgstr "Cycles through available typing sound packs."
+
+msgid "D&uplicate"
+msgstr "D&uplicate"
+
+msgid "Damping"
+msgstr "Затухание"
+
+msgid "Damping:"
+msgstr "Затухание:"
+
+msgid "Debug &beep mode"
+msgstr "Debug &beep mode"
+
+msgid "Decrease Audio Themes Volume"
+msgstr "Decrease Audio Themes Volume"
+
+msgid "Decreases the audio themes volume by 5 percent."
+msgstr "Decreases the audio themes volume by 5 percent."
+
+msgid "Default &Keystroke: %s"
+msgstr "Default &Keystroke: %s"
+
+msgid "Default (name, role then state)"
+msgstr "Default (name, role then state)"
+
+msgid "Delay before initial autoClick in milliseconds:"
+msgstr "Delay before initial autoClick in milliseconds:"
+
+msgid "Delay between recurring autoClicks  in milliseconds:"
+msgstr "Delay between recurring autoClicks  in milliseconds:"
+
+msgid "Deselect All"
+msgstr "Deselect All"
+
+msgid "Dictionary Entry Error"
+msgstr "Dictionary Entry Error"
+
+msgid "Disable (&toggle)"
+msgstr "Disable (&toggle)"
+
+msgid "Disable A&ll"
+msgstr "Disable A&ll"
+
+msgid "Disable Audio Themes in these applications (comma separated):"
+msgstr "Disable Audio Themes in these applications (comma separated):"
+
+msgid "Disable PhoneticPuntuation in applications (comma-separated list)"
+msgstr "Disable PhoneticPuntuation in applications (comma-separated list)"
+
+msgid "Disable audio themes"
+msgstr "Disable audio themes"
+
+msgid "Disable typing sounds"
+msgstr "Disable typing sounds"
+
+msgid "Disabled"
+msgstr "Disabled"
+
+msgid "Do not speak anything"
+msgstr "Do not speak anything"
+
+msgid "Domain"
+msgstr "Domain"
+
+msgid "Done."
+msgstr "Done."
+
+msgid "Download failed."
+msgstr "Ошибка скачивания."
+
+msgid "Downloading audio preview..."
+msgstr "Скачивание предварительного просмотра..."
+
+msgid "Downloading... Please wait"
+msgstr "Скачивание... Пожалуйста, подождите"
+
+msgid "Dry Level"
+msgstr "Уровень оригинала"
+
+msgid "Dry Level:"
+msgstr "Уровень оригинала:"
+
+msgid "Ducked Volume (%):"
+msgstr "Ducked Volume (%):"
+
+msgid "Duration in milliseconds:"
+msgstr "Duration in milliseconds:"
+
+msgid "E&xport Configuration..."
+msgstr "E&xport Configuration..."
+
+msgid "E&xport as .atp..."
+msgstr "Э&кспорт как .atp..."
+
+msgid "E&xport site and all bookmarks"
+msgstr "E&xport site and all bookmarks"
+
+msgid "Earcons & Speech Rules"
+msgstr "Earcons & Speech Rules"
+
+msgid "Earcons and Speech Rules add-on"
+msgstr "Earcons and Speech Rules add-on"
+
+msgid "Earcons and Speech Rules off"
+msgstr "Earcons and Speech Rules off"
+
+msgid "Earcons and Speech Rules on"
+msgstr "Earcons and Speech Rules on"
+
+msgid "Earcons and speech rules add-on Error"
+msgstr "Earcons and speech rules add-on Error"
+
+msgid "Edit &Description"
+msgstr "Edit &Description"
+
+msgid "Edit &bookmarks"
+msgstr "Edit &bookmarks"
+
+msgid "Edit &script in new window; press Control+Enter when Done."
+msgstr "Edit &script in new window; press Control+Enter when Done."
+
+msgid "Edit audio rule"
+msgstr "Edit audio rule"
+
+msgid ""
+"Edit bookmark {bookmark} of category {category} that doesn't match "
+"formatting for current paragraph from site {site}"
+msgstr ""
+"Edit bookmark {bookmark} of category {category} that doesn't match "
+"formatting for current paragraph from site {site}"
+
+msgid "Edit bookmarks for %s"
+msgstr "Edit bookmarks for %s"
+
+msgid "Edit browserNav bookmark"
+msgstr "Edit browserNav bookmark"
+
+msgid "Edit existing website %s"
+msgstr "Edit existing website %s"
+
+msgid ""
+"Edit perfect match bookmark {bookmark} of category {category} from site "
+"{site}"
+msgstr ""
+"Edit perfect match bookmark {bookmark} of category {category} from site "
+"{site}"
+
+msgid "Edit semi-accessible edit box."
+msgstr "Edit semi-accessible edit box."
+
+msgid "Edit site configuration"
+msgstr "Edit site configuration"
+
+msgid "Edit site description"
+msgstr "Edit site description"
+
+msgid "Edit spoken text"
+msgstr "Edit spoken text"
+
+msgid "Edit text"
+msgstr "Edit text"
+
+msgid "Editing Audio Theme: {name}"
+msgstr "Редактирование аудио темы: {name}"
+
+msgid "Editing script for %s"
+msgstr "Editing script for %s"
+
+msgid "Effect"
+msgstr "Effect"
+
+msgid "Enable (&toggle)"
+msgstr "Enable (&toggle)"
+
+msgid "Enable A&ll"
+msgstr "Enable A&ll"
+
+msgid "Enable Audio Themes"
+msgstr "Enable Audio Themes"
+
+msgid "Enable RAM Caching (Improves performance and latency)"
+msgstr "Enable RAM Caching (Improves performance and latency)"
+
+msgid "Enable Reverb"
+msgstr "Включить реверберацию"
+
+msgid "Enable audio themes"
+msgstr "Включить аудио темы"
+
+msgid "Enable experimental support for Word and WordPad"
+msgstr "Enable experimental support for Word and WordPad"
+
+msgid "Enable recurrent auto click"
+msgstr "Enable recurrent auto click"
+
+msgid "Enable recurrent auto speak of "
+msgstr "Enable recurrent auto speak of "
+
+msgid "Enable spatial typing sounds (simulates a physical keyboard)"
+msgstr "Enable spatial typing sounds (simulates a physical keyboard)"
+
+msgid "Enable typing sounds"
+msgstr "Enable typing sounds"
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid ""
+"End adjustment in millis - positive for early cut off, negative for extra "
+"pause in the end"
+msgstr ""
+"End adjustment in millis - positive for early cut off, negative for extra "
+"pause in the end"
+
+msgid "End adjustment must be a number."
+msgstr "End adjustment must be a number."
+
+msgid "Enter Theme Information"
+msgstr "Введите информацию о теме"
+
+msgid "Error"
+msgstr "Ошибка"
+
+msgid "Error during installation."
+msgstr "Ошибка во время установки."
+
+msgid "Error during switch to window stage, focused element role is %d"
+msgstr "Error during switch to window stage, focused element role is %d"
+
+msgid ""
+"Error exporting configuration:\n"
+"{}"
+msgstr ""
+"Error exporting configuration:\n"
+"{}"
+
+msgid ""
+"Error importing configuration:\n"
+"{}"
+msgstr ""
+"Error importing configuration:\n"
+"{}"
+
+msgid ""
+"Error initializing some text rules of Earcons and Speech Rules add-on since they contain URL filter.\n"
+"URL detection feature requires BrowserNav v2.6.2 or later add-on to be installed.\n"
+"However it is either not installed, or failed to initialize.\n"
+"Please install the latest BrowserNav add-on from add-on store and restart NVDA.\n"
+"In the mean time all text rules with URL filter will be disabled.\n"
+msgstr ""
+"Error initializing some text rules of Earcons and Speech Rules add-on since they contain URL filter.\n"
+"URL detection feature requires BrowserNav v2.6.2 or later add-on to be installed.\n"
+"However it is either not installed, or failed to initialize.\n"
+"Please install the latest BrowserNav add-on from add-on store and restart NVDA.\n"
+"In the mean time all text rules with URL filter will be disabled.\n"
+
+msgid ""
+"Error retrieving contents of BrowserNav bookmark store: {}.\n"
+"Please check your Internet connectivity and try again.\n"
+msgstr ""
+"Error retrieving contents of BrowserNav bookmark store: {}.\n"
+"Please check your Internet connectivity and try again.\n"
+
+msgid ""
+"Error! Focused element on the page has changed while pasting updated text. "
+"Possibly content of a different edit box has changed. Please inspect edit "
+"boxes manually and undo if needed."
+msgstr ""
+"Error! Focused element on the page has changed while pasting updated text. "
+"Possibly content of a different edit box has changed. Please inspect edit "
+"boxes manually and undo if needed."
+
+msgid ""
+"Error! When switching back to browser window, a different edit box is "
+"focused."
+msgstr ""
+"Error! When switching back to browser window, a different edit box is "
+"focused."
+
+msgid ""
+"Error: you have entered URL filter for this rule.\n"
+"URL detection feature requires BrowserNav v2.6.2 or later add-on to be installed.\n"
+"However it is either not installed, or failed to initialize.\n"
+"Please install the latest BrowserNav add-on from add-on store and restart NVDA.\n"
+"Alternatively, please clear URL regex field to enable this rule on all web sites.\n"
+msgstr ""
+"Error: you have entered URL filter for this rule.\n"
+"URL detection feature requires BrowserNav v2.6.2 or later add-on to be installed.\n"
+"However it is either not installed, or failed to initialize.\n"
+"Please install the latest BrowserNav add-on from add-on store and restart NVDA.\n"
+"Alternatively, please clear URL regex field to enable this rule on all web sites.\n"
+
+msgid "Exact URL match"
+msgstr "Exact URL match"
+
+msgid "Exact paragraph match"
+msgstr "Exact paragraph match"
+
+msgid "Exceptional abbreviations (space separated):"
+msgstr "Exceptional abbreviations (space separated):"
+
+msgid ""
+"Experimental: go back to the previous location of cursor in current document"
+msgstr ""
+"Experimental: go back to the previous location of cursor in current document"
+
+msgid "Export Audio Themes Configuration"
+msgstr "Export Audio Themes Configuration"
+
+msgid "Failed to compile regular expression: %s"
+msgstr "Failed to compile regular expression: %s"
+
+msgid "Failed to connect to store. Check your internet connection."
+msgstr ""
+"Не удалось подключиться к магазину. Проверьте подключение к Интернету."
+
+msgid "Failed to open settings. Please open through NVDA Preferences."
+msgstr "Failed to open settings. Please open through NVDA Preferences."
+
+msgid ""
+"Failed to read clipboard data. Please make sure clipboard is not empty - "
+"copy some text to clipboard."
+msgstr ""
+"Failed to read clipboard data. Please make sure clipboard is not empty - "
+"copy some text to clipboard."
+
+msgid "File exists"
+msgstr "File exists"
+
+msgid "File {} already exists. Would you like to replace it?"
+msgstr "File {} already exists. Would you like to replace it?"
+
+msgid "Filter URL regex"
+msgstr "Filter URL regex"
+
+msgid "Filter applications regex"
+msgstr "Filter applications regex"
+
+msgid "Filter window title regex"
+msgstr "Filter window title regex"
+
+msgid "First Item"
+msgstr "Первый элемент"
+
+msgid "Font size"
+msgstr "Font size"
+
+msgid "Format"
+msgstr "Format"
+
+msgid "Full width phrase breakers:"
+msgstr "Full width phrase breakers:"
+
+msgid "Full width sentence breakers:"
+msgstr "Full width sentence breakers:"
+
+msgid "General"
+msgstr "General"
+
+msgid "Global announcement format for all elements:"
+msgstr "Global announcement format for all elements:"
+
+msgid "Go to line"
+msgstr "Go to line"
+
+msgid "Go to line:"
+msgstr "Go to line:"
+
+msgid "Heading"
+msgstr "Heading"
+
+msgid "Heading level"
+msgstr "Heading level"
+
+msgid "Heading level 1"
+msgstr "Heading level 1"
+
+msgid "Heading level 2"
+msgstr "Heading level 2"
+
+msgid "Heading level 3"
+msgstr "Heading level 3"
+
+msgid "Heading level 4"
+msgstr "Heading level 4"
+
+msgid "Heading level 5"
+msgstr "Heading level 5"
+
+msgid "Heading level 6"
+msgstr "Heading level 6"
+
+msgid "Hello"
+msgstr "Hello"
+
+msgid "Hierarchical quick jump"
+msgstr "Hierarchical quick jump"
+
+msgid "Highlighted"
+msgstr "Highlighted"
+
+msgid "I&mport Configuration..."
+msgstr "I&mport Configuration..."
+
+msgid "Ignore all focus events - good for websites that misuse focus events"
+msgstr "Ignore all focus events - good for websites that misuse focus events"
+
+msgid "Import Audio Themes Configuration"
+msgstr "Import Audio Themes Configuration"
+
+msgid "Import Themes"
+msgstr "Import Themes"
+
+msgid "Import website from bookmar&k store"
+msgstr "Import website from bookmar&k store"
+
+msgid "Increase Audio Themes Volume"
+msgstr "Increase Audio Themes Volume"
+
+msgid "Increases the audio themes volume by 5 percent."
+msgstr "Increases the audio themes volume by 5 percent."
+
+msgid "Installation successful!"
+msgstr "Установка успешно завершена!"
+
+msgid ""
+"Invalid keystroke %s: Cannot use keystrokes with shift modifier for "
+"quickJump bookmarks!"
+msgstr ""
+"Invalid keystroke %s: Cannot use keystrokes with shift modifier for "
+"quickJump bookmarks!"
+
+msgid "Invalid keystroke %s: cannot overload essential  NVDA keystrokes!"
+msgstr "Invalid keystroke %s: cannot overload essential  NVDA keystrokes!"
+
+msgid "Invalid level for numeric script: '{level}'"
+msgstr "Invalid level for numeric script: '{level}'"
+
+msgid "Invalid regular expression"
+msgstr "Invalid regular expression"
+
+msgid "Invalid regular expression."
+msgstr "Invalid regular expression."
+
+msgid ""
+"Invalid replacement pattern: {}\n"
+"Plesae use curly braces {} as a format placeholder; please don't use any other curly braces in replacement string."
+msgstr ""
+"Invalid replacement pattern: {}\n"
+"Plesae use curly braces {} as a format placeholder; please don't use any other curly braces in replacement string."
+
+msgid "Invalid wav file."
+msgstr "Invalid wav file."
+
+msgid "Italic"
+msgstr "Italic"
+
+msgid ""
+"Jump to next hierarchical bookmark {levelStr}; please check browserNav "
+"configuration panel for hierarchical bookmark configuration."
+msgstr ""
+"Jump to next hierarchical bookmark {levelStr}; please check browserNav "
+"configuration panel for hierarchical bookmark configuration."
+
+msgid ""
+"Jump to previous hierarchical bookmark {levelStr}; please check browserNav "
+"configuration panel for hierarchical bookmark configuration."
+msgstr ""
+"Jump to previous hierarchical bookmark {levelStr}; please check browserNav "
+"configuration panel for hierarchical bookmark configuration."
+
+msgid "Keep default NVDA focus behavior"
+msgstr "Keep default NVDA focus behavior"
+
+msgid "Keep existing website definition, but overwrite all &bookmarks"
+msgstr "Keep existing website definition, but overwrite all &bookmarks"
+
+msgid "Keep original text"
+msgstr "Keep original text"
+
+msgid "Keystroke reset to default"
+msgstr "Keystroke reset to default"
+
+msgid "Last Item"
+msgstr "Последний элемент"
+
+msgid "Last Jupyter text has been copied to clipboard."
+msgstr "Last Jupyter text has been copied to clipboard."
+
+msgid "Last edited text has been copied to the clipboard."
+msgstr "Last edited text has been copied to the clipboard."
+
+msgid "Level {announceLevel}"
+msgstr "Level {announceLevel}"
+
+msgid "Line number must be a positive integer!"
+msgstr "Line number must be a positive integer!"
+
+msgid "Lower case letters (no spaces):"
+msgstr "Lower case letters (no spaces):"
+
+msgid "Match all sites (domain field ignored) "
+msgstr "Match all sites (domain field ignored) "
+
+msgid "Match domain and its subdomains"
+msgstr "Match domain and its subdomains"
+
+msgid "Match domain name"
+msgstr "Match domain name"
+
+msgid "Match empty URL only, that is pages without URL"
+msgstr "Match empty URL only, that is pages without URL"
+
+msgid "Match substring in URL"
+msgstr "Match substring in URL"
+
+msgid "Match type"
+msgstr "Match type"
+
+msgid "Maximum font size or heading level"
+msgstr "Maximum font size or heading level"
+
+msgid "Maximum prosody offset"
+msgstr "Maximum prosody offset"
+
+msgid "Minimum font size or heading level"
+msgstr "Minimum font size or heading level"
+
+msgid ""
+"Minimum numeric value must be strictly less than maximum numeric value."
+msgstr ""
+"Minimum numeric value must be strictly less than maximum numeric value."
+
+msgid "Minimum prosody offset"
+msgstr "Minimum prosody offset"
+
+msgid "Miscellaneous"
+msgstr "Miscellaneous"
+
+msgid "Move &down"
+msgstr "Move &down"
+
+msgid "Move &up"
+msgstr "Move &up"
+
+msgid "Move to next paragraph containing text."
+msgstr "Move to next paragraph containing text."
+
+msgid "Move to previous paragraph containing text."
+msgstr "Move to previous paragraph containing text."
+
+msgid "Moves to next child in browser"
+msgstr "Moves to next child in browser"
+
+msgid "Moves to next parent in browser"
+msgstr "Moves to next parent in browser"
+
+msgid "Moves to next sibling in browser"
+msgstr "Moves to next sibling in browser"
+
+msgid "Moves to previous child in browser"
+msgstr "Moves to previous child in browser"
+
+msgid "Moves to previous sibling in browser"
+msgstr "Moves to previous sibling in browser"
+
+msgid "Mute live regions"
+msgstr "Mute live regions"
+
+msgid "Name"
+msgstr "Name"
+
+msgid ""
+"Name: {name}\n"
+"Author: {author}\n"
+"\n"
+"{summary}"
+msgstr ""
+"Название: {name}\n"
+"Автор: {author}\n"
+"\n"
+"{summary}"
+
+msgid "Navigate to table cells by pressing T and Shift+T"
+msgstr "Перемещение по ячейкам таблицы нажатием T и Shift+T"
+
+msgid "Negative state"
+msgstr "Negative state"
+
+msgid "Negative states"
+msgstr "Negative states"
+
+msgid "Never"
+msgstr "Never"
+
+msgid "New Notification Sound"
+msgstr "Звук нового уведомления"
+
+msgid "Next Audio Theme"
+msgstr "Next Audio Theme"
+
+msgid ""
+"Next paragraph not found: current position is at the end of the document."
+msgstr ""
+"Next paragraph not found: current position is at the end of the document."
+
+msgid "No Audio Themes"
+msgstr "Аудио темы отсутствуют"
+
+msgid "No URL"
+msgstr "No URL"
+
+msgid "No audio themes available"
+msgstr "No audio themes available"
+
+msgid "No beeps"
+msgstr "No beeps"
+
+msgid "No bookmarks matched!"
+msgstr "No bookmarks matched!"
+
+msgid "No cursor history available"
+msgstr "No cursor history available"
+
+msgid "No heading level information"
+msgstr "No heading level information"
+
+msgid ""
+"No hierarchical quickJump bookmarks configured for current website. Please "
+"add QuickJump bookmarks in BrowserNav settings in NVDA settings window."
+msgstr ""
+"No hierarchical quickJump bookmarks configured for current website. Please "
+"add QuickJump bookmarks in BrowserNav settings in NVDA settings window."
+
+msgid ""
+"No hierarchical quickJump bookmarks or numeric script bookmarks configured "
+"for current website. Please add QuickJump bookmarks in BrowserNav settings "
+"in NVDA settings window."
+msgstr ""
+"No hierarchical quickJump bookmarks or numeric script bookmarks configured "
+"for current website. Please add QuickJump bookmarks in BrowserNav settings "
+"in NVDA settings window."
+
+msgid "No indent announcement"
+msgstr "No indent announcement"
+
+msgid "No last Jupyter text., or last Jupyter text is empty."
+msgstr "No last Jupyter text., or last Jupyter text is empty."
+
+msgid "No match!"
+msgstr "No match!"
+
+msgid "No more sentences chime volume:"
+msgstr "No more sentences chime volume:"
+
+msgid "No more text units chime volume:"
+msgstr "No more text units chime volume:"
+
+msgid ""
+"No next QuickJump result. To configure QuickJump rules, please go to "
+"BrowserNav settings in NVDA configuration window."
+msgstr ""
+"No next QuickJump result. To configure QuickJump rules, please go to "
+"BrowserNav settings in NVDA configuration window."
+
+msgid "No next format change!"
+msgstr "No next format change!"
+
+msgid "No next hierarchical bookmark {levelStr}"
+msgstr "No next hierarchical bookmark {levelStr}"
+
+msgid "No next paragraph  with {qualifier} {mode} in the document"
+msgstr "No next paragraph  with {qualifier} {mode} in the document"
+
+msgid "No next paragraph with text"
+msgstr "No next paragraph with text"
+
+msgid "No next paragraph with the same {mode} in the document"
+msgstr "No next paragraph with the same {mode} in the document"
+
+msgid "No next phrase"
+msgstr "Нет следующей фразы"
+
+msgid "No next sentence"
+msgstr "Нет следующего предложения"
+
+msgid "No previous hierarchical bookmark {levelStr}"
+msgstr "No previous hierarchical bookmark {levelStr}"
+
+msgid "No previous paragraph  with {qualifier} {mode} in the document"
+msgstr "No previous paragraph  with {qualifier} {mode} in the document"
+
+msgid "No previous paragraph with text"
+msgstr "No previous paragraph with text"
+
+msgid "No previous paragraph with the same {mode} in the document"
+msgstr "No previous paragraph with the same {mode} in the document"
+
+msgid "No previous phrase"
+msgstr "Нет предыдущей фразы"
+
+msgid "No previous sentence"
+msgstr "Нет предыдущего предложения"
+
+msgid ""
+"No quickJump bookmarks configured for current website. Please add QuickJump "
+"bookmarks in BrowserNav settings in NVDA settings window."
+msgstr ""
+"No quickJump bookmarks configured for current website. Please add QuickJump "
+"bookmarks in BrowserNav settings in NVDA settings window."
+
+msgid "No sites are configured for current URL."
+msgstr "No sites are configured for current URL."
+
+msgid "No typing sound packs available"
+msgstr "No typing sound packs available"
+
+msgid ""
+"No {category} bookmarks configured for current website. Please add "
+"{category} bookmarks in BrowserNav settings in NVDA settings window."
+msgstr ""
+"No {category} bookmarks configured for current website. Please add "
+"{category} bookmarks in BrowserNav settings in NVDA settings window."
+
+msgid "Not editable"
+msgstr "Not editable"
+
+msgid ""
+"Note: These settings adjust the audio feedback for SentenceNav, TextNav, and"
+" BrowserNav integrations."
+msgstr ""
+"Note: These settings adjust the audio feedback for SentenceNav, TextNav, and"
+" BrowserNav integrations."
+
+msgid "Numeric Script"
+msgstr "Numeric Script"
+
+msgid ""
+"Numeric Script - script that can consume a numeric argument by pressing "
+"Alt+digits"
+msgstr ""
+"Numeric Script - script that can consume a numeric argument by pressing "
+"Alt+digits"
+
+msgid "Numeric format"
+msgstr "Numeric format"
+
+msgid "Numeric text formatting"
+msgstr "Numeric text formatting"
+
+msgid "OK"
+msgstr "ОК"
+
+msgid ""
+"Offset in paragraphs - select a value to place the cursor on following or "
+"preceding paragraph from the bookmark match:"
+msgstr ""
+"Offset in paragraphs - select a value to place the cursor on following or "
+"preceding paragraph from the bookmark match:"
+
+msgid "Ogg audio files"
+msgstr "Аудиофайлы Ogg"
+
+msgid "Other audio rule"
+msgstr "Other audio rule"
+
+msgid "Other audio rules"
+msgstr "Other audio rules"
+
+msgid "Out of container"
+msgstr "Out of container"
+
+msgid "Over&write existing website definition"
+msgstr "Over&write existing website definition"
+
+msgid "P&review"
+msgstr "P&review"
+
+msgid "Paragraph boundary chime volume:"
+msgstr "Paragraph boundary chime volume:"
+
+msgid "Paragraph crackle volume:"
+msgstr "Paragraph crackle volume:"
+
+msgid ""
+"Pass raw text through to synth. Typically you want to enable this only for "
+"punctuation marks and disable for all other rules."
+msgstr ""
+"Pass raw text through to synth. Typically you want to enable this only for "
+"punctuation marks and disable for all other rules."
+
+msgid "Pattern"
+msgstr "Pattern"
+
+msgid "Pattern &match type:"
+msgstr "Pattern &match type:"
+
+msgid "Pattern cannot be empty!"
+msgstr "Pattern cannot be empty!"
+
+msgid "Perform autoClick on page load automatically:"
+msgstr "Perform autoClick on page load automatically:"
+
+msgid "Perform autoSpeak (live region) for:"
+msgstr "Perform autoSpeak (live region) for:"
+
+msgid ""
+"Phonetic punctuation add-on has been renamed to Earcons and Speech Rules.\n"
+"We have automatically migrated all your phonetic punctuation rules to Earcons and Speech Rules add-on, so no further action is required.\n"
+"Please feel free to explore add-on settings to discover new features.\n"
+msgstr ""
+"Phonetic punctuation add-on has been renamed to Earcons and Speech Rules.\n"
+"We have automatically migrated all your phonetic punctuation rules to Earcons and Speech Rules add-on, so no further action is required.\n"
+"Please feel free to explore add-on settings to discover new features.\n"
+
+msgid "Phrase breakers:"
+msgstr "Phrase breakers:"
+
+msgid "Plain text not found: tried to search for '{text}' {direction}."
+msgstr "Plain text not found: tried to search for '{text}' {direction}."
+
+msgid "Play chime when bookmark appears on the page"
+msgstr "Play chime when bookmark appears on the page"
+
+msgid "Play chime when bookmark disappears from the page"
+msgstr "Play chime when bookmark disappears from the page"
+
+msgid "Play chime when text matched by bookmark changes"
+msgstr "Play chime when text matched by bookmark changes"
+
+msgid "Play sounds in 3D mode"
+msgstr "Воспроизводить звуки в 3D-режиме"
+
+msgid "Play typing sounds only in edit boxes"
+msgstr "Play typing sounds only in edit boxes"
+
+msgid "Please create a new site configuration in site submenu."
+msgstr "Please create a new site configuration in site submenu."
+
+msgid "Please enter a single character as pattern."
+msgstr "Please enter a single character as pattern."
+
+msgid ""
+"Please enter a version in order to  export this website.\n"
+"We recommend to use date-based versions, like v2025.01.31.\n"
+msgstr ""
+"Please enter a version in order to  export this website.\n"
+"We recommend to use date-based versions, like v2025.01.31.\n"
+
+msgid "Please enter website name in order to export it."
+msgstr "Please enter website name in order to export it."
+
+msgid "Press desired keystroke now"
+msgstr "Press desired keystroke now"
+
+msgid ""
+"Pressing it once toggles audio themes on and off. Pressing twice toggles "
+"typing sounds."
+msgstr ""
+"Pressing it once toggles audio themes on and off. Pressing twice toggles "
+"typing sounds."
+
+msgid "Preview finished."
+msgstr "Предварительный просмотр завершен."
+
+msgid "Previous Audio Theme"
+msgstr "Previous Audio Theme"
+
+msgid ""
+"Previous paragraph not found: current position is at the beginning of the "
+"document."
+msgstr ""
+"Previous paragraph not found: current position is at the beginning of the "
+"document."
+
+msgid "Prosody offset cannot be zero."
+msgstr "Prosody offset cannot be zero."
+
+msgid "Prosody offset:"
+msgstr "Prosody offset:"
+
+msgid "Protected Edit Field"
+msgstr "Защищённое поле редактирования"
+
+msgid "Quick speak"
+msgstr "Quick speak"
+
+msgid "Quick speak 2"
+msgstr "Quick speak 2"
+
+msgid "QuickClick"
+msgstr "QuickClick"
+
+msgid "QuickClick2"
+msgstr "QuickClick2"
+
+msgid "QuickClick3"
+msgstr "QuickClick3"
+
+msgid "QuickJump"
+msgstr "QuickJump"
+
+msgid "QuickJump - assigned to J by default"
+msgstr "QuickJump - assigned to J by default"
+
+msgid ""
+"QuickJump back according to BrowserNav QuickJump bookmarks; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"QuickJump back according to BrowserNav QuickJump bookmarks; please check "
+"browserNav configuration panel for the list of bookmarks."
+
+msgid ""
+"QuickJump forward according to BrowserNav QuickJump bookmarks; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"QuickJump forward according to BrowserNav QuickJump bookmarks; please check "
+"browserNav configuration panel for the list of bookmarks."
+
+msgid "QuickJump2"
+msgstr "QuickJump2"
+
+msgid "QuickJump3"
+msgstr "QuickJump3"
+
+msgid "QuickNav item not found: tried to search for '{text}' {direction}."
+msgstr "QuickNav item not found: tried to search for '{text}' {direction}."
+
+msgid "QuickSearch & Bookmarks"
+msgstr "QuickSearch & Bookmarks"
+
+msgid ""
+"QuickSpeak  according to BrowserNav QuickSpeak bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+msgstr ""
+"QuickSpeak  according to BrowserNav QuickSpeak bookmark; please check "
+"browserNav configuration panel for the list of bookmarks."
+
+msgid "Re&move rule"
+msgstr "Re&move rule"
+
+msgid "React to focus event, but prevent entering focus mode"
+msgstr "React to focus event, but prevent entering focus mode"
+
+msgid "Read an error message instead of playing a chime"
+msgstr "Читать сообщение об ошибке вместо воспроизведения сигнала"
+
+msgid "Reconstruct sentences across paragraphs:"
+msgstr "Reconstruct sentences across paragraphs:"
+
+msgid "Regex match of URL"
+msgstr "Regex match of URL"
+
+msgid "Regex paragraph match"
+msgstr "Regex paragraph match"
+
+msgid "Regex search"
+msgstr "Regex search"
+
+msgid "Regexp text not found: tried to search for '{text}' {direction}."
+msgstr "Regexp text not found: tried to search for '{text}' {direction}."
+
+msgid ""
+"Regular expression pattern matches empty string. This is not allowed. Please"
+" change the pattern."
+msgstr ""
+"Regular expression pattern matches empty string. This is not allowed. Please"
+" change the pattern."
+
+msgid "Remove Audio Theme"
+msgstr "Удалить аудио тему"
+
+msgid "Report the object under the cursor with full 3D audio coordinates."
+msgstr "Report the object under the cursor with full 3D audio coordinates."
+
+msgid "Reverb"
+msgstr "Reverb"
+
+msgid "Role"
+msgstr "Role"
+
+msgid "Role and state, then name"
+msgstr "Role and state, then name"
+
+msgid "Role and state, then name (Role State Label)"
+msgstr "Role and state, then name (Role State Label)"
+
+msgid "Roles"
+msgstr "Roles"
+
+msgid "Room Size"
+msgstr "Размер помещения"
+
+msgid "Room Size:"
+msgstr "Размер помещения:"
+
+msgid "Rotate global speech order"
+msgstr "Rotate global speech order"
+
+msgid "Rotates the global speech order format."
+msgstr "Rotates the global speech order format."
+
+msgid "Rule disabled"
+msgstr "Rule disabled"
+
+msgid "Rule enabled"
+msgstr "Rule enabled"
+
+msgid "Same indent and style"
+msgstr "Same indent and style"
+
+msgid "Save Audio Theme Package"
+msgstr "Сохранить пакет аудио темы"
+
+msgid "Save this website under a different &name"
+msgstr "Save this website under a different &name"
+
+msgid "Script"
+msgstr "Script"
+
+msgid "Script compilation failed "
+msgstr "Script compilation failed "
+
+msgid "Script: runs a custom Python script"
+msgstr "Script: runs a custom Python script"
+
+msgid "Scroll to all possible elements backward"
+msgstr "Scroll to all possible elements backward"
+
+msgid "Scroll to all possible elements forward"
+msgstr "Scroll to all possible elements forward"
+
+msgid "Scrolling backward. This may load more elements on the page."
+msgstr "Scrolling backward. This may load more elements on the page."
+
+msgid "Scrolling forward. This may load more elements on the page."
+msgstr "Scrolling forward. This may load more elements on the page."
+
+msgid "Search for a role:"
+msgstr "Search for a role:"
+
+msgid "Select All"
+msgstr "Select All"
+
+msgid "Select An Audio Theme"
+msgstr "Выберите аудио тему"
+
+msgid "Select Roles..."
+msgstr "Select Roles..."
+
+msgid "Select Spoken Roles"
+msgstr "Select Spoken Roles"
+
+msgid "Select a theme to edit or remix:"
+msgstr "Select a theme to edit or remix:"
+
+msgid "Select an audio themes command to execute:"
+msgstr "Select an audio themes command to execute:"
+
+msgid ""
+"Select the roles you want NVDA to speak (if the global speak roles setting "
+"is enabled):"
+msgstr ""
+"Select the roles you want NVDA to speak (if the global speak roles setting "
+"is enabled):"
+
+msgid "Select theme:"
+msgstr "Выберите тему:"
+
+msgid "Select wav file:"
+msgstr "Select wav file:"
+
+msgid "Sentence Navigation (Alt+Arrows)"
+msgstr "Sentence Navigation (Alt+Arrows)"
+
+msgid "Sentence breakers:"
+msgstr "Sentence breakers:"
+
+msgid ""
+"Sets an audio beacon at the current navigator object. Navigate around to "
+"hear a sonar ping relative to this beacon."
+msgstr ""
+"Sets an audio beacon at the current navigator object. Navigate around to "
+"hear a sonar ping relative to this beacon."
+
+msgid "Show BrowserNav popup menu."
+msgstr "Show BrowserNav popup menu."
+
+msgid "Shows audio themes commands help."
+msgstr "Shows audio themes commands help."
+
+msgid "Site Entry Error"
+msgstr "Site Entry Error"
+
+msgid "Skip Clutter chime volume:"
+msgstr "Skip Clutter chime volume:"
+
+msgid "Skip Wikipedia references in sentence endings"
+msgstr "Skip Wikipedia references in sentence endings"
+
+msgid "Skip clutter off for line navigation"
+msgstr "Skip clutter off for line navigation"
+
+msgid "Skip clutter off for paragraph navigation"
+msgstr "Skip clutter off for paragraph navigation"
+
+msgid "Skip clutter on for line navigation"
+msgstr "Skip clutter on for line navigation"
+
+msgid "Skip clutter on for paragraph navigation"
+msgstr "Skip clutter on for paragraph navigation"
+
+msgid "SkipClutter"
+msgstr "SkipClutter"
+
+msgid ""
+"SkipClutter - will automatically skip this paragraph or line when navigating"
+" via Control+Up/Down or Up/Down keystrokes; must match the whole paragraph. "
+"or "
+msgstr ""
+"SkipClutter - will automatically skip this paragraph or line when navigating"
+" via Control+Up/Down or Up/Down keystrokes; must match the whole paragraph. "
+"or "
+
+msgid "Skippable punctuation:"
+msgstr "Skippable punctuation:"
+
+msgid "Smart Volume Normalization"
+msgstr "Smart Volume Normalization"
+
+msgid ""
+"Smart spatial positioning (maps characters to their exact physical keys)"
+msgstr ""
+"Smart spatial positioning (maps characters to their exact physical keys)"
+
+msgid "Smooth 3D Panning (Glide effect for moving objects)"
+msgstr "Smooth 3D Panning (Glide effect for moving objects)"
+
+msgid "Smooth Envelope (Fade In/Out to prevent popping)"
+msgstr "Smooth Envelope (Fade In/Out to prevent popping)"
+
+msgid "Sound For:"
+msgstr "Звук для:"
+
+msgid "Speak Object 3D Coordinates"
+msgstr "Speak Object 3D Coordinates"
+
+msgid "Speak background color"
+msgstr "Произносить цвет фона"
+
+msgid "Speak bold and italic text"
+msgstr "Произносить жирный и курсивный текст"
+
+msgid "Speak changed paragraphs"
+msgstr "Speak changed paragraphs"
+
+msgid "Speak current URL."
+msgstr "Speak current URL."
+
+msgid "Speak current heading level"
+msgstr "Speak current heading level"
+
+msgid "Speak current heading level."
+msgstr "Speak current heading level."
+
+msgid "Speak font color"
+msgstr "Произносить цвет шрифта"
+
+msgid "Speak font family"
+msgstr "Произносить семейство шрифтов"
+
+msgid "Speak formatted text"
+msgstr "Speak formatted text"
+
+msgid "Speak live regions"
+msgstr "Speak live regions"
+
+msgid "Speak message when no more text units found"
+msgstr "Speak message when no more text units found"
+
+msgid "Speak only changed words (diff)"
+msgstr "Speak only changed words (diff)"
+
+msgid "Speak roles during say all"
+msgstr "Озвучивать роли во время чтения всего"
+
+msgid "Speak roles such as button, edit box , link etc. "
+msgstr "Озвучивать роли, такие как кнопка, поле редактирования, ссылка и т.д."
+
+msgid "Speech Action"
+msgstr "Speech Action"
+
+msgid "Speech Order"
+msgstr "Speech Order"
+
+msgid "Speech order: Default (Name, Role, State)"
+msgstr "Speech order: Default (Name, Role, State)"
+
+msgid "Speech order: Role, State, Name"
+msgstr "Speech order: Role, State, Name"
+
+msgid "Speech order: State, Name"
+msgstr "Speech order: State, Name"
+
+msgid "Spoken &message when bookmark is found:"
+msgstr "Spoken &message when bookmark is found:"
+
+msgid ""
+"Start adjustment in millis - positive to cut off start, negative for extra "
+"pause in the beginning."
+msgstr ""
+"Start adjustment in millis - positive to cut off start, negative for extra "
+"pause in the beginning."
+
+msgid "Start adjustment must be a number."
+msgstr "Start adjustment must be a number."
+
+msgid "State"
+msgstr "State"
+
+msgid "State, then name"
+msgstr "State, then name"
+
+msgid "State, then name (State Label)"
+msgstr "State, then name (State Label)"
+
+msgid "States"
+msgstr "States"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Store URL:"
+msgstr "URL магазина:"
+
+msgid "Strikethrough"
+msgstr "Strikethrough"
+
+msgid "Substring paragraph match"
+msgstr "Substring paragraph match"
+
+msgid "Success"
+msgstr "Success"
+
+msgid "Suppress aria label announcements for landmarks and regions"
+msgstr "Suppress aria label announcements for landmarks and regions"
+
+msgid "Suppress aria name announcements for editables and combo boxes"
+msgstr "Suppress aria name announcements for editables and combo boxes"
+
+msgid "Suppress aria role text announcements"
+msgstr "Suppress aria role text announcements"
+
+msgid "Suppress descriptions"
+msgstr "Suppress descriptions"
+
+msgid "Suppress this state in non-verbose mode."
+msgstr "Suppress this state in non-verbose mode."
+
+msgid "Suppress tree level announcements"
+msgstr "Suppress tree level announcements"
+
+msgid "Switches to the next audio theme."
+msgstr "Switches to the next audio theme."
+
+msgid "Switches to the previous audio theme."
+msgstr "Switches to the previous audio theme."
+
+msgid "T&est rule"
+msgstr "T&est rule"
+
+msgid "Text Navigation (Alt+Shift+Arrows)"
+msgstr "Text Navigation (Alt+Shift+Arrows)"
+
+msgid "Text formatting"
+msgstr "Text formatting"
+
+msgid "Text regular expression pattern"
+msgstr "Text regular expression pattern"
+
+msgid "Text regular expressions"
+msgstr "Text regular expressions"
+
+msgid "TextNav error: Infinite loop"
+msgstr "TextNav error: Infinite loop"
+
+msgid "Theme Author"
+msgstr "Автор темы"
+
+msgid "Theme Description"
+msgstr "Описание темы"
+
+msgid "Theme Name"
+msgstr "Название темы"
+
+msgid "Theme Sounds"
+msgstr "Звуки темы"
+
+msgid "Theme Studio"
+msgstr "Theme Studio"
+
+msgid "Theme Studio - "
+msgstr "Theme Studio - "
+
+msgid "Themes Store"
+msgstr "Магазин тем"
+
+msgid "Themes successfully fetched. Select a theme:"
+msgstr "Темы успешно загружены. Выберите тему:"
+
+msgid ""
+"There is already a website with this name. Please enter a different name."
+msgstr ""
+"There is already a website with this name. Please enter a different name."
+
+msgid ""
+"This can not be undone.\n"
+"Are you sure you  want to remove audio theme {name}?"
+msgstr ""
+"Это действие нельзя отменить.\n"
+"Вы уверены, что хотите удалить аудио тему {name}?"
+
+msgid ""
+"This package contains audio themes.\n"
+"Do you want to overwrite existing themes with the same name?"
+msgstr ""
+"This package contains audio themes.\n"
+"Do you want to overwrite existing themes with the same name?"
+
+msgid "This site is a duplicate of another existing site %s"
+msgstr "This site is a duplicate of another existing site %s"
+
+msgid "This value is already used in another rule."
+msgstr "This value is already used in another rule."
+
+msgid "This website doesn't have a name. Cannot import it."
+msgstr "This website doesn't have a name. Cannot import it."
+
+msgid "This website doesn't have a version. Cannot import it."
+msgstr "This website doesn't have a version. Cannot import it."
+
+msgid "Timed out during release modifiers stage"
+msgstr "Timed out during release modifiers stage"
+
+msgid "Timed out during single-character control+C stage"
+msgstr "Timed out during single-character control+C stage"
+
+msgid "Timed out during switch to browser window stage"
+msgstr "Timed out during switch to browser window stage"
+
+msgid "Timed out during switch to window stage"
+msgstr "Timed out during switch to window stage"
+
+msgid "Timeout while trying to focus current edit box."
+msgstr "Timeout while trying to focus current edit box."
+
+msgid "Toggle"
+msgstr "Toggle"
+
+msgid "Toggle Audio Beacon"
+msgstr "Toggle Audio Beacon"
+
+msgid "Toggle Audio Themes"
+msgstr "Toggle Audio Themes"
+
+msgid "Toggle Earcons and Speech Rules"
+msgstr "Toggle Earcons and Speech Rules"
+
+msgid "Toggle Earcons and Speech Rules."
+msgstr "Toggle Earcons and Speech Rules."
+
+msgid "Toggle Typing Sounds"
+msgstr "Toggle Typing Sounds"
+
+msgid "Toggle skip clutter for line navigation"
+msgstr "Toggle skip clutter for line navigation"
+
+msgid "Toggle skip clutter for paragraph navigation"
+msgstr "Toggle skip clutter for paragraph navigation"
+
+msgid "Toggle state verbosity"
+msgstr "Toggle state verbosity"
+
+msgid "Toggle state verbosity reporting."
+msgstr "Toggle state verbosity reporting."
+
+msgid "Toggles typing sounds on and off."
+msgstr "Toggles typing sounds on and off."
+
+msgid "Total: {total} | Enabled: {enabled} | Disabled: {disabled}"
+msgstr "Total: {total} | Enabled: {enabled} | Disabled: {disabled}"
+
+msgid "Trim silence from beginning and end of sounds"
+msgstr "Trim silence from beginning and end of sounds"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Typing Sound Pack"
+msgstr "Typing Sound Pack"
+
+msgid "Typing Sound Pack (optional):"
+msgstr "Typing Sound Pack (optional):"
+
+msgid "Typing Sounds"
+msgstr "Typing Sounds"
+
+msgid "Typing sound pack:"
+msgstr "Typing sound pack:"
+
+msgid "Typing sounds disabled"
+msgstr "Typing sounds disabled"
+
+msgid "Typing sounds enabled"
+msgstr "Typing sounds enabled"
+
+msgid "Typing sounds volume:"
+msgstr "Typing sounds volume:"
+
+msgid "Typing sounds: {pack}"
+msgstr "Typing sounds: {pack}"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Underline"
+msgstr "Underline"
+
+msgid "Use global setting"
+msgstr "Use global setting"
+
+msgid "Use speech synthesizer volume"
+msgstr "Использовать громкость синтезатора речи"
+
+msgid "Verbose state reporting"
+msgstr "Verbose state reporting"
+
+msgid "Version"
+msgstr "Version"
+
+msgid "Vertical margin between paragraphs"
+msgstr "Вертикальный отступ между абзацами"
+
+msgid "Volume"
+msgstr "Volume"
+
+msgid "Volume of Skip Clutter (skipClutter) chime"
+msgstr "Громкость сигнала пропуска беспорядка (skipClutter)"
+
+msgid "Volume of the No Next Text chime"
+msgstr "Громкость сигнала 'Нет следующего текста'"
+
+msgid "Volume {vol}"
+msgstr "Volume {vol}"
+
+msgid ""
+"Warning! While copying text out of edit box, focused elementon the page has "
+"changed. Please try again."
+msgstr ""
+"Warning! While copying text out of edit box, focused elementon the page has "
+"changed. Please try again."
+
+msgid ""
+"Warning: you are about to create or update a skip clutter bookmark. If your "
+"pattern is too generic, it might hide significant part of your website. For "
+"example, if you specify a single whitespace as pattern and substring match, "
+"then all paragraphs containing at least a single whitespace would disappear."
+" Please make sure you understand how skip clutter works and how to undo this"
+" change if you have to. Would you like to continue?"
+msgstr ""
+"Warning: you are about to create or update a skip clutter bookmark. If your "
+"pattern is too generic, it might hide significant part of your website. For "
+"example, if you specify a single whitespace as pattern and substring match, "
+"then all paragraphs containing at least a single whitespace would disappear."
+" Please make sure you understand how skip clutter works and how to undo this"
+" change if you have to. Would you like to continue?"
+
+msgid ""
+"Warning: you are about to move this bookmark to site %(new_site)s. This "
+"bookmark will disappear from the old site %(old_site)s. Would you like to "
+"proceed?"
+msgstr ""
+"Warning: you are about to move this bookmark to site %(new_site)s. This "
+"bookmark will disappear from the old site %(old_site)s. Would you like to "
+"proceed?"
+
+msgid ""
+"Warning: you are trying to  move this bookmark to site %(new_site)s. However"
+" it already contains a bookmark with the same UUID. This is not supported. "
+"Please create a new bookmark instead."
+msgstr ""
+"Warning: you are trying to  move this bookmark to site %(new_site)s. However"
+" it already contains a bookmark with the same UUID. This is not supported. "
+"Please create a new bookmark instead."
+
+msgid "Wav file"
+msgstr "Wav file"
+
+msgid "Wav file not found."
+msgstr "Wav file not found."
+
+msgid "Wave audio files"
+msgstr "Аудиофайлы Wave"
+
+msgid "Web Page Loaded"
+msgstr "Веб-страница загружена"
+
+msgid "Website export Error"
+msgstr "Website export Error"
+
+msgid ""
+"Welcome To The Audio Themes Studio:\n"
+"Here you can create new audio themes and package them for sharing with others.\n"
+"You can also customize anyone of your installed audio themes with your own sounds."
+msgstr ""
+"Добро пожаловать в Студию звуковых тем:\n"
+"Здесь вы можете создавать новые аудио темы и упаковывать их для обмена с другими.\n"
+"Вы также можете настроить любую из установленных аудио тем, используя свои собственные звуки."
+
+msgid "Wet Level"
+msgstr "Уровень эффекта"
+
+msgid "Wet Level:"
+msgstr "Уровень эффекта:"
+
+msgid "Width"
+msgstr "Ширина"
+
+msgid "Width:"
+msgstr "Ширина:"
+
+msgid "Wrong domain format. An example is: en.wikipedia.com "
+msgstr "Wrong domain format. An example is: en.wikipedia.com "
+
+msgid "Wrong line number"
+msgstr "Wrong line number"
+
+msgid "Wrong regex"
+msgstr "Wrong regex"
+
+msgid ""
+"You already have website {} in your BrowserNav configuration.\n"
+"Existing site version: {}.\n"
+"To be imported site version: {}.\n"
+"What would you like to do?"
+msgstr ""
+"You already have website {} in your BrowserNav configuration.\n"
+"Existing site version: {}.\n"
+"To be imported site version: {}.\n"
+"What would you like to do?"
+
+msgid ""
+"You do not have any audio themes installed.\n"
+"Please install or create an audio theme first."
+msgstr ""
+"У вас не установлено ни одной аудио темы.\n"
+"Пожалуйста, сначала установите или создайте аудио тему."
+
+msgid "You must specify blank domain for this match option."
+msgstr "You must specify blank domain for this match option."
+
+msgid "You must specify non-empty string as domain"
+msgstr "You must specify non-empty string as domain"
+
+msgid "You must specify prosody offset."
+msgstr "You must specify prosody offset."
+
+msgid ""
+"You will lose all of the changes you have made.\n"
+"Are you sure you want to quit this dialog?"
+msgstr ""
+"Вы потеряете все внесённые изменения.\n"
+"Вы уверены, что хотите закрыть этот диалог?"
+
+msgid "at level {level}"
+msgstr "at level {level}"
+
+msgid "backward"
+msgstr "backward"
+
+msgid "duration must be an integer between 0 and 60000"
+msgstr "duration must be an integer between 0 and 60000"
+
+msgid "font size"
+msgstr "font size"
+
+msgid "font size and same style"
+msgstr "font size and same style"
+
+msgid "forward"
+msgstr "forward"
+
+msgid "greater"
+msgstr "greater"
+
+msgid "horizontal offset"
+msgstr "horizontal offset"
+
+msgid "no indent"
+msgstr "no indent"
+
+msgid "out of"
+msgstr "out of"
+
+msgid "prosody offset must be an integer between -100 and 100"
+msgstr "prosody offset must be an integer between -100 and 100"
+
+msgid "smaller"
+msgstr "smaller"
+
+msgid "tone must be an integer between 0 and 50000"
+msgstr "tone must be an integer between 0 and 50000"
+
+msgid "world"
+msgstr "world"
+
+msgid "{roleText} level {level}"
+msgstr "{roleText} level {level}"
+
+msgid ""
+"استكمال العمل على إضافة سمات الصوت (Audio Themes)، مع إضافة دعم للإصدارات الأحدث من NVDA.\n"
+"تقوم هذه الإضافة بإنشاء عرض صوتي افتراضي يشغل أصواتاً عند التركيز أو التنقل بين العناصر.\n"
+"كما تتيح لك الإضافة تفعيل، تثبيت، إزالة، تحرير، إنشاء، وتوزيع حزم السمات الصوتية.\n"
+"\n"
+"تم دمجها مع إضافة Earcons and Speech rules:\n"
+"تسمح بإعداد أصوات مخصصة للكلمات، الأحرف، أنواع العناصر، الحالات، ومعلومات التنسيق.\n"
+"\n"
+"تم دمج إضافة SentenceNav للتنقل بالجمل (Alt+أسهم).\n"
+"تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).\n"
+msgstr ""
+"استكمال العمل على إضافة سمات الصوت (Audio Themes)، مع إضافة دعم للإصدارات الأحدث من NVDA.\n"
+"تقوم هذه الإضافة بإنشاء عرض صوتي افتراضي يشغل أصواتاً عند التركيز أو التنقل بين العناصر.\n"
+"كما تتيح لك الإضافة تفعيل، تثبيت، إزالة، تحرير، إنشاء، وتوزيع حزم السمات الصوتية.\n"
+"\n"
+"تم دمجها مع إضافة Earcons and Speech rules:\n"
+"تسمح بإعداد أصوات مخصصة للكلمات، الأحرف، أنواع العناصر، الحالات، ومعلومات التنسيق.\n"
+"\n"
+"تم دمج إضافة SentenceNav للتنقل بالجمل (Alt+أسهم).\n"
+"تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).\n"

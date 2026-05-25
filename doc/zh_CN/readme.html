@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>高级音效主题与语音规则 9.0.0</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style media="screen">
+@charset "utf-8";
+body { 
+font-family : "Microsoft YaHei", Verdana, Arial, Helvetica, Sans-serif;
+line-height: 1.5em;
+} 
+h1, h2 {text-align: center}
+dt { 
+font-weight : bold; 
+float : left; 
+width: 10%;
+clear: left
+} 
+dd { 
+margin : 0 0 0.4em 0; 
+float : left;
+width: 90%;
+display: block;
+} 
+p { clear : both; 
+} 
+a { text-decoration : underline; 
+} 
+:active { 
+text-decoration : none; 
+}
+a:focus, a:hover {outline: solid}
+</style>
+</head>
+<body>
+<h1 id="audio-themes-ng-phonetic-punctuation">高级音效主题与语音规则 (Audio Themes NG &amp; Phonetic Punctuation)</h1>
+<p>本插件通过为各种用户界面 (UI) 事件播放音效，为 NVDA 屏幕阅读器用户提供沉浸式的音频体验。它支持创建、安装和自定义音效主题，从而增强来自操作系统和应用程序的听觉反馈。</p>
+<h2 id="features">主要功能</h2>
+<ul>
+<li><strong>界面音效：</strong> 为聚焦控件、浏览列表、打开/关闭窗口等 UI 事件播放音效。</li>
+<li><strong>3D 空间音效：</strong> 采用 Steam Audio 提供 3D 定位音效，让您清晰感知控件在屏幕上的具体位置。</li>
+<li><strong>混响与环境模拟：</strong> 为音效添加混响与房间声学效果，带来更具深度和真实感的沉浸体验。</li>
+<li><strong>自定义主题：</strong> 允许用户轻松创建、安装并在不同的音效主题之间进行切换。</li>
+<li><strong>音效主题工作室 (Audio Themes Studio V2)：</strong> 内置的可视化工具，支持通过麦克风直接录音或拖放 (Drag &amp; Drop) 音频文件来创建新主题或编辑现有主题。</li>
+<li><strong>高级打字音效 (Advanced Typing Sounds)：</strong> 模拟真实物理键盘的按键音，具备 3D 空间定位、随打字速度动态调节音量以及针对特殊按键 (Enter、Backspace、Space、Shift、Ctrl、Alt) 的专属音效。</li>
+<li><strong>音频信标 / 声纳 (Audio Beacon / Sonar)：</strong> 允许在屏幕任意位置放置音频信标，在移动浏览时发出实时声纳脉冲，引导您了解当前位置与信标的相对方位。</li>
+<li><strong>高级导航：</strong> 集成 SentenceNav 和 BrowserNav 引擎，提供流畅的文本和网页导航体验，且不与常规方向键冲突。</li>
+</ul>
+<h2 id="development-credits">开发与鸣谢</h2>
+<p>本插件由 <strong>Hassan AlBarshoumy</strong> 独家开发、重构整合及翻译。</p>
+<p>所有代码重构、结构整合与 GUI 集成（包括音效主题工作室 V2 和统一设置对话框）均已完成，以确保在 NVDA 2026.1+ 版本上的最高稳定性和兼容性。 </p>
+<ul>
+<li><strong>开发者：</strong> Hassan AlBarshoumy</li>
+<li><strong>联系与更新：</strong> <a href="https://t.me/HassanAlBarshoumy">https://t.me/HassanAlBarshoumy</a></li>
+</ul>
+<h2 id="installation">安装方法</h2>
+<ol>
+<li>从开发者的官方渠道下载最新版本的插件。</li>
+<li>打开下载的 <code>.nvda-addon</code> 插件文件。</li>
+<li>NVDA 会提示您确认安装，请选择“是”(Yes)。</li>
+<li>重启 NVDA 以完成安装。</li>
+</ol>
+<h2 id="how-to-use">使用说明</h2>
+<h3 id="enablingdisabling-audio-themes">启用/禁用音效主题</h3>
+<p>您可以在 NVDA 的设置中启用或禁用音效主题功能：</p>
+<ol>
+<li>打开 NVDA 菜单 (NVDA+N)。</li>
+<li>进入“首选项” -&gt; “设置”。</li>
+<li>在设置对话框中，选择“高级音效主题”(Advanced Audio Themes) 类别。</li>
+<li>勾选或取消勾选“启用音效主题”(Enable audio themes) 复选框。</li>
+</ol>
+<h3 id="selecting-and-managing-themes">选择与管理主题</h3>
+<p>在“音效主题”设置面板中，您可以：</p>
+<ul>
+<li><strong>选择主题：</strong> 在已安装的音效主题列表中进行切换。</li>
+<li><strong>添加新主题：</strong> 点击“添加新主题...”(Add New...) 按钮，从 <code>.atp</code> 文件安装主题包。</li>
+<li><strong>删除主题：</strong> 选择一个主题并点击“删除”(Remove) 按钮。</li>
+<li><strong>关于主题：</strong> 点击“关于”(About) 按钮以查看当前选中主题的详细信息。</li>
+</ul>
+<h3 id="using-the-audio-themes-studio-v2">使用音效主题工作室 V2</h3>
+<p>音效主题工作室允许您轻松创建和编辑主题。打开工作室的方法：</p>
+<ol>
+<li>打开 NVDA 菜单 (NVDA+N)。</li>
+<li>选择“音效主题工作室”(Audio Themes Studio)。</li>
+</ol>
+<p>在工作室中，您可以：</p>
+<ul>
+<li><strong>创建新音效主题：</strong> 通过向导指引您从零开始创建新主题。</li>
+<li><strong>自定义现有主题：</strong> 修改已安装主题的各项音效。</li>
+<li><strong>麦克风录音：</strong> 现在您可以直接通过麦克风录制声音或语音，并将其分配给 UI 事件！</li>
+<li><strong>拖放操作 (Drag &amp; Drop)：</strong> 将音频文件直接拖入工作室窗口即可快速完成分配。</li>
+</ul>
+<h3 id="exporting-your-theme">导出您的主题</h3>
+<p>创建或编辑主题后，您可以将其导出为 <code>.atp</code> 文件与他人分享。导出选项位于工作室的编辑界面中。</p>
+<h2 id="advanced-rules-phonetic-punctuation">高级语音规则与音标符号</h2>
+<p>提示音与语音规则功能允许 NVDA 播放独立的提示音 (Earcons) 以及应用其他语音效果（例如语调和语速变化）。</p>
+<h3 id="usage">使用方法</h3>
+<ol>
+<li>确保已启用该功能。按 NVDA+Alt+P 可进行开启/关闭切换。</li>
+<li>可以通过 NVDA 首选项菜单中的专用对话框配置各项规则。</li>
+<li>默认情况下，插件已提供了一套预设的实用音频规则。</li>
+<li>规则保存在 NVDA 用户配置目录下的 <code>earconsAndSpeechRules.json</code> 文件中。</li>
+</ol>
+<h3 id="keyboard-commands">快捷键一览</h3>
+<ul>
+<li><strong>NVDA+Alt+N:</strong> 开启/关闭音效主题。（快速双击可开启/关闭打字音效）。</li>
+<li><strong>NVDA+Alt+T:</strong> 循环切换可用的音效主题。</li>
+<li><strong>NVDA+Alt+Y:</strong> 循环切换可用的打字音效包。</li>
+<li><strong>NVDA+Alt+K:</strong> 开启/关闭打字音效。</li>
+<li><strong>NVDA+Shift+B:</strong> 在当前导航对象位置放置/移除音频信标 (Beacon)，移动浏览时可通过声纳脉冲感知相对方位。</li>
+<li><strong>NVDA+Shift+A:</strong> 进入音效主题命令层（按下此组合键后，再按命令键：'h' 获取帮助，'t' 切换主题，'p' 切换规则，'s' 切换状态提示详细度，'c' 播报标题级别，'o' 切换语音播报顺序）。</li>
+<li><strong>NVDA+Alt+P:</strong> 开启/关闭提示音与语音规则功能。</li>
+<li><strong>NVDA+Alt+[ (左中括号):</strong> 切换简洁/详细的状态播报模式。</li>
+<li><strong>NVDA+H:</strong> 播报当前标题级别。</li>
+<li><strong>NVDA+Tab:</strong> 播报光标下对象及其完整的 3D 空间音频坐标。</li>
+<li><strong>Alt+方向键:</strong> 高级句子/短语导航 (SentenceNav)。</li>
+<li><strong>NVDA+Alt+方向键:</strong> 高级网页浏览导航 (BrowserNav)。</li>
+</ul>
+<h2 id="support">支持与反馈</h2>
+<p>如有任何问题、功能建议或错误报告，请联系开发者的官方渠道：<br />
+<strong><a href="https://t.me/HassanAlBarshoumy">Hassan AlBarshoumy 的 Telegram 频道</a></strong></p>
+</body>
+</html>
