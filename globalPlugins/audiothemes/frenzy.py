@@ -215,7 +215,7 @@ def monkeyPatch():
         controlTypes.processAndLabelStates = new_processAndLabelStates
 
     global original_getTextInfoSpeech_considerSpelling    
-    if speech.speech._getTextInfoSpeech_considerSpelling is not new_getTextInfoSpeech_considerSpelling:
+    if hasattr(speech.speech, "_getTextInfoSpeech_considerSpelling") and speech.speech._getTextInfoSpeech_considerSpelling is not new_getTextInfoSpeech_considerSpelling:
         original_getTextInfoSpeech_considerSpelling = speech.speech._getTextInfoSpeech_considerSpelling
         speech.speech._getTextInfoSpeech_considerSpelling = new_getTextInfoSpeech_considerSpelling
 
@@ -233,7 +233,8 @@ def monkeyUnpatch():
     
     controlTypes.processAndLabelStates = original_processAndLabelStates
     
-    speech.speech._getTextInfoSpeech_considerSpelling = original_getTextInfoSpeech_considerSpelling
+    if original_getTextInfoSpeech_considerSpelling is not None and hasattr(speech.speech, "_getTextInfoSpeech_considerSpelling"):
+        speech.speech._getTextInfoSpeech_considerSpelling = original_getTextInfoSpeech_considerSpelling
 
 
 roleRules = None
@@ -267,18 +268,36 @@ def updateRules():
     numericFormatRules = buildList(FrenzyType.NUMERIC_FORMAT)
     otherRules = buildList(FrenzyType.OTHER_RULE)
 
-_active_rule_cache = {}
-_active_rule_cache_lock = threading.Lock()
+class _LRUCache:
+    def __init__(self, capacity: int):
+        self.cache = collections.OrderedDict()
+        self.capacity = capacity
+        self.lock = threading.Lock()
+
+    def get(self, key):
+        with self.lock:
+            if key not in self.cache:
+                return False, None
+            self.cache.move_to_end(key)
+            return True, self.cache[key]
+
+    def put(self, key, value):
+        with self.lock:
+            self.cache[key] = value
+            self.cache.move_to_end(key)
+            if len(self.cache) > self.capacity:
+                self.cache.popitem(last=False)
+
+_active_rule_cache = _LRUCache(256)
 
 def getActiveRuleContext(ruleList, appName, windowTitle, url):
     if not ruleList:
         return None
         
     cache_key = (id(ruleList), appName, windowTitle, url)
-    global _active_rule_cache, _active_rule_cache_lock
-    with _active_rule_cache_lock:
-        if cache_key in _active_rule_cache:
-            return _active_rule_cache[cache_key]
+    found, cached_val = _active_rule_cache.get(cache_key)
+    if found:
+        return cached_val
 
     matched_rule = None
     for rule in ruleList:
@@ -291,11 +310,7 @@ def getActiveRuleContext(ruleList, appName, windowTitle, url):
         matched_rule = rule
         break
         
-    with _active_rule_cache_lock:
-        _active_rule_cache[cache_key] = matched_rule
-        if len(_active_rule_cache) > 1000:
-            _active_rule_cache.clear()
-        
+    _active_rule_cache.put(cache_key, matched_rule)
     return matched_rule
 
 def getRuleStateValue(rule, is_negative=False):
@@ -355,8 +370,9 @@ class FakeTextInfo:
                 ]
                 if len(strings) > 0:
                     firstString = strings[0]
-                    if m:=speech.speech.RE_INDENTATION_CONVERT.search(firstString):
-                        fields.insert(index, m.group() + "\n")
+                    if hasattr(speech.speech, "RE_INDENTATION_CONVERT"):
+                        if m:=speech.speech.RE_INDENTATION_CONVERT.search(firstString):
+                            fields.insert(index, m.group() + "\n")
         self.fields = fields
     
     def setSkipSet(self, skipSet):

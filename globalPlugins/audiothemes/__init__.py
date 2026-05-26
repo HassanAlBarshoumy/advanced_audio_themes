@@ -22,7 +22,6 @@ import _ctypes
 import time
 import wx
 import config
-import config
 import globalPluginHandler
 import appModuleHandler
 import scriptHandler
@@ -177,7 +176,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             wx.ID_ANY,
             _("Enable Audio Themes"),
         )
-        import config
         self.toggleMenuItem.Check(config.conf["audiothemes"]["enable_audio_themes"])
         gui.mainFrame.sysTrayIcon.Bind(
             wx.EVT_MENU, self.on_toggle_item_clicked, self.toggleMenuItem
@@ -201,8 +199,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         self.orig_caretMovementScriptHelper = None
         try:
             import speech
-            self.orig_caretMovementScriptHelper = speech._caretMovementScriptHelper
-            speech._caretMovementScriptHelper = self._hook_caretMovementScriptHelper
+            if hasattr(speech, "_caretMovementScriptHelper"):
+                self.orig_caretMovementScriptHelper = speech._caretMovementScriptHelper
+                speech._caretMovementScriptHelper = self._hook_caretMovementScriptHelper
         except Exception as e:
             try:
                 from logHandler import log
@@ -393,7 +392,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             self._unhook_keyboard()
             if self.orig_caretMovementScriptHelper:
                 import speech
-                speech._caretMovementScriptHelper = self.orig_caretMovementScriptHelper
+                if hasattr(speech, "_caretMovementScriptHelper"):
+                    speech._caretMovementScriptHelper = self.orig_caretMovementScriptHelper
                 
             self.quicknav_interceptor.terminate()
             self.handler.close()
@@ -463,7 +463,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         wx.CallAfter(do_open)
 
     def on_toggle_item_clicked(self, event):
-        import config
         enabled = not config.conf["audiothemes"]["enable_audio_themes"]
         config.conf["audiothemes"]["enable_audio_themes"] = enabled
         self.toggleMenuItem.Check(enabled)
@@ -605,7 +604,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
     def event_valueChange(self, obj, nextHandler):
         try:
             if obj.role == controlTypes.Role.PROGRESSBAR:
-                import config
                 if config.conf["audiothemes"]["enable_audio_themes"] and self.handler.active_theme:
                     val = obj.value
                     if val is not None:
@@ -688,7 +686,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         if not injected and vkCode not in (16, 17, 18, 20, 91, 92, 144, 160, 161, 162, 163, 164, 165):
             self._last_vkCode = vkCode
             self._last_extended = extended
-        import config
         # Play advanced typing sounds for non-characters
         try:
             if not injected and config.conf["audiothemes"]["typing_sounds"]:
@@ -717,7 +714,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         return True
 
     def event_typedCharacter(self, obj, nextHandler, ch):
-        import config
         from logHandler import log
         try:
             if config.conf["audiothemes"]["typing_sounds"]:
@@ -744,7 +740,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                 pass
     @script(description=_("Switches to the next audio theme."))
     def script_nextAudioTheme(self, gesture):
-        import config
         themes = self.handler.get_installed_themes()
         if not themes: return
         current_folder = config.conf["audiothemes"].get("active_theme", "Default")
@@ -757,7 +752,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
 
     @script(description=_("Switches to the previous audio theme."))
     def script_previousAudioTheme(self, gesture):
-        import config
         themes = self.handler.get_installed_themes()
         if not themes: return
         current_folder = config.conf["audiothemes"].get("active_theme", "Default")
@@ -770,7 +764,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
 
     @script(description=_("Increases the audio themes volume by 5 percent."))
     def script_increaseAudioThemesVolume(self, gesture):
-        import config
         vol = config.conf["audiothemes"]["volume"]
         new_vol = min(100, vol + 5)
         config.conf["audiothemes"]["volume"] = new_vol
@@ -779,7 +772,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
 
     @script(description=_("Decreases the audio themes volume by 5 percent."))
     def script_decreaseAudioThemesVolume(self, gesture):
-        import config
         vol = config.conf["audiothemes"]["volume"]
         new_vol = max(0, vol - 5)
         config.conf["audiothemes"]["volume"] = new_vol
@@ -788,7 +780,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
 
     @script(gesture="kb:NVDA+alt+n")
     def script_toggleAudioThemes(self, gesture):
-        import config
         from scriptHandler import getLastScriptRepeatCount
         import ui
         isSameScript = getLastScriptRepeatCount()
@@ -813,35 +804,22 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
     def event_mouseMove(self, obj, nextHandler, x, y):
         if obj is not self._previous_mouse_object:
             self._previous_mouse_object = obj
-            obj_info = self._snapshot_obj(obj)
-            utils.threadPool.add_task(self.playObject, obj_info)
-        try:
-            nextHandler()
-        except Exception as e:
             try:
+                obj_info = self._snapshot_obj(obj)
+                utils.threadPool.add_task(self.playObject, obj_info)
+            except Exception as e:
                 from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
+                log.debug(f"AudioThemes mouseMove error: {e}")
+        nextHandler()
     def event_show(self, obj, nextHandler):
         try:
-            if obj.role == controlTypes.Role.HELPBALLOON:
+            if getattr(obj, "role", None) == controlTypes.Role.HELPBALLOON:
                 obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.notify)
                 self.playObject(obj_info)
         except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
-        try:
-            nextHandler()
-        except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
+            from logHandler import log
+            log.debug(f"AudioThemes event_show error: {e}")
+        nextHandler()
     def event_documentLoadComplete(self, obj, nextHandler):
         # Cache app name on handler
         try:
@@ -963,7 +941,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
 
     @script(description=_("Rotates the global speech order format."))
     def script_rotateSpeechOrder(self, gesture):
-        import config
         fmt = config.conf["audiothemes"].get("announceFormat", "0")
         
         if fmt == "0":

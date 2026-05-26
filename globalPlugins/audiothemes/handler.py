@@ -142,6 +142,7 @@ class AudioTheme:
     summary: str
     is_active: bool = False
     sounds: dict = field(default_factory=dict)
+    available_files: set = field(default_factory=set)
     _lock: threading.Lock = field(default_factory=threading.Lock, repr=False, compare=False)
 
     @property
@@ -166,16 +167,23 @@ class AudioTheme:
         with self._lock:
             if self.sounds:
                 self.sounds.clear()
+            if hasattr(self, 'available_files'):
+                self.available_files.clear()
+            else:
+                self.available_files = set()
         if not os.path.isdir(self.directory):
             return
         new_sounds = {}
+        available = set()
         for filename in os.listdir(self.directory):
+            available.add(filename.lower())
             path = os.path.join(self.directory, filename)
             rep_role = self.is_valid_audio_file(path)
             if rep_role is not None:
                 new_sounds[rep_role] = player.make_sound_object(path)
         with self._lock:
             self.sounds = new_sounds
+            self.available_files = available
 
     def unload(self):
         with self._lock:
@@ -382,9 +390,7 @@ class AudioThemesHandler:
         
         global _typing_dir_cache
         _typing_dir_cache.clear()
-        global _theme_sound_existence_cache
-        if '_theme_sound_existence_cache' in globals():
-            _theme_sound_existence_cache.clear()
+        # _theme_sound_existence_cache removed completely for performance
         self._theme_cache = {}
         try:
             raw_profiles = json.loads(user_config.get("app_profiles", "{}"))
@@ -473,15 +479,8 @@ class AudioThemesHandler:
             
         sound_path = os.path.join(theme.directory, sound_name)
         
-        # Cache file existence check to eliminate disk I/O
-        global _theme_sound_existence_cache
-        if '_theme_sound_existence_cache' not in globals():
-            _theme_sound_existence_cache = {}
-            
-        if sound_path not in _theme_sound_existence_cache:
-            _theme_sound_existence_cache[sound_path] = os.path.isfile(sound_path)
-            
-        if _theme_sound_existence_cache[sound_path]:
+        # Check pre-indexed files in memory to eliminate Disk I/O
+        if sound_name.lower() in getattr(theme, 'available_files', set()):
             self.player.play_file(
                 sound_path,
                 volume=config.conf["audiothemes"]["volume"],

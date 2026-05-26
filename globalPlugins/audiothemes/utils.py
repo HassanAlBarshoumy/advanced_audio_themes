@@ -85,7 +85,8 @@ class ThreadPool:
       when the add-on is unloaded.
     """
     def __init__(self, num_threads):
-        self.tasks = Queue()          # Unbounded — never blocks callers.
+        # Professional bounded queue: Drop incoming tasks rather than freezing RAM or Main Thread
+        self.tasks = Queue(maxsize=30)
         self._num_threads = num_threads
         self._workers = []
         self._last_watchdog_time = 0.0
@@ -113,26 +114,18 @@ class ThreadPool:
         """Enqueue a task.  Returns immediately; never blocks the caller."""
         # Throttled watchdog: only check workers every 5 seconds
         import time
+        import queue
         now = time.monotonic()
         if now - self._last_watchdog_time > 5.0:
             self._last_watchdog_time = now
             self._check_and_respawn_workers()
             
-        # Garbage collection: Prevent unbound queue growth from stale tasks
-        if self.tasks.qsize() > 100:
-            try:
-                for _ in range(50):
-                    task = self.tasks.get_nowait()
-                    if task is _WORKER_STOP:
-                        self.tasks.put_nowait(_WORKER_STOP)
-                    self.tasks.task_done()
-            except Exception as e:
-                try:
-                    from logHandler import log
-                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-                except:
-                    pass
-        self.tasks.put_nowait((func, args, kargs))
+        try:
+            # put_nowait raises queue.Full instantly instead of blocking the main NVDA thread
+            self.tasks.put_nowait((func, args, kargs))
+        except queue.Full:
+            # Queue is full (User moved mouse/keyboard too fast) -> Drop gracefully without memory leak
+            pass
     def map(self, func, args_list):
         """Enqueue one task per element in args_list."""
         for args in args_list:
