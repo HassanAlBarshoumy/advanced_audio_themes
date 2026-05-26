@@ -99,7 +99,10 @@ class ThemesStoreDialog(wx.Dialog):
             wx.CallAfter(self.statusLabel.SetLabel, _("Failed to connect to store. Check your internet connection."))
             
     def PopulateList(self, data):
-        self.themes_data = data.get("themes", [])
+        if isinstance(data, list):
+            self.themes_data = data
+        else:
+            self.themes_data = data.get("themes", [])
         self.filtered_themes = list(self.themes_data)
         self.statusLabel.SetLabel(_("Themes successfully fetched. Select a theme:"))
         self.UpdateThemesList()

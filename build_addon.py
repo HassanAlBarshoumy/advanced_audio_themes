@@ -32,7 +32,7 @@ def should_exclude(rel_path):
 
 def build_addon():
     output_path = os.path.join(ADDON_DIR, output_name)
-    with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as zf:
+    with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
         for root, dirs, files in os.walk(ADDON_DIR):
             for d in list(dirs):
                 if d in EXCLUDE_DIRS:
