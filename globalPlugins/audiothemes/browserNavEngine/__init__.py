@@ -698,18 +698,7 @@ def watchURL(initialDelayMs=None):
         updateURLIfChanged()
     utils.executeAsynchronously(watchURLAsync(localUpdateUrlCounter, None))
 
-originalSetFocusObject = None
 originalVirtualBufferHandleUpdate = None
-def bnSetFocusObject(obj):
-    result = originalSetFocusObject(obj)
-    with updateURLLock:
-        global globalUpdateUrlCounter
-        globalUpdateUrlCounter += 1
-        localUpdateUrlCounter = globalUpdateUrlCounter
-    utils.executeAsynchronously(watchURLAsync(localUpdateUrlCounter, None))
-    api.postFocusOrURLChange.notify()
-    return result
-
 def bnVirtualBufferHandleUpdate(self):
     result = originalVirtualBufferHandleUpdate(self)
     watchURL()
@@ -761,9 +750,7 @@ class BrowserNavMixin:
             quickJump.originalReportLiveRegion = None
             log.debug("BrowserNav: nvdaControllerInternal_reportLiveRegion not available in NVDAHelper; Live Region hook disabled.")
         # Destructive GC patches removed to ensure NVDA core stability
-        global originalSetFocusObject, originalVirtualBufferHandleUpdate
-        originalSetFocusObject = api.setFocusObject
-        api.setFocusObject = bnSetFocusObject
+        global originalVirtualBufferHandleUpdate
         originalVirtualBufferHandleUpdate = virtualBuffers.VirtualBuffer._handleUpdate
         virtualBuffers.VirtualBuffer._handleUpdate = bnVirtualBufferHandleUpdate
         global originalSpeakTextInfo
@@ -787,7 +774,6 @@ class BrowserNavMixin:
         if getattr(quickJump, 'originalReportLiveRegion', None) is not None:
             NVDAHelper.nvdaControllerInternal_reportLiveRegion = quickJump.originalReportLiveRegion
         
-        api.setFocusObject = originalSetFocusObject
         virtualBuffers.VirtualBuffer._handleUpdate = originalVirtualBufferHandleUpdate
         speech.speakTextInfo = originalSpeakTextInfo
         
