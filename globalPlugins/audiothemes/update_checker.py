@@ -10,8 +10,12 @@ from urllib.error import URLError
 
 try:
     addonHandler.initTranslation()
-except Exception:
-    pass
+except Exception as e:
+    try:
+        from logHandler import log
+        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+    except:
+        pass
 try:
     _
 except NameError:

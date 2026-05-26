@@ -48,9 +48,12 @@ class Worker(Thread):
         try:
             THREAD_PRIORITY_ABOVE_NORMAL = 1
             ctypes.windll.kernel32.SetThreadPriority(ctypes.windll.kernel32.GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL)
-        except Exception:
-            pass
-
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
         while True:
             item = self.tasks.get()
             # Shutdown sentinel received — exit the loop.
@@ -123,9 +126,12 @@ class ThreadPool:
                     if task is _WORKER_STOP:
                         self.tasks.put_nowait(_WORKER_STOP)
                     self.tasks.task_done()
-            except Exception:
-                pass
-                
+            except Exception as e:
+                try:
+                    from logHandler import log
+                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                except:
+                    pass
         self.tasks.put_nowait((func, args, kargs))
     def map(self, func, args_list):
         """Enqueue one task per element in args_list."""

@@ -223,8 +223,12 @@ class PpWaveFileCommand(PpSynchronousCommand):
         # Close the file handle — we've read all data into self.buf
         try:
             self.f.close()
-        except Exception:
-            pass
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
         self.f = None
         
         with self._cache_lock:

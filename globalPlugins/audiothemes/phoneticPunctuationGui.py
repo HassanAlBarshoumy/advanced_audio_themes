@@ -1085,9 +1085,12 @@ class RulesDialog(SettingsPanel):
         if os.path.exists(rulesFileName):
             try:
                 shutil.copy2(rulesFileName, rulesFileName + ".backup")
-            except Exception:
-                pass
-                
+            except Exception as e:
+                try:
+                    from logHandler import log
+                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                except:
+                    pass
         rulesFile = open(rulesFileName, "w")
         try:
             rulesFile.write(rulesJson)

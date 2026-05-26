@@ -203,9 +203,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             import speech
             self.orig_caretMovementScriptHelper = speech._caretMovementScriptHelper
             speech._caretMovementScriptHelper = self._hook_caretMovementScriptHelper
-        except Exception:
-            pass
-
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
         # ── BrowserNav initialization ──
         # Wire up all BrowserNav monkey patches, browse-mode keystrokes,
         # QuickJump system, and URL tracking.
@@ -251,9 +254,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                     from . import utils
                     utils.threadPool.add_task(self.playObject, obj_info)
                     utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
-        except Exception:
-            pass
-
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
     def _rebindInstanceGestures(self):
         # ── SentenceNav & TextNav Initialization ──
         # Bind gestures explicitly to ensure NVDA's ScriptableObject metaclass 
@@ -430,9 +436,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                     from . import utils
                     utils.threadPool.add_task(self.playObject, obj_info)
                     utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
-        except Exception:
-            pass
-
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
     def on_studio_item_clicked(self, event):
         # Translators: title for the audio themes studio dialog
         with AudioThemesStudioStartupDialog(self, _("Audio Themes Studio")) as dlg:
@@ -498,9 +507,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         
         try:
             nextHandler()
-        except Exception:
-            pass
-
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
         obj_info = self._snapshot_obj(obj)
         utils.threadPool.add_task(self.playObject, obj_info)
         utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
@@ -529,9 +541,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                 ny = dy / float(desktop[3])
                 obj_info["progress_angle"] = nx * 90.0
                 self.handler.play_theme_sound("beacon", angle_x=nx * 90.0, angle_y=ny * 50.0)
-        except Exception:
-            pass
-
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
     def event_becomeNavigatorObject(self, obj, nextHandler, isFocus=False):
         """
         Snapshot on main thread, dispatch dict to worker.
@@ -552,20 +567,32 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         if isFocus:
             try:
                 nextHandler()
-            except Exception:
-                pass
+            except Exception as e:
+                try:
+                    from logHandler import log
+                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                except:
+                    pass
             return
         # Dedup: skip if gainFocus just fired for this very object
         if obj is self._last_focused_obj and (time.monotonic() - self._last_focus_time) < 0.3:
             try:
                 nextHandler()
-            except Exception:
-                pass
+            except Exception as e:
+                try:
+                    from logHandler import log
+                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                except:
+                    pass
             return
         try:
             nextHandler()
-        except Exception:
-            pass
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
         self._last_play_time = time.monotonic()
         try:
             self._last_navigator_object = api.getNavigatorObject()
@@ -599,15 +626,26 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                             obj_info['progress_angle'] = angle_x
                             obj_info['progress_percent'] = percent
                             utils.threadPool.add_task(self.playObject, obj_info)
-                        except Exception:
-                            pass
-        except Exception:
-            pass
+                        except Exception as e:
+                            try:
+                                from logHandler import log
+                                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                            except:
+                                pass
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
         try:
             nextHandler()
-        except Exception:
-            pass
-
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
     def _is_editable(self, obj):
         try:
             controls = (controlTypes.Role.EDITABLETEXT, controlTypes.Role.TERMINAL, controlTypes.Role.RICHEDIT)
@@ -668,9 +706,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                     # Note: printable characters will still be caught by event_typedCharacter
                     # We don't catch them here to avoid double playing, except if we want to bypass event_typedCharacter completely.
                     # Actually event_typedCharacter is safer for letters.
-        except Exception:
-            pass
-            
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
         if self._original_keyDownEvent:
             return self._original_keyDownEvent(vkCode, scanCode, extended, injected)
         return True
@@ -687,14 +728,20 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                         self.handler.play_typing_sound(ch=ch, vkCode=vk, extended=ext)
                 else:
                     self.handler.play_typing_sound(ch=ch, vkCode=vk, extended=ext)
-        except Exception:
-            pass
-            
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
         try:
             nextHandler()
-        except Exception:
-            pass
-
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
     @script(description=_("Switches to the next audio theme."))
     def script_nextAudioTheme(self, gesture):
         import config
@@ -770,21 +817,31 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             utils.threadPool.add_task(self.playObject, obj_info)
         try:
             nextHandler()
-        except Exception:
-            pass
-
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
     def event_show(self, obj, nextHandler):
         try:
             if obj.role == controlTypes.Role.HELPBALLOON:
                 obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.notify)
                 self.playObject(obj_info)
-        except (_ctypes.COMError, Exception):
-            pass
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
         try:
             nextHandler()
-        except Exception:
-            pass
-
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
     def event_documentLoadComplete(self, obj, nextHandler):
         # Cache app name on handler
         try:
@@ -795,13 +852,20 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             if appModuleHandler.getAppNameFromProcessID(obj.processID) in self.browser_apps:
                 obj_info = self._snapshot_obj(obj)
                 utils.threadPool.add_task(self.playObject, obj_info)
-        except Exception:
-            pass
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
         try:
             nextHandler()
-        except Exception:
-            pass
-
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
     def playObject(self, obj_info):
         """
         Resolve the sound for an object and play it.
@@ -1037,9 +1101,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                     if loc and loc[2] > 0 and loc[3] > 0:
                         children.append(child)
                     collect_children(child, depth + 1)
-            except Exception:
-                pass
-        
+            except Exception as e:
+                try:
+                    from logHandler import log
+                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                except:
+                    pass
         collect_children(obj)
         # sort by X coordinate
         children.sort(key=lambda c: c.location[0] if c.location else 0)
@@ -1056,18 +1123,24 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                     nx = (c_x / float(desktop[2])) - 0.5 # -0.5 to 0.5
                     obj_info["progress_angle"] = nx * 90.0 # -45 to 45
                 snapshots.append(obj_info)
-            except Exception:
-                pass
-                
+            except Exception as e:
+                try:
+                    from logHandler import log
+                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                except:
+                    pass
         def sweep():
             import time
             for obj_info in snapshots:
                 try:
                     self.playObject(obj_info)
                     time.sleep(0.04)
-                except Exception:
-                    pass
-                    
+                except Exception as e:
+                    try:
+                        from logHandler import log
+                        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                    except:
+                        pass
         utils.threadPool.add_task(sweep)
 
     # ────────────────────────────────────────────────

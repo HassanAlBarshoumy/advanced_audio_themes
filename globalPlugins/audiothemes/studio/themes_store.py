@@ -138,9 +138,12 @@ class ThemesStoreDialog(wx.Dialog):
             self.downloadBtn.Enable()
             try:
                 os.remove(tmp_path)
-            except Exception:
-                pass
-
+            except Exception as e:
+                try:
+                    from logHandler import log
+                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                except:
+                    pass
     def OnPreview(self, event):
         idx = self.themesList.GetSelection()
         if idx == wx.NOT_FOUND: return
@@ -189,8 +192,11 @@ class ThemesStoreDialog(wx.Dialog):
             wx.CallAfter(self.previewBtn.Enable)
             try:
                 os.remove(tmp_path)
-            except Exception:
-                pass
-
+            except Exception as e:
+                try:
+                    from logHandler import log
+                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                except:
+                    pass
     def OnClose(self, event):
         self.Destroy()

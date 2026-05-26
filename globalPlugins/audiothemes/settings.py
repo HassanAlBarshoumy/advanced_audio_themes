@@ -390,9 +390,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
                 # Translate Unknown if it's the literal string "Unknown"
                 author = _("Unknown") if author_val == "Unknown" else author_val
                 description = info.get("description", "")
-            except Exception:
-                pass
-            
+            except Exception as e:
+                try:
+                    from logHandler import log
+                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                except:
+                    pass
         msg = _("Name: {name}\nAuthor: {author}\nNumber of sounds: {count}\nLocation: {path}").format(
             name=pack, author=author, count=count, path=typingSoundsDir
         )
@@ -1126,17 +1129,28 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # Save language specific variables cleanly
         try:
             setSNConfig("capitalLetters", self.capitalLettersEdit.GetValue(), getattr(self, "snLang", "en"))
-        except Exception:
-            pass
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
         try:
             setSNConfig("lowerCaseLetters", self.lowerCaseLettersEdit.GetValue(), getattr(self, "snLang", "en"))
-        except Exception:
-            pass
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
         try:
             setSNConfig("exceptionalAbbreviations", self.exceptionalAbbreviationsEdit.GetValue(), getattr(self, "snLang", "en"))
-        except Exception:
-            pass
-        
+        except Exception as e:
+            try:
+                from logHandler import log
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            except:
+                pass
         snConf["applicationsBlacklist"] = self.snAppsBlacklistEdit.GetValue()
         
         # Clear the regex cache to force recompilation with new rules
@@ -1192,8 +1206,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
                         nvwave.playWaveFile(p, asynchronous=True)
                         _time.sleep(0.3)
                         break
-            except Exception:
-                pass
+            except Exception as e:
+                try:
+                    from logHandler import log
+                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                except:
+                    pass
         threading.Thread(target=play_preview).start()
 
     def onAbout(self, event):
@@ -1272,8 +1290,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
             path = os.path.join(theme_dir, name)
             if os.path.exists(path):
                 try: nvwave.playWaveFile(path, asynchronous=True)
-                except Exception:
-                    pass
+                except Exception as e:
+                    try:
+                        from logHandler import log
+                        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                    except:
+                        pass
                 return
 
     def _add_directory_to_zip(self, zipf, source_dir, archive_prefix):
@@ -1362,21 +1384,33 @@ class AudioThemesSettingsPanel(SettingsPanel):
                                 for k, v in settings_data["audiothemes"].items():
                                     try:
                                         config.conf["audiothemes"][k] = v
-                                    except Exception:
-                                        pass
+                                    except Exception as e:
+                                        try:
+                                            from logHandler import log
+                                            log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                                        except:
+                                            pass
                             if "unspoken" in settings_data:
                                 for k, v in settings_data["unspoken"].items():
                                     try:
                                         config.conf["unspoken"][k] = v
-                                    except Exception:
-                                        pass
+                                    except Exception as e:
+                                        try:
+                                            from logHandler import log
+                                            log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                                        except:
+                                            pass
                             if "phoneticpunctuation" in settings_data:
                                 from .utils import phoneticPunctuationConfigKey
                                 for k, v in settings_data["phoneticpunctuation"].items():
                                     try:
                                         config.conf[phoneticPunctuationConfigKey][k] = v
-                                    except Exception:
-                                        pass
+                                    except Exception as e:
+                                        try:
+                                            from logHandler import log
+                                            log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                                        except:
+                                            pass
                         # 3. Audio themes
                         has_themes = any(n.startswith("audio-themes/") for n in files)
                         if has_themes:

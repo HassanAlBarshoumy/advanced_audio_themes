@@ -286,9 +286,12 @@ class AudioThemesHandler:
                         rule = frenzy.getActiveRuleContext(frenzy.roleRules[role], appName, windowTitle, url)
                         if rule is not None and getattr(rule, 'speechBehavior', 2) == 0:
                             suppress = False
-                except Exception:
-                    pass
-                
+                except Exception as e:
+                    try:
+                        from logHandler import log
+                        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+                    except:
+                        pass
             if self.player.use_in_say_all and SayAllHandler.isRunning():
                 suppress = False
                 

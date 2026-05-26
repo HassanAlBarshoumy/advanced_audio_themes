@@ -501,9 +501,12 @@ class UnspokenPlayer:
 			if ducking_enabled and (speech.isSpeaking() or time.time() - last_speech_time < 0.5):
 				duck_factor = config.conf.get("audiothemes", {}).get("audio_ducking_volume", 30) / 100.0
 				base_vol *= duck_factor
-		except Exception:
-			pass
-			
+		except Exception as e:
+		    try:
+		        from logHandler import log
+		        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+		    except:
+		        pass
 		return clamp(base_vol, 0.0, 1.5)
 
 	def _play_audio_data(self, audio_bytes):
@@ -528,7 +531,12 @@ class UnspokenPlayer:
 		if sound.get("is_ogg"):
 			import nvwave
 			try: nvwave.playWaveFile(sound.get("path"), asynchronous=True)
-			except Exception: pass
+			except Exception as e:
+			    try:
+			        from logHandler import log
+			        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+			    except:
+			        pass
 			return
 		curtime = time.time()
 		# De-duplicate: skip if same name played < 50ms ago, unless it's a progress bar updating
@@ -677,7 +685,12 @@ class UnspokenPlayer:
 		if path.lower().endswith('.ogg'):
 			import nvwave
 			try: nvwave.playWaveFile(path, asynchronous=True)
-			except Exception: pass
+			except Exception as e:
+			    try:
+			        from logHandler import log
+			        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+			    except:
+			        pass
 			return
 
 		if volume is not None:
@@ -718,8 +731,12 @@ class UnspokenPlayer:
 				if ducking_enabled and (speech.isSpeaking() or time.time() - last_speech_time < 0.5):
 					duck_factor = config.conf.get("audiothemes", {}).get("audio_ducking_volume", 30) / 100.0
 					final_volume *= duck_factor
-			except Exception:
-				pass
+			except Exception as e:
+			    try:
+			        from logHandler import log
+			        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+			    except:
+			        pass
 		else:
 			final_volume = self._compute_volume()
 			is_typing_sound = False
@@ -855,15 +872,22 @@ class UnspokenPlayer:
 		if hasattr(self, "wave_player"):
 			try:
 				self.wave_player.close()
-			except Exception:
-				pass
+			except Exception as e:
+			    try:
+			        from logHandler import log
+			        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+			    except:
+			        pass
 		if hasattr(self, "typing_players"):
 			for p in self.typing_players:
 				try:
 					p.close()
-				except Exception:
-					pass
-
+				except Exception as e:
+				    try:
+				        from logHandler import log
+				        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+				    except:
+				        pass
 		# Cleanup Steam Audio
 		if hasattr(self, "steam_audio"):
 			self.steam_audio.cleanup()
@@ -882,5 +906,10 @@ class UnspokenPlayer:
 		if hasattr(self, "typing_players"):
 			for p in self.typing_players:
 				try: p.close()
-				except Exception: pass
+				except Exception as e:
+				    try:
+				        from logHandler import log
+				        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+				    except:
+				        pass
 		self.create_wave_player()
