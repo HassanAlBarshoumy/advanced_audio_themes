@@ -672,7 +672,7 @@ class SentenceNavMixin:
 
     # ── Scripts (bound to Alt+Arrows) ──
 
-    @script(description="Move to next sentence.", gestures=['kb:Alt+DownArrow'],
+    @script(description=_("Move to next sentence."), category="Advanced Audio Themes", gestures=['kb:Alt+DownArrow'],
             resumeSayAllMode=CURSOR_CARET)
     def script_nextSentence(self, gesture):
         try:
@@ -687,7 +687,7 @@ class SentenceNavMixin:
         errorMsg = _("No next sentence")
         self._sn_move(gesture, regex, 1, errorMsg)
 
-    @script(description="Move to previous sentence.", gestures=['kb:Alt+UpArrow'],
+    @script(description=_("Move to previous sentence."), category="Advanced Audio Themes", gestures=['kb:Alt+UpArrow'],
             resumeSayAllMode=CURSOR_CARET)
     def script_previousSentence(self, gesture):
         try:
@@ -702,14 +702,14 @@ class SentenceNavMixin:
         errorMsg = _("No previous sentence")
         self._sn_move(gesture, regex, -1, errorMsg)
 
-    @script(description="Speak current sentence.", gestures=['kb:NVDA+Alt+S'])
+    @script(description=_("Speak current sentence."), category="Advanced Audio Themes", gestures=['kb:NVDA+Alt+S'])
     def script_currentSentence(self, gesture):
         if self._sn_maybePassThrough(gesture):
             return
         regex = getRegex(getCurrentLanguage())
         self._sn_move(gesture, regex, 0, "")
 
-    @script(description="Move to next phrase.", gestures=['kb:Alt+Windows+DownArrow'],
+    @script(description=_("Move to next phrase."), category="Advanced Audio Themes", gestures=['kb:Alt+Windows+DownArrow'],
             resumeSayAllMode=CURSOR_CARET)
     def script_nextPhrase(self, gesture):
         if self._sn_maybePassThrough(gesture):
@@ -718,7 +718,7 @@ class SentenceNavMixin:
         errorMsg = _("No next phrase")
         self._sn_move(gesture, regex, 1, errorMsg)
 
-    @script(description="Move to previous phrase.", gestures=['kb:Alt+Windows+UpArrow'],
+    @script(description=_("Move to previous phrase."), category="Advanced Audio Themes", gestures=['kb:Alt+Windows+UpArrow'],
             resumeSayAllMode=CURSOR_CARET)
     def script_previousPhrase(self, gesture):
         if self._sn_maybePassThrough(gesture):
@@ -727,20 +727,20 @@ class SentenceNavMixin:
         errorMsg = _("No previous phrase")
         self._sn_move(gesture, regex, -1, errorMsg)
 
-    @script(description="Speak current phrase.", gestures=[])
+    @script(description=_("Speak current phrase."), category="Advanced Audio Themes", gestures=[])
     def script_currentPhrase(self, gesture):
         if self._sn_maybePassThrough(gesture):
             return
         regex = getPhraseRegex()
         self._sn_move(gesture, regex, 0, "")
 
-    @script(description=_("Move to next paragraph containing text."), gestures=['kb:Alt+Shift+DownArrow'])
+    @script(description=_("Move to next paragraph containing text."), category="Advanced Audio Themes", gestures=['kb:Alt+Shift+DownArrow'])
     def script_nextText(self, gesture):
         if self._sn_maybePassThrough(gesture):
             return
         self._sn_moveToText(gesture, 1, _("No next paragraph with text"))
 
-    @script(description=_("Move to previous paragraph containing text."), gestures=['kb:Alt+Shift+UpArrow'])
+    @script(description=_("Move to previous paragraph containing text."), category="Advanced Audio Themes", gestures=['kb:Alt+Shift+UpArrow'])
     def script_previousText(self, gesture):
         if self._sn_maybePassThrough(gesture):
             return
