@@ -114,8 +114,8 @@ def pairUp(l):
             return
 def initConfiguration():
     confspec = {
-        "crackleVolume" : "integer( default=25, min=0, max=100)",
-        "beepVolume" : "integer( default=60, min=0, max=100)",
+        "crackleVolume" : "integer( default=0, min=0, max=100)",
+        "beepVolume" : "integer( default=0, min=0, max=100)",
         "noNextTextChimeVolume" : "integer( default=50, min=0, max=100)",
         "noNextTextMessage" : "boolean( default=True)",
         "browserMode" : "integer( default=0, min=0, max=2)",
@@ -126,7 +126,7 @@ def initConfiguration():
         "marks" : "string( default='(^upvote$|^up vote$)')",
         "skipEmptyParagraphs" : "boolean( default=True)",
         "skipEmptyLines" : "boolean( default=True)",
-        "skipChimeVolume" : "integer( default=25, min=0, max=100)",
+        "skipChimeVolume" : "integer( default=0, min=0, max=100)",
         "skipRegex" : "string( default='(^Hide or report this$)')",
         "tableNavigateToCell" : "boolean( default=True)",
         "verticalAlignmentMargin" : "integer( default=2, min=0, max=10000)",

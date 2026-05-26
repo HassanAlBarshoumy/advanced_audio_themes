@@ -159,7 +159,7 @@ def setConfig(key, value):
 
 def initConfiguration():
     confspec = {
-        "enabled" : "boolean( default=True)",
+        "enabled" : "boolean( default=False)",
         "rules" : "string( default='')",
         "applicationsBlacklist" : "string( default='')",
         "stateVerbose" : "boolean( default=True)",

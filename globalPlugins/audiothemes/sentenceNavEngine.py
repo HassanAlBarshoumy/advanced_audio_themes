@@ -66,28 +66,31 @@ def initSentenceNavConfiguration():
     exceptionalAbbreviations = """
 {
     "en": "Mr Ms Mrs Dr St e.g",
-    "ru": "Тов тов"
+    "ru": "Тов тов",
+    "ar": "Mr Ms Mrs Dr St e.g"
 }
 """.replace("\n", " ")
     capitalLetters = """
 {
     "en": "A-Z",
-    "ru": "А-Я"
+    "ru": "А-Я",
+    "ar": "A-Z"
 }
 """.replace("\n", " ")
     lowerCaseLetters = """
 {
     "en": "a-z",
-    "ru": "а-я"
+    "ru": "а-я",
+    "ar": "a-z"
 }
 """.replace("\n", " ")
     confspec = {
-        "paragraphChimeVolume": "integer( default=5, min=0, max=100)",
-        "noNextSentenceChimeVolume": "integer( default=50, min=0, max=100)",
+        "paragraphChimeVolume": "integer( default=0, min=0, max=100)",
+        "noNextSentenceChimeVolume": "integer( default=0, min=0, max=100)",
         "noNextSentenceMessage": "boolean( default=False)",
         "speakFormatted": "boolean( default=True)",
-        "textCrackleVolume": "integer( default=25, min=0, max=100)",
-        "noNextTextChimeVolume": "integer( default=50, min=0, max=100)",
+        "textCrackleVolume": "integer( default=0, min=0, max=100)",
+        "noNextTextChimeVolume": "integer( default=0, min=0, max=100)",
         "noNextTextMessage": "boolean( default=False)",
         "reconstructMode": "string( default='sameIndent')",
         "breakOnWikiReferences": "boolean( default=True)",
