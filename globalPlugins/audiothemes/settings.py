@@ -212,24 +212,25 @@ class AudioThemesSettingsPanel(SettingsPanel):
         duckingVolLabel = wx.StaticText(innerPanel, -1, _("Ducked Volume (%):"))
         self.audioDuckingVolumeSlider = wx.Slider(innerPanel, -1, minValue=1, maxValue=100)
         
-        # Speak Roles Sizer
-        speakRolesSizer = wx.BoxSizer(wx.HORIZONTAL)
-        speakRolesSizer.Add(self.speakRoleCheckbox, 1, wx.ALIGN_CENTER_VERTICAL)
+        # Speak Roles Checkbox (alone)
+        # Say All Roles Sizer
+        sayAllRolesSizer = wx.BoxSizer(wx.HORIZONTAL)
+        sayAllRolesSizer.Add(self.useInSayAllCheckbox, 0, wx.ALIGN_CENTER_VERTICAL)
         self.selectRolesButton = wx.Button(innerPanel, -1, _("Select Roles..."))
         self.selectRolesButton.Bind(wx.EVT_BUTTON, self.onSelectRoles)
-        speakRolesSizer.Add(self.selectRolesButton, 0, wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 10)
+        sayAllRolesSizer.Add(self.selectRolesButton, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
         
         innerSizer.AddMany(
             [
-                (self.play3dCheckbox, 1, wx.ALL, 5),
-                (speakRolesSizer, 1, wx.ALL | wx.EXPAND, 5),
-                (self.useInSayAllCheckbox, 1, wx.ALL, 5),
-                (self.useSynthVolumeCheckbox, 1, wx.ALL, 5),
-                (volumeLabel, 1, wx.TOP | wx.LEFT | wx.RIGHT, 10),
-                (self.volumeSlider, 1, wx.BOTTOM | wx.LEFT | wx.RIGHT, 5),
-                (self.audioDuckingCheckbox, 1, wx.ALL, 5),
-                (duckingVolLabel, 1, wx.TOP | wx.LEFT | wx.RIGHT, 10),
-                (self.audioDuckingVolumeSlider, 1, wx.BOTTOM | wx.LEFT | wx.RIGHT, 5),
+                (self.play3dCheckbox, 0, wx.ALL, 5),
+                (self.speakRoleCheckbox, 0, wx.ALL, 5),
+                (sayAllRolesSizer, 0, wx.ALL, 5),
+                (self.useSynthVolumeCheckbox, 0, wx.ALL, 5),
+                (volumeLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10),
+                (self.volumeSlider, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 5),
+                (self.audioDuckingCheckbox, 0, wx.ALL, 5),
+                (duckingVolLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10),
+                (self.audioDuckingVolumeSlider, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 5),
             ]
         )
         
@@ -282,11 +283,14 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.exportConfigButton = wx.Button(innerPanel, -1, _("E&xport Configuration..."))
         self.importConfigButton = wx.Button(innerPanel, -1, _("I&mport Configuration..."))
         self.checkUpdatesButton = wx.Button(innerPanel, -1, _("Check for &Updates..."))
+        # Translators: label for a button to contact the author on Telegram
+        self.telegramButton = wx.Button(innerPanel, -1, _("Contact on Telegram"))
         configActionSizer.AddMany(
             [
                 (self.exportConfigButton, 1, wx.ALL, 5),
                 (self.importConfigButton, 1, wx.ALL, 5),
                 (self.checkUpdatesButton, 1, wx.ALL, 5),
+                (self.telegramButton, 1, wx.ALL, 5),
             ]
         )
         innerSizer.Add(configActionSizer, 0, wx.ALIGN_CENTER | wx.ALL, 10)
@@ -305,6 +309,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.Bind(wx.EVT_BUTTON, self.onStoreClicked, self.storeThemeButton)
         self.Bind(wx.EVT_BUTTON, self.onBlenderTheme, self.blenderThemeButton)
         self.Bind(wx.EVT_BUTTON, self.onPreviewTheme, self.previewThemeButton)
+        self.Bind(wx.EVT_BUTTON, self.onTelegram, self.telegramButton)
         self.Bind(wx.EVT_BUTTON, self.onAboutTypingSounds, self.aboutTypingSoundsButton)
         self.Bind(
             wx.EVT_CHECKBOX,
@@ -354,6 +359,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
             except Exception:
                 log.debug("Preview playback interrupted")
         threading.Thread(target=play_preview).start()
+
+    def onTelegram(self, event):
+        import webbrowser
+        webbrowser.open("https://t.me/HassanAlBarshoumy")
 
     def onAboutTypingSounds(self, event):
         pack = self.typingPackCombobox.GetStringSelection()
@@ -1188,10 +1197,22 @@ class AudioThemesSettingsPanel(SettingsPanel):
         threading.Thread(target=play_preview).start()
 
     def onAbout(self, event):
+        theme_dict = self.selected_theme.todict()
+        author_val = theme_dict.get("author", "").strip()
+        if not author_val or author_val.lower() == "unknown":
+            theme_dict["author"] = _("Unknown")
+            
+        try:
+            import os
+            files = [f for f in os.listdir(self.selected_theme.directory) if f.lower().endswith(('.wav', '.ogg'))]
+            theme_dict["count"] = len(files)
+        except Exception:
+            theme_dict["count"] = 0
+
         wx.MessageBox(
             # Translators: content of a message box containing theme information
-            _("Name: {name}\nAuthor: {author}\n\n{summary}").format(
-                **self.selected_theme.todict()
+            _("Name: {name}\nAuthor: {author}\nNumber of sounds: {count}\n\n{summary}").format(
+                **theme_dict
             ),
             # Translators: title for a message containing theme information
             _("About Audio Theme"),

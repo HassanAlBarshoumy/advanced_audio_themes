@@ -2308,3 +2308,11 @@ msgstr "الاسم: {name}\nالمؤلف: {author}\nعدد الأصوات: {coun
 
 msgid "Unknown"
 msgstr "مجهول"
+
+
+msgid "Name: {name}\nAuthor: {author}\nNumber of sounds: {count}\n\n{summary}"
+msgstr "الاسم: {name}\nالمؤلف: {author}\nعدد الأصوات: {count}\n\n{summary}"
+
+
+msgid "Contact on Telegram"
+msgstr "التواصل عبر تليجرام"

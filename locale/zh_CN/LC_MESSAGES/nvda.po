@@ -2286,3 +2286,7 @@ msgstr "下载更新失败：{error}"
 
 msgid "Unknown error"
 msgstr "未知错误"
+
+
+msgid "Contact on Telegram"
+msgstr "在 Telegram 上联系"

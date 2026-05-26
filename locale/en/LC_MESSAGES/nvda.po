@@ -2110,3 +2110,7 @@ msgid ""
 "تم دمج إضافة SentenceNav للتنقل بالجمل (Alt+أسهم).\n"
 "تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).\n"
 msgstr ""
+
+
+msgid "Contact on Telegram"
+msgstr "Contact on Telegram"

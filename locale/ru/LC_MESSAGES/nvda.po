@@ -2298,3 +2298,7 @@ msgstr "Не удалось загрузить обновление: {error}"
 
 msgid "Unknown error"
 msgstr "Неизвестная ошибка"
+
+
+msgid "Contact on Telegram"
+msgstr "Связаться в Telegram"
