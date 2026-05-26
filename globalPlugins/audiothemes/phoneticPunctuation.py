@@ -390,7 +390,7 @@ def reloadRules():
     else:
         new_cached_passThrough_regex = None
 
-    global _rules_lock, cached_passThrough_regex
+    # global _rules_lock, cached_passThrough_regex
     with _rules_lock:
         rulesByFrenzy = newRulesByFrenzy
         allProsodies = newAllProsodies
@@ -469,7 +469,7 @@ def preCancelSpeech(*args, **kwargs):
     
 
 def preProcessSpeechSymbols(locale, text, level):
-    global rulesByFrenzy, cached_passThrough_regex
+    # global rulesByFrenzy, cached_passThrough_regex
     if not cached_passThrough_regex:
         return originalProcessSpeechSymbols(locale, text, level)
         
@@ -608,7 +608,7 @@ def injectMonkeyPatches():
     #monkeyPatchRestoreProsodyInAllHighLevelSpeakFunctions()
 
 def  restoreMonkeyPatches():
-    global originalSpeechSpeechSpeak, originalSpeechCancel
+    # global originalSpeechSpeechSpeak, originalSpeechCancel
     speech.speech.speak = originalSpeechSpeechSpeak
     speech.speak = speech.speech.speak
     speech.sayAll.SayAllHandler.speechWithoutPausesInstance.speak = speech.speech.speak
@@ -719,10 +719,10 @@ def fixProsodyCommands(sequence):
     We can't deal with multiplicative  prosody commands, so we just don't support them here.
     Adjusting prosody offsets in this function so that they support nesting.
     """
-    global prosodyStacks, prosodyOffsets
+    # global prosodyStacks, prosodyOffsets
     prosodySettings = {}
     def findProsodySetting(cls):
-        nonlocal prosodySettings
+        # nonlocal prosodySettings
         try:
             return prosodySettings[cls]
         except KeyError:
@@ -790,7 +790,7 @@ def resetProsodies(sequence):
     So doing a poor man's prosody reset here.
     Also resetting prosodies stack.
     """
-    global prosodyStacks, prosodyOffsets
+    # global prosodyStacks, prosodyOffsets
     prosodyStacks.clear()
     prosodyOffsets.clear()
     if len(allProsodies) == 0:

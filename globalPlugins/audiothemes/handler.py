@@ -46,24 +46,27 @@ audiotheme_changed = extensionPoints.Action()
 audiothemes_config_defaults = {
     "enable_audio_themes": "boolean(default=    True)",
     "active_theme": 'string(default="Default")',
-    "audio3d": "boolean(default=True)",
+    "audio3d": "boolean(default=False)",
     "use_in_say_all": "boolean(default=True)",
-    "speak_roles": "boolean(default=False)",
-    "use_synth_volume": "boolean(default=True)",
-    "volume": "integer(default=100)",
+    "speak_roles": "boolean(default=True)",
+    "use_synth_volume": "boolean(default=False)",
+    "volume": "integer(default=15)",
     "migrated_to_named_files": "boolean(default=False)",
     "disabled_apps": "string(default='')",
     "default_theme_deleted": "boolean(default=False)",
     "blacklisted_roles": "int_list(default=list())",
-    "typing_sounds": "boolean(default=False)",
+    "typing_sounds": "boolean(default=True)",
     "typing_sounds_edit_only": "boolean(default=True)",
-    "typing_sounds_volume": "integer(default=100)",
+    "typing_sounds_volume": "integer(default=10)",
     "typing_sound_pack": "string(default='1blueSwitch')",
-    "typing_sounds_spatial": "boolean(default=True)",
+    "typing_sounds_spatial": "boolean(default=False)",
     "typing_sounds_spatial_smart": "boolean(default=True)",
     "announceFormat": "string(default='0')",
     "roleAnnounceFormats": "string(default='{}')",
     "app_profiles": "string(default='{}')",
+    "audio_ducking_enabled": "boolean(default=False)",
+    "audio_ducking_volume": "integer(default=6)",
+    "output_mode": "string(default='stereo')",
 }
 
 
@@ -388,7 +391,7 @@ class AudioThemesHandler:
             self.enabled = user_config["enable_audio_themes"]
             self.active_theme = self.get_active_theme()
         
-        global _typing_dir_cache
+        # global _typing_dir_cache
         _typing_dir_cache.clear()
         # _theme_sound_existence_cache removed completely for performance
         self._theme_cache = {}
@@ -542,7 +545,7 @@ class AudioThemesHandler:
         
         sound_path = None
         if typing_dir:
-            global _typing_dir_cache
+            # global _typing_dir_cache
             cache = _typing_dir_cache.get(typing_dir)
             if cache is None:
                 if os.path.isdir(typing_dir):

@@ -365,7 +365,6 @@ originalExecuteGesture = None
 blockBeeper = Beeper()
 blockKeysUntil = 0
 def preExecuteGesture(selfself, gesture, *args, **kwargs):
-    global blockKeysUntil
     now = time.time()
     if now < blockKeysUntil:
         # Block this keystroke!
@@ -690,7 +689,6 @@ def watchURLAsync(localUpdateUrlCounter, delays=None):
     for delayMs in delays:
         yield delayMs
         with updateURLLock:
-            global globalUpdateUrlCounter
             if globalUpdateUrlCounter != localUpdateUrlCounter:
                 return
             updateURLIfChanged()
@@ -724,7 +722,7 @@ def bnSpeakTextInfo(info, *args, **kwargs):
 class BrowserNavMixin:
     """Mixin providing BrowserNav's indentation/style/QuickJump navigation.
     Inherit alongside globalPluginHandler.GlobalPlugin in the main plugin."""
-    _bn_scriptCategory = _("BrowserNav")
+    _bn_scriptCategory = "Advanced Audio Themes"
     beeper = Beeper()
 
     def initBrowserNav(self):
@@ -1178,7 +1176,7 @@ class BrowserNavMixin:
                 return
 
     def script_editJupyter(self, gesture, selfself):
-        global jupyterUpdateInProgress
+        # global jupyterUpdateInProgress
         if jupyterUpdateInProgress:
             ui.message_("Jupyter cell update in progress!")
             self.beeper.fancyBeep("AF#", length=100, left=20, right=20)
@@ -1588,7 +1586,7 @@ class BrowserNavMixin:
             gpFunc = getattr(gp, scriptFuncName)
             script = lambda selfself, gesture: gpFunc(gesture, selfself)
         script.__name__ = scriptFuncName
-        script.category = "BrowserNav"
+        script.category = "Advanced Audio Themes"
         if doc is not None:
             script.__doc__ = doc
         setattr(cls, scriptFuncName, script)

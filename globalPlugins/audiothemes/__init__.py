@@ -69,7 +69,7 @@ initSentenceNavConfiguration()
 class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.GlobalPlugin):
 
     browser_apps = ["firefox", "iexplore", "chrome", "opera", "edge"]
-    scriptCategory = _("Audio Themes NG")
+    scriptCategory = "Advanced Audio Themes"
 
     # -- COM-safety: extract everything on the main thread ---------------
     @staticmethod

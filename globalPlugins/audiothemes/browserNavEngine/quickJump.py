@@ -686,7 +686,7 @@ def loadConfig():
 
 
 def saveConfig(config=None):
-    global globalConfig
+    # global globalConfig
     config = config or globalConfig
     configDict = config.asDict()
     rulesJson = json.dumps(configDict, indent=4, sort_keys=True)
@@ -931,7 +931,7 @@ def newReportLiveRegion(text: str, politeness: str):
 
 asyncAutoclickCounter = 0
 def asyncAutoclick(self, asyncAutoclickCounterLocal, site):
-    global asyncAutoclickCounter
+    # global asyncAutoclickCounter
     yield site.autoClickOnFocusDelay
     category = site.autoClickCategory
     while True:
@@ -2064,7 +2064,7 @@ def scanLevelsSync(self, config, bookmarks):
         raise e
 
 def scanLevels(self, bookmarks):
-    global globalConfig, hierarchicalCache
+    # global globalConfig, hierarchicalCache
     result = scanLevelsSync(self, globalConfig, bookmarks)
     return result
 
@@ -2084,7 +2084,7 @@ def hierarchicalQuickJump(self, gesture, category, direction, level, unbounded, 
             return endOfDocument(_('No hierarchical quickJump bookmarks or numeric script bookmarks configured for current website. Please add QuickJump bookmarks in BrowserNav settings in NVDA settings window.'))
 
 def _hierarchicalQuickJump(self, gesture, category, direction, level, unbounded, errorMsg):
-    global hierarchicalCache
+    # global hierarchicalCache
     oldSelection = self.selection
     url = getUrl(self)
     bookmarks = findApplicableBookmarks(globalConfig, url, category)
@@ -3707,7 +3707,7 @@ class SettingsDialog(SettingsPanel):
         super(SettingsDialog, self).__init__(*args, **kwargs)
 
     def makeSettings(self, settingsSizer):
-        global globalConfig
+        # global globalConfig
         self.config = copy.deepcopy(globalConfig)
 
         sHelper = gui.guiHelper.BoxSizerHelper(self, sizer=settingsSizer)

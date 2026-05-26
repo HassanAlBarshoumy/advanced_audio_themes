@@ -27,7 +27,7 @@ _wave_player_pool = {}
 _wave_player_pool_lock = threading.Lock()
 
 def get_pooled_player(channels, sample_rate, ducking=False):
-    global _wave_player_pool
+    # global _wave_player_pool
     key = (channels, sample_rate, ducking)
     with _wave_player_pool_lock:
         if key not in _wave_player_pool:

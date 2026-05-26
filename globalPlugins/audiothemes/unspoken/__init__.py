@@ -212,7 +212,7 @@ class UnspokenPlayer:
 			"noSounds": "boolean(default=False)",
 			"HRTF": "boolean(default=True)",
 			"volumeAdjust": "boolean(default=True)",
-			"Reverb": "boolean(default=True)",
+			"Reverb": "boolean(default=False)",
 			"AdaptiveReverb": "boolean(default=True)",
 			"RoomSize": "integer(default=10, min=0, max=100)",
 			"Damping": "integer(default=100, min=0, max=100)",
@@ -220,9 +220,10 @@ class UnspokenPlayer:
 			"DryLevel": "integer(default=30, min=0, max=100)",
 			"Width": "integer(default=100, min=0, max=100)",
 			"AudioCache": "boolean(default=True)",
-			"SmartVolume": "boolean(default=True)",
-			"SmoothEnvelope": "boolean(default=True)",
+			"SmartVolume": "boolean(default=False)",
+			"SmoothEnvelope": "boolean(default=False)",
 			"SmoothPanning": "boolean(default=True)",
+			"TrimSilence": "boolean(default=True)",
 		}
 		log.debug("Initializing Steam Audio", exc_info=True)
 		self.steam_audio = steam_audio.get_steam_audio()

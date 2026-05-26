@@ -363,7 +363,7 @@ def getPhraseRegex():
     return result
 
 def clearRegexCaches():
-    global regexCache, phraseRegex
+    # global regexCache, phraseRegex
     regexCache.clear()
     phraseRegex = None
 
