@@ -714,10 +714,10 @@ class UnspokenPlayer:
 			try:
 				import time
 				try:
-				from .. import frenzy
-				last_speech_time = frenzy.last_speech_time
-			except (ImportError, AttributeError):
-				last_speech_time = 0
+					from .. import frenzy
+					last_speech_time = frenzy.last_speech_time
+				except (ImportError, AttributeError):
+					last_speech_time = 0
 				ducking_enabled = config.conf.get("audiothemes", {}).get("audio_ducking_enabled", True)
 				if ducking_enabled and (speech.isSpeaking() or time.time() - last_speech_time < 0.5):
 					duck_factor = config.conf.get("audiothemes", {}).get("audio_ducking_volume", 30) / 100.0
