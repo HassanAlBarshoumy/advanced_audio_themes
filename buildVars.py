@@ -34,9 +34,9 @@ Integrated with SentenceNav add-on for sentence navigation (Alt+Arrows).
 Integrated with BrowserNav add-on for advanced browser navigation (NVDA+Alt+Arrows).
 """),
 	# version
-	"addon_version": "9.0.0",
+	"addon_version": "9.1",
 	# Author(s)
-	"addon_author": u"Hassan AlBarshoumy, Musharraf Omer, Tony Malykh, Austin Hicks, Bryan Smart, Ahmed Sami",
+	"addon_author": u"Hassan AlBarshoumy, Ahmed Sami, Musharraf Omer, Tony Malykh, Austin Hicks, Bryan Smart",
 	# URL for the add-on documentation support
 	"addon_url": "https://t.me/HassanAlBarshoumy",
 	# URL for the add-on repository where the source code can be found
