@@ -23,15 +23,15 @@ addon_info = {
 	# Add-on description
 	# Translators: Long description to be shown for this add-on
 	# on add-on information from add-ons manager
-	"addon_description": _("""استكمال العمل على إضافة سمات الصوت (Audio Themes)، مع إضافة دعم للإصدارات الأحدث من NVDA.
-تقوم هذه الإضافة بإنشاء عرض صوتي افتراضي يشغل أصواتاً عند التركيز أو التنقل بين العناصر.
-كما تتيح لك الإضافة تفعيل، تثبيت، إزالة، تحرير، إنشاء، وتوزيع حزم السمات الصوتية.
+	"addon_description": _("""Continuing the work on the Audio Themes add-on, with added support for newer NVDA versions.
+This add-on creates a virtual audio display that plays sounds when focusing on or navigating between objects.
+The add-on also allows you to enable, install, remove, edit, create, and distribute audio theme packages.
 
-تم دمجها مع إضافة Earcons and Speech rules:
-تسمح بإعداد أصوات مخصصة للكلمات، الأحرف، أنواع العناصر، الحالات، ومعلومات التنسيق.
+Integrated with Earcons and Speech rules add-on:
+Allows configuring custom sounds for words, characters, object types, states, and formatting information.
 
-تم دمج إضافة SentenceNav للتنقل بالجمل (Alt+أسهم).
-تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).
+Integrated with SentenceNav add-on for sentence navigation (Alt+Arrows).
+Integrated with BrowserNav add-on for advanced browser navigation (NVDA+Alt+Arrows).
 """),
 	# version
 	"addon_version": "9.0.0",
