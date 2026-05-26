@@ -1353,7 +1353,7 @@ class BrowserNavMixin:
                 if (uniqueID is not None) and (uniqueID != 0):
                     focus = api.getFocusObject()
                     if uniqueID != focus.IA2UniqueID:
-                        mesage = _("Error! When switching back to browser window, a different edit box is focused.")
+                        message = _("Error! When switching back to browser window, a different edit box is focused.")
                         raise EditBoxUpdateError(message)
 
               # Step 3: start sending keys
