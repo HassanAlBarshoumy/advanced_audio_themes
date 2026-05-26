@@ -42,7 +42,10 @@ import uuid
 import requests
 import scriptHandler
 
-addonHandler.initTranslation()
+try:
+    addonHandler.initTranslation()
+except AttributeError:
+    pass
 
 sonifyTextInfo = None # Due to import error we set this value from __init__
 

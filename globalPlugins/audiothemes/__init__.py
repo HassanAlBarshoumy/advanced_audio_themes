@@ -53,7 +53,10 @@ from .browserNavEngine import BrowserNavMixin
 import api
 
 import addonHandler
-addonHandler.initTranslation()
+try:
+    addonHandler.initTranslation()
+except AttributeError:
+    pass
 
 utils.initConfiguration()
 pp.reloadRules()
@@ -160,8 +163,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         self._audio_beacon_desktop = None
         self._last_focus_is_editable = False
         # Add the menu item for the audio themes studio
-        self.studioMenuItem = gui.mainFrame.sysTrayIcon.menu.Insert(
-            2,
+        self.studioMenuItem = gui.mainFrame.sysTrayIcon.menu.Append(
             wx.ID_ANY,
             # Translators: label for the audio themes studio menu item
             _("&Audio Themes Studio"),
@@ -171,8 +173,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         )
 
         # Add checkable menu item for quickly toggling audio themes
-        self.toggleMenuItem = gui.mainFrame.sysTrayIcon.menu.InsertCheckItem(
-            4,
+        self.toggleMenuItem = gui.mainFrame.sysTrayIcon.menu.AppendCheckItem(
             wx.ID_ANY,
             _("Enable Audio Themes"),
         )

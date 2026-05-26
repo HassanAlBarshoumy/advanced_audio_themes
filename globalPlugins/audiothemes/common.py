@@ -6,7 +6,10 @@
 
 import addonHandler
 from enum import Enum
-addonHandler.initTranslation()
+try:
+    addonHandler.initTranslation()
+except AttributeError:
+    pass
 
 audioRuleBuiltInWave = "builtInWave"
 audioRuleWave = "wave"

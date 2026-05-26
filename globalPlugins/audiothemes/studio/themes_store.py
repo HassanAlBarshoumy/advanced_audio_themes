@@ -8,7 +8,10 @@ import gui
 from ..handler import AudioThemesHandler
 
 import addonHandler
-addonHandler.initTranslation()
+try:
+    addonHandler.initTranslation()
+except AttributeError:
+    pass
 import config
 
 STORE_URL = "https://raw.githubusercontent.com/HassanAlBarshoumy/AudioThemesStore/main/store.json"

@@ -3,7 +3,10 @@ import shutil
 import globalVars
 import addonHandler
 
-addonHandler.initTranslation()
+try:
+    addonHandler.initTranslation()
+except AttributeError:
+    pass
 
 def onInstall():
 	old_paths = [

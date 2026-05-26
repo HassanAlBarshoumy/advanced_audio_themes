@@ -6,7 +6,10 @@
 # Integrated and adapted by Hassan AlBarshoumy
 
 import addonHandler
-addonHandler.initTranslation()
+try:
+    addonHandler.initTranslation()
+except AttributeError:
+    pass
 import api
 import bisect
 import braille

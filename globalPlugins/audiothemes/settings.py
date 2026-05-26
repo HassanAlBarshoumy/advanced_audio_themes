@@ -23,7 +23,10 @@ from .update_checker import check_for_updates
 log = logging.getLogger(__name__)
 
 import addonHandler
-addonHandler.initTranslation()
+try:
+    addonHandler.initTranslation()
+except AttributeError:
+    pass
 
 
 from gui.settingsDialogs import SettingsPanel
@@ -254,7 +257,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
         if not self.typingPackChoices:
             self.typingPackChoices = ["1blueSwitch"]
 
+        typingPackSizer = wx.BoxSizer(wx.HORIZONTAL)
         self.typingPackCombobox = wx.Choice(innerPanel, -1, choices=self.typingPackChoices)
+        self.aboutTypingSoundsButton = wx.Button(innerPanel, -1, _("&About"))
+        typingPackSizer.Add(self.typingPackCombobox, 1, wx.EXPAND | wx.RIGHT, 5)
+        typingPackSizer.Add(self.aboutTypingSoundsButton, 0, wx.ALL, 0)
         self.typingSoundsSpatialCheckbox = wx.CheckBox(innerPanel, -1, _("Enable spatial typing sounds (simulates a physical keyboard)"))
         self.typingSoundsSmartSpatialCheckbox = wx.CheckBox(innerPanel, -1, _("Smart spatial positioning (maps characters to their exact physical keys)"))
 
@@ -265,7 +272,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             (self.typingSoundsSpatialCheckbox, 1, wx.ALL, 5),
             (self.typingSoundsSmartSpatialCheckbox, 1, wx.ALL, 5),
             (typingPackLabel, 1, wx.TOP | wx.LEFT | wx.RIGHT, 10),
-            (self.typingPackCombobox, 1, wx.BOTTOM | wx.LEFT | wx.RIGHT, 5),
+            (typingPackSizer, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5),
             (typingVolumeLabel, 1, wx.TOP | wx.LEFT | wx.RIGHT, 10),
             (self.typingSoundsVolumeSlider, 1, wx.BOTTOM | wx.LEFT | wx.RIGHT, 5),
         ])
@@ -298,6 +305,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.Bind(wx.EVT_BUTTON, self.onStoreClicked, self.storeThemeButton)
         self.Bind(wx.EVT_BUTTON, self.onBlenderTheme, self.blenderThemeButton)
         self.Bind(wx.EVT_BUTTON, self.onPreviewTheme, self.previewThemeButton)
+        self.Bind(wx.EVT_BUTTON, self.onAboutTypingSounds, self.aboutTypingSoundsButton)
         self.Bind(
             wx.EVT_CHECKBOX,
             lambda e: self.innerPanel.Enable(e.IsChecked()),
@@ -346,6 +354,47 @@ class AudioThemesSettingsPanel(SettingsPanel):
             except Exception:
                 log.debug("Preview playback interrupted")
         threading.Thread(target=play_preview).start()
+
+    def onAboutTypingSounds(self, event):
+        pack = self.typingPackCombobox.GetStringSelection()
+        if not pack:
+            return
+        typingSoundsDir = os.path.join(os.path.dirname(__file__), "typingSounds", pack)
+        
+        # Count sounds
+        try:
+            files = [f for f in os.listdir(typingSoundsDir) if f.lower().endswith(('.wav', '.ogg'))]
+            count = len(files)
+        except Exception:
+            count = 0
+
+        # Read info.json
+        author = _("Unknown")
+        description = ""
+        info_path = os.path.join(typingSoundsDir, "info.json")
+        if os.path.isfile(info_path):
+            try:
+                import json
+                with open(info_path, "r", encoding="utf-8") as f:
+                    info = json.load(f)
+                author_val = info.get("author", "Unknown")
+                # Translate Unknown if it's the literal string "Unknown"
+                author = _("Unknown") if author_val == "Unknown" else author_val
+                description = info.get("description", "")
+            except Exception:
+                pass
+            
+        msg = _("Name: {name}\nAuthor: {author}\nNumber of sounds: {count}\nLocation: {path}").format(
+            name=pack, author=author, count=count, path=typingSoundsDir
+        )
+        if description:
+            msg += f"\n\n{description}"
+            
+        wx.MessageBox(
+            msg,
+            _("About Typing Sound Pack"),
+            style=wx.ICON_INFORMATION
+        )
 
     def onBlenderTheme(self, event):
         from .studio.themes_blender import ThemeBlenderDialog

@@ -16,7 +16,10 @@ from .mic_recorder import MicRecorder
 import tempfile
 
 import addonHandler
-addonHandler.initTranslation()
+try:
+    addonHandler.initTranslation()
+except AttributeError:
+    pass
 
 class AudioDropTarget(wx.FileDropTarget):
     def __init__(self, dialog):

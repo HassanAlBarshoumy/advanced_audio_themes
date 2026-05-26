@@ -46,7 +46,10 @@ from . import phoneticPunctuation as pp
 from .utils import *
 from . import common
 
-addonHandler.initTranslation()
+try:
+    addonHandler.initTranslation()
+except AttributeError:
+    pass
 
 class AudioRuleDialog(wx.Dialog):
     TYPE_LABELS = {

@@ -2295,3 +2295,16 @@ msgstr "فشل تنزيل التحديث: {error}"
 
 msgid "Unknown error"
 msgstr "خطأ غير معروف"
+
+
+msgid "&About"
+msgstr "&حول"
+
+msgid "About Typing Sound Pack"
+msgstr "حول حزمة أصوات الكتابة"
+
+msgid "Name: {name}\nAuthor: {author}\nNumber of sounds: {count}\nLocation: {path}"
+msgstr "الاسم: {name}\nالمؤلف: {author}\nعدد الأصوات: {count}\nالمسار: {path}"
+
+msgid "Unknown"
+msgstr "مجهول"

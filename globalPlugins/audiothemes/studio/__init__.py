@@ -14,7 +14,10 @@ from ..handler import AudioTheme, AudioThemesHandler, audiotheme_changed
 from .themes_blender import BaseDialog, ThemeBlenderDialog
 
 import addonHandler
-addonHandler.initTranslation()
+try:
+    addonHandler.initTranslation()
+except AttributeError:
+    pass
 
 
 # Translators: the welcome message of the audio theme studio dialog

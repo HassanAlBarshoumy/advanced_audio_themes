@@ -27,7 +27,10 @@ import speech
 from speech.sayAll import SayAllHandler
 
 import addonHandler
-addonHandler.initTranslation()
+try:
+    addonHandler.initTranslation()
+except AttributeError:
+    pass
 
 THEMES_DIR = os.path.join(globalVars.appArgs.configPath, "audio-themes")
 INFO_FILE_NAME = "info.json"

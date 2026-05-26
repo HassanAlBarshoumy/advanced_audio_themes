@@ -10,7 +10,10 @@
 # https://github.com/mltony/nvda-indent-nav/
 
 import addonHandler
-addonHandler.initTranslation()
+try:
+    addonHandler.initTranslation()
+except AttributeError:
+    pass
 import api
 import browseMode
 from contextlib import ExitStack
@@ -136,7 +139,10 @@ browseModeGestures = {
 
 
 
-addonHandler.initTranslation()
+try:
+    addonHandler.initTranslation()
+except AttributeError:
+    pass
 initConfiguration()
 
 class SettingsDialog(SettingsPanel):
