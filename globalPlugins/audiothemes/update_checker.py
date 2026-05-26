@@ -76,11 +76,8 @@ def download_addon(url, callback):
 def check_for_updates(parent=None):
     if parent is None:
         parent = wx.GetActiveWindow()
-    wx.MessageBox(
-        _("Checking for updates..."),
-        _("Update Check"),
-        style=wx.ICON_INFORMATION
-    )
+    import ui
+    ui.message(_("Checking for updates..."))
 
     def _check_thread():
         tag, download_url, _html_url = get_latest_release()
