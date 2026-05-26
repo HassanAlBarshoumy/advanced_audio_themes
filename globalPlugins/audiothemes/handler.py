@@ -617,6 +617,36 @@ class AudioThemesHandler:
             os.rename(identified_path, default_theme_path)
 
     @classmethod
+    def install_typing_soundPackage(cls, pack_path):
+        import json
+        pack_name = "Imported_" + uuid4().hex[:8]
+        with ZipFile(pack_path, "r") as pack:
+            if "info.json" in pack.namelist():
+                try:
+                    info_data = json.loads(pack.read("info.json").decode("utf-8"))
+                    pack_name = info_data.get("name", pack_name)
+                except Exception:
+                    pass
+            elif len(pack.infolist()) > 0 and pack.infolist()[0].is_dir():
+                pack_name = pack.infolist()[0].orig_filename.strip("/")
+            
+            addon_dir = os.path.dirname(__file__)
+            typing_dir = os.path.join(addon_dir, "typingSounds", pack_name)
+            
+            if os.path.exists(typing_dir):
+                shutil.rmtree(typing_dir)
+            os.makedirs(typing_dir)
+            pack.extractall(path=typing_dir)
+            
+            contents = os.listdir(typing_dir)
+            if len(contents) == 1:
+                inner_path = os.path.join(typing_dir, contents[0])
+                if os.path.isdir(inner_path):
+                    for item in os.listdir(inner_path):
+                        shutil.move(os.path.join(inner_path, item), typing_dir)
+                    os.rmdir(inner_path)
+
+    @classmethod
     def _install_legacy(cls, pack, final_dst):
         pack_infolist = pack.infolist()
         theme_name = pack_infolist[0].orig_filename.strip("/")

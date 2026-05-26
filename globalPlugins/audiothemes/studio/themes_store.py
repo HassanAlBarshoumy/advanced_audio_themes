@@ -144,9 +144,10 @@ class ThemesStoreDialog(wx.Dialog):
         
         self.downloadBtn.Disable()
         self.statusLabel.SetLabel(_("Downloading... Please wait"))
-        threading.Thread(target=self.DownloadAndInstall, args=(url,), daemon=True).start()
+        pkg_type = t.get("type", "theme")
+        threading.Thread(target=self.DownloadAndInstall, args=(url, pkg_type), daemon=True).start()
         
-    def DownloadAndInstall(self, url):
+    def DownloadAndInstall(self, url, pkg_type):
         try:
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             with urllib.request.urlopen(req, timeout=30) as response:
@@ -167,20 +168,25 @@ class ThemesStoreDialog(wx.Dialog):
                         wx.CallAfter(self.statusLabel.SetLabel, _("Downloading... {}%").format(percent))
                         
             wx.CallAfter(self.progressBar.SetValue, 0)
-            fd, tmp_path = tempfile.mkstemp(suffix=".atp")
+            fd, tmp_path = tempfile.mkstemp(suffix=".zip")
             with os.fdopen(fd, 'wb') as f:
                 f.write(pack_data)
                 
-            wx.CallAfter(self.InstallFinished, tmp_path)
+            wx.CallAfter(self.InstallFinished, tmp_path, pkg_type)
         except Exception as e:
             wx.CallAfter(self.statusLabel.SetLabel, _("Download failed."))
             wx.CallAfter(self.downloadBtn.Enable)
             
-    def InstallFinished(self, tmp_path):
+    def InstallFinished(self, tmp_path, pkg_type):
         try:
-            AudioThemesHandler.install_audio_themePackage(tmp_path)
-            self.statusLabel.SetLabel(_("Installation successful!"))
-            wx.MessageBox(_("Audio theme successfully installed. You can now select it from the themes menu."), _("Success"), wx.ICON_INFORMATION)
+            if pkg_type == "typing_pack":
+                AudioThemesHandler.install_typing_soundPackage(tmp_path)
+                self.statusLabel.SetLabel(_("Typing pack installation successful!"))
+                wx.MessageBox(_("Typing sound pack successfully installed."), _("Success"), wx.ICON_INFORMATION)
+            else:
+                AudioThemesHandler.install_audio_themePackage(tmp_path)
+                self.statusLabel.SetLabel(_("Installation successful!"))
+                wx.MessageBox(_("Audio theme successfully installed. You can now select it from the themes menu."), _("Success"), wx.ICON_INFORMATION)
         except Exception as e:
             self.statusLabel.SetLabel(_("Error during installation."))
         finally:
