@@ -3631,7 +3631,7 @@ def importImpl(self, sites, site):
 
 def downloadAllWebsitesFromStore():
     url = "https://raw.githubusercontent.com/mltony/nvda-browser-nav-bookmark-store/refs/heads/main/output/websites.json"
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
     response.raise_for_status()
     data = json.loads(response.text)
     return data

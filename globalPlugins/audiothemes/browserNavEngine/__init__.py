@@ -1367,11 +1367,9 @@ class BrowserNavMixin:
                         self.copyToClip(text)
                         kbdControlA.send()
                         if hackerRankMode:
-                            # For some reason there is a race condition in Hacker Rank. Sleep to work around.
-                            time.sleep(0.1)
+                            yield 100
                         elif googleCollabMode:
-                            # Say hi to awesome Google engineers too
-                            time.sleep(0.3)
+                            yield 300
                         kbdControlV.send()
                   # Step 3.2. Select first character and copy to clip and wait to assure that edit box has processed the previous paste
                     if  hasChanged and not shortTextMode:
