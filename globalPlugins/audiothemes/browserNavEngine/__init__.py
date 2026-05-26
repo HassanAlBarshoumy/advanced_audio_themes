@@ -702,7 +702,11 @@ originalSetFocusObject = None
 originalVirtualBufferHandleUpdate = None
 def bnSetFocusObject(obj):
     result = originalSetFocusObject(obj)
-    watchURL()
+    with updateURLLock:
+        global globalUpdateUrlCounter
+        globalUpdateUrlCounter += 1
+        localUpdateUrlCounter = globalUpdateUrlCounter
+    utils.executeAsynchronously(watchURLAsync(localUpdateUrlCounter, None))
     api.postFocusOrURLChange.notify()
     return result
 
