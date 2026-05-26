@@ -1763,6 +1763,7 @@ msgid ""
 msgstr "تحديد المواقع المكانية الذكية (تعيين الأحرف لمفاتيحها الفعلية بالضبط)"
 
 msgid "Smooth 3D Panning (Glide effect for moving objects)"
+msgstr ""
 
 msgid "Smooth Envelope (Fade In/Out to prevent popping)"
 msgstr "تنعيم أطراف الصوت (منع طقطقة السماعات)"
@@ -2281,8 +2282,18 @@ msgstr "التحقق من التحديث"
 msgid "You are already running the latest version ({version})."
 msgstr "أنت تستخدم بالفعل أحدث إصدار ({version})."
 
-msgid "A new version is available: {tag}\n\nCurrent version: {current}\n\nWould you like to download and install the update?"
-msgstr "يتوفر إصدار جديد: {tag}\n\nالإصدار الحالي: {current}\n\nهل ترغب في تنزيل التحديث وتثبيته؟"
+msgid ""
+"A new version is available: {tag}\n"
+"\n"
+"Current version: {current}\n"
+"\n"
+"Would you like to download and install the update?"
+msgstr ""
+"يتوفر إصدار جديد: {tag}\n"
+"\n"
+"الإصدار الحالي: {current}\n"
+"\n"
+"هل ترغب في تنزيل التحديث وتثبيته؟"
 
 msgid "Update Available"
 msgstr "تحديث متاح"
@@ -2296,23 +2307,56 @@ msgstr "فشل تنزيل التحديث: {error}"
 msgid "Unknown error"
 msgstr "خطأ غير معروف"
 
-
 msgid "&About"
 msgstr "&حول"
 
 msgid "About Typing Sound Pack"
 msgstr "حول حزمة أصوات الكتابة"
 
-msgid "Name: {name}\nAuthor: {author}\nNumber of sounds: {count}\nLocation: {path}"
-msgstr "الاسم: {name}\nالمؤلف: {author}\nعدد الأصوات: {count}\nالمسار: {path}"
+msgid ""
+"Name: {name}\n"
+"Author: {author}\n"
+"Number of sounds: {count}\n"
+"Location: {path}"
+msgstr ""
+"الاسم: {name}\n"
+"المؤلف: {author}\n"
+"عدد الأصوات: {count}\n"
+"المسار: {path}"
 
 msgid "Unknown"
 msgstr "مجهول"
 
-
-msgid "Name: {name}\nAuthor: {author}\nNumber of sounds: {count}\n\n{summary}"
-msgstr "الاسم: {name}\nالمؤلف: {author}\nعدد الأصوات: {count}\n\n{summary}"
-
+msgid ""
+"Name: {name}\n"
+"Author: {author}\n"
+"Number of sounds: {count}\n"
+"\n"
+"{summary}"
+msgstr ""
+"الاسم: {name}\n"
+"المؤلف: {author}\n"
+"عدد الأصوات: {count}\n"
+"\n"
+"{summary}"
 
 msgid "Contact on Telegram"
 msgstr "التواصل عبر تليجرام"
+
+msgid "Move to next sentence."
+msgstr "الانتقال إلى الجملة التالية."
+
+msgid "Move to previous sentence."
+msgstr "الانتقال إلى الجملة السابقة."
+
+msgid "Speak current sentence."
+msgstr "نطق الجملة الحالية."
+
+msgid "Move to next phrase."
+msgstr "الانتقال إلى العبارة التالية."
+
+msgid "Move to previous phrase."
+msgstr "الانتقال إلى العبارة السابقة."
+
+msgid "Speak current phrase."
+msgstr "نطق العبارة الحالية."

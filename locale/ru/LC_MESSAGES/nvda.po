@@ -211,7 +211,7 @@ msgid "Adjusts BrowserNav rotor"
 msgstr "Adjusts BrowserNav rotor"
 
 msgid "Advanced Audio Themes"
-msgstr "Advanced Audio Themes"
+msgstr "Расширенные звуковые темы"
 
 msgid "Advanced Browser Navigation (BrowserNav)"
 msgstr "Advanced Browser Navigation (BrowserNav)"
@@ -2276,7 +2276,9 @@ msgid "Check for &Updates..."
 msgstr "Проверить &обновления..."
 
 msgid "Could not check for updates. Please check your internet connection."
-msgstr "Не удалось проверить наличие обновлений. Пожалуйста, проверьте подключение к интернету."
+msgstr ""
+"Не удалось проверить наличие обновлений. Пожалуйста, проверьте подключение к"
+" интернету."
 
 msgid "Update Check"
 msgstr "Проверка обновлений"
@@ -2284,8 +2286,18 @@ msgstr "Проверка обновлений"
 msgid "You are already running the latest version ({version})."
 msgstr "Вы уже используете последнюю версию ({version})."
 
-msgid "A new version is available: {tag}\n\nCurrent version: {current}\n\nWould you like to download and install the update?"
-msgstr "Доступна новая версия: {tag}\n\nТекущая версия: {current}\n\nХотите ли вы загрузить и установить обновление?"
+msgid ""
+"A new version is available: {tag}\n"
+"\n"
+"Current version: {current}\n"
+"\n"
+"Would you like to download and install the update?"
+msgstr ""
+"Доступна новая версия: {tag}\n"
+"\n"
+"Текущая версия: {current}\n"
+"\n"
+"Хотите ли вы загрузить и установить обновление?"
 
 msgid "Update Available"
 msgstr "Доступно обновление"
@@ -2299,6 +2311,23 @@ msgstr "Не удалось загрузить обновление: {error}"
 msgid "Unknown error"
 msgstr "Неизвестная ошибка"
 
-
 msgid "Contact on Telegram"
 msgstr "Связаться в Telegram"
+
+msgid "Move to next sentence."
+msgstr "Перейти к следующему предложению."
+
+msgid "Move to previous sentence."
+msgstr "Перейти к предыдущему предложению."
+
+msgid "Speak current sentence."
+msgstr "Озвучить текущее предложение."
+
+msgid "Move to next phrase."
+msgstr "Перейти к следующей фразе."
+
+msgid "Move to previous phrase."
+msgstr "Перейти к предыдущей фразе."
+
+msgid "Speak current phrase."
+msgstr "Озвучить текущую фразу."

@@ -211,7 +211,7 @@ msgid "Adjusts BrowserNav rotor"
 msgstr "Adjusts BrowserNav rotor"
 
 msgid "Advanced Audio Themes"
-msgstr "Advanced Audio Themes"
+msgstr "高级音频主题"
 
 msgid "Advanced Browser Navigation (BrowserNav)"
 msgstr "Advanced Browser Navigation (BrowserNav)"
@@ -2272,8 +2272,18 @@ msgstr "更新检查"
 msgid "You are already running the latest version ({version})."
 msgstr "您已在使用最新版本 ({version})。"
 
-msgid "A new version is available: {tag}\n\nCurrent version: {current}\n\nWould you like to download and install the update?"
-msgstr "有新版本可用：{tag}\n\n当前版本：{current}\n\n您想下载并安装更新吗？"
+msgid ""
+"A new version is available: {tag}\n"
+"\n"
+"Current version: {current}\n"
+"\n"
+"Would you like to download and install the update?"
+msgstr ""
+"有新版本可用：{tag}\n"
+"\n"
+"当前版本：{current}\n"
+"\n"
+"您想下载并安装更新吗？"
 
 msgid "Update Available"
 msgstr "有可用更新"
@@ -2287,6 +2297,23 @@ msgstr "下载更新失败：{error}"
 msgid "Unknown error"
 msgstr "未知错误"
 
-
 msgid "Contact on Telegram"
 msgstr "在 Telegram 上联系"
+
+msgid "Move to next sentence."
+msgstr "移动到下一句。"
+
+msgid "Move to previous sentence."
+msgstr "移动到上一句。"
+
+msgid "Speak current sentence."
+msgstr "朗读当前句子。"
+
+msgid "Move to next phrase."
+msgstr "移动到下一词组。"
+
+msgid "Move to previous phrase."
+msgstr "移动到上一词组。"
+
+msgid "Speak current phrase."
+msgstr "朗读当前词组。"
