@@ -889,7 +889,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                         snd = order
                     else:
                         snd = obj_info.get("role", 0)
-                        if not snd:
+                        if not snd and not obj_info.get("force_3d", False):
                             return
 
                 self.handler.play(obj_info, snd)

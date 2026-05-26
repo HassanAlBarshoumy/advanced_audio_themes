@@ -426,21 +426,33 @@ class AudioThemesHandler:
         """
         Play a themed sound.  obj_info is a plain dict (no COM object).
         """
-        if not self.enabled or (self.active_theme is None):
+        force_3d = obj_info.get("force_3d", False) if isinstance(obj_info, dict) else False
+        if not force_3d and (not self.enabled or (self.active_theme is None)):
             return
 
         # Use pre-extracted foreground app name from snapshot (no COM call here).
         foreground_app = obj_info.get("foreground_app") if isinstance(obj_info, dict) else None
-        if foreground_app:
+        if foreground_app and not force_3d:
             import fnmatch
             app_l = foreground_app.lower()
             if any(fnmatch.fnmatch(app_l, p.lower()) for p in self.disabled_apps):
                 return
 
         theme = self.get_theme_for_app(foreground_app)
+        if not theme and force_3d:
+            theme = self.active_theme
+
+        if not theme:
+            return
 
         with theme._lock:
             sound_obj = theme.sounds.get(sound)
+            if sound_obj is None and force_3d:
+                import controlTypes
+                sound_obj = theme.sounds.get(controlTypes.Role.BUTTON)
+                if sound_obj is None and theme.sounds:
+                    sound_obj = next(iter(theme.sounds.values()))
+                    
         if sound_obj is None:
             return
         self.player.play(obj_info, sound_obj)
