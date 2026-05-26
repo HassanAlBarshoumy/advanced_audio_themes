@@ -197,11 +197,8 @@ class ThemesStoreDialog(wx.Dialog):
             try:
                 os.remove(tmp_path)
             except Exception as e:
-                try:
-                    from logHandler import log
-                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-                except:
-                    pass
+                import logging
+                logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
     def OnPreview(self, event):
         idx = self.themesList.GetSelection()
         if idx == wx.NOT_FOUND: return
@@ -289,10 +286,7 @@ class ThemesStoreDialog(wx.Dialog):
             try:
                 os.remove(tmp_path)
             except Exception as e:
-                try:
-                    from logHandler import log
-                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-                except:
-                    pass
+                import logging
+                logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
     def OnClose(self, event):
         self.Destroy()

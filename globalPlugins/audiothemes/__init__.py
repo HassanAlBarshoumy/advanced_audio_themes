@@ -504,14 +504,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         except Exception:
             self.handler._current_app_name = None
         
-        try:
-            nextHandler()
-        except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
+        nextHandler()
         obj_info = self._snapshot_obj(obj)
         utils.threadPool.add_task(self.playObject, obj_info)
         utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
@@ -564,34 +557,13 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             self.handler._current_window_title = None
             self.handler._current_url = None
         if isFocus:
-            try:
-                nextHandler()
-            except Exception as e:
-                try:
-                    from logHandler import log
-                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-                except:
-                    pass
+            nextHandler()
             return
         # Dedup: skip if gainFocus just fired for this very object
         if obj is self._last_focused_obj and (time.monotonic() - self._last_focus_time) < 0.3:
-            try:
-                nextHandler()
-            except Exception as e:
-                try:
-                    from logHandler import log
-                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-                except:
-                    pass
-            return
-        try:
             nextHandler()
-        except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
+            return
+        nextHandler()
         self._last_play_time = time.monotonic()
         try:
             self._last_navigator_object = api.getNavigatorObject()
@@ -636,14 +608,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                 log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
             except:
                 pass
-        try:
-            nextHandler()
-        except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
+        nextHandler()
     def _is_editable(self, obj):
         try:
             controls = (controlTypes.Role.EDITABLETEXT, controlTypes.Role.TERMINAL, controlTypes.Role.RICHEDIT)
@@ -730,14 +695,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                 log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
             except:
                 pass
-        try:
-            nextHandler()
-        except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
+        nextHandler()
     @script(description=_("Switches to the next audio theme."))
     def script_nextAudioTheme(self, gesture):
         themes = self.handler.get_installed_themes()
@@ -836,14 +794,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                 log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
             except:
                 pass
-        try:
-            nextHandler()
-        except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
+        nextHandler()
     def playObject(self, obj_info):
         """
         Resolve the sound for an object and play it.

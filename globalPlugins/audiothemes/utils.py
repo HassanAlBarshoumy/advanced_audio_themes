@@ -49,11 +49,8 @@ class Worker(Thread):
             THREAD_PRIORITY_ABOVE_NORMAL = 1
             ctypes.windll.kernel32.SetThreadPriority(ctypes.windll.kernel32.GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL)
         except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
+            import logging
+            logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
         while True:
             item = self.tasks.get()
             # Shutdown sentinel received — exit the loop.

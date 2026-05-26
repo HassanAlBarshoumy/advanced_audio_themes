@@ -1086,11 +1086,8 @@ class RulesDialog(SettingsPanel):
             try:
                 shutil.copy2(rulesFileName, rulesFileName + ".backup")
             except Exception as e:
-                try:
-                    from logHandler import log
-                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-                except:
-                    pass
+                import logging
+                logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
         rulesFile = open(rulesFileName, "w")
         try:
             rulesFile.write(rulesJson)

@@ -489,11 +489,8 @@ class SentenceNavMixin:
             try:
                 formatField.update(field.field)
             except Exception as e:
-                try:
-                    from logHandler import log
-                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-                except:
-                    pass
+                import logging
+                logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
         result = [formatField.get(fieldName, None) for fieldName in self.styleFields]
         return tuple(result)
 

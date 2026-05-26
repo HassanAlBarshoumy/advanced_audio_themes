@@ -430,11 +430,8 @@ def getFormatting(info):
         try:
             formatField.update(field.field)
         except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
+            import logging
+            logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
     return formatField
 
 def getBeepTone(textInfo):

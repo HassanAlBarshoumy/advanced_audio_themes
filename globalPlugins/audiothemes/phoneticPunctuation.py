@@ -819,11 +819,8 @@ def new_processSpeechSymbol(locale, symbol):
                     # Symbol is silent or literal at this level — skip earcon
                     return nativeOut
             except Exception as e:
-                try:
-                    from logHandler import log
-                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-                except:
-                    pass
+                import logging
+                logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
             speechBehavior = getattr(rule, 'speechBehavior', 0)
             customText = getattr(rule, 'customSpeechText', "")
             cmd = rule.getSpeechCommand()[0]

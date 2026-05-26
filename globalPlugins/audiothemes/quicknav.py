@@ -40,11 +40,8 @@ class BrowseModeQuickNavInterceptor:
                 try:
                     selection = instance.makeTextInfo(textInfos.POSITION_CARET)
                 except Exception as e:
-                    try:
-                        from logHandler import log
-                        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-                    except:
-                        pass
+                    import logging
+                    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
             old_info = selection.copy() if selection else None
 
             self.orig_quick_nav_script(
@@ -60,11 +57,8 @@ class BrowseModeQuickNavInterceptor:
                 try:
                     new_selection = instance.makeTextInfo(textInfos.POSITION_CARET)
                 except Exception as e:
-                    try:
-                        from logHandler import log
-                        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-                    except:
-                        pass
+                    import logging
+                    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
             if new_selection:
                 if not old_info or old_info.compareEndPoints(new_selection, "startToStart") != 0:
                     self._check_and_play_nav(itemType)

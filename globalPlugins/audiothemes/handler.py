@@ -298,11 +298,8 @@ class AudioThemesHandler:
                         if rule is not None and getattr(rule, 'speechBehavior', 2) == 0:
                             suppress = False
                 except Exception as e:
-                    try:
-                        from logHandler import log
-                        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-                    except:
-                        pass
+                    import logging
+                    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
             if self.player.use_in_say_all and SayAllHandler.isRunning():
                 suppress = False
                 

@@ -1224,6 +1224,28 @@ def new_getControlFieldSpeech(
     reason = None,
 ):
     if not isPhoneticPunctuationEnabled():
+        try:
+            if fieldType == "start" or getattr(fieldType, "value", fieldType) == "start":
+                import globalPluginHandler
+                import controlTypes
+                for plugin in globalPluginHandler.runningPlugins:
+                    if plugin.__module__ == "globalPlugins.audiothemes":
+                        role = attrs.get('role')
+                        if role is not None:
+                            role_val = getattr(role, "value", role)
+                            ignored = {
+                                getattr(controlTypes.Role.DOCUMENT, "value", controlTypes.Role.DOCUMENT),
+                                getattr(controlTypes.Role.PARAGRAPH, "value", controlTypes.Role.PARAGRAPH),
+                                getattr(controlTypes.Role.SECTION, "value", controlTypes.Role.SECTION),
+                                getattr(controlTypes.Role.TEXTFRAME, "value", controlTypes.Role.TEXTFRAME),
+                                getattr(controlTypes.Role.PANE, "value", controlTypes.Role.PANE),
+                                getattr(controlTypes.Role.WINDOW, "value", controlTypes.Role.WINDOW)
+                            }
+                            if role_val not in ignored:
+                                plugin._unspoken_play_role(role_val, attrs.get("states", set()))
+                        break
+        except Exception:
+            pass
         return original_getControlFieldSpeech(attrs, ancestorAttrs, fieldType, formatConfig, extraDetail, reason)
         
     import config
@@ -1556,3 +1578,4 @@ def new_getTextInfoSpeech_considerSpelling(
                 ),
             )
             yield descriptionSequence
+

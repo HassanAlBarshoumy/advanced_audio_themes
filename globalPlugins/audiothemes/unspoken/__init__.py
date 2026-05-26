@@ -153,16 +153,11 @@ def pitch_shift(audio_data, pitch_factor):
 	new_len = int(old_len / pitch_factor)
 	if new_len < 2:
 		return audio_data
-	import array
-	new_data = array.array('f', [0.0]) * new_len
+	
 	max_idx = old_len - 1
-	for i in range(new_len):
-		idx = i * pitch_factor
-		idx_floor = int(idx)
-		idx_ceil = idx_floor + 1 if idx_floor < max_idx else max_idx
-		fraction = idx - idx_floor
-		new_data[i] = audio_data[idx_floor] + (audio_data[idx_ceil] - audio_data[idx_floor]) * fraction
-	return new_data
+	import array
+	# Nearest neighbor interpolation for maximum performance in pure Python
+	return array.array('f', (audio_data[int(i * pitch_factor)] if int(i * pitch_factor) <= max_idx else audio_data[max_idx] for i in range(new_len)))
 
 def trim_silence_array(audio_data, threshold=0.01):
 	"""Trim silence from the start and end of a float PCM array."""
@@ -225,20 +220,26 @@ class UnspokenPlayer:
 			"SmoothPanning": "boolean(default=True)",
 			"TrimSilence": "boolean(default=True)",
 		}
-		log.debug("Initializing Steam Audio", exc_info=True)
+		log.debug("Initializing Steam Audio")
 		self.steam_audio = steam_audio.get_steam_audio()
-		if not self.steam_audio.initialize():
-			log.error("Failed to initialize Steam Audio")
-			raise RuntimeError("Steam Audio initialization failed")
+		self.steam_audio_active = True
+		try:
+			if not self.steam_audio.initialize():
+				log.warning("Steam Audio initialization returned False. Falling back to simple stereo.")
+				self.steam_audio_active = False
+		except Exception as e:
+			log.warning(f"Failed to initialize Steam Audio: {e}. Falling back to simple stereo.")
+			self.steam_audio_active = False
 
 		# Configure reverb settings
-		self.steam_audio.set_reverb_settings(
-			room_size=config.conf["unspoken"]["RoomSize"] / 100.0,
-			damping=config.conf["unspoken"]["Damping"] / 100.0,
-			wet_level=config.conf["unspoken"]["WetLevel"] / 100.0,
-			dry_level=config.conf["unspoken"]["DryLevel"] / 100.0,
-			width=config.conf["unspoken"]["Width"] / 100.0,
-		)
+		if self.steam_audio_active:
+			self.steam_audio.set_reverb_settings(
+				room_size=config.conf["unspoken"]["RoomSize"] / 100.0,
+				damping=config.conf["unspoken"]["Damping"] / 100.0,
+				wet_level=config.conf["unspoken"]["WetLevel"] / 100.0,
+				dry_level=config.conf["unspoken"]["DryLevel"] / 100.0,
+				width=config.conf["unspoken"]["Width"] / 100.0,
+			)
 
 		self.create_wave_player()
 		self._last_played_object = None
@@ -353,6 +354,8 @@ class UnspokenPlayer:
 			self._update_reverb_settings()
 
 	def _update_reverb_settings(self):
+		if not getattr(self, 'steam_audio_active', False):
+			return
 		self.steam_audio.set_reverb_settings(
 			room_size=self._room_size / 100.0,
 			damping=self._damping / 100.0,
@@ -496,18 +499,15 @@ class UnspokenPlayer:
 			try:
 				from .. import frenzy
 				last_speech_time = frenzy.last_speech_time
-			except ImportError:
+			except (ImportError, AttributeError):
 				last_speech_time = 0
 			ducking_enabled = config.conf.get("audiothemes", {}).get("audio_ducking_enabled", True)
 			if ducking_enabled and (speech.isSpeaking() or time.time() - last_speech_time < 0.5):
 				duck_factor = config.conf.get("audiothemes", {}).get("audio_ducking_volume", 30) / 100.0
 				base_vol *= duck_factor
 		except Exception as e:
-		    try:
-		        from logHandler import log
-		        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-		    except:
-		        pass
+		    import logging
+		    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
 		return clamp(base_vol, 0.0, 1.5)
 
 	def _play_audio_data(self, audio_bytes):
@@ -533,11 +533,8 @@ class UnspokenPlayer:
 			import nvwave
 			try: nvwave.playWaveFile(sound.get("path"), asynchronous=True)
 			except Exception as e:
-			    try:
-			        from logHandler import log
-			        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-			    except:
-			        pass
+			    import logging
+			    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
 			return
 		curtime = time.time()
 		# De-duplicate: skip if same name played < 50ms ago, unless it's a progress bar updating
@@ -647,14 +644,10 @@ class UnspokenPlayer:
 			if sound_data.get("channels", 1) == 2:
 				# Bypass Steam Audio to preserve original stereo separation
 				final_audio = floats_to_pcm_bytes(adjusted_audio)
-			elif is_mono and not reverb_on:
+			elif is_mono and (not reverb_on or not self.steam_audio_active):
 				# True Mono Bypass: bypass Steam Audio, duplicate mono to L/R
-				n = len(adjusted_audio)
-				stereo_audio = [0.0] * (n * 2)
-				for i in range(n):
-					s = adjusted_audio[i]
-					stereo_audio[i * 2] = s
-					stereo_audio[i * 2 + 1] = s
+				import itertools
+				stereo_audio = list(itertools.chain.from_iterable(zip(adjusted_audio, adjusted_audio)))
 				final_audio = floats_to_pcm_bytes(stereo_audio)
 			else:
 				# Process with Steam Audio for 3D positioning
@@ -687,11 +680,8 @@ class UnspokenPlayer:
 			import nvwave
 			try: nvwave.playWaveFile(path, asynchronous=True)
 			except Exception as e:
-			    try:
-			        from logHandler import log
-			        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-			    except:
-			        pass
+			    import logging
+			    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
 			return
 
 		if volume is not None:
@@ -724,20 +714,17 @@ class UnspokenPlayer:
 			try:
 				import time
 				try:
-					from .. import frenzy
-					last_speech_time = frenzy.last_speech_time
-				except ImportError:
-					last_speech_time = 0
+				from .. import frenzy
+				last_speech_time = frenzy.last_speech_time
+			except (ImportError, AttributeError):
+				last_speech_time = 0
 				ducking_enabled = config.conf.get("audiothemes", {}).get("audio_ducking_enabled", True)
 				if ducking_enabled and (speech.isSpeaking() or time.time() - last_speech_time < 0.5):
 					duck_factor = config.conf.get("audiothemes", {}).get("audio_ducking_volume", 30) / 100.0
 					final_volume *= duck_factor
 			except Exception as e:
-			    try:
-			        from logHandler import log
-			        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-			    except:
-			        pass
+			    import logging
+			    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
 		else:
 			final_volume = self._compute_volume()
 			is_typing_sound = False
@@ -874,21 +861,15 @@ class UnspokenPlayer:
 			try:
 				self.wave_player.close()
 			except Exception as e:
-			    try:
-			        from logHandler import log
-			        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-			    except:
-			        pass
+			    import logging
+			    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
 		if hasattr(self, "typing_players"):
 			for p in self.typing_players:
 				try:
 					p.close()
 				except Exception as e:
-				    try:
-				        from logHandler import log
-				        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-				    except:
-				        pass
+				    import logging
+				    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
 		# Cleanup Steam Audio
 		if hasattr(self, "steam_audio"):
 			self.steam_audio.cleanup()
@@ -908,9 +889,6 @@ class UnspokenPlayer:
 			for p in self.typing_players:
 				try: p.close()
 				except Exception as e:
-				    try:
-				        from logHandler import log
-				        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-				    except:
-				        pass
+				    import logging
+				    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
 		self.create_wave_player()
