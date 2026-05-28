@@ -2360,3 +2360,19 @@ msgstr "الانتقال إلى العبارة السابقة."
 
 msgid "Speak current phrase."
 msgstr "نطق العبارة الحالية."
+
+msgid "Conflicting Add-ons"
+msgstr "إضافات متضاربة"
+
+msgid ""
+"The following add-ons are now included in Advanced Audio Themes.\n"
+"Select the ones you want to remove to prevent conflicts:"
+msgstr ""
+"الإضافات التالية أصبحت مدمجة في Advanced Audio Themes.\n"
+"اختر ما تريد إزالته لمنع التعارض:"
+
+msgid "Remove selected"
+msgstr "إزالة المحدد"
+
+msgid "Skip"
+msgstr "تخطي"

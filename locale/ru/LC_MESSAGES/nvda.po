@@ -2331,3 +2331,17 @@ msgstr "Перейти к предыдущей фразе."
 
 msgid "Speak current phrase."
 msgstr "Озвучить текущую фразу."
+
+msgid "Conflicting Add-ons"
+msgstr ""
+
+msgid ""
+"The following add-ons are now included in Advanced Audio Themes.\n"
+"Select the ones you want to remove to prevent conflicts:"
+msgstr ""
+
+msgid "Remove selected"
+msgstr ""
+
+msgid "Skip"
+msgstr ""

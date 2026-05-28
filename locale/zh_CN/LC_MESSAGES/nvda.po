@@ -2317,3 +2317,17 @@ msgstr "移动到上一词组。"
 
 msgid "Speak current phrase."
 msgstr "朗读当前词组。"
+
+msgid "Conflicting Add-ons"
+msgstr ""
+
+msgid ""
+"The following add-ons are now included in Advanced Audio Themes.\n"
+"Select the ones you want to remove to prevent conflicts:"
+msgstr ""
+
+msgid "Remove selected"
+msgstr ""
+
+msgid "Skip"
+msgstr ""
