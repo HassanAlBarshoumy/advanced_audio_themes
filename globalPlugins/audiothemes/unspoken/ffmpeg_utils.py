@@ -69,7 +69,7 @@ def decode_with_ffmpeg(path):
     try:
         cmd = [ffmpeg, "-y", "-i", path,
                "-f", "wav", "-acodec", "pcm_s16le",
-               "-ar", "44100", "-ac", "2"]
+               "-ar", "44100", "-ac", "1"]
         if filter_str:
             cmd.extend(["-af", filter_str])
         cmd.append("pipe:1")
