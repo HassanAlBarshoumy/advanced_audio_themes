@@ -39,6 +39,9 @@ SUPPORTED_FILE_TYPES = OrderedDict()
 SUPPORTED_FILE_TYPES["ogg"] = _("Ogg audio files")
 # Translators: The file type to be shown in a dialog used to browse for audio files.
 SUPPORTED_FILE_TYPES["wav"] = _("Wave audio files")
+
+# Additional formats supported via FFmpeg (loaded dynamically at runtime)
+FFMPEG_FORMATS = ["mp3", "flac", "m4a", "aac", "wma", "opus", "mp2", "ac3"]
 # When the active audio theme is being changed
 audiotheme_changed = extensionPoints.Action()
 
@@ -67,6 +70,8 @@ audiothemes_config_defaults = {
     "audio_ducking_enabled": "boolean(default=False)",
     "audio_ducking_volume": "integer(default=6)",
     "output_mode": "string(default='stereo')",
+    "ffmpeg_path": "string(default='')",
+    "enable_ffmpeg": "boolean(default=False)",
 }
 
 

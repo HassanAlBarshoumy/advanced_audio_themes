@@ -116,7 +116,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.setupReverbPage(self.reverbPage)
         self.notebook.AddPage(self.reverbPage, _("Reverb"))
 
-        # Tab 3: Earcons and Speech Rules
+        # Tab 3: Audio Formats and FFmpeg
+        self.audioFormatsPage = wx.Panel(self.notebook)
+        self.setupAudioFormatsPage(self.audioFormatsPage)
+        self.notebook.AddPage(self.audioFormatsPage, _("Audio Formats"))
+
+        # Tab 4: Earcons and Speech Rules
         from .phoneticPunctuationGui import RulesDialog
         self.rulesPage = RulesDialog(self.notebook)
         self.notebook.AddPage(self.rulesPage, _("Earcons & Speech Rules"))
@@ -460,6 +465,30 @@ class AudioThemesSettingsPanel(SettingsPanel):
         engineSizer.Add(modeSizer, 0, wx.EXPAND | wx.ALL, 5)
 
         page.SetSizer(engineSizer)
+
+    def setupAudioFormatsPage(self, page):
+        """Tab: Audio Formats and FFmpeg configuration."""
+        sizer = wx.BoxSizer(wx.VERTICAL)
+
+        self.ffmpegEnableCheckbox = wx.CheckBox(page, -1, _("Use FFmpeg for additional audio formats (MP3, FLAC, M4A, etc.)"))
+        sizer.Add(self.ffmpegEnableCheckbox, 0, wx.ALL, 5)
+
+        self.ffmpegStatusText = wx.StaticText(page, -1, _("FFmpeg status: checking..."))
+        sizer.Add(self.ffmpegStatusText, 0, wx.ALL, 5)
+
+        self.downloadFFmpegButton = wx.Button(page, -1, _("&Download and Install FFmpeg"))
+        sizer.Add(self.downloadFFmpegButton, 0, wx.ALL, 5)
+        self.Bind(wx.EVT_BUTTON, self.onDownloadFFmpeg, self.downloadFFmpegButton)
+
+        sizer.AddStretchSpacer()
+        infoText = wx.StaticText(page, -1, _(
+            "FFmpeg enables support for many audio formats.\n"
+            "Without it, only WAV and OGG are supported.\n"
+            "Download size: ~50MB, extracted: ~12MB."
+        ))
+        sizer.Add(infoText, 0, wx.ALL, 5)
+
+        page.SetSizer(sizer)
 
     def setupReverbPage(self, page):
         reverbSizer = wx.BoxSizer(wx.VERTICAL)
@@ -1028,6 +1057,50 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.beepVolumeSlider.SetValue(_i(bnConf["beepVolume"]))
         self.skipChimeVolumeSlider.SetValue(_i(bnConf["skipChimeVolume"]))
 
+        # Audio Formats tab — FFmpeg
+        audioConf = config.conf["audiothemes"]
+        self.ffmpegEnableCheckbox.SetValue(audioConf.get("enable_ffmpeg", False))
+        self._updateFFmpegStatus()
+
+    def _updateFFmpegStatus(self):
+        try:
+            from .unspoken import ffmpeg_utils
+            path = ffmpeg_utils.get_ffmpeg_path()
+            if path:
+                from .unspoken import ogg_vorbis as _ov
+                ogg_ok = True
+                self.ffmpegStatusText.SetLabel(_("FFmpeg: available at {path}").format(path=path))
+                self.downloadFFmpegButton.Enable(False)
+            else:
+                self.ffmpegStatusText.SetLabel(_("FFmpeg: not installed"))
+                self.downloadFFmpegButton.Enable(True)
+        except Exception:
+            self.ffmpegStatusText.SetLabel(_("FFmpeg: not available"))
+            self.downloadFFmpegButton.Enable(True)
+
+    def onDownloadFFmpeg(self, event):
+        self.downloadFFmpegButton.Enable(False)
+        self.downloadFFmpegButton.SetLabel(_("Downloading..."))
+        import wx
+        from .unspoken import ffmpeg_utils
+        def cb(progress, msg):
+            wx.CallAfter(lambda: self.ffmpegStatusText.SetLabel(msg))
+            if progress >= 0:
+                wx.CallAfter(lambda: self.downloadFFmpegButton.SetLabel(
+                    _(f"Downloading... {progress}%")))
+            else:
+                wx.CallAfter(lambda: self.downloadFFmpegButton.Enable(True))
+                wx.CallAfter(lambda: self.downloadFFmpegButton.SetLabel(
+                    _("&Download and Install FFmpeg")))
+        result = ffmpeg_utils.download_ffmpeg(progress_callback=cb)
+        if result:
+            wx.CallAfter(self._updateFFmpegStatus)
+        else:
+            wx.CallAfter(lambda: self.ffmpegStatusText.SetLabel(_("FFmpeg download failed.")))
+            wx.CallAfter(lambda: self.downloadFFmpegButton.Enable(True))
+            wx.CallAfter(lambda: self.downloadFFmpegButton.SetLabel(
+                _("&Download and Install FFmpeg")))
+
     def _maintain_state(self):
         self.audio_themes = sorted(AudioThemesHandler.get_installed_themes())
         self.installedThemesChoice.Clear()
@@ -1163,6 +1236,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
         bnConf["crackleVolume"] = self.crackleVolumeSlider.GetValue()
         bnConf["beepVolume"] = self.beepVolumeSlider.GetValue()
         bnConf["skipChimeVolume"] = self.skipChimeVolumeSlider.GetValue()
+
+        # Audio Formats tab — FFmpeg
+        conf["enable_ffmpeg"] = self.ffmpegEnableCheckbox.IsChecked()
 
     def postSave(self):
         audiotheme_changed.notify()

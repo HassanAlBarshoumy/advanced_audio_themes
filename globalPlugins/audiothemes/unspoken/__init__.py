@@ -391,97 +391,105 @@ class UnspokenPlayer:
 		use_cache = config.conf["unspoken"].get("AudioCache", True)
 		with sounds_lock:
 			if use_cache and path in sounds:
-				# Move to end to mark as recently used
 				sound = sounds.pop(path)
 				sounds[path] = sound
 				return sound
 
-
-		
-		if path.lower().endswith('.ogg'):
-			result = {"path": path, "is_ogg": True}
-			if use_cache:
-				with sounds_lock:
-					sounds[path] = result
-			return result
-
-		try:
-			# Load WAV file and convert to float32 mono
-			with wave.open(path, "rb") as wav_file:
-				frames = wav_file.readframes(wav_file.getnframes())
-				sample_width = wav_file.getsampwidth()
-				channels = wav_file.getnchannels()
-				sample_rate = wav_file.getframerate()
-
-				# Convert to float32 samples (stored as array.array for fast ctypes conversion)
-				if sample_width == 2:  # 16-bit
-					import array
-					arr = array.array('h')
-					arr.frombytes(frames)
-					# array('f') from array('h') — C-level conversion, fast
-					float_samples = array.array('f', [s / 32768.0 for s in arr])
-				elif sample_width == 1:  # 8-bit
-					float_samples = array.array('f', [(s - 128) / 128.0 for s in frames])
-				else:
-					log.error(f"Unsupported sample width: {sample_width}")
-					return None
-
-				# Convert to mono if stereo and OutputMode is mono
-				is_mono_mode = config.conf.get("audiothemes", {}).get("output_mode", "stereo") == "mono"
-				if channels == 2 and is_mono_mode:
-					import array
-					n = len(float_samples) // 2
-					mono = array.array('f', [0.0]) * n
-					for i in range(n):
-						mono[i] = (float_samples[i * 2] + float_samples[i * 2 + 1]) * 0.5
-					float_samples = mono
-					channels = 1
-				
-				# Trim Silence
-				if config.conf["unspoken"].get("TrimSilence", False):
-					float_samples = trim_silence_array(float_samples, threshold=0.01)
-				
-				# Smart Volume Normalization
-				if config.conf["unspoken"].get("SmartVolume", True):
-					if float_samples:
-						peak = max((abs(s) for s in float_samples), default=0.0)
-						if peak > 0.01:
-							target_peak = 0.8
-							ratio = target_peak / peak
-							import array
-							float_samples = array.array('f', [s * ratio for s in float_samples])
-
-				# Smooth Envelope (Fade In/Out to prevent popping)
-				if config.conf["unspoken"].get("SmoothEnvelope", True):
-					fade_samples = int(sample_rate * 0.01) # 10ms fade
-					num_samples = len(float_samples)
-					fade_samples = min(fade_samples, num_samples // 2)
-					for i in range(fade_samples):
-						multiplier = i / float(fade_samples)
-						float_samples[i] *= multiplier
-						float_samples[num_samples - 1 - i] *= multiplier
-
-				# Pad to a multiple of 1024 samples (Steam Audio frame size) to prevent dropping short sounds
-				remainder = len(float_samples) % 1024
-				if remainder != 0:
-					import array
-					float_samples.extend(array.array('f', [0.0]) * (1024 - remainder))
-
-				result = {"data": float_samples, "sample_rate": sample_rate, "path": path, "channels": channels}
-				
+		# Load raw PCM data from OGG (via vorbisfile), FFmpeg, or WAV
+		loaded = None
+		ext = path.lower().split('.')[-1] if '.' in path else ''
+		if ext == 'ogg':
+			try:
+				from . import ogg_vorbis
+				loaded = ogg_vorbis.decode_ogg_to_float(path)
+			except Exception as e:
+				log.error(f"OGG decode failed for {path}: {e}")
+		if loaded is not None:
+			float_samples, sample_rate, channels = loaded
+		else:
+			if ext == 'ogg':
+				result = {"path": path, "is_ogg": True}
 				if use_cache:
 					with sounds_lock:
 						sounds[path] = result
-						# Cap cache size to 100 items
-						if len(sounds) > 100:
-							# Remove oldest
-							sounds.pop(next(iter(sounds)))
-
 				return result
+			if ext not in ('wav',):
+				try:
+					from . import ffmpeg_utils
+					loaded = ffmpeg_utils.decode_with_ffmpeg(path)
+				except Exception as e:
+					log.error(f"FFmpeg decode failed for {path}: {e}")
+			if loaded is not None:
+				float_samples, sample_rate, channels = loaded
+			else:
+				if ext not in ('wav',):
+					log.error(f"Unsupported format: {path}")
+					return None
+				try:
+					with wave.open(path, "rb") as wav_file:
+						frames = wav_file.readframes(wav_file.getnframes())
+						sample_width = wav_file.getsampwidth()
+						channels = wav_file.getnchannels()
+						sample_rate = wav_file.getframerate()
+						if sample_width == 2:
+							import array
+							arr = array.array('h')
+							arr.frombytes(frames)
+							float_samples = array.array('f', [s / 32768.0 for s in arr])
+						elif sample_width == 1:
+							float_samples = array.array('f', [(s - 128) / 128.0 for s in frames])
+						else:
+							log.error(f"Unsupported sample width: {sample_width}")
+							return None
+				except Exception as e:
+					log.error(f"Failed to load {path}: {e}")
+					return None
 
-		except Exception as e:
-			log.error(f"Failed to load {path}: {e}")
-			return None
+		# Common processing for all PCM float data
+		is_mono_mode = config.conf.get("audiothemes", {}).get("output_mode", "stereo") == "mono"
+		if channels == 2 and is_mono_mode:
+			import array
+			n = len(float_samples) // 2
+			mono = array.array('f', [0.0]) * n
+			for i in range(n):
+				mono[i] = (float_samples[i * 2] + float_samples[i * 2 + 1]) * 0.5
+			float_samples = mono
+			channels = 1
+
+		if config.conf["unspoken"].get("TrimSilence", False):
+			float_samples = trim_silence_array(float_samples, threshold=0.01)
+
+		if config.conf["unspoken"].get("SmartVolume", True):
+			if float_samples:
+				peak = max((abs(s) for s in float_samples), default=0.0)
+				if peak > 0.01:
+					target_peak = 0.8
+					ratio = target_peak / peak
+					import array
+					float_samples = array.array('f', [s * ratio for s in float_samples])
+
+		if config.conf["unspoken"].get("SmoothEnvelope", True):
+			fade_samples = int(sample_rate * 0.01)
+			num_samples = len(float_samples)
+			fade_samples = min(fade_samples, num_samples // 2)
+			for i in range(fade_samples):
+				multiplier = i / float(fade_samples)
+				float_samples[i] *= multiplier
+				float_samples[num_samples - 1 - i] *= multiplier
+
+		remainder = len(float_samples) % 1024
+		if remainder != 0:
+			import array
+			float_samples.extend(array.array('f', [0.0]) * (1024 - remainder))
+
+		result = {"data": float_samples, "sample_rate": sample_rate, "path": path, "channels": channels}
+
+		if use_cache:
+			with sounds_lock:
+				sounds[path] = result
+				if len(sounds) > 100:
+					sounds.pop(next(iter(sounds)))
+		return result
 
 	def _compute_volume(self):
 		if not self.use_synth_volume:
@@ -531,10 +539,13 @@ class UnspokenPlayer:
 
 		if sound.get("is_ogg"):
 			import nvwave
-			try: nvwave.playWaveFile(sound.get("path"), asynchronous=True)
+			try:
+				nvwave.playWaveFile(sound.get("path"), asynchronous=True)
 			except Exception as e:
 			    import logging
 			    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
+			return
+		if "data" not in sound:
 			return
 		curtime = time.time()
 		# De-duplicate: skip if same name played < 50ms ago, unless it's a progress bar updating
@@ -676,14 +687,6 @@ class UnspokenPlayer:
 
 
 	def play_file(self, path, volume=None, audio3d=False, ch=None, vkCode=None, angle_x=0, angle_y=0, extended=None):
-		if path.lower().endswith('.ogg'):
-			import nvwave
-			try: nvwave.playWaveFile(path, asynchronous=True)
-			except Exception as e:
-			    import logging
-			    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
-			return
-
 		if volume is not None:
 			# Typing sounds use absolute volume
 			base_vol = clamp(volume / 100.0, 0.0, 1.0)
@@ -786,6 +789,14 @@ class UnspokenPlayer:
 
 		sound = self.make_sound_object(path)
 		if not sound:
+			return
+		if sound.get("is_ogg") and "data" not in sound:
+			import nvwave
+			try:
+				nvwave.playWaveFile(path, asynchronous=True)
+			except Exception as e:
+			    import logging
+			    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
 			return
 		
 		adjusted_audio = _apply_volume(sound["data"], final_volume)
