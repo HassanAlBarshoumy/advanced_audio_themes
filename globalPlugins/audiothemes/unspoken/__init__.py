@@ -398,14 +398,14 @@ class UnspokenPlayer:
 		# Load raw PCM data from FFmpeg (when enabled) or native decoders
 		loaded = None
 		ext = path.lower().split('.')[-1] if '.' in path else ''
-		ffmpeg_enabled = False
+		ffmpeg_used = False
 		try:
 			from config import conf
-			ffmpeg_enabled = conf.get("audiothemes", {}).get("enable_ffmpeg", False)
+			ffmpeg_used = conf.get("audiothemes", {}).get("enable_ffmpeg", False)
 		except Exception:
 			pass
 
-		if ffmpeg_enabled:
+		if ffmpeg_used:
 			try:
 				from . import ffmpeg_utils
 				loaded = ffmpeg_utils.decode_with_ffmpeg(path)
@@ -413,6 +413,7 @@ class UnspokenPlayer:
 				log.error(f"FFmpeg decode failed for {path}: {e}")
 
 		if loaded is None:
+			ffmpeg_used = False
 			if ext == 'ogg':
 				try:
 					from . import ogg_vorbis
@@ -452,7 +453,7 @@ class UnspokenPlayer:
 
 		float_samples, sample_rate, channels = loaded
 
-		# Common processing for all PCM float data
+		# Common processing for all PCM float data (only when FFmpeg not used)
 		is_mono_mode = config.conf.get("audiothemes", {}).get("output_mode", "stereo") == "mono"
 		if channels == 2 and is_mono_mode:
 			import array
@@ -463,31 +464,32 @@ class UnspokenPlayer:
 			float_samples = mono
 			channels = 1
 
-		if config.conf["unspoken"].get("TrimSilence", False):
-			float_samples = trim_silence_array(float_samples, threshold=0.01)
+		if not ffmpeg_used:
+			if config.conf["unspoken"].get("TrimSilence", False):
+				float_samples = trim_silence_array(float_samples, threshold=0.01)
 
-		if config.conf["unspoken"].get("SmartVolume", True):
-			if float_samples:
-				peak = max((abs(s) for s in float_samples), default=0.0)
-				if peak > 0.01:
-					target_peak = 0.8
-					ratio = target_peak / peak
-					import array
-					float_samples = array.array('f', [s * ratio for s in float_samples])
+			if config.conf["unspoken"].get("SmartVolume", True):
+				if float_samples:
+					peak = max((abs(s) for s in float_samples), default=0.0)
+					if peak > 0.01:
+						target_peak = 0.8
+						ratio = target_peak / peak
+						import array
+						float_samples = array.array('f', [s * ratio for s in float_samples])
 
-		if config.conf["unspoken"].get("SmoothEnvelope", True):
-			fade_samples = int(sample_rate * 0.01)
-			num_samples = len(float_samples)
-			fade_samples = min(fade_samples, num_samples // 2)
-			for i in range(fade_samples):
-				multiplier = i / float(fade_samples)
-				float_samples[i] *= multiplier
-				float_samples[num_samples - 1 - i] *= multiplier
+			if config.conf["unspoken"].get("SmoothEnvelope", True):
+				fade_samples = int(sample_rate * 0.01)
+				num_samples = len(float_samples)
+				fade_samples = min(fade_samples, num_samples // 2)
+				for i in range(fade_samples):
+					multiplier = i / float(fade_samples)
+					float_samples[i] *= multiplier
+					float_samples[num_samples - 1 - i] *= multiplier
 
-		remainder = len(float_samples) % 1024
-		if remainder != 0:
-			import array
-			float_samples.extend(array.array('f', [0.0]) * (1024 - remainder))
+			remainder = len(float_samples) % 1024
+			if remainder != 0:
+				import array
+				float_samples.extend(array.array('f', [0.0]) * (1024 - remainder))
 
 		result = {"data": float_samples, "sample_rate": sample_rate, "path": path, "channels": channels}
 
