@@ -32,46 +32,19 @@ def get_ffmpeg_path():
         return candidate
     return None
 
-def _build_filter_chain():
-    """Build FFmpeg audio filter chain from config settings.
-    Returns filter string or empty string.
-    """
-    from config import conf
-    filters = []
-    if conf.get("unspoken", {}).get("TrimSilence", False):
-        filters.extend([
-            "silenceremove=start_periods=1:start_duration=0:start_threshold=-50dB",
-            "areverse",
-            "silenceremove=start_periods=1:start_duration=0:start_threshold=-50dB",
-            "areverse",
-        ])
-    if conf.get("unspoken", {}).get("SmartVolume", True):
-        filters.append("dynaudnorm=p=0.8:m=100")
-    if conf.get("unspoken", {}).get("SmoothEnvelope", True):
-        filters.extend([
-            "afade=t=in:d=0.01",
-            "afade=t=out:d=0.01",
-        ])
-    if filters:
-        return ",".join(filters)
-    return ""
-
 def decode_with_ffmpeg(path):
-    """Decode and fully process any audio file to float32 PCM using FFmpeg.
-    Handles TrimSilence, SmartVolume, and SmoothEnvelope via FFmpeg filters.
-    Returns (float_array, sample_rate, channels, padded_to_1024) or None on failure.
-    The returned float_array is already padded to a multiple of 1024 samples.
+    """Decode any audio file to float32 PCM using FFmpeg only.
+    No processing filters applied here — TrimSilence, SmartVolume,
+    SmoothEnvelope, and padding are handled in Python.
+    Returns (float_array, sample_rate, channels) or None on failure.
     """
     ffmpeg = get_ffmpeg_path()
     if not ffmpeg:
         return None
-    filter_str = _build_filter_chain()
     try:
         cmd = [ffmpeg, "-y", "-i", path,
                "-f", "wav", "-acodec", "pcm_s16le",
                "-ar", "44100", "-ac", "1"]
-        if filter_str:
-            cmd.extend(["-af", filter_str])
         cmd.append("pipe:1")
         result = subprocess.run(cmd, capture_output=True, check=True, timeout=30)
         wav_data = result.stdout
@@ -85,9 +58,6 @@ def decode_with_ffmpeg(path):
             arr = array.array('h')
             arr.frombytes(frames)
             float_samples = array.array('f', [s / 32768.0 for s in arr])
-            remainder = len(float_samples) % 1024
-            if remainder != 0:
-                float_samples.extend(array.array('f', [0.0]) * (1024 - remainder))
             return (float_samples, sample_rate, channels)
     except subprocess.TimeoutExpired:
         log.error(f"FFmpeg decode timed out for {path}")
