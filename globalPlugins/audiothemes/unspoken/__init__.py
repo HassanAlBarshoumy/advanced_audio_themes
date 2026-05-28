@@ -395,36 +395,37 @@ class UnspokenPlayer:
 				sounds[path] = sound
 				return sound
 
-		# Load raw PCM data from OGG (via vorbisfile), FFmpeg, or WAV
+		# Load raw PCM data from FFmpeg (when enabled) or native decoders
 		loaded = None
 		ext = path.lower().split('.')[-1] if '.' in path else ''
-		if ext == 'ogg':
+		ffmpeg_enabled = False
+		try:
+			from config import conf
+			ffmpeg_enabled = conf.get("audiothemes", {}).get("enable_ffmpeg", False)
+		except Exception:
+			pass
+
+		if ffmpeg_enabled:
 			try:
-				from . import ogg_vorbis
-				loaded = ogg_vorbis.decode_ogg_to_float(path)
+				from . import ffmpeg_utils
+				loaded = ffmpeg_utils.decode_with_ffmpeg(path)
 			except Exception as e:
-				log.error(f"OGG decode failed for {path}: {e}")
-		if loaded is not None:
-			float_samples, sample_rate, channels = loaded
-		else:
+				log.error(f"FFmpeg decode failed for {path}: {e}")
+
+		if loaded is None:
 			if ext == 'ogg':
-				result = {"path": path, "is_ogg": True}
-				if use_cache:
-					with sounds_lock:
-						sounds[path] = result
-				return result
-			if ext not in ('wav',):
 				try:
-					from . import ffmpeg_utils
-					loaded = ffmpeg_utils.decode_with_ffmpeg(path)
+					from . import ogg_vorbis
+					loaded = ogg_vorbis.decode_ogg_to_float(path)
 				except Exception as e:
-					log.error(f"FFmpeg decode failed for {path}: {e}")
-			if loaded is not None:
-				float_samples, sample_rate, channels = loaded
-			else:
-				if ext not in ('wav',):
-					log.error(f"Unsupported format: {path}")
-					return None
+					log.error(f"OGG decode failed for {path}: {e}")
+				if loaded is None:
+					result = {"path": path, "is_ogg": True}
+					if use_cache:
+						with sounds_lock:
+							sounds[path] = result
+					return result
+			elif ext == 'wav':
 				try:
 					with wave.open(path, "rb") as wav_file:
 						frames = wav_file.readframes(wav_file.getnframes())
@@ -441,9 +442,15 @@ class UnspokenPlayer:
 						else:
 							log.error(f"Unsupported sample width: {sample_width}")
 							return None
+						loaded = (float_samples, sample_rate, channels)
 				except Exception as e:
 					log.error(f"Failed to load {path}: {e}")
 					return None
+			else:
+				log.error(f"Unsupported format: {path}")
+				return None
+
+		float_samples, sample_rate, channels = loaded
 
 		# Common processing for all PCM float data
 		is_mono_mode = config.conf.get("audiothemes", {}).get("output_mode", "stereo") == "mono"
