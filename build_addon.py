@@ -14,6 +14,7 @@ output_name = f"{addon_name}-{addon_version}.nvda-addon"
 EXCLUDE_DIRS = {"__pycache__", ".git", ".github"}
 EXCLUDE_FILES = {".gitignore", "buildVars.py", "build_addon.py", "SConstruct",
                  "sconstruct", "manifest.ini.tpl", "*.pyc", "*.pyo"}
+EXCLUDE_SUFFIXES = {".nvda-addon"}
 ADDON_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -26,6 +27,8 @@ def should_exclude(rel_path):
     if fname in EXCLUDE_FILES:
         return True
     if fname.endswith((".pyc", ".pyo", ".py~")):
+        return True
+    if fname.endswith(tuple(EXCLUDE_SUFFIXES)):
         return True
     return False
 
