@@ -1240,6 +1240,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
         )
         if confirm == wx.YES:
             AudioThemesHandler.remove_audio_theme(theme)
+            remaining = list(AudioThemesHandler.get_installed_themes())
+            if remaining:
+                config.conf["audiothemes"]["active_theme"] = remaining[0].folder
             self._maintain_state()
 
     def onAdd(self, event):

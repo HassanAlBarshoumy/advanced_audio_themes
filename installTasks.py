@@ -4,6 +4,8 @@ import globalVars
 import addonHandler
 import gui
 import wx
+import config
+import json
 
 try:
     addonHandler.initTranslation()
@@ -92,4 +94,10 @@ def onInstall():
 	if os.path.exists(addon_default_theme_path):
 		if not os.path.exists(dest_default_theme_path):
 			shutil.copytree(addon_default_theme_path, dest_default_theme_path)
+
+	# If the active theme in config doesn't exist, reset to Default
+	active = config.conf.get("audiothemes", {}).get("active_theme", "Default")
+	if active and not os.path.exists(os.path.join(new_path, active)):
+		config.conf["audiothemes"]["active_theme"] = "Default"
+
 	_checkConflictingAddons()

@@ -322,6 +322,8 @@ class AudioThemesHandler:
         # Copy ALL bundled themes to the user's THEMES_DIR if they don't exist
         if os.path.isdir(bundled_themes_dir):
             for theme_name in os.listdir(bundled_themes_dir):
+                if theme_name == "Default" and user_config.get("default_theme_deleted"):
+                    continue
                 bundled_theme_path = os.path.join(bundled_themes_dir, theme_name)
                 if not os.path.isdir(bundled_theme_path):
                     continue
@@ -337,6 +339,8 @@ class AudioThemesHandler:
         if os.path.isdir(default_theme_path):
             if user_config.get("default_theme_deleted"):
                 user_config["default_theme_deleted"] = False
+            return
+        if user_config.get("default_theme_deleted"):
             return
             
         # Fallback: create empty directory with info.json if Default was completely missing.
@@ -375,6 +379,8 @@ class AudioThemesHandler:
         if not theme:
             config.conf["audiothemes"]["active_theme"] = "Default"
             theme = self.get_theme_from_folder("Default")
+        if not theme:
+            return
         if theme.exists():
             theme.load(self.player)
             theme.is_active = True
@@ -609,12 +615,17 @@ class AudioThemesHandler:
                 continue
             yield theme
 
+    @staticmethod
+    def _sanitize_folder_name(name):
+        name = name.strip().replace(" ", "_")
+        keep = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-.")
+        return "".join(c if c in keep else "_" for c in name).strip("_") or "Theme"
+
     @classmethod
     def install_audio_themePackage(cls, theme_pack):
         identified_path = os.path.join(THEMES_DIR, uuid4().hex).lower()
         with ZipFile(theme_pack, "r") as pack:
             if pack.infolist()[0].is_dir():
-                # Legacy theme package
                 cls._install_legacy(pack, identified_path)
             else:
                 pack.extractall(path=identified_path)
@@ -622,11 +633,16 @@ class AudioThemesHandler:
         if not os.path.exists(info_file):
             return
         theme_info = cls.load_info_file(info_file)
-        if theme_info.get("name", "").lower() == "default":
-            default_theme_path = os.path.join(THEMES_DIR, "Default")
-            if os.path.isdir(default_theme_path):
-                shutil.rmtree(default_theme_path)
-            os.rename(identified_path, default_theme_path)
+        theme_name = theme_info.get("name", "").strip()
+        if theme_name:
+            safe_name = cls._sanitize_folder_name(theme_name)
+            if theme_name.lower() == "default":
+                safe_name = "Default"
+            target_path = os.path.join(THEMES_DIR, safe_name)
+            if os.path.isdir(target_path):
+                shutil.rmtree(target_path)
+            if safe_name != os.path.basename(identified_path):
+                os.rename(identified_path, target_path)
 
     @classmethod
     def install_typing_soundPackage(cls, pack_path):
