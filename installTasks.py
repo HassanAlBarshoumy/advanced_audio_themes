@@ -13,49 +13,29 @@ except AttributeError:
     pass
 
 
+CONFLICT_PENDING_FILE = os.path.join(
+	globalVars.appArgs.configPath, "audio-themes", ".pending_conflict.json"
+)
+
 def _checkConflictingAddons():
-	conflicting_ids = {
-		"navSounds": "Navigation Sound Effects",
-		"SentenceNav": "SentenceNav",
-		"browserNav": "BrowserNav",
-		"phoneticPunctuation": "Earcons and Speech Rules",
-		"audiothemes": "Audio Themes (legacy)",
-		"audio_themes_NG": "Audio Themes NG (legacy)",
-	}
-	found = {}
-	for addon in addonHandler.getAvailableAddons():
-		if addon.name in conflicting_ids and not addon.isPendingRemove:
-			found[addon.name] = addon
+	conflicting_ids = (
+		"navSounds", "SentenceNav", "browserNav",
+		"phoneticPunctuation", "audiothemes", "audio_themes_NG",
+	)
+	found = [
+		addon.name for addon in addonHandler.getAvailableAddons()
+		if addon.name in conflicting_ids and not addon.isPendingRemove
+	]
 	if not found:
 		return
-	gui.mainFrame.prePopup()
-	dlg = wx.Dialog(gui.mainFrame, title=_("Conflicting Add-ons"))
-	sizer = wx.BoxSizer(wx.VERTICAL)
-	label = wx.StaticText(dlg, label=_(
-		"The following add-ons are now included in Advanced Audio Themes.\n"
-		"Select the ones you want to remove to prevent conflicts:"
-	))
-	sizer.Add(label, flag=wx.ALL | wx.EXPAND, border=10)
-	names = list(found.keys())
-	display_names = [conflicting_ids[n] for n in names]
-	clb = wx.CheckListBox(dlg, choices=display_names)
-	for i in range(len(display_names)):
-		clb.Check(i)
-	sizer.Add(clb, proportion=1, flag=wx.ALL | wx.EXPAND, border=10)
-	btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
-	ok_btn = wx.Button(dlg, wx.ID_OK, _("Remove selected"))
-	cancel_btn = wx.Button(dlg, wx.ID_CANCEL, _("Skip"))
-	btn_sizer.Add(ok_btn, flag=wx.ALL, border=5)
-	btn_sizer.Add(cancel_btn, flag=wx.ALL, border=5)
-	sizer.Add(btn_sizer, flag=wx.ALIGN_CENTER | wx.ALL, border=10)
-	dlg.SetSizer(sizer)
-	dlg.SetSize((500, 350))
-	if dlg.ShowModal() == wx.ID_OK:
-		for i, name in enumerate(names):
-			if clb.IsChecked(i):
-				found[name].requestRemove()
-	dlg.Destroy()
-	gui.mainFrame.postPopup()
+	try:
+		with open(CONFLICT_PENDING_FILE, "w") as f:
+			json.dump(found, f)
+	except Exception:
+		pass
+
+
+
 
 
 def onInstall():

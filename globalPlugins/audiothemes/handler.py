@@ -242,6 +242,66 @@ def migrate_theme_to_named_files(theme_directory):
 
 
 
+CONFLICT_PENDING_FILE = os.path.join(THEMES_DIR, ".pending_conflict.json")
+
+
+def showPendingConflicts():
+	try:
+		with open(CONFLICT_PENDING_FILE, "r") as f:
+			found_ids = json.load(f)
+		os.remove(CONFLICT_PENDING_FILE)
+	except Exception:
+		return
+	conflicting_ids = {
+		"navSounds": "Navigation Sound Effects",
+		"SentenceNav": "SentenceNav",
+		"browserNav": "BrowserNav",
+		"phoneticPunctuation": "Earcons and Speech Rules",
+		"audiothemes": "Audio Themes (legacy)",
+		"audio_themes_NG": "Audio Themes NG (legacy)",
+	}
+	display_names = [conflicting_ids.get(n, n) for n in found_ids]
+	import gui
+	import wx
+	try:
+		addonHandler.initTranslation()
+	except Exception:
+		pass
+	gui.mainFrame.prePopup()
+	try:
+		dlg = wx.Dialog(gui.mainFrame, title=_("Conflicting Add-ons"))
+		sizer = wx.BoxSizer(wx.VERTICAL)
+		label = wx.StaticText(dlg, label=_(
+			"The following add-ons are now included in Advanced Audio Themes.\n"
+			"Select the ones you want to remove to prevent conflicts:"
+		))
+		sizer.Add(label, flag=wx.ALL | wx.EXPAND, border=10)
+		clb = wx.CheckListBox(dlg, choices=display_names)
+		for i in range(len(display_names)):
+			clb.Check(i)
+		sizer.Add(clb, proportion=1, flag=wx.ALL | wx.EXPAND, border=10)
+		btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
+		ok_btn = wx.Button(dlg, wx.ID_OK, _("Remove selected"))
+		cancel_btn = wx.Button(dlg, wx.ID_CANCEL, _("Skip"))
+		btn_sizer.Add(ok_btn, flag=wx.ALL, border=5)
+		btn_sizer.Add(cancel_btn, flag=wx.ALL, border=5)
+		sizer.Add(btn_sizer, flag=wx.ALIGN_CENTER | wx.ALL, border=10)
+		dlg.SetSizer(sizer)
+		dlg.SetSize((500, 350))
+		dlg.CenterOnScreen()
+		dlg.Raise()
+		if dlg.ShowModal() == wx.ID_OK:
+			for i, name in enumerate(found_ids):
+				if clb.IsChecked(i):
+					for addon in addonHandler.getAvailableAddons():
+						if addon.name == name and not addon.isPendingRemove:
+							addon.requestRemove()
+		dlg.Destroy()
+	except Exception:
+		pass
+	gui.mainFrame.postPopup()
+
+
 _typing_dir_cache = {}
 
 class AudioThemesHandler:

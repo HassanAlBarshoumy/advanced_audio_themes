@@ -35,7 +35,7 @@ import eventHandler
 import ui
 import textInfos
 
-from .handler import AudioThemesHandler, SpecialProps
+from .handler import AudioThemesHandler, SpecialProps, showPendingConflicts
 from .settings import AudioThemesSettingsPanel
 from .studio import AudioThemesStudioStartupDialog
 
@@ -237,6 +237,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             "kb:h": "audioThemesHelp",
         }
         self._rebindInstanceGestures()
+        showPendingConflicts()
 
     def _hook_caretMovementScriptHelper(self, extraDetail, unit, direction, posConstant=textInfos.POSITION_CARET, *args, **kwargs):
         if self.orig_caretMovementScriptHelper:
