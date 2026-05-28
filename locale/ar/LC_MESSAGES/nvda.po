@@ -2371,8 +2371,11 @@ msgstr ""
 "الإضافات التالية أصبحت مدمجة في Advanced Audio Themes.\n"
 "اختر ما تريد إزالته لمنع التعارض:"
 
-msgid "Remove selected"
+msgid "Remove checked"
 msgstr "إزالة المحدد"
+
+msgid "Do not show this dialog again"
+msgstr "لا تظهر هذه النافذة مرة أخرى"
 
 msgid "Skip"
 msgstr "تخطي"

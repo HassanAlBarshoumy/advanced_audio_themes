@@ -2116,15 +2116,20 @@ msgid "Contact on Telegram"
 msgstr "Contact on Telegram"
 
 msgid "Conflicting Add-ons"
-msgstr ""
+msgstr "Conflicting Add-ons"
 
 msgid ""
 "The following add-ons are now included in Advanced Audio Themes.\n"
 "Select the ones you want to remove to prevent conflicts:"
 msgstr ""
+"The following add-ons are now included in Advanced Audio Themes.\n"
+"Select the ones you want to remove to prevent conflicts:"
 
-msgid "Remove selected"
-msgstr ""
+msgid "Remove checked"
+msgstr "Remove checked"
 
 msgid "Skip"
-msgstr ""
+msgstr "Skip"
+
+msgid "Do not show this dialog again"
+msgstr "Do not show this dialog again"

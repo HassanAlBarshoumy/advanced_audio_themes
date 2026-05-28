@@ -2333,15 +2333,20 @@ msgid "Speak current phrase."
 msgstr "Озвучить текущую фразу."
 
 msgid "Conflicting Add-ons"
-msgstr ""
+msgstr "Конфликтующие дополнения"
 
 msgid ""
 "The following add-ons are now included in Advanced Audio Themes.\n"
 "Select the ones you want to remove to prevent conflicts:"
 msgstr ""
+"Следующие дополнения теперь включены в Advanced Audio Themes.\n"
+"Выберите те, которые хотите удалить для предотвращения конфликтов:"
 
-msgid "Remove selected"
-msgstr ""
+msgid "Remove checked"
+msgstr "Удалить отмеченные"
 
 msgid "Skip"
-msgstr ""
+msgstr "Пропустить"
+
+msgid "Do not show this dialog again"
+msgstr "Больше не показывать это окно"

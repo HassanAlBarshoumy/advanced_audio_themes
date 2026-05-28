@@ -2319,15 +2319,20 @@ msgid "Speak current phrase."
 msgstr "朗读当前词组。"
 
 msgid "Conflicting Add-ons"
-msgstr ""
+msgstr "冲突的附加组件"
 
 msgid ""
 "The following add-ons are now included in Advanced Audio Themes.\n"
 "Select the ones you want to remove to prevent conflicts:"
 msgstr ""
+"以下附加组件现已包含在 Advanced Audio Themes 中。\n"
+"请选择要移除的以避免冲突："
 
-msgid "Remove selected"
-msgstr ""
+msgid "Remove checked"
+msgstr "移除已勾选的"
 
 msgid "Skip"
-msgstr ""
+msgstr "跳过"
+
+msgid "Do not show this dialog again"
+msgstr "不再显示此对话框"
