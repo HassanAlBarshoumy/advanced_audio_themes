@@ -49,7 +49,7 @@ Integrated with BrowserNav add-on for advanced browser navigation (NVDA+Alt+Arro
 	# (e.g. "2018.4", ideally more recent than minimum version)
 	"addon_lastTestedNVDAVersion": "2026.1.0",
 	# Add-on update channel (default is stable or None)
-	"addon_updateChannel": None,
+	"addon_updateChannel": "beta",
 	# Add-on license such as GPL 2
 	"addon_license": "GPL 2",
 	# URL for the license document the ad-on is licensed under
