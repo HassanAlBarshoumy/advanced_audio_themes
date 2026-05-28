@@ -237,7 +237,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             "kb:h": "audioThemesHelp",
         }
         self._rebindInstanceGestures()
-        showPendingConflicts()
+        try:
+            wx.CallAfter(showPendingConflicts)
+        except Exception:
+            pass
 
     def _hook_caretMovementScriptHelper(self, extraDetail, unit, direction, posConstant=textInfos.POSITION_CARET, *args, **kwargs):
         if self.orig_caretMovementScriptHelper:
