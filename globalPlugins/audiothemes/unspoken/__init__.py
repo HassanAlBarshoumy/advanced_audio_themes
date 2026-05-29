@@ -416,6 +416,15 @@ class UnspokenPlayer:
 						with sounds_lock:
 							sounds[path] = result
 					return result
+			elif ext == 'mp3':
+				try:
+					from . import mp3_decode
+					loaded = mp3_decode.decode_mp3_to_float(path)
+				except Exception as e:
+					log.error(f"MP3 decode failed for {path}: {e}")
+				if loaded is None:
+					log.error(f"Failed to decode MP3: {path}")
+					return None
 			elif ext == 'wav':
 				try:
 					with wave.open(path, "rb") as wav_file:
