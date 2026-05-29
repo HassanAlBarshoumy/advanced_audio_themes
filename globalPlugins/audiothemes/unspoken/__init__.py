@@ -8,7 +8,7 @@ import time
 import threading
 import queue
 import wave
-import array as _array_mod
+from array import array
 import struct as _struct_mod
 import config
 import speech
@@ -23,13 +23,6 @@ try:
 except ImportError as e:
 	log.error(f"Failed to load Steam Audio: {e}")
 	raise
-
-UNSPOKEN_ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
-
-
-# Sounds
-
-UNSPOKEN_SOUNDS_PATH = os.path.join(UNSPOKEN_ROOT_PATH, "sounds")
 
 sounds = dict()  # For holding instances in RAM.
 sounds_lock = threading.Lock()  # Protects `sounds` from concurrent access across threads.
@@ -155,9 +148,8 @@ def pitch_shift(audio_data, pitch_factor):
 		return audio_data
 	
 	max_idx = old_len - 1
-	import array
 	# Nearest neighbor interpolation for maximum performance in pure Python
-	return array.array('f', (audio_data[int(i * pitch_factor)] if int(i * pitch_factor) <= max_idx else audio_data[max_idx] for i in range(new_len)))
+	return array('f', (audio_data[int(i * pitch_factor)] if int(i * pitch_factor) <= max_idx else audio_data[max_idx] for i in range(new_len)))
 
 def trim_silence_array(audio_data, threshold=0.01):
 	"""Trim silence from the start and end of a float PCM array."""
@@ -187,15 +179,13 @@ def clamp(my_value, min_value, max_value):
 
 def floats_to_pcm_bytes(float_samples):
 	"""Convert float samples to 16-bit PCM bytes. Uses fast integer math."""
-	import array
-	return array.array('h', [max(-32768, min(32767, int(s * 32767.0))) for s in float_samples]).tobytes()
+	return array('h', [max(-32768, min(32767, int(s * 32767.0))) for s in float_samples]).tobytes()
 
 def _apply_volume(float_samples, volume):
 	"""Multiply all samples by volume factor. Returns new array."""
 	if volume == 1.0:
 		return float_samples
-	import array
-	return array.array('f', [s * volume for s in float_samples])
+	return array('f', [s * volume for s in float_samples])
 
 
 class UnspokenPlayer:
@@ -434,12 +424,11 @@ class UnspokenPlayer:
 						channels = wav_file.getnchannels()
 						sample_rate = wav_file.getframerate()
 						if sample_width == 2:
-							import array
-							arr = array.array('h')
+							arr = array('h')
 							arr.frombytes(frames)
-							float_samples = array.array('f', [s / 32768.0 for s in arr])
+							float_samples = array('f', [s / 32768.0 for s in arr])
 						elif sample_width == 1:
-							float_samples = array.array('f', [(s - 128) / 128.0 for s in frames])
+							float_samples = array('f', [(s - 128) / 128.0 for s in frames])
 						else:
 							log.error(f"Unsupported sample width: {sample_width}")
 							return None
@@ -456,9 +445,8 @@ class UnspokenPlayer:
 		# Common processing for all PCM float data
 		is_mono_mode = config.conf.get("audiothemes", {}).get("output_mode", "stereo") == "mono"
 		if channels == 2 and is_mono_mode:
-			import array
 			n = len(float_samples) // 2
-			mono = array.array('f', [0.0]) * n
+			mono = array('f', [0.0]) * n
 			for i in range(n):
 				mono[i] = (float_samples[i * 2] + float_samples[i * 2 + 1]) * 0.5
 			float_samples = mono
@@ -473,8 +461,7 @@ class UnspokenPlayer:
 				if peak > 0.01:
 					target_peak = 0.8
 					ratio = target_peak / peak
-					import array
-					float_samples = array.array('f', [s * ratio for s in float_samples])
+					float_samples = array('f', [s * ratio for s in float_samples])
 
 		if config.conf["unspoken"].get("SmoothEnvelope", True):
 			fade_samples = int(sample_rate * 0.01)
@@ -487,8 +474,7 @@ class UnspokenPlayer:
 
 		remainder = len(float_samples) % 1024
 		if remainder != 0:
-			import array
-			float_samples.extend(array.array('f', [0.0]) * (1024 - remainder))
+			float_samples.extend(array('f', [0.0]) * (1024 - remainder))
 
 		result = {"data": float_samples, "sample_rate": sample_rate, "path": path, "channels": channels}
 

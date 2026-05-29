@@ -471,7 +471,8 @@ class AudioThemesHandler:
                     self._app_profiles_cache[k] = {"theme": v, "typing_pack": ""}
                 else:
                     self._app_profiles_cache[k] = v
-        except Exception:
+        except Exception as e:
+            log.debugWarning(f"Malformed app_profiles JSON: {e}")
             self._app_profiles_cache = {}
 
         if self.active_theme is None:

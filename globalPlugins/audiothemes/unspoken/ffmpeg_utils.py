@@ -68,17 +68,33 @@ def decode_with_ffmpeg(path):
     return None
 
 def download_ffmpeg(progress_callback=None):
-    """Download and extract ffmpeg.exe.
+    """Download and extract ffmpeg.exe with timeout and chunked progress.
     Returns path to ffmpeg.exe or None on failure.
     """
     import urllib.request
+    import urllib.error
     import zipfile
+    import io
     target_dir = _get_tools_dir()
     zip_path = os.path.join(tempfile.gettempdir(), "ffmpeg-essentials.zip")
     try:
         if progress_callback:
             progress_callback(0, "Downloading FFmpeg...")
-        urllib.request.urlretrieve(FFMPEG_DOWNLOAD_URL, zip_path)
+        req = urllib.request.Request(FFMPEG_DOWNLOAD_URL, method="GET")
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            total = int(resp.headers.get("Content-Length", 0))
+            downloaded = 0
+            chunk_size = 8192
+            with open(zip_path, "wb") as f:
+                while True:
+                    chunk = resp.read(chunk_size)
+                    if not chunk:
+                        break
+                    f.write(chunk)
+                    downloaded += len(chunk)
+                    if total and progress_callback:
+                        pct = int(downloaded / total * 100)
+                        progress_callback(pct, f"Downloading FFmpeg... {pct}%")
         if progress_callback:
             progress_callback(50, "Extracting...")
         os.makedirs(target_dir, exist_ok=True)

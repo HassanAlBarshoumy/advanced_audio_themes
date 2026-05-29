@@ -849,7 +849,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
 
                 self.handler.play(obj_info, snd)
 
-        except Exception:
+        except Exception as e:
+            log.debugWarning(f"playObject failed: {e}")
             return
 
     def getOrder(self, obj_info, parrole=None, chrole=None):
