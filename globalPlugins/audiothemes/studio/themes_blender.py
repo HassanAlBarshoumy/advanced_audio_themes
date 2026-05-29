@@ -480,16 +480,47 @@ class AudioSelectorDialog(BaseDialog):
 
     def onRecordClicked(self, event):
         if not self.mic_recorder.is_recording:
-            # Start recording
+            # Validate a role is selected before recording
+            if self.selected_role is None:
+                gui.messageBox(
+                    # Translators: error message when no role is selected
+                    _("Please select a sound role before recording."),
+                    # Translators: title for error dialog
+                    _("Recording Error"),
+                    style=wx.OK | wx.ICON_ERROR,
+                )
+                return
             self.recordButton.SetLabel(_("&Stop Recording"))
-            self.mic_recorder.start_recording()
+            try:
+                self.mic_recorder.start_recording()
+            except Exception as e:
+                self.recordButton.SetLabel(_("&Record from Microphone"))
+                import logging
+                logging.getLogger("audiothemes").error(f"Recording start failed: {e}", exc_info=True)
+                gui.messageBox(
+                    # Translators: error message when recording fails to start
+                    _("Could not start recording:\n{}").format(str(e)),
+                    # Translators: title for error dialog
+                    _("Recording Error"),
+                    style=wx.OK | wx.ICON_ERROR,
+                )
         else:
-            # Stop recording
             self.recordButton.SetLabel(_("&Record from Microphone"))
             temp_dir = tempfile.gettempdir()
             rec_file = os.path.join(temp_dir, f"rec_{self.selected_role}.wav")
-            self.mic_recorder.stop_and_save(rec_file)
-            self.set_audio_file(rec_file)
+            try:
+                self.mic_recorder.stop_and_save(rec_file)
+                self.set_audio_file(rec_file)
+            except Exception as e:
+                import logging
+                logging.getLogger("audiothemes").error(f"Recording save failed: {e}", exc_info=True)
+                gui.messageBox(
+                    # Translators: error message when saving recording fails
+                    _("Could not save recording:\n{}").format(str(e)),
+                    # Translators: title for error dialog
+                    _("Recording Error"),
+                    style=wx.OK | wx.ICON_ERROR,
+                )
 
     def onPreviewClicked(self, event):
         if self.selected_audio is not None:
