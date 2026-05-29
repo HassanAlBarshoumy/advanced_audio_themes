@@ -9,6 +9,8 @@ _mpg123 = ctypes.CDLL(os.path.join(_X64_DIR, "libmpg123-0.dll"))
 
 MPG123_OK = 0
 MPG123_DONE = -11
+MPG123_NEED_MORE = -10
+MPG123_NEW_FORMAT = -12
 
 _mpg123.mpg123_new.argtypes = [ctypes.c_char_p, ctypes.POINTER(ctypes.c_int)]
 _mpg123.mpg123_new.restype = ctypes.c_void_p
@@ -53,22 +55,36 @@ def decode_mp3_to_float(path):
         with open(path, 'rb') as f:
             data = f.read()
 
-        _mpg123.mpg123_feed(mh, data, len(data))
-        _mpg123.mpg123_feed(mh, None, 0)
+        ret = _mpg123.mpg123_feed(mh, data, len(data))
+        if ret != MPG123_OK:
+            log.error(f"mpg123_feed failed: {ret}")
+            return None
 
         buf_size = 8192
         buf = ctypes.create_string_buffer(buf_size)
         done = ctypes.c_size_t(0)
         all_pcm = bytearray()
+        needs_more_retries = 3
 
         while True:
             ret = _mpg123.mpg123_read(mh, buf, buf_size, ctypes.byref(done))
             if done.value > 0:
                 all_pcm.extend(buf.raw[:done.value])
+                needs_more_retries = 3
             if ret == MPG123_DONE:
                 break
+            if ret == MPG123_NEED_MORE:
+                needs_more_retries -= 1
+                if needs_more_retries <= 0:
+                    break
+                continue
+            if ret == MPG123_NEW_FORMAT:
+                continue
             if ret != MPG123_OK:
-                break
+                log.debugWarning(f"mpg123_read returned {ret}")
+                if all_pcm:
+                    break
+                return None
 
         if not all_pcm:
             log.error(f"No PCM data decoded from {path}")
@@ -79,6 +95,7 @@ def decode_mp3_to_float(path):
         encoding = ctypes.c_int(0)
         ret = _mpg123.mpg123_getformat(mh, ctypes.byref(rate), ctypes.byref(channels), ctypes.byref(encoding))
         if ret != MPG123_OK:
+            log.error(f"mpg123_getformat failed: {ret}")
             return None
 
         arr = array.array('h')
