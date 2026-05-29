@@ -41,6 +41,44 @@ class WAVEHDR(ctypes.Structure):
 
 winmm = ctypes.windll.winmm
 
+# Set argtypes for all winmm functions used
+winmm.waveInGetNumDevs.argtypes = []
+winmm.waveInGetNumDevs.restype = ctypes.wintypes.UINT
+
+winmm.waveInOpen.argtypes = [
+	ctypes.POINTER(ctypes.wintypes.HANDLE),
+	ctypes.wintypes.WORD,
+	ctypes.POINTER(WAVEFORMATEX),
+	ctypes.c_void_p,
+	ctypes.c_void_p,
+	ctypes.wintypes.DWORD,
+]
+winmm.waveInOpen.restype = ctypes.wintypes.DWORD
+
+winmm.waveInClose.argtypes = [ctypes.wintypes.HANDLE]
+winmm.waveInClose.restype = ctypes.wintypes.DWORD
+
+winmm.waveInPrepareHeader.argtypes = [ctypes.wintypes.HANDLE, ctypes.POINTER(WAVEHDR), ctypes.wintypes.UINT]
+winmm.waveInPrepareHeader.restype = ctypes.wintypes.DWORD
+
+winmm.waveInUnprepareHeader.argtypes = [ctypes.wintypes.HANDLE, ctypes.POINTER(WAVEHDR), ctypes.wintypes.UINT]
+winmm.waveInUnprepareHeader.restype = ctypes.wintypes.DWORD
+
+winmm.waveInAddBuffer.argtypes = [ctypes.wintypes.HANDLE, ctypes.POINTER(WAVEHDR), ctypes.wintypes.UINT]
+winmm.waveInAddBuffer.restype = ctypes.wintypes.DWORD
+
+winmm.waveInStart.argtypes = [ctypes.wintypes.HANDLE]
+winmm.waveInStart.restype = ctypes.wintypes.DWORD
+
+winmm.waveInStop.argtypes = [ctypes.wintypes.HANDLE]
+winmm.waveInStop.restype = ctypes.wintypes.DWORD
+
+winmm.waveInReset.argtypes = [ctypes.wintypes.HANDLE]
+winmm.waveInReset.restype = ctypes.wintypes.DWORD
+
+winmm.waveInGetErrorTextW.argtypes = [ctypes.wintypes.DWORD, ctypes.wintypes.LPWSTR, ctypes.wintypes.UINT]
+winmm.waveInGetErrorTextW.restype = ctypes.wintypes.DWORD
+
 WAVEIN_CALLBACK = ctypes.WINFUNCTYPE(
 	None,
 	ctypes.wintypes.HANDLE,
@@ -70,13 +108,14 @@ class MicRecorder:
 
 	def _callback(self, hwi, uMsg, dwInstance, dwParam1, dwParam2):
 		if uMsg == WIM_DATA:
-			hdr = ctypes.cast(dwParam1, ctypes.POINTER(WAVEHDR)).contents
+			hdr_ptr = ctypes.cast(dwParam1, ctypes.POINTER(WAVEHDR))
+			hdr = hdr_ptr.contents
 			if hdr.dwBytesRecorded > 0:
 				data = ctypes.string_at(hdr.lpData, hdr.dwBytesRecorded)
 				with self._lock:
 					self._samples.append(data)
 			if self.is_recording:
-				winmm.waveInAddBuffer(hwi, ctypes.byref(hdr), ctypes.sizeof(WAVEHDR))
+				winmm.waveInAddBuffer(ctypes.c_void_p(hwi), hdr_ptr, ctypes.sizeof(WAVEHDR))
 
 	def start_recording(self, sample_rate=44100, channels=2):
 		if self.is_recording:
