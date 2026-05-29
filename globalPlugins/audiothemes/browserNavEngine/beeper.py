@@ -21,6 +21,7 @@ import ui
 import wave
 
 from . addonConfig import *
+from ..utils import ensure_mono
 
 class Beeper:
     BASE_FREQ = speech.IDT_BASE_FREQUENCY
@@ -164,21 +165,23 @@ def adjustVolume(bb, volume):
 spcFile=None
 spcPlayer=None
 spcBuf = None
+spcChannels = 2
 def skippedParagraphChime():
     import globalPlugins.audiothemes as at
     handler = getattr(at.GlobalPlugin, "_instance_handler", None)
     if handler and handler.play_theme_sound("skip_paragraph"):
         return
         
-    global spcFile, spcPlayer, spcBuf
+    global spcFile, spcPlayer, spcBuf, spcChannels
     if spcPlayer is  None:
         spcFile = wave.open(getSoundsPath() + "\\classic\\on.wav","r")
+        spcChannels = spcFile.getnchannels()
         try:
             outputDevice=config.conf["speech"]["outputDevice"]
         except KeyError:
             outputDevice=config.conf["audio"]["outputDevice"]
         spcPlayer = nvwave.WavePlayer(
-            channels=spcFile.getnchannels(),
+            channels=spcChannels,
             samplesPerSec=spcFile.getframerate(),
             bitsPerSample=spcFile.getsampwidth()*8,
             outputDevice=outputDevice,
@@ -192,9 +195,13 @@ def skippedParagraphChime():
     def playSkipParagraphChime():
         spcPlayer.stop()
         spcPlayer.feed(
-            adjustVolume(
-                spcBuf,
-                getConfig("skipChimeVolume")
+            ensure_mono(
+                adjustVolume(
+                    spcBuf,
+                    getConfig("skipChimeVolume")
+                ),
+                spcChannels,
+                0
             )
         )
         spcPlayer.idle()

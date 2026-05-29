@@ -25,6 +25,31 @@ def myAssert(condition):
     if not condition:
         raise RuntimeError("Assertion failed")
 
+def ensure_mono(audio_bytes, channels, sample_rate):
+	"""Downmix stereo PCM to mono when mono output mode is active.
+
+	When mono mode is enabled, stereo interleaved 16-bit PCM is downmixed
+	to (L+R)/2 and duplicated to both channels. This preserves the existing
+	2-channel WavePlayer configuration while achieving true mono output.
+	Returns the original bytes unchanged when stereo mode is active.
+	"""
+	if channels != 2:
+		return audio_bytes
+	out_mode = config.conf.get("audiothemes", {}).get("output_mode", "stereo")
+	if out_mode != "mono":
+		return audio_bytes
+	import array
+	arr = array.array('h')
+	arr.frombytes(audio_bytes)
+	n = len(arr) // 2
+	result = array.array('h', [0]) * (n * 2)
+	for i in range(n):
+		mono = int((arr[i * 2] + arr[i * 2 + 1]) * 0.5)
+		result[i * 2] = mono
+		result[i * 2 + 1] = mono
+	return result.tobytes()
+
+
 # Sentinel object used to signal Worker threads to shut down cleanly.
 _WORKER_STOP = object()
 

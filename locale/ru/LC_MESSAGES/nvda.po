@@ -2350,3 +2350,12 @@ msgstr "Пропустить"
 
 msgid "Do not show this dialog again"
 msgstr "Больше не показывать это окно"
+
+msgid "(Plays 3D sound even if 3D mode is disabled)"
+msgstr "(Воспроизводит 3D-звук, даже если 3D-режим отключён)"
+
+msgid "About Typing Sound Pack"
+msgstr "О наборе звуков печати"
+
+msgid "Unknown"
+msgstr "Неизвестно"

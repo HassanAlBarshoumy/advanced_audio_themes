@@ -127,8 +127,9 @@ class PpBeepCommand(PpSynchronousCommand):
         bufSize=generateBeep(None,hz,length,left,right)
         buf=create_string_buffer(bufSize)
         generateBeep(buf,hz,length,left,right)
+        audio_bytes = ensure_mono(buf.raw, 2, int(tones.SAMPLE_RATE))
         ppSynchronousPlayer.stop()
-        ppSynchronousPlayer.feed(buf.raw)
+        ppSynchronousPlayer.feed(audio_bytes)
         ppSynchronousPlayer.idle()
 
     def getDuration(self):
@@ -289,9 +290,10 @@ class PpWaveFileCommand(PpSynchronousCommand):
             from logHandler import log
             log.error(f"Failed to apply reverb to PpWaveFileCommand: {e}", exc_info=True)
 
+        audio_bytes = ensure_mono(self.buf, self._channels, self._sample_rate)
         fileWavePlayer = self.fileWavePlayer
         fileWavePlayer.stop()
-        fileWavePlayer.feed(self.buf)
+        fileWavePlayer.feed(audio_bytes)
         fileWavePlayer.idle()
 
     def getDuration(self):

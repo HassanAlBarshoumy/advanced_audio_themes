@@ -2336,3 +2336,12 @@ msgstr "跳过"
 
 msgid "Do not show this dialog again"
 msgstr "不再显示此对话框"
+
+msgid "(Plays 3D sound even if 3D mode is disabled)"
+msgstr "(即使3D模式禁用也播放3D声音)"
+
+msgid "About Typing Sound Pack"
+msgstr "关于打字音效包"
+
+msgid "Unknown"
+msgstr "未知"

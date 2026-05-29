@@ -52,6 +52,7 @@ sonifyTextInfo = None # Due to import error we set this value from __init__
 from .constants import *
 from . beeper import *
 from . import utils
+from ..utils import ensure_mono
 from .editor import EditTextDialog
 from .paragraph import Paragraph, NotFoundError, ScriptError, textInfoRange, pump, retry, getFocusTextInfo, getFocusParagraph
 import operator
@@ -1082,7 +1083,7 @@ def playBiwInThread(bookmark=None, earcon=None, volume=None):
     for i in range(n):
         unpacked[i] = int(unpacked[i] * volume/100)
     packed = struct.pack(f"<{n}h", *unpacked)
-    buf = packed
+    buf = ensure_mono(packed, f.getnchannels(), f.getframerate())
     try:
         outputDevice=config.conf["speech"]["outputDevice"]
     except KeyError:

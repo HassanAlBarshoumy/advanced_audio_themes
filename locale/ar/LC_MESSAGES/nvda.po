@@ -1763,7 +1763,7 @@ msgid ""
 msgstr "تحديد المواقع المكانية الذكية (تعيين الأحرف لمفاتيحها الفعلية بالضبط)"
 
 msgid "Smooth 3D Panning (Glide effect for moving objects)"
-msgstr ""
+msgstr "تحريك ثلاثي الأبعاد سلس (تأثير انزلاق للكائنات المتحركة)"
 
 msgid "Smooth Envelope (Fade In/Out to prevent popping)"
 msgstr "تنعيم أطراف الصوت (منع طقطقة السماعات)"
@@ -2306,9 +2306,6 @@ msgstr "فشل تنزيل التحديث: {error}"
 
 msgid "Unknown error"
 msgstr "خطأ غير معروف"
-
-msgid "&About"
-msgstr "&حول"
 
 msgid "About Typing Sound Pack"
 msgstr "حول حزمة أصوات الكتابة"

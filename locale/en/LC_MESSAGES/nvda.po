@@ -2133,3 +2133,54 @@ msgstr "Skip"
 
 msgid "Do not show this dialog again"
 msgstr "Do not show this dialog again"
+
+msgid "(Plays 3D sound even if 3D mode is disabled)"
+msgstr "(Plays 3D sound even if 3D mode is disabled)"
+
+msgid "About Typing Sound Pack"
+msgstr "About Typing Sound Pack"
+
+msgid "Check for &Updates..."
+msgstr "Check for &Updates..."
+
+msgid "Could not check for updates. Please check your internet connection."
+msgstr "Could not check for updates. Please check your internet connection."
+
+msgid "Download complete. The add-on installation dialog will now open."
+msgstr "Download complete. The add-on installation dialog will now open."
+
+msgid "Failed to download the update: {error}"
+msgstr "Failed to download the update: {error}"
+
+msgid "Move to next phrase."
+msgstr "Move to next phrase."
+
+msgid "Move to next sentence."
+msgstr "Move to next sentence."
+
+msgid "Move to previous phrase."
+msgstr "Move to previous phrase."
+
+msgid "Move to previous sentence."
+msgstr "Move to previous sentence."
+
+msgid "Speak current phrase."
+msgstr "Speak current phrase."
+
+msgid "Speak current sentence."
+msgstr "Speak current sentence."
+
+msgid "Unknown"
+msgstr "Unknown"
+
+msgid "Unknown error"
+msgstr "Unknown error"
+
+msgid "Update Available"
+msgstr "Update Available"
+
+msgid "Update Check"
+msgstr "Update Check"
+
+msgid "You are already running the latest version ({version})."
+msgstr "You are already running the latest version ({version})."
