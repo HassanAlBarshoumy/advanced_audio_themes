@@ -1223,11 +1223,11 @@ def new_getControlFieldSpeech(
     extraDetail = False,
     reason = None,
 ):
+    import controlTypes
     if not isPhoneticPunctuationEnabled():
         try:
             if fieldType == "start" or getattr(fieldType, "value", fieldType) == "start":
                 import globalPluginHandler
-                import controlTypes
                 for plugin in globalPluginHandler.runningPlugins:
                     if plugin.__module__ == "globalPlugins.audiothemes":
                         role = attrs.get('role')
