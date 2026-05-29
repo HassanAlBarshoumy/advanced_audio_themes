@@ -12,8 +12,6 @@ import wx
 import gui
 from ..unspoken import UnspokenPlayer
 from ..handler import AudioTheme, AudioThemesHandler, theme_roles, SUPPORTED_FILE_TYPES, get_active_file_types, role_int_to_name, state_name_to_int, STATE_OFFSET
-from .mic_recorder import MicRecorder
-import tempfile
 
 import addonHandler
 try:
@@ -432,9 +430,6 @@ class AudioSelectorDialog(BaseDialog):
         self.browseButton = wx.Button(parent, -1, _("&Browse"))
         # Translators: label for a button to preview the selected sound
         self.previewButton = wx.Button(parent, -1, _("&Preview"))
-        # Translators: label for a button to record from microphone
-        self.recordButton = wx.Button(parent, -1, _("&Record from Microphone"))
-        self.mic_recorder = MicRecorder()
         
         choiceSizer = wx.BoxSizer(wx.HORIZONTAL)
         choiceSizer.AddMany(
@@ -445,12 +440,11 @@ class AudioSelectorDialog(BaseDialog):
         )
         btnSizer = wx.BoxSizer(wx.HORIZONTAL)
         btnSizer.AddMany(
-            [(self.browseButton, 1, wx.ALL, 5), (self.previewButton, 1, wx.ALL, 5), (self.recordButton, 1, wx.ALL, 5)]
+            [(self.browseButton, 1, wx.ALL, 5), (self.previewButton, 1, wx.ALL, 5)]
         )
         sizer.AddMany([(choiceSizer, 1, wx.ALL, 10), (btnSizer, 1, wx.ALL, 10)])
         self.Bind(wx.EVT_BUTTON, self.onBrowseClicked, self.browseButton)
         self.Bind(wx.EVT_BUTTON, self.onPreviewClicked, self.previewButton)
-        self.Bind(wx.EVT_BUTTON, self.onRecordClicked, self.recordButton)
         self.Bind(wx.EVT_BUTTON, self.onOkClicked, id=wx.ID_OK)
         
         self.SetDropTarget(AudioDropTarget(self))
@@ -477,50 +471,6 @@ class AudioSelectorDialog(BaseDialog):
         filepath = _show_audio_file_dialog(self)
         if filepath is not None:
             self.set_audio_file(filepath)
-
-    def onRecordClicked(self, event):
-        if not self.mic_recorder.is_recording:
-            # Validate a role is selected before recording
-            if self.selected_role is None:
-                gui.messageBox(
-                    # Translators: error message when no role is selected
-                    _("Please select a sound role before recording."),
-                    # Translators: title for error dialog
-                    _("Recording Error"),
-                    style=wx.OK | wx.ICON_ERROR,
-                )
-                return
-            self.recordButton.SetLabel(_("&Stop Recording"))
-            try:
-                self.mic_recorder.start_recording()
-            except Exception as e:
-                self.recordButton.SetLabel(_("&Record from Microphone"))
-                import logging
-                logging.getLogger("audiothemes").error(f"Recording start failed: {e}", exc_info=True)
-                gui.messageBox(
-                    # Translators: error message when recording fails to start
-                    _("Could not start recording:\n{}").format(str(e)),
-                    # Translators: title for error dialog
-                    _("Recording Error"),
-                    style=wx.OK | wx.ICON_ERROR,
-                )
-        else:
-            self.recordButton.SetLabel(_("&Record from Microphone"))
-            temp_dir = tempfile.gettempdir()
-            rec_file = os.path.join(temp_dir, f"rec_{self.selected_role}.wav")
-            try:
-                self.mic_recorder.stop_and_save(rec_file)
-                self.set_audio_file(rec_file)
-            except Exception as e:
-                import logging
-                logging.getLogger("audiothemes").error(f"Recording save failed: {e}", exc_info=True)
-                gui.messageBox(
-                    # Translators: error message when saving recording fails
-                    _("Could not save recording:\n{}").format(str(e)),
-                    # Translators: title for error dialog
-                    _("Recording Error"),
-                    style=wx.OK | wx.ICON_ERROR,
-                )
 
     def onPreviewClicked(self, event):
         if self.selected_audio is not None:
