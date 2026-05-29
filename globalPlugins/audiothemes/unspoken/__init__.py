@@ -451,14 +451,8 @@ class UnspokenPlayer:
 		float_samples, sample_rate, channels = loaded
 
 		# Common processing for all PCM float data
-		is_mono_mode = config.conf.get("audiothemes", {}).get("output_mode", "stereo") == "mono"
-		if channels == 2 and is_mono_mode:
-			n = len(float_samples) // 2
-			mono = array('f', [0.0]) * n
-			for i in range(n):
-				mono[i] = (float_samples[i * 2] + float_samples[i * 2 + 1]) * 0.5
-			float_samples = mono
-			channels = 1
+		# Note: mono downmix is NOT done here — it happens at playback time
+		# based on active 3D/mono mode, so cached data preserves original channels
 
 		if config.conf["unspoken"].get("TrimSilence", False):
 			float_samples = trim_silence_array(float_samples, threshold=0.01)
@@ -619,8 +613,8 @@ class UnspokenPlayer:
 
 		# Cache output mode once for this call
 		out_mode = config.conf.get("audiothemes", {}).get("output_mode", "stereo")
-		is_mono = out_mode == "mono" and not force_3d
-
+		# 3D audio overrides mono mode — spatialization requires stereo output
+		is_mono = out_mode == "mono" and not force_3d and not self.audio3d
 		if is_mono:
 			angle_x = 0
 			angle_y = 0
@@ -662,7 +656,17 @@ class UnspokenPlayer:
 				audio_data = pitch_shift(audio_data, pitch_factor)
 			adjusted_audio = _apply_volume(audio_data, volume)
 
-			if sound_data.get("channels", 1) == 2:
+			# Determine if spatial processing is needed
+			needs_spatial = (self.audio3d or force_3d) and (angle_x != 0 or angle_y != 0 or reverb_on)
+			# Downmix stereo to mono when needed: spatialization or mono output mode
+			if sound_data.get("channels", 1) == 2 and (needs_spatial or is_mono):
+				n = len(adjusted_audio) // 2
+				mono = array('f', [0.0]) * n
+				for i in range(n):
+					mono[i] = (adjusted_audio[i * 2] + adjusted_audio[i * 2 + 1]) * 0.5
+				adjusted_audio = mono
+
+			if sound_data.get("channels", 1) == 2 and not needs_spatial and not is_mono:
 				# Bypass Steam Audio to preserve original stereo separation
 				final_audio = floats_to_pcm_bytes(adjusted_audio)
 			elif is_mono and (not reverb_on or not self.steam_audio_active):
@@ -744,7 +748,8 @@ class UnspokenPlayer:
 
 		reverb_enabled = config.conf["unspoken"]["Reverb"]
 		out_mode = config.conf.get("audiothemes", {}).get("output_mode", "stereo")
-		is_mono = out_mode == "mono"
+		# audio3d overrides mono mode — spatialization requires stereo output
+		is_mono = out_mode == "mono" and not audio3d
 		
 		# For non-typing sounds, keep the caller-provided angle values (e.g. beacon).
 		# For typing sounds, calculate spatial positioning below or default to center.
@@ -811,14 +816,17 @@ class UnspokenPlayer:
 		
 		adjusted_audio = _apply_volume(sound["data"], final_volume)
 
-		if sound.get("channels", 1) == 2:
-			if is_typing_sound and not is_mono and (angle_x != 0 or angle_y != 0):
-				# Mix stereo to mono so Steam Audio can spatialize it
-				n = len(adjusted_audio) // 2
-				mono = [0.0] * n
-				for i in range(n):
-					mono[i] = (adjusted_audio[i * 2] + adjusted_audio[i * 2 + 1]) * 0.5
-				adjusted_audio = mono
+		# Determine if spatial or mono processing is needed
+		needs_spatial = audio3d or (is_typing_sound and not is_mono and (angle_x != 0 or angle_y != 0))
+		# Downmix stereo to mono when needed: spatialization or mono output mode
+		if sound.get("channels", 1) == 2 and (needs_spatial or is_mono):
+			# Mix stereo to mono
+			n = len(adjusted_audio) // 2
+			mono = [0.0] * n
+			for i in range(n):
+				mono[i] = (adjusted_audio[i * 2] + adjusted_audio[i * 2 + 1]) * 0.5
+			adjusted_audio = mono
+			if needs_spatial:
 				processed_audio = self.steam_audio.process_sound(adjusted_audio, angle_x, angle_y)
 				if not processed_audio:
 					return
@@ -827,9 +835,28 @@ class UnspokenPlayer:
 					reverb_audio = self.steam_audio.apply_reverb(processed_audio)
 					if reverb_audio:
 						final_audio = reverb_audio
+			elif is_mono and not reverb_enabled:
+				# True Mono Bypass: duplicate mono to L/R
+				n = len(adjusted_audio)
+				stereo_audio = [0.0] * (n * 2)
+				for i in range(n):
+					s = adjusted_audio[i]
+					stereo_audio[i * 2] = s
+					stereo_audio[i * 2 + 1] = s
+				final_audio = floats_to_pcm_bytes(stereo_audio)
 			else:
-				# Bypass Steam Audio to preserve original stereo separation
-				final_audio = floats_to_pcm_bytes(adjusted_audio)
+				# Mono file with reverb or other case
+				processed_audio = self.steam_audio.process_sound(adjusted_audio, angle_x, angle_y)
+				if not processed_audio:
+					return
+				final_audio = processed_audio
+				if reverb_enabled:
+					reverb_audio = self.steam_audio.apply_reverb(processed_audio)
+					if reverb_audio:
+						final_audio = reverb_audio
+		elif sound.get("channels", 1) == 2:
+			# Bypass Steam Audio to preserve original stereo separation
+			final_audio = floats_to_pcm_bytes(adjusted_audio)
 		elif is_mono and not reverb_enabled:
 			# True Mono Bypass: duplicate mono to L/R
 			n = len(adjusted_audio)
