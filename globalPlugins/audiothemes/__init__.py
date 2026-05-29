@@ -487,6 +487,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         globalCommands.commands.script_reportCurrentFocus(gesture)
 
     def event_gainFocus(self, obj, nextHandler):
+        from logHandler import log
         """
         Snapshot all COM properties on the main thread, then dispatch the
         plain dict to a background worker.  This eliminates the COMError
@@ -507,8 +508,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             self.handler._current_app_name = obj.appModule.appName
         except Exception:
             self.handler._current_app_name = None
-        
-        nextHandler()
+        try:
+            nextHandler()
+        except Exception as e:
+            log.debugWarning(f"event_gainFocus nextHandler: {e}")
         obj_info = self._snapshot_obj(obj)
         utils.threadPool.add_task(self.playObject, obj_info)
         utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
@@ -544,6 +547,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             except:
                 pass
     def event_becomeNavigatorObject(self, obj, nextHandler, isFocus=False):
+        from logHandler import log
         """
         Snapshot on main thread, dispatch dict to worker.
         isFocus=True means gainFocus already dispatched -- skip double-play.
@@ -561,13 +565,22 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             self.handler._current_window_title = None
             self.handler._current_url = None
         if isFocus:
-            nextHandler()
+            try:
+                nextHandler()
+            except Exception as e:
+                log.debugWarning(f"event_becomeNavigatorObject nextHandler (isFocus): {e}")
             return
         # Dedup: skip if gainFocus just fired for this very object
         if obj is self._last_focused_obj and (time.monotonic() - self._last_focus_time) < 0.3:
-            nextHandler()
+            try:
+                nextHandler()
+            except Exception as e:
+                log.debugWarning(f"event_becomeNavigatorObject nextHandler (dedup): {e}")
             return
-        nextHandler()
+        try:
+            nextHandler()
+        except Exception as e:
+            log.debugWarning(f"event_becomeNavigatorObject nextHandler: {e}")
         self._last_play_time = time.monotonic()
         try:
             self._last_navigator_object = api.getNavigatorObject()
@@ -578,6 +591,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
 
     def event_valueChange(self, obj, nextHandler):
+        from logHandler import log
         try:
             if obj.role == controlTypes.Role.PROGRESSBAR:
                 if config.conf["audiothemes"]["enable_audio_themes"] and self.handler.active_theme:
@@ -601,18 +615,13 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                             obj_info['progress_percent'] = percent
                             utils.threadPool.add_task(self.playObject, obj_info)
                         except Exception as e:
-                            try:
-                                from logHandler import log
-                                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-                            except:
-                                pass
+                            log.debug(f"AudioThemes event_valueChange progress: {e}")
         except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
-        nextHandler()
+            log.debug(f"AudioThemes event_valueChange: {e}")
+        try:
+            nextHandler()
+        except Exception as e:
+            log.debugWarning(f"event_valueChange nextHandler: {e}")
     def _is_editable(self, obj):
         try:
             controls = (controlTypes.Role.EDITABLETEXT, controlTypes.Role.TERMINAL, controlTypes.Role.RICHEDIT)
@@ -685,6 +694,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
     def event_typedCharacter(self, obj, nextHandler, ch):
         from logHandler import log
         try:
+            if not hasattr(self, 'handler'):
+                nextHandler()
+                return
             if config.conf["audiothemes"]["typing_sounds"]:
                 vk = getattr(self, "_last_vkCode", None)
                 ext = getattr(self, "_last_extended", None)
@@ -693,13 +705,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                         self.handler.play_typing_sound(ch=ch, vkCode=vk, extended=ext)
                 else:
                     self.handler.play_typing_sound(ch=ch, vkCode=vk, extended=ext)
+            nextHandler()
         except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
-        nextHandler()
+            log.debugWarning(f"event_typedCharacter: {e}")
     @script(description=_("Switches to the next audio theme."))
     def script_nextAudioTheme(self, gesture):
         themes = self.handler.get_installed_themes()
@@ -764,25 +772,32 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
     script_toggleAudioThemes.__doc__ = _("Pressing it once toggles audio themes on and off. Pressing twice toggles typing sounds.")
 
     def event_mouseMove(self, obj, nextHandler, x, y):
+        from logHandler import log
         if obj is not self._previous_mouse_object:
             self._previous_mouse_object = obj
             try:
                 obj_info = self._snapshot_obj(obj)
                 utils.threadPool.add_task(self.playObject, obj_info)
             except Exception as e:
-                from logHandler import log
-                log.debug(f"AudioThemes mouseMove error: {e}")
-        nextHandler()
+                log.debugWarning(f"event_mouseMove snapshot: {e}")
+        try:
+            nextHandler()
+        except Exception as e:
+            log.debugWarning(f"event_mouseMove nextHandler: {e}")
     def event_show(self, obj, nextHandler):
+        from logHandler import log
         try:
             if getattr(obj, "role", None) == controlTypes.Role.HELPBALLOON:
                 obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.notify)
                 self.playObject(obj_info)
         except Exception as e:
-            from logHandler import log
-            log.debug(f"AudioThemes event_show error: {e}")
-        nextHandler()
+            log.debugWarning(f"event_show: {e}")
+        try:
+            nextHandler()
+        except Exception as e:
+            log.debugWarning(f"event_show nextHandler: {e}")
     def event_documentLoadComplete(self, obj, nextHandler):
+        from logHandler import log
         # Cache app name on handler
         try:
             self.handler._current_app_name = obj.appModule.appName if obj.appModule else None
@@ -793,12 +808,11 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                 obj_info = self._snapshot_obj(obj)
                 utils.threadPool.add_task(self.playObject, obj_info)
         except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
-        nextHandler()
+            log.debug(f"AudioThemes event_documentLoadComplete: {e}")
+        try:
+            nextHandler()
+        except Exception as e:
+            log.debugWarning(f"event_documentLoadComplete nextHandler: {e}")
     def playObject(self, obj_info):
         """
         Resolve the sound for an object and play it.
