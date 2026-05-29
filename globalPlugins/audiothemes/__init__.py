@@ -510,6 +510,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             self.handler._current_app_name = None
         try:
             nextHandler()
+        except UnboundLocalError:
+            pass
         except Exception as e:
             log.debugWarning(f"event_gainFocus nextHandler: {e}")
         obj_info = self._snapshot_obj(obj)

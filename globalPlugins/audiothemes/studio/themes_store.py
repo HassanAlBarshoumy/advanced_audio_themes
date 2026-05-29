@@ -1,3 +1,4 @@
+from contextlib import suppress
 import wx
 import urllib.request
 import json
@@ -277,8 +278,9 @@ class ThemesStoreDialog(wx.Dialog):
                         import threading
                         threading.Timer(5.0, lambda: os.remove(extracted_path) if os.path.exists(extracted_path) else None).start()
                     except Exception:
-                        if os.path.exists(extracted_path):
-                            os.remove(extracted_path)
+                        with suppress(PermissionError):
+                            if os.path.exists(extracted_path):
+                                os.remove(extracted_path)
                         
             wx.CallAfter(self.statusLabel.SetLabel, _("Preview finished."))
         except Exception as e:
@@ -286,9 +288,12 @@ class ThemesStoreDialog(wx.Dialog):
         finally:
             wx.CallAfter(self.previewBtn.Enable)
             try:
-                os.remove(tmp_path)
-            except Exception as e:
-                import logging
-                logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
+                tp = locals().get("tmp_path")
+                if tp and os.path.exists(tp):
+                    os.remove(tp)
+            except PermissionError:
+                pass
+            except Exception:
+                pass
     def OnClose(self, event):
         self.Destroy()
