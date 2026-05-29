@@ -3,7 +3,7 @@
 
 # This file is covered by the GNU General Public License.
 
-from typing import Sequence
+from typing import Sequence, List
 from dataclasses import dataclass, field, asdict
 from contextlib import suppress
 import os
@@ -11,7 +11,7 @@ import shutil
 import wx
 import gui
 from ..unspoken import UnspokenPlayer
-from ..handler import AudioTheme, AudioThemesHandler, theme_roles, SUPPORTED_FILE_TYPES, role_int_to_name
+from ..handler import AudioTheme, AudioThemesHandler, theme_roles, SUPPORTED_FILE_TYPES, get_active_file_types, role_int_to_name, state_name_to_int, STATE_OFFSET
 from .mic_recorder import MicRecorder
 import tempfile
 
@@ -35,9 +35,10 @@ class AudioDropTarget(wx.FileDropTarget):
 
 
 def _show_audio_file_dialog(parent):
-    # Translators: label for all supported file types found in an open dialog
-    wildcards = [_("All Supported Audio Formats") + "(*.wav, *.ogg, *.mp3)|*.wav;*.ogg;*.mp3"]
-    for ext, desc in SUPPORTED_FILE_TYPES.items():
+    active_types = get_active_file_types()
+    all_exts = ";".join(f"*.{ext}" for ext in active_types)
+    wildcards = [_("All Supported Audio Formats") + f" ({', '.join(active_types)})|{all_exts}"]
+    for ext, desc in active_types.items():
         wildcards.append(_(desc) + f" (*.{ext})|*.{ext}")
     openFileDlg = wx.FileDialog(
         parent,
@@ -193,6 +194,8 @@ class ThemeBlenderDialog(BaseDialog):
         self.removeButton = wx.Button(parent, wx.ID_REMOVE, _("&Remove"))
         # Translators: label for a button to add a new audio file
         self.addButton = wx.Button(parent, wx.ID_ADD, _("&Add..."))
+        # Translators: label for a button to import an entire folder
+        self.importFolderButton = wx.Button(parent, -1, _("Import &Folder..."))
         mainSizer = wx.BoxSizer(wx.HORIZONTAL)
         listSizer = wx.BoxSizer(wx.VERTICAL)
         actionButtonSizer = wx.BoxSizer(wx.VERTICAL)
@@ -207,6 +210,7 @@ class ThemeBlenderDialog(BaseDialog):
                 (self.editButton, 0, wx.ALL, 5),
                 (self.removeButton, 0, wx.ALL, 5),
                 (self.addButton, 0, wx.ALL, 5),
+                (self.importFolderButton, 0, wx.ALL, 5),
             ]
         )
         mainSizer.Add(listSizer, 1, wx.EXPAND | wx.ALL, 10)
@@ -238,6 +242,7 @@ class ThemeBlenderDialog(BaseDialog):
         self.Bind(wx.EVT_BUTTON, self.onExportAsATP, id=wx.ID_SAVEAS)
         self.Bind(wx.EVT_BUTTON, self.onEdit, self.editButton)
         self.Bind(wx.EVT_BUTTON, self.onAdd, self.addButton)
+        self.Bind(wx.EVT_BUTTON, self.onImportFolder, self.importFolderButton)
         self.Bind(wx.EVT_BUTTON, self.onRemove, self.removeButton)
         self.Bind(
             wx.EVT_LISTBOX, self.onEntriesListSelectionChanged, self.themeEntriesList
@@ -327,6 +332,74 @@ class ThemeBlenderDialog(BaseDialog):
             if dlg.ShowModal() == wx.ID_OK:
                 self.theme_state.state.append(dlg.get_sound())
                 self._maintain_state()
+
+    def onImportFolder(self, event):
+        dirDlg = wx.DirDialog(
+            self,
+            # Translators: title for a dialog to choose a folder to import
+            _("Choose a folder containing audio files to import"),
+            style=wx.DD_DEFAULT_STYLE,
+        )
+        if dirDlg.ShowModal() != wx.ID_OK:
+            dirDlg.Destroy()
+            return
+        folder = dirDlg.GetPath().strip()
+        dirDlg.Destroy()
+        if not folder:
+            return
+
+        extensions = {".wav", ".ogg", ".mp3", ".flac"}
+        existing_roles = {f.role for f in self.theme_state.state}
+        matched = []
+        for root, dirs, files in os.walk(folder):
+            for fname in files:
+                name, ext = os.path.splitext(fname)
+                if ext.lower() not in extensions:
+                    continue
+                role_val = role_name_to_int.get(name.lower())
+                if role_val is not None and role_val not in existing_roles:
+                    role_label = theme_roles[role_val]
+                    matched.append(SoundFileInfo(
+                        role=role_val,
+                        src=os.path.join(root, fname),
+                        dst=os.path.join(self.theme_state.theme.directory, fname),
+                    ))
+                    existing_roles.add(role_val)
+                else:
+                    state_val = state_name_to_int.get(name.lower())
+                    if state_val is not None:
+                        state_role = state_val + STATE_OFFSET
+                        if state_role not in existing_roles:
+                            role_label = theme_roles.get(state_role, name)
+                            matched.append(SoundFileInfo(
+                                role=state_role,
+                                src=os.path.join(root, fname),
+                                dst=os.path.join(self.theme_state.theme.directory, fname),
+                            ))
+                            existing_roles.add(state_role)
+
+        if not matched:
+            wx.MessageBox(
+                # Translators: message when no matching audio files were found
+                _("No matching audio files found in the selected folder."),
+                # Translators: title for an information message
+                _("Import Folder"),
+                style=wx.OK | wx.ICON_INFORMATION,
+            )
+            return
+
+        # Translators: title for a dialog showing imported files
+        msg = _("Found {count} matching file(s):\n\n").format(count=len(matched))
+        for m in matched:
+            msg += f"  {m.role_label} \u2190 {os.path.basename(m.src)}\n"
+        result = wx.MessageBox(
+            msg + _("\nDo you want to import them?"),
+            _("Import Folder"),
+            style=wx.YES_NO | wx.ICON_QUESTION,
+        )
+        if result == wx.YES:
+            self.theme_state.state.extend(matched)
+            self._maintain_state()
 
     def onRemove(self, event):
         if self.selected_sound is not None:

@@ -16,7 +16,7 @@ unescapePatterns = [
     for c in '.,!?'
 ]
 
-j = json.loads(open(r"C:\Users\tony\AppData\Roaming\nvda\phoneticPunctuationRules.json", 'r', encoding='utf-8').read())
+j = json.loads(open(os.path.join(os.environ.get("USERPROFILE", ""), "AppData", "Roaming", "nvda", "phoneticPunctuationRules.json"), 'r', encoding='utf-8').read())
 d = []
 for rule in j:
     if (

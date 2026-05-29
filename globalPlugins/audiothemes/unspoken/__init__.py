@@ -385,69 +385,68 @@ class UnspokenPlayer:
 				sounds[path] = sound
 				return sound
 
-		# Load raw PCM data from FFmpeg (when enabled) or native decoders
+		# Load raw PCM data from native decoders first, then FFmpeg as fallback
 		loaded = None
 		ext = path.lower().split('.')[-1] if '.' in path else ''
-		ffmpeg_used = False
-		try:
-			from config import conf
-			ffmpeg_used = conf.get("audiothemes", {}).get("enable_ffmpeg", False)
-		except Exception:
-			pass
 
-		if ffmpeg_used:
+		# Try native decoders first
+		if ext == 'ogg':
+			try:
+				from . import ogg_vorbis
+				loaded = ogg_vorbis.decode_ogg_to_float(path)
+			except Exception as e:
+				log.error(f"OGG decode failed for {path}: {e}")
+			if loaded is None:
+				result = {"path": path, "is_ogg": True}
+				if use_cache:
+					with sounds_lock:
+						sounds[path] = result
+				return result
+		elif ext == 'flac':
+			try:
+				from . import flac_decode
+				loaded = flac_decode.decode_flac_to_float(path)
+			except Exception as e:
+				log.error(f"FLAC decode failed for {path}: {e}")
+		elif ext == 'mp3':
+			try:
+				from . import mp3_decode
+				loaded = mp3_decode.decode_mp3_to_float(path)
+			except Exception as e:
+				log.error(f"MP3 decode failed for {path}: {e}")
+		elif ext == 'wav':
+			try:
+				with wave.open(path, "rb") as wav_file:
+					frames = wav_file.readframes(wav_file.getnframes())
+					sample_width = wav_file.getsampwidth()
+					channels = wav_file.getnchannels()
+					sample_rate = wav_file.getframerate()
+					if sample_width == 2:
+						arr = array('h')
+						arr.frombytes(frames)
+						float_samples = array('f', [s / 32768.0 for s in arr])
+						loaded = (float_samples, sample_rate, channels)
+					elif sample_width == 1:
+						float_samples = array('f', [(s - 128) / 128.0 for s in frames])
+						loaded = (float_samples, sample_rate, channels)
+					else:
+						log.error(f"Unsupported sample width: {sample_width}")
+			except Exception as e:
+				log.error(f"Failed to load {path}: {e}")
+
+		# Fall back to FFmpeg if native decode failed
+		if loaded is None:
 			try:
 				from . import ffmpeg_utils
 				loaded = ffmpeg_utils.decode_with_ffmpeg(path)
+				if loaded is not None:
+					ffmpeg_used = True
 			except Exception as e:
-				log.error(f"FFmpeg decode failed for {path}: {e}")
+				log.error(f"FFmpeg fallback decode failed for {path}: {e}")
 
 		if loaded is None:
-			ffmpeg_used = False
-			if ext == 'ogg':
-				try:
-					from . import ogg_vorbis
-					loaded = ogg_vorbis.decode_ogg_to_float(path)
-				except Exception as e:
-					log.error(f"OGG decode failed for {path}: {e}")
-				if loaded is None:
-					result = {"path": path, "is_ogg": True}
-					if use_cache:
-						with sounds_lock:
-							sounds[path] = result
-					return result
-			elif ext == 'mp3':
-				try:
-					from . import mp3_decode
-					loaded = mp3_decode.decode_mp3_to_float(path)
-				except Exception as e:
-					log.error(f"MP3 decode failed for {path}: {e}")
-				if loaded is None:
-					log.error(f"Failed to decode MP3: {path}")
-					return None
-			elif ext == 'wav':
-				try:
-					with wave.open(path, "rb") as wav_file:
-						frames = wav_file.readframes(wav_file.getnframes())
-						sample_width = wav_file.getsampwidth()
-						channels = wav_file.getnchannels()
-						sample_rate = wav_file.getframerate()
-						if sample_width == 2:
-							arr = array('h')
-							arr.frombytes(frames)
-							float_samples = array('f', [s / 32768.0 for s in arr])
-						elif sample_width == 1:
-							float_samples = array('f', [(s - 128) / 128.0 for s in frames])
-						else:
-							log.error(f"Unsupported sample width: {sample_width}")
-							return None
-						loaded = (float_samples, sample_rate, channels)
-				except Exception as e:
-					log.error(f"Failed to load {path}: {e}")
-					return None
-			else:
-				log.error(f"Unsupported format: {path}")
-				return None
+			log.error(f"Failed to decode audio: {path}")
+			return None
 
 		float_samples, sample_rate, channels = loaded
 
@@ -480,6 +479,14 @@ class UnspokenPlayer:
 				multiplier = i / float(fade_samples)
 				float_samples[i] *= multiplier
 				float_samples[num_samples - 1 - i] *= multiplier
+
+		if config.conf["unspoken"].get("NoiseGate", False):
+			from . import audio_filters
+			float_samples = array('f', audio_filters.apply_noise_gate(float_samples, sample_rate=sample_rate))
+
+		if config.conf["unspoken"].get("BassBoost", False):
+			from . import audio_filters
+			float_samples = array('f', audio_filters.apply_bass_boost(float_samples, sample_rate=sample_rate))
 
 		remainder = len(float_samples) % 1024
 		if remainder != 0:
@@ -597,13 +604,13 @@ class UnspokenPlayer:
 				angle_x = obj_info["progress_angle"]
 				angle_y = 0.0
 			
-			# BUG FIX: The old "SmoothPanning" logic interpolated the position with the previous object, 
-			# causing the sound to play at the wrong location (e.g., halfway between items).
-			# For absolute 3D precision, the sound must spawn exactly at the object's coordinates.
-			# if config.conf["unspoken"].get("SmoothPanning", True) and hasattr(self, '_last_angle_x'):
-			# 	angle_x = (angle_x + self._last_angle_x) / 2.0
-			# 	angle_y = (angle_y + self._last_angle_y) / 2.0
-				
+			if config.conf["unspoken"].get("SmoothPanning", True) and hasattr(self, '_last_angle_x'):
+				dx = abs(angle_x - self._last_angle_x)
+				dy = abs(angle_y - self._last_angle_y)
+				if max(dx, dy) < 30.0:
+					angle_x = (angle_x + self._last_angle_x) * 0.5
+					angle_y = (angle_y + self._last_angle_y) * 0.5
+
 			self._last_angle_x = angle_x
 			self._last_angle_y = angle_y
 		else:

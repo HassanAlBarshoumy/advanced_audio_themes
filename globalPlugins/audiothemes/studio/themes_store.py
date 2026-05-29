@@ -5,7 +5,7 @@ import threading
 import os
 import tempfile
 import gui
-from ..handler import AudioThemesHandler
+from ..handler import AudioThemesHandler, get_active_file_types
 
 import addonHandler
 try:
@@ -261,7 +261,9 @@ class ThemesStoreDialog(wx.Dialog):
                 f.write(pack_data)
                 
             with zipfile.ZipFile(tmp_path, "r") as z:
-                wav_files = [n for n in z.namelist() if n.lower().endswith('.wav') or n.lower().endswith('.ogg') or n.lower().endswith('.mp3')]
+                active_types = get_active_file_types()
+                ext_tuples = tuple('.' + ext for ext in active_types)
+                wav_files = [n for n in z.namelist() if n.lower().endswith(ext_tuples)]
                 if wav_files:
                     import random
                     # Prioritize button or window sounds for preview

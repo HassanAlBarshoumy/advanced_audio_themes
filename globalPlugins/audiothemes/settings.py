@@ -126,7 +126,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.rulesPage = RulesDialog(self.notebook)
         self.notebook.AddPage(self.rulesPage, _("Earcons & Speech Rules"))
 
-        # Tab 4: Miscellaneous
+        # Tab 5: Miscellaneous
         self.miscPage = wx.Panel(self.notebook)
         self.setupMiscPage(self.miscPage)
         self.notebook.AddPage(self.miscPage, _("Miscellaneous"))
@@ -456,6 +456,14 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.trimSilenceCheckbox = wx.CheckBox(page, -1, _("Trim silence from beginning and end of sounds"))
         engineSizer.Add(self.trimSilenceCheckbox, 0, wx.ALL, 5)
 
+        # Noise Gate
+        self.noiseGateCheckbox = wx.CheckBox(page, -1, _("Noise Gate (Remove background noise below threshold)"))
+        engineSizer.Add(self.noiseGateCheckbox, 0, wx.ALL, 5)
+
+        # Bass Boost
+        self.bassBoostCheckbox = wx.CheckBox(page, -1, _("Bass Boost (Enhance low frequencies)"))
+        engineSizer.Add(self.bassBoostCheckbox, 0, wx.ALL, 5)
+
         # Output Mode
         modeSizer = wx.BoxSizer(wx.HORIZONTAL)
         modeLabel = wx.StaticText(page, -1, _("Audio Output Mode:"))
@@ -483,7 +491,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         sizer.AddStretchSpacer()
         infoText = wx.StaticText(page, -1, _(
             "FFmpeg enables support for many audio formats.\n"
-            "Without it, only WAV and OGG are supported.\n"
+            "Without it, WAV, OGG, MP3, and FLAC are supported natively.\n"
             "Download size: ~50MB, extracted: ~12MB."
         ))
         sizer.Add(infoText, 0, wx.ALL, 5)
@@ -939,13 +947,15 @@ class AudioThemesSettingsPanel(SettingsPanel):
         
         unspoken_conf = config.conf["unspoken"]
         self.audioCacheCheckbox.SetValue(_b(unspoken_conf.get("AudioCache", True)))
-        self.smartVolumeCheckbox.SetValue(_b(unspoken_conf.get("SmartVolume", True)))
-        self.smoothEnvelopeCheckbox.SetValue(_b(unspoken_conf.get("SmoothEnvelope", True)))
+        self.smartVolumeCheckbox.SetValue(_b(unspoken_conf.get("SmartVolume", False)))
+        self.smoothEnvelopeCheckbox.SetValue(_b(unspoken_conf.get("SmoothEnvelope", False)))
         self.smoothPanningCheckbox.SetValue(_b(unspoken_conf.get("SmoothPanning", True)))
-        trim_sil = unspoken_conf.get("TrimSilence", False)
+        trim_sil = unspoken_conf.get("TrimSilence", True)
         if isinstance(trim_sil, str):
             trim_sil = trim_sil.lower() == "true"
         self.trimSilenceCheckbox.SetValue(_b(bool(trim_sil)))
+        self.noiseGateCheckbox.SetValue(_b(unspoken_conf.get("NoiseGate", False)))
+        self.bassBoostCheckbox.SetValue(_b(unspoken_conf.get("BassBoost", False)))
         
         mode = conf.get("output_mode", "stereo")
         if mode == "mono":
@@ -1067,8 +1077,6 @@ class AudioThemesSettingsPanel(SettingsPanel):
             from .unspoken import ffmpeg_utils
             path = ffmpeg_utils.get_ffmpeg_path()
             if path:
-                from .unspoken import ogg_vorbis as _ov
-                ogg_ok = True
                 self.ffmpegStatusText.SetLabel(_("FFmpeg: available at {path}").format(path=path))
                 self.downloadFFmpegButton.Enable(False)
             else:
@@ -1168,6 +1176,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
         unspoken_conf["SmoothEnvelope"] = self.smoothEnvelopeCheckbox.GetValue()
         unspoken_conf["SmoothPanning"] = self.smoothPanningCheckbox.GetValue()
         unspoken_conf["TrimSilence"] = self.trimSilenceCheckbox.GetValue()
+        unspoken_conf["NoiseGate"] = self.noiseGateCheckbox.GetValue()
+        unspoken_conf["BassBoost"] = self.bassBoostCheckbox.GetValue()
         unspoken_conf["Reverb"] = self.enableReverbCheckbox.IsChecked()
         unspoken_conf["RoomSize"] = self.roomSizeSlider.GetValue()
         unspoken_conf["Damping"] = self.dampingSlider.GetValue()
@@ -1256,10 +1266,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
         theme_path = os.path.join(THEMES_DIR, theme.folder)
         # Try to find common sound files to play
         sounds_to_try = [
-            "focus.wav", "focus.ogg", "focus.mp3",
-            "select.wav", "select.ogg", "select.mp3",
-            "button.wav", "button.ogg", "button.mp3",
-            "link.wav", "link.ogg", "link.mp3"
+            "focus.wav", "focus.ogg", "focus.mp3", "focus.flac",
+            "select.wav", "select.ogg", "select.mp3", "select.flac",
+            "button.wav", "button.ogg", "button.mp3", "button.flac",
+            "link.wav", "link.ogg", "link.mp3", "link.flac"
         ]
         
         def play_preview():
@@ -1348,7 +1358,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
     def _playThemePreview(self, theme):
         """Play a sample sound from the given theme as a preview."""
         # Try common sound names in order of preference
-        preview_names = ["button.ogg", "button.wav", "button.mp3", "link.ogg", "link.wav", "link.mp3", "checkbox.ogg", "checkbox.wav", "checkbox.mp3"]
+        preview_names = ["button.ogg", "button.wav", "button.mp3", "button.flac", "link.ogg", "link.wav", "link.mp3", "link.flac", "checkbox.ogg", "checkbox.wav", "checkbox.mp3", "checkbox.flac"]
         theme_dir = os.path.join(THEMES_DIR, theme.folder)
         for name in preview_names:
             path = os.path.join(theme_dir, name)

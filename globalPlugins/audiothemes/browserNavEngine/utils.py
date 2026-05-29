@@ -194,7 +194,10 @@ def getIA2DocumentInThread():
         while obj is not None:
             if obj.role == controlTypes.Role.DOCUMENT:
                 return obj
-            obj = obj.parent
+            try:
+                obj = obj.parent
+            except Exception:
+                break
         return None
 
 class DocumentHolder:

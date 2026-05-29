@@ -41,9 +41,34 @@ SUPPORTED_FILE_TYPES["ogg"] = _("Ogg audio files")
 SUPPORTED_FILE_TYPES["wav"] = _("Wave audio files")
 # Translators: The file type to be shown in a dialog used to browse for audio files.
 SUPPORTED_FILE_TYPES["mp3"] = _("MPEG audio files")
+# Translators: The file type to be shown in a dialog used to browse for audio files.
+SUPPORTED_FILE_TYPES["flac"] = _("FLAC audio files")
+# Translators: The file type to be shown in a dialog used to browse for audio files.
+SUPPORTED_FILE_TYPES["m4a"] = _("AAC/M4A audio files")
+# Translators: The file type to be shown in a dialog used to browse for audio files.
+SUPPORTED_FILE_TYPES["aac"] = _("AAC audio files")
+# Translators: The file type to be shown in a dialog used to browse for audio files.
+SUPPORTED_FILE_TYPES["opus"] = _("Opus audio files")
+# Translators: The file type to be shown in a dialog used to browse for audio files.
+SUPPORTED_FILE_TYPES["wma"] = _("WMA audio files")
+# Translators: The file type to be shown in a dialog used to browse for audio files.
+SUPPORTED_FILE_TYPES["mp2"] = _("MP2 audio files")
+# Translators: The file type to be shown in a dialog used to browse for audio files.
+SUPPORTED_FILE_TYPES["ac3"] = _("AC3 audio files")
 
-# Additional formats supported via FFmpeg (loaded dynamically at runtime)
-FFMPEG_FORMATS = ["mp3", "flac", "m4a", "aac", "wma", "opus", "mp2", "ac3"]
+# Additional formats supported natively (without FFmpeg)
+NATIVE_FORMATS = {"ogg", "wav", "mp3", "flac"}
+# Formats that require FFmpeg
+FFMPEG_ONLY_FORMATS = {"m4a", "aac", "opus", "wma", "mp2", "ac3"}
+
+def get_active_file_types():
+    try:
+        from config import conf
+        if conf.get("audiothemes", {}).get("enable_ffmpeg", False):
+            return SUPPORTED_FILE_TYPES
+    except Exception:
+        pass
+    return OrderedDict((k, v) for k, v in SUPPORTED_FILE_TYPES.items() if k in NATIVE_FORMATS)
 # When the active audio theme is being changed
 audiotheme_changed = extensionPoints.Action()
 
@@ -560,7 +585,7 @@ class AudioThemesHandler:
             
         theme = self.get_theme_for_app(foreground_app)
             
-        if not any(sound_name.endswith(ext) for ext in ('.wav', '.ogg', '.mp3')):
+        if not any(sound_name.endswith('.' + ext) for ext in SUPPORTED_FILE_TYPES):
             sound_name += '.wav'
             
         sound_path = os.path.join(theme.directory, sound_name)
@@ -632,7 +657,7 @@ class AudioThemesHandler:
             cache = _typing_dir_cache.get(typing_dir)
             if cache is None:
                 if os.path.isdir(typing_dir):
-                    files = [f for f in os.listdir(typing_dir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
+                    files = [f for f in os.listdir(typing_dir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]  # typing packs are bundled as WAV/OGG/MP3 only
                     cache = {'files': files}
                 else:
                     cache = {'files': []}
