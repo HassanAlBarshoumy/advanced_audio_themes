@@ -678,7 +678,7 @@ class AudioRuleDialog(wx.Dialog):
             if len(relDirName) > 0 and relDirName[0] == "\\":
                 relDirName = relDirName[1:]
             for fileName in fileList:
-                if fileName.lower().endswith(".wav"):
+                if fileName.lower().endswith((".wav", ".mp3")):
                     result.append(os.path.join(relDirName, fileName))
         return result
 

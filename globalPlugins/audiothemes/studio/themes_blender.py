@@ -36,7 +36,7 @@ class AudioDropTarget(wx.FileDropTarget):
 
 def _show_audio_file_dialog(parent):
     # Translators: label for all supported file types found in an open dialog
-    wildcards = [_("All Supported Audio Formats") + "(*.wav, *.ogg)|*.wav;*.ogg"]
+    wildcards = [_("All Supported Audio Formats") + "(*.wav, *.ogg, *.mp3)|*.wav;*.ogg;*.mp3"]
     for ext, desc in SUPPORTED_FILE_TYPES.items():
         wildcards.append(_(desc) + f" (*.{ext})|*.{ext}")
     openFileDlg = wx.FileDialog(

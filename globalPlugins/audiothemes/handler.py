@@ -39,6 +39,8 @@ SUPPORTED_FILE_TYPES = OrderedDict()
 SUPPORTED_FILE_TYPES["ogg"] = _("Ogg audio files")
 # Translators: The file type to be shown in a dialog used to browse for audio files.
 SUPPORTED_FILE_TYPES["wav"] = _("Wave audio files")
+# Translators: The file type to be shown in a dialog used to browse for audio files.
+SUPPORTED_FILE_TYPES["mp3"] = _("MPEG audio files")
 
 # Additional formats supported via FFmpeg (loaded dynamically at runtime)
 FFMPEG_FORMATS = ["mp3", "flac", "m4a", "aac", "wma", "opus", "mp2", "ac3"]
@@ -558,7 +560,7 @@ class AudioThemesHandler:
             
         theme = self.get_theme_for_app(foreground_app)
             
-        if not sound_name.endswith('.wav'):
+        if not any(sound_name.endswith(ext) for ext in ('.wav', '.ogg', '.mp3')):
             sound_name += '.wav'
             
         sound_path = os.path.join(theme.directory, sound_name)
@@ -630,7 +632,7 @@ class AudioThemesHandler:
             cache = _typing_dir_cache.get(typing_dir)
             if cache is None:
                 if os.path.isdir(typing_dir):
-                    files = [f for f in os.listdir(typing_dir) if f.lower().endswith(('.wav', '.ogg'))]
+                    files = [f for f in os.listdir(typing_dir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
                     cache = {'files': files}
                 else:
                     cache = {'files': []}

@@ -351,7 +351,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         if not pack: return
         typingSoundsDir = os.path.join(os.path.dirname(__file__), "typingSounds", pack)
         if not os.path.isdir(typingSoundsDir): return
-        files = [f for f in os.listdir(typingSoundsDir) if f.lower().endswith(('.wav', '.ogg'))]
+        files = [f for f in os.listdir(typingSoundsDir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
         if not files: return
 
         # Play a sequence of 3 rapid random keystrokes to simulate typing
@@ -377,7 +377,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         
         # Count sounds
         try:
-            files = [f for f in os.listdir(typingSoundsDir) if f.lower().endswith(('.wav', '.ogg'))]
+            files = [f for f in os.listdir(typingSoundsDir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
             count = len(files)
         except Exception:
             count = 0
@@ -1256,10 +1256,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
         theme_path = os.path.join(THEMES_DIR, theme.folder)
         # Try to find common sound files to play
         sounds_to_try = [
-            "focus.wav", "focus.ogg",
-            "select.wav", "select.ogg",
-            "button.wav", "button.ogg",
-            "link.wav", "link.ogg"
+            "focus.wav", "focus.ogg", "focus.mp3",
+            "select.wav", "select.ogg", "select.mp3",
+            "button.wav", "button.ogg", "button.mp3",
+            "link.wav", "link.ogg", "link.mp3"
         ]
         
         def play_preview():
@@ -1283,7 +1283,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             
         try:
             import os
-            files = [f for f in os.listdir(self.selected_theme.directory) if f.lower().endswith(('.wav', '.ogg'))]
+            files = [f for f in os.listdir(self.selected_theme.directory) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
             theme_dict["count"] = len(files)
         except Exception:
             theme_dict["count"] = 0
@@ -1348,7 +1348,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
     def _playThemePreview(self, theme):
         """Play a sample sound from the given theme as a preview."""
         # Try common sound names in order of preference
-        preview_names = ["button.ogg", "button.wav", "link.ogg", "link.wav", "checkbox.ogg", "checkbox.wav"]
+        preview_names = ["button.ogg", "button.wav", "button.mp3", "link.ogg", "link.wav", "link.mp3", "checkbox.ogg", "checkbox.wav", "checkbox.mp3"]
         theme_dir = os.path.join(THEMES_DIR, theme.folder)
         for name in preview_names:
             path = os.path.join(theme_dir, name)
