@@ -59,15 +59,15 @@ def ov_read(vf_buffer):
     buf_size = 4096
     buf = ctypes.create_string_buffer(buf_size)
     bitstream = ctypes.c_int(0)
-	total_data = bytearray()
-	while True:
-		ret = _vorbisfile_lib.ov_read(vf_buffer, buf, buf_size, 0, 2, 1, ctypes.byref(bitstream))
-		if ret == 0:
-			break
-		if ret < 0:
-			log.debugWarning(f"ov_read error: {ret} (OV_HOLE=OV_ENOTVORBIS?) — continuing with partial data")
-			break
-		total_data.extend(buf.raw[:ret])
+    total_data = bytearray()
+    while True:
+        ret = _vorbisfile_lib.ov_read(vf_buffer, buf, buf_size, 0, 2, 1, ctypes.byref(bitstream))
+        if ret == 0:
+            break
+        if ret < 0:
+            log.debugWarning(f"ov_read error: {ret} (OV_HOLE=OV_ENOTVORBIS?) — continuing with partial data")
+            break
+        total_data.extend(buf.raw[:ret])
     return bytes(total_data)
 
 # --- ov_clear ---
