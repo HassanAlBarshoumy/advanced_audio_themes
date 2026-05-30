@@ -285,12 +285,6 @@ CONFLICT_PENDING_FILE = os.path.join(THEMES_DIR, ".pending_conflict.json")
 
 
 def showPendingConflicts():
-	try:
-		with open(CONFLICT_PENDING_FILE, "r") as f:
-			found_ids = json.load(f)
-		os.remove(CONFLICT_PENDING_FILE)
-	except Exception:
-		return
 	conflicting_ids = {
 		"navSounds": "Navigation Sound Effects",
 		"SentenceNav": "SentenceNav",
@@ -299,6 +293,22 @@ def showPendingConflicts():
 		"audiothemes": "Audio Themes (legacy)",
 		"audio_themes_NG": "Audio Themes NG (legacy)",
 	}
+	try:
+		found = [
+			addon.name for addon in addonHandler.getAvailableAddons()
+			if addon.name in conflicting_ids and not addon.isPendingRemove
+		]
+		if found:
+			with open(CONFLICT_PENDING_FILE, "w") as f:
+				json.dump(found, f)
+	except Exception:
+		pass
+	try:
+		with open(CONFLICT_PENDING_FILE, "r") as f:
+			found_ids = json.load(f)
+		os.remove(CONFLICT_PENDING_FILE)
+	except Exception:
+		return
 	display_names = [conflicting_ids.get(n, n) for n in found_ids]
 	import gui
 	import wx
@@ -309,19 +319,24 @@ def showPendingConflicts():
 	gui.mainFrame.prePopup()
 	try:
 		dlg = wx.Dialog(gui.mainFrame, title=_("Conflicting Add-ons"))
+		dlg.Name = _("Conflicting Add-ons")
 		sizer = wx.BoxSizer(wx.VERTICAL)
 		label = wx.StaticText(dlg, label=_(
 			"The following add-ons are now included in Advanced Audio Themes.\n"
 			"Select the ones you want to remove to prevent conflicts:"
 		))
+		label.Name = _("The following add-ons are now included in Advanced Audio Themes. Select the ones you want to remove to prevent conflicts:")
 		sizer.Add(label, flag=wx.ALL | wx.EXPAND, border=10)
 		clb = wx.CheckListBox(dlg, choices=display_names)
+		clb.Name = _("Conflicting add-ons list")
 		for i in range(len(display_names)):
 			clb.Check(i)
 		sizer.Add(clb, proportion=1, flag=wx.ALL | wx.EXPAND, border=10)
 		btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
 		ok_btn = wx.Button(dlg, wx.ID_OK, _("Remove selected"))
+		ok_btn.Name = _("Remove selected")
 		cancel_btn = wx.Button(dlg, wx.ID_CANCEL, _("Skip"))
+		cancel_btn.Name = _("Skip")
 		btn_sizer.Add(ok_btn, flag=wx.ALL, border=5)
 		btn_sizer.Add(cancel_btn, flag=wx.ALL, border=5)
 		sizer.Add(btn_sizer, flag=wx.ALIGN_CENTER | wx.ALL, border=10)
