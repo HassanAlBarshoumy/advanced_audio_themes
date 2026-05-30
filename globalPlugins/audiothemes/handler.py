@@ -99,6 +99,7 @@ audiothemes_config_defaults = {
     "output_mode": "string(default='stereo')",
     "ffmpeg_path": "string(default='')",
     "enable_ffmpeg": "boolean(default=False)",
+    "dont_show_conflicts": "boolean(default=False)",
 }
 
 
@@ -285,6 +286,8 @@ CONFLICT_PENDING_FILE = os.path.join(THEMES_DIR, ".pending_conflict.json")
 
 
 def showPendingConflicts():
+	if config.conf["audiothemes"].get("dont_show_conflicts", False):
+		return
 	conflicting_ids = {
 		"navSounds": "Navigation Sound Effects",
 		"SentenceNav": "SentenceNav",
@@ -332,6 +335,9 @@ def showPendingConflicts():
 		for i in range(len(display_names)):
 			clb.Check(i)
 		sizer.Add(clb, proportion=1, flag=wx.ALL | wx.EXPAND, border=10)
+		dont_show = wx.CheckBox(dlg, label=_("Don't show this dialog again"))
+		dont_show.Name = _("Don't show this dialog again")
+		sizer.Add(dont_show, flag=wx.ALL | wx.EXPAND, border=10)
 		btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
 		ok_btn = wx.Button(dlg, wx.ID_OK, _("Remove selected"))
 		ok_btn.Name = _("Remove selected")
@@ -341,10 +347,12 @@ def showPendingConflicts():
 		btn_sizer.Add(cancel_btn, flag=wx.ALL, border=5)
 		sizer.Add(btn_sizer, flag=wx.ALIGN_CENTER | wx.ALL, border=10)
 		dlg.SetSizer(sizer)
-		dlg.SetSize((500, 350))
+		dlg.SetSize((500, 400))
 		dlg.CenterOnScreen()
 		dlg.Raise()
 		if dlg.ShowModal() == wx.ID_OK:
+			if dont_show.IsChecked():
+				config.conf["audiothemes"]["dont_show_conflicts"] = True
 			for i, name in enumerate(found_ids):
 				if clb.IsChecked(i):
 					for addon in addonHandler.getAvailableAddons():
