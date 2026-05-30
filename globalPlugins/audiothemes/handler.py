@@ -330,12 +330,13 @@ def showPendingConflicts():
 		))
 		label.Name = _("The following add-ons are now included in Advanced Audio Themes. Select the ones you want to remove to prevent conflicts:")
 		sizer.Add(label, flag=wx.ALL | wx.EXPAND, border=10)
-		checkboxes = []
+		conflict_list = wx.ListView(dlg, style=wx.LC_REPORT | wx.LC_NO_HEADER, name=_("Conflicting add-ons"))
+		conflict_list.EnableCheckBoxes(True)
+		conflict_list.InsertColumn(0, _("Conflicting add-ons"), width=460)
 		for display in display_names:
-			cb = wx.CheckBox(dlg, label=display)
-			cb.Name = display
-			sizer.Add(cb, flag=wx.ALL | wx.EXPAND, border=5)
-			checkboxes.append(cb)
+			idx = conflict_list.GetItemCount()
+			conflict_list.InsertItem(idx, display)
+		sizer.Add(conflict_list, proportion=1, flag=wx.ALL | wx.EXPAND, border=10)
 		dont_show = wx.CheckBox(dlg, label=_("Don't show this dialog again"))
 		dont_show.Name = _("Don't show this dialog again")
 		sizer.Add(dont_show, flag=wx.ALL | wx.EXPAND, border=10)
@@ -355,7 +356,7 @@ def showPendingConflicts():
 			if dont_show.IsChecked():
 				config.conf["audiothemes"]["dont_show_conflicts"] = True
 			for i, name in enumerate(found_ids):
-				if checkboxes[i].IsChecked():
+				if conflict_list.IsChecked(i):
 					for addon in addonHandler.getAvailableAddons():
 						if addon.name == name and not addon.isPendingRemove:
 							addon.requestRemove()
