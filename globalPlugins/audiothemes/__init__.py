@@ -220,6 +220,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             "kb:w": "speakObject",
             "kb:h": "audioThemesHelp",
         }
+        self._helpDialog = None
+        self._studioDialog = None
         self._rebindInstanceGestures()
         try:
             wx.CallAfter(showPendingConflicts)
@@ -409,6 +411,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
 
     @script(description=_("Shows audio themes commands help."))
     def script_audioThemesHelp(self, gesture):
+        if self._helpDialog is not None:
+            try:
+                self._helpDialog.Raise()
+                return
+            except Exception:
+                self._helpDialog = None
         import wx
         from gui import mainFrame
         
@@ -435,6 +443,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                     "w: " + _("Speak Object 3D Coordinates") + " " + _("(Plays 3D sound even if 3D mode is disabled)")
                 ]
             )
+            self._helpDialog = dlg
+            dlg.Raise()
             if dlg.ShowModal() == wx.ID_OK:
                 sel = dlg.GetSelection()
                 if sel == 0:
@@ -468,6 +478,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                 elif sel == 14:
                     self.script_speakObject(None)
             dlg.Destroy()
+            self._helpDialog = None
         wx.CallAfter(runDialog)
 
     def terminate(self):
@@ -535,9 +546,17 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             except:
                 pass
     def on_studio_item_clicked(self, event):
-        # Translators: title for the audio themes studio dialog
+        if self._studioDialog is not None:
+            try:
+                self._studioDialog.Raise()
+                return
+            except Exception:
+                self._studioDialog = None
         with AudioThemesStudioStartupDialog(self, _("Audio Themes Studio")) as dlg:
+            self._studioDialog = dlg
+            dlg.Raise()
             dlg.ShowModal()
+        self._studioDialog = None
 
     def on_settings_item_clicked(self, event):
         import wx
