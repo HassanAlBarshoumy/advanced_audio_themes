@@ -18,6 +18,7 @@
 """
 
 from contextlib import suppress
+import ctypes
 import _ctypes
 import time
 import wx
@@ -161,25 +162,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         self._audio_beacon_location = None
         self._audio_beacon_desktop = None
         self._last_focus_is_editable = False
-        # Add the menu item for the audio themes studio
-        self.studioMenuItem = gui.mainFrame.sysTrayIcon.menu.Append(
-            wx.NewIdRef(),
-            # Translators: label for the audio themes studio menu item
-            _("&Audio Themes Studio"),
-        )
-        gui.mainFrame.sysTrayIcon.Bind(
-            wx.EVT_MENU, self.on_studio_item_clicked, self.studioMenuItem
-        )
-
-        # Add checkable menu item for quickly toggling audio themes
-        self.toggleMenuItem = gui.mainFrame.sysTrayIcon.menu.AppendCheckItem(
-            wx.NewIdRef(),
-            _("Enable Audio Themes"),
-        )
-        self.toggleMenuItem.Check(config.conf["audiothemes"]["enable_audio_themes"])
-        gui.mainFrame.sysTrayIcon.Bind(
-            wx.EVT_MENU, self.on_toggle_item_clicked, self.toggleMenuItem
-        )
+        # Defer menu item creation — the sys tray icon may not be ready yet
+        wx.CallAfter(self._create_menu_items)
 
         # Browse-mode navigation timer: polls the navigator object every 180ms.
         # This is the ONLY way to detect arrow-key movement inside a virtual
@@ -241,6 +225,108 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             wx.CallAfter(showPendingConflicts)
         except Exception:
             pass
+
+    def _create_menu_items(self):
+        for id_val, handler in [
+            (20000, self.on_studio_item_clicked),
+            (20001, self.on_toggle_item_clicked),
+        ]:
+            gui.mainFrame.sysTrayIcon.Bind(wx.EVT_MENU, handler, id=id_val)
+        self._install_menu_hook()
+
+    def _install_menu_hook(self):
+        import ctypes
+        from ctypes import wintypes
+        user32 = ctypes.windll.user32
+        kernel32 = ctypes.windll.kernel32
+
+        user32.CallNextHookEx.argtypes = [
+            ctypes.c_void_p, ctypes.c_int, ctypes.c_size_t, ctypes.c_ssize_t
+        ]
+        user32.CallNextHookEx.restype = ctypes.c_ssize_t
+
+        user32.AppendMenuW.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint, ctypes.c_size_t, ctypes.c_wchar_p
+        ]
+        user32.AppendMenuW.restype = ctypes.c_bool
+        user32.GetMenuItemCount.argtypes = [ctypes.c_void_p]
+        user32.GetMenuItemCount.restype = ctypes.c_uint
+        user32.GetMenuItemID.argtypes = [ctypes.c_void_p, ctypes.c_int]
+        user32.GetMenuItemID.restype = ctypes.c_uint
+        user32.CheckMenuItem.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_uint]
+        user32.CheckMenuItem.restype = ctypes.c_uint
+
+        class CWPSTRUCT(ctypes.Structure):
+            _fields_ = [
+                ("lParam", wintypes.LPARAM),
+                ("wParam", wintypes.WPARAM),
+                ("message", wintypes.UINT),
+                ("hwnd", wintypes.HWND),
+            ]
+
+        WM_INITMENUPOPUP = 0x0117
+        HOOKPROC = ctypes.CFUNCTYPE(
+            ctypes.c_ssize_t, ctypes.c_int, ctypes.c_size_t, ctypes.c_ssize_t
+        )
+
+        def hook_proc(nCode, wParam, lParam):
+            if nCode >= 0:
+                cwp = ctypes.cast(
+                    ctypes.c_void_p(lParam),
+                    ctypes.POINTER(CWPSTRUCT)
+                ).contents
+                if cwp.message == WM_INITMENUPOPUP:
+                    hMenu = ctypes.c_void_p(cwp.wParam)
+                    try:
+                        if self._is_tray_menu(hMenu):
+                            if not self._hmenu_has_our_ids(hMenu):
+                                self._add_items_to_hmenu(hMenu)
+                            self._update_toggle_checkmark(hMenu)
+                    except Exception:
+                        pass
+            return user32.CallNextHookEx(None, nCode, wParam, lParam)
+
+        self._hook_proc = HOOKPROC(hook_proc)
+        thread_id = kernel32.GetCurrentThreadId()
+        self._hook_handle = user32.SetWindowsHookExW(
+            4, self._hook_proc, None, thread_id
+        )
+        if not self._hook_handle:
+            raise ctypes.WinError()
+
+    def _is_tray_menu(self, hMenu):
+        user32 = ctypes.windll.user32
+        for i in range(user32.GetMenuItemCount(hMenu)):
+            try:
+                if user32.GetMenuItemID(hMenu, i) in (wx.ID_EXIT, wx.ID_ABOUT):
+                    return True
+            except Exception:
+                pass
+        return False
+
+    def _hmenu_has_our_ids(self, hMenu):
+        user32 = ctypes.windll.user32
+        for i in range(user32.GetMenuItemCount(hMenu)):
+            if user32.GetMenuItemID(hMenu, i) in (20000, 20001):
+                return True
+        return False
+
+    def _add_items_to_hmenu(self, hMenu):
+        user32 = ctypes.windll.user32
+        user32.AppendMenuW(hMenu, 0x800, 0, None)
+        s1 = ctypes.create_unicode_buffer(_("&Audio Themes Studio"))
+        user32.AppendMenuW(hMenu, 0, 20000, s1)
+        s2 = ctypes.create_unicode_buffer(_("Enable Audio Themes"))
+        user32.AppendMenuW(hMenu, 0, 20001, s2)
+
+    def _update_toggle_checkmark(self, hMenu):
+        user32 = ctypes.windll.user32
+        for i in range(user32.GetMenuItemCount(hMenu)):
+            if user32.GetMenuItemID(hMenu, i) == 20001:
+                checked = config.conf["audiothemes"]["enable_audio_themes"]
+                flags = 0x0008 if checked else 0x0000
+                user32.CheckMenuItem(hMenu, i, flags | 0x0400)
+                break
 
     def _hook_caretMovementScriptHelper(self, extraDetail, unit, direction, posConstant=textInfos.POSITION_CARET, *args, **kwargs):
         if self.orig_caretMovementScriptHelper:
@@ -389,9 +475,11 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             gui.settingsDialogs.NVDASettingsDialog.categoryClasses.remove(
                 AudioThemesSettingsPanel
             )
-            gui.mainFrame.sysTrayIcon.menu.RemoveItem(self.studioMenuItem)
-            
-            gui.mainFrame.sysTrayIcon.menu.RemoveItem(self.toggleMenuItem)
+            user32 = ctypes.windll.user32
+            hMenu = int(gui.mainFrame.sysTrayIcon.menu.GetHandle())
+            if hMenu:
+                user32.RemoveMenu(hMenu, 20000, 0)
+                user32.RemoveMenu(hMenu, 20001, 0)
             self.restoreMonkeyPatches()
             self._unhook_keyboard()
             if self.orig_caretMovementScriptHelper:
@@ -469,8 +557,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
     def on_toggle_item_clicked(self, event):
         enabled = not config.conf["audiothemes"]["enable_audio_themes"]
         config.conf["audiothemes"]["enable_audio_themes"] = enabled
-        self.toggleMenuItem.Check(enabled)
-        # Notify handler
         self.handler.configure()
         if enabled:
             ui.message(_("Audio themes enabled"))
@@ -758,7 +844,13 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         if isSameScript == 0:
             enabled = not config.conf["audiothemes"]["enable_audio_themes"]
             config.conf["audiothemes"]["enable_audio_themes"] = enabled
-            self.toggleMenuItem.Check(enabled)
+            try:
+                user32 = ctypes.windll.user32
+                hMenu = int(gui.mainFrame.sysTrayIcon.menu.GetHandle())
+                if hMenu:
+                    user32.CheckMenuItem(hMenu, 20001, 8 if enabled else 0)
+            except Exception:
+                pass
             self.handler.configure()
             if enabled:
                 ui.message(_("Enable audio themes"))

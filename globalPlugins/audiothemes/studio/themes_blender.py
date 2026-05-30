@@ -185,7 +185,7 @@ class ThemeBlenderDialog(BaseDialog):
     def addControls(self, sizer, parent):
         # Translators: label for a list containing theme's audio files
         themeEntriesLabel = wx.StaticText(parent, -1, _("Theme Sounds"))
-        self.themeEntriesList = wx.ListBox(parent, -1)
+        self.themeEntriesList = wx.ListBox(parent, -1, name=_("Theme Sounds"))
         # Translators: label for a button to change the audio file
         self.editButton = wx.Button(parent, wx.ID_EDIT, _("&Change..."))
         # Translators: label for a button to remove the audio file
@@ -425,7 +425,7 @@ class AudioSelectorDialog(BaseDialog):
     def addControls(self, sizer, parent):
         # Translators: label for a choice containing theme roles
         roleChoiceLabel = wx.StaticText(parent, -1, _("Sound For:"))
-        self.roleChoice = wx.Choice(parent, -1)
+        self.roleChoice = wx.Choice(parent, -1, name=_("Sound For"))
         # Translators: label for a button to browse to a an audio file
         self.browseButton = wx.Button(parent, -1, _("&Browse"))
         # Translators: label for a button to preview the selected sound

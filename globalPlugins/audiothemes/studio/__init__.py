@@ -34,14 +34,14 @@ class NewThemeInfoDialog(BaseDialog):
     def addControls(self, sizer, parent):
         # Translators: label for a text field
         themeNameLabel = wx.StaticText(parent, -1, _("Theme Name"))
-        self.themeNameEdit = wx.TextCtrl(parent, -1, name="name")
+        self.themeNameEdit = wx.TextCtrl(parent, -1, name=_("Theme Name"))
         # Translators: label for a text field
         themeAuthorLabel = wx.StaticText(parent, -1, _("Theme Author"))
-        self.themeAuthorEdit = wx.TextCtrl(parent, -1, name="author")
+        self.themeAuthorEdit = wx.TextCtrl(parent, -1, name=_("Theme Author"))
         # Translators: label for a text field
         themeSummaryLabel = wx.StaticText(parent, -1, _("Theme Description"))
         self.themeSummaryEdit = wx.TextCtrl(
-            parent, -1, style=wx.TE_MULTILINE, name="summary"
+            parent, -1, style=wx.TE_MULTILINE, name=_("Theme Description")
         )
         sizer.AddMany(
             [
@@ -81,7 +81,7 @@ class AudioThemeSelectorDialog(BaseDialog):
     def addControls(self, sizer, parent):
         # Translators: label for the audio theme selector choice
         themesChoiceLabel = wx.StaticText(parent, -1, _("Audio themes"))
-        self.themeChoice = wx.Choice(parent, -1)
+        self.themeChoice = wx.Choice(parent, -1, name=_("Audio themes"))
         sizer.AddMany(
             [
                 (themesChoiceLabel, 0, wx.ALL, 5),
@@ -107,7 +107,7 @@ class AudioThemesStudioStartupDialog(BaseDialog):
 
     def addControls(self, sizer, parent):
         # Translators: instruction message in the audio themes studio startup dialog
-        dialogMessage = wx.StaticText(self, -1, _(WELCOME_MSG))
+        dialogMessage = wx.StaticText(self, -1, WELCOME_MSG)
         self.createNewThemeButton = CommandLinkButton(
             parent,
             -1,

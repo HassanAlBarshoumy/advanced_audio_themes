@@ -47,7 +47,7 @@ class RoleSelectionDialog(wx.Dialog):
         label = wx.StaticText(self, label=_("Select the roles you want NVDA to speak (if the global speak roles setting is enabled):"))
         mainSizer.Add(label, 0, wx.ALL | wx.EXPAND, 10)
         
-        self.rolesListBox = wx.ListView(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_NO_HEADER)
+        self.rolesListBox = wx.ListView(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_NO_HEADER, name=_("Roles"))
         self.rolesListBox.EnableCheckBoxes(True)
         self.rolesListBox.InsertColumn(0, _("Roles"), width=360)
         mainSizer.Add(self.rolesListBox, 1, wx.ALL | wx.EXPAND, 10)
@@ -157,7 +157,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.innerPanel = innerPanel = wx.Panel(page)
         # Translators: label for a combobox containing a list of installed audio themes
         installedThemesLabel = wx.StaticText(innerPanel, -1, _("Select theme:"))
-        self.installedThemesChoice = wx.Choice(innerPanel, -1)
+        self.installedThemesChoice = wx.Choice(innerPanel, -1, name=_("Select theme"))
         # Translators: label for a button to show info about an audio theme
         self.aboutThemeButton = wx.Button(innerPanel, -1, _("&About"))
         # Translators: label for a button to remove an audio theme
@@ -215,7 +215,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # Audio Ducking
         self.audioDuckingCheckbox = wx.CheckBox(innerPanel, -1, _("Audio Ducking (lower volume when NVDA speaks)"))
         duckingVolLabel = wx.StaticText(innerPanel, -1, _("Ducked Volume (%):"))
-        self.audioDuckingVolumeSlider = wx.Slider(innerPanel, -1, minValue=1, maxValue=100)
+        self.audioDuckingVolumeSlider = wx.Slider(innerPanel, -1, minValue=1, maxValue=100, name=_("Ducked Volume"))
         
         # Speak Roles Checkbox (alone)
         # Say All Roles Sizer
@@ -243,7 +243,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         
         # Application Blacklist
         disabledAppsLabel = wx.StaticText(innerPanel, -1, _("Disable Audio Themes in these applications (comma separated):"))
-        self.disabledAppsEdit = wx.TextCtrl(innerPanel, -1, value="")
+        self.disabledAppsEdit = wx.TextCtrl(innerPanel, -1, value="", name=_("Disable in applications"))
         innerSizer.AddMany([
             (disabledAppsLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10),
             (self.disabledAppsEdit, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
@@ -253,7 +253,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.typingSoundsCheckbox = wx.CheckBox(innerPanel, -1, _("Enable typing sounds"))
         self.typingSoundsEditOnlyCheckbox = wx.CheckBox(innerPanel, -1, _("Play typing sounds only in edit boxes"))
         typingVolumeLabel = wx.StaticText(innerPanel, -1, _("Typing sounds volume:"))
-        self.typingSoundsVolumeSlider = wx.Slider(innerPanel, -1, minValue=0, maxValue=100)
+        self.typingSoundsVolumeSlider = wx.Slider(innerPanel, -1, minValue=0, maxValue=100, name=_("Typing sounds volume"))
         
         typingPackLabel = wx.StaticText(innerPanel, -1, _("Typing sound pack:"))
         self.typingPackChoices = []
@@ -264,7 +264,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             self.typingPackChoices = ["1blueSwitch"]
 
         typingPackSizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.typingPackCombobox = wx.Choice(innerPanel, -1, choices=self.typingPackChoices)
+        self.typingPackCombobox = wx.Choice(innerPanel, -1, choices=self.typingPackChoices, name=_("Typing sound pack"))
         self.aboutTypingSoundsButton = wx.Button(innerPanel, -1, _("&About"))
         typingPackSizer.Add(self.typingPackCombobox, 1, wx.EXPAND | wx.RIGHT, 5)
         typingPackSizer.Add(self.aboutTypingSoundsButton, 0, wx.ALL, 0)
@@ -467,7 +467,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # Output Mode
         modeSizer = wx.BoxSizer(wx.HORIZONTAL)
         modeLabel = wx.StaticText(page, -1, _("Audio Output Mode:"))
-        self.outputModeChoice = wx.Choice(page, -1, choices=[_("3D Spatial (Stereo)"), _("Centered (Mono)")])
+        self.outputModeChoice = wx.Choice(page, -1, choices=[_("3D Spatial (Stereo)"), _("Centered (Mono)")], name=_("Audio Output Mode"))
         modeSizer.Add(modeLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
         modeSizer.Add(self.outputModeChoice, 1, wx.EXPAND | wx.ALL, 0)
         engineSizer.Add(modeSizer, 0, wx.EXPAND | wx.ALL, 5)
@@ -570,7 +570,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         )
         
         announceFormatChoices = [name for fmt_code, name in self.ANNOUNCE_FORMATS]
-        self.announceFormatChoice = wx.Choice(page, -1, choices=announceFormatChoices)
+        self.announceFormatChoice = wx.Choice(page, -1, choices=announceFormatChoices, name=_("Announcement format"))
         sizer.Add(self.announceFormatChoice, 0, wx.EXPAND | wx.ALL, 5)
         
         # --- Per-role customization ---
@@ -610,7 +610,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # Search box for filtering roles
         searchSizer = wx.BoxSizer(wx.HORIZONTAL)
         searchLabel = wx.StaticText(page, -1, _("Search for a role:"))
-        self.roleSearchEdit = wx.TextCtrl(page, -1, value="")
+        self.roleSearchEdit = wx.TextCtrl(page, -1, value="", name=_("Search for a role"))
         searchSizer.Add(searchLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
         searchSizer.Add(self.roleSearchEdit, 1, wx.EXPAND | wx.ALL, 5)
         sizer.Add(searchSizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5)
@@ -679,7 +679,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         sizer.Add(helpText, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
         
         # List of mappings
-        self.appProfilesList = wx.ListCtrl(page, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
+        self.appProfilesList = wx.ListCtrl(page, style=wx.LC_REPORT | wx.LC_SINGLE_SEL, name=_("Application Profiles"))
         self.appProfilesList.InsertColumn(0, _("Application (e.g. chrome.exe)"), width=200)
         self.appProfilesList.InsertColumn(1, _("Audio Theme"), width=150)
         self.appProfilesList.InsertColumn(2, _("Typing Sound Pack"), width=150)
@@ -771,13 +771,13 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         # Paragraph chime volume
         pChimeLabel = wx.StaticText(page, -1, _("Paragraph boundary chime volume:"))
-        self.paragraphChimeVolumeSlider = wx.Slider(page, -1, minValue=0, maxValue=100)
+        self.paragraphChimeVolumeSlider = wx.Slider(page, -1, minValue=0, maxValue=100, name=_("Paragraph boundary chime volume"))
         sentBox.Add(pChimeLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         sentBox.Add(self.paragraphChimeVolumeSlider, 0, wx.EXPAND | wx.ALL, 5)
 
         # No next sentence chime
         nChimeLabel = wx.StaticText(page, -1, _("No more sentences chime volume:"))
-        self.noNextSentenceChimeSlider = wx.Slider(page, -1, minValue=0, maxValue=100)
+        self.noNextSentenceChimeSlider = wx.Slider(page, -1, minValue=0, maxValue=100, name=_("No more sentences chime volume"))
         sentBox.Add(nChimeLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         sentBox.Add(self.noNextSentenceChimeSlider, 0, wx.EXPAND | wx.ALL, 5)
 
@@ -797,61 +797,61 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.reconstructOptions = ["always", "sameIndent", "never"]
         self.reconstructOptionsText = [_("Always"), _("Same indent and style"), _("Never")]
         reconLabel = wx.StaticText(page, -1, _("Reconstruct sentences across paragraphs:"))
-        self.reconstructModeCombobox = wx.Choice(page, -1, choices=self.reconstructOptionsText)
+        self.reconstructModeCombobox = wx.Choice(page, -1, choices=self.reconstructOptionsText, name=_("Reconstruct sentences across paragraphs"))
         sentBox.Add(reconLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         sentBox.Add(self.reconstructModeCombobox, 0, wx.EXPAND | wx.ALL, 5)
 
         # Sentence breakers
         breakLabel = wx.StaticText(page, -1, _("Sentence breakers:"))
-        self.sentenceBreakersEdit = wx.TextCtrl(page, -1)
+        self.sentenceBreakersEdit = wx.TextCtrl(page, -1, name=_("Sentence breakers"))
         sentBox.Add(breakLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         sentBox.Add(self.sentenceBreakersEdit, 0, wx.EXPAND | wx.ALL, 5)
 
         # Full width sentence breakers
         fwSentenceBreakLabel = wx.StaticText(page, -1, _("Full width sentence breakers:"))
-        self.fullWidthSentenceBreakersEdit = wx.TextCtrl(page, -1)
+        self.fullWidthSentenceBreakersEdit = wx.TextCtrl(page, -1, name=_("Full width sentence breakers"))
         sentBox.Add(fwSentenceBreakLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         sentBox.Add(self.fullWidthSentenceBreakersEdit, 0, wx.EXPAND | wx.ALL, 5)
 
         # Phrase breakers
         phraseBreakLabel = wx.StaticText(page, -1, _("Phrase breakers:"))
-        self.phraseBreakersEdit = wx.TextCtrl(page, -1)
+        self.phraseBreakersEdit = wx.TextCtrl(page, -1, name=_("Phrase breakers"))
         sentBox.Add(phraseBreakLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         sentBox.Add(self.phraseBreakersEdit, 0, wx.EXPAND | wx.ALL, 5)
 
         # Full width phrase breakers
         fwPhraseBreakLabel = wx.StaticText(page, -1, _("Full width phrase breakers:"))
-        self.fullWidthPhraseBreakersEdit = wx.TextCtrl(page, -1)
+        self.fullWidthPhraseBreakersEdit = wx.TextCtrl(page, -1, name=_("Full width phrase breakers"))
         sentBox.Add(fwPhraseBreakLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         sentBox.Add(self.fullWidthPhraseBreakersEdit, 0, wx.EXPAND | wx.ALL, 5)
 
         # Skippable punctuation
         skipLabel = wx.StaticText(page, -1, _("Skippable punctuation:"))
-        self.skippableEdit = wx.TextCtrl(page, -1)
+        self.skippableEdit = wx.TextCtrl(page, -1, name=_("Skippable punctuation"))
         sentBox.Add(skipLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         sentBox.Add(self.skippableEdit, 0, wx.EXPAND | wx.ALL, 5)
 
         # Capital letters
         capsLabel = wx.StaticText(page, -1, _("Capital letters (no spaces):"))
-        self.capitalLettersEdit = wx.TextCtrl(page, -1)
+        self.capitalLettersEdit = wx.TextCtrl(page, -1, name=_("Capital letters"))
         sentBox.Add(capsLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         sentBox.Add(self.capitalLettersEdit, 0, wx.EXPAND | wx.ALL, 5)
 
         # Lower case letters
         lowerLabel = wx.StaticText(page, -1, _("Lower case letters (no spaces):"))
-        self.lowerCaseLettersEdit = wx.TextCtrl(page, -1)
+        self.lowerCaseLettersEdit = wx.TextCtrl(page, -1, name=_("Lower case letters"))
         sentBox.Add(lowerLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         sentBox.Add(self.lowerCaseLettersEdit, 0, wx.EXPAND | wx.ALL, 5)
 
         # Exceptional abbreviations
         abbrLabel = wx.StaticText(page, -1, _("Exceptional abbreviations (space separated):"))
-        self.exceptionalAbbreviationsEdit = wx.TextCtrl(page, -1)
+        self.exceptionalAbbreviationsEdit = wx.TextCtrl(page, -1, name=_("Exceptional abbreviations"))
         sentBox.Add(abbrLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         sentBox.Add(self.exceptionalAbbreviationsEdit, 0, wx.EXPAND | wx.ALL, 5)
 
         # Blacklist
         blLabel = wx.StaticText(page, -1, _("Blacklist applications for sentence navigation (comma separated):"))
-        self.snAppsBlacklistEdit = wx.TextCtrl(page, -1)
+        self.snAppsBlacklistEdit = wx.TextCtrl(page, -1, name=_("Blacklist applications"))
         sentBox.Add(blLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         sentBox.Add(self.snAppsBlacklistEdit, 0, wx.EXPAND | wx.ALL, 5)
 
@@ -862,13 +862,13 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         # Crackling Volume
         crackleTextLabel = wx.StaticText(page, -1, _("Paragraph crackle volume:"))
-        self.textCrackleVolumeSlider = wx.Slider(page, -1, minValue=0, maxValue=100)
+        self.textCrackleVolumeSlider = wx.Slider(page, -1, minValue=0, maxValue=100, name=_("Paragraph crackle volume"))
         textBox.Add(crackleTextLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         textBox.Add(self.textCrackleVolumeSlider, 0, wx.EXPAND | wx.ALL, 5)
 
         # No next text chime
         noTextChimeLabel = wx.StaticText(page, -1, _("No more text units chime volume:"))
-        self.noNextTextChimeSlider = wx.Slider(page, -1, minValue=0, maxValue=100)
+        self.noNextTextChimeSlider = wx.Slider(page, -1, minValue=0, maxValue=100, name=_("No more text units chime volume"))
         textBox.Add(noTextChimeLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         textBox.Add(self.noNextTextChimeSlider, 0, wx.EXPAND | wx.ALL, 5)
         
@@ -884,19 +884,19 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         # Crackling volume
         crackleLabel = wx.StaticText(page, -1, _("Crackling sound volume (during navigation):"))
-        self.crackleVolumeSlider = wx.Slider(page, -1, minValue=0, maxValue=100)
+        self.crackleVolumeSlider = wx.Slider(page, -1, minValue=0, maxValue=100, name=_("Crackling sound volume"))
         bnBox.Add(crackleLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         bnBox.Add(self.crackleVolumeSlider, 0, wx.EXPAND | wx.ALL, 5)
 
         # Beep volume
         beepLabel = wx.StaticText(page, -1, _("Beeping sound volume:"))
-        self.beepVolumeSlider = wx.Slider(page, -1, minValue=0, maxValue=100)
+        self.beepVolumeSlider = wx.Slider(page, -1, minValue=0, maxValue=100, name=_("Beeping sound volume"))
         bnBox.Add(beepLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         bnBox.Add(self.beepVolumeSlider, 0, wx.EXPAND | wx.ALL, 5)
 
         # Skip Clutter volume
         skipLabel = wx.StaticText(page, -1, _("Skip Clutter chime volume:"))
-        self.skipChimeVolumeSlider = wx.Slider(page, -1, minValue=0, maxValue=100)
+        self.skipChimeVolumeSlider = wx.Slider(page, -1, minValue=0, maxValue=100, name=_("Skip Clutter chime volume"))
         bnBox.Add(skipLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
         bnBox.Add(self.skipChimeVolumeSlider, 0, wx.EXPAND | wx.ALL, 5)
 
