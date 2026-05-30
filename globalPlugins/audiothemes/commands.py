@@ -77,7 +77,16 @@ class PpBeepCommand(PpSynchronousCommand):
     def run(self):
         from NVDAHelper import generateBeep
         hz,length,left,right = self.hz, self.length, self.left, self.right
-        
+
+        _angle_x, _angle_y = 0, 0
+        _audio3d = config.conf.get("audiothemes", {}).get("audio3d", False)
+        _handler = None
+        if _audio3d:
+            import globalPlugins.audiothemes as at
+            _handler = getattr(at.GlobalPlugin, "_instance_handler", None)
+            if _handler:
+                _angle_x, _angle_y = _handler.get_earcon_angles()
+
         try:
             reverb_enabled = config.conf.get("unspoken", {}).get("Reverb", False)
             if reverb_enabled:
@@ -97,7 +106,7 @@ class PpBeepCommand(PpSynchronousCommand):
                 bufSize=generateBeep(None,hz,length,left,right)
                 buf=create_string_buffer(bufSize)
                 generateBeep(buf,hz,length,left,right)
-                
+
                 from .unspoken.steam_audio import get_steam_audio
                 steam_audio = get_steam_audio()
                 if steam_audio and getattr(steam_audio, "initialized", False):
@@ -109,7 +118,7 @@ class PpBeepCommand(PpSynchronousCommand):
                     remainder = len(float_samples) % 1024
                     if remainder != 0:
                         float_samples.extend([0.0] * (1024 - remainder))
-                    processed = steam_audio.process_sound(float_samples, 0, 0)
+                    processed = steam_audio.process_sound(float_samples, _angle_x, _angle_y)
                     if processed:
                         reverbed_generated = steam_audio.apply_reverb(processed)
                         if reverbed_generated:
@@ -127,7 +136,27 @@ class PpBeepCommand(PpSynchronousCommand):
         bufSize=generateBeep(None,hz,length,left,right)
         buf=create_string_buffer(bufSize)
         generateBeep(buf,hz,length,left,right)
-        audio_bytes = ensure_mono(buf.raw, 2, int(tones.SAMPLE_RATE))
+        audio_bytes = buf.raw
+        cur_channels = 2
+        cur_sample_rate = int(tones.SAMPLE_RATE)
+
+        _spatialized = False
+        if _audio3d and _handler and getattr(_handler.player, "steam_audio_active", False):
+            import array
+            arr = array.array('h')
+            arr.frombytes(audio_bytes)
+            float_samples = [(arr[i] + arr[i+1]) / (2.0 * 32767.0) for i in range(0, len(arr), 2)]
+            remainder = len(float_samples) % 1024
+            if remainder:
+                float_samples.extend([0.0] * (1024 - remainder))
+            processed = _handler.player.steam_audio.process_sound(float_samples, _angle_x, _angle_y)
+            if processed:
+                audio_bytes = processed
+                _spatialized = True
+
+        if not _spatialized:
+            audio_bytes = ensure_mono(audio_bytes, cur_channels, cur_sample_rate)
+
         ppSynchronousPlayer.stop()
         ppSynchronousPlayer.feed(audio_bytes)
         ppSynchronousPlayer.idle()
@@ -246,6 +275,15 @@ class PpWaveFileCommand(PpSynchronousCommand):
         if self.startAdjustment < 0:
             time.sleep(-self.startAdjustment / 1000.0)
 
+        _angle_x, _angle_y = 0, 0
+        _audio3d = config.conf.get("audiothemes", {}).get("audio3d", False)
+        _handler = None
+        if _audio3d:
+            import globalPlugins.audiothemes as at
+            _handler = getattr(at.GlobalPlugin, "_instance_handler", None)
+            if _handler:
+                _angle_x, _angle_y = _handler.get_earcon_angles()
+
         try:
             reverb_enabled = config.conf.get("unspoken", {}).get("Reverb", False)
             if reverb_enabled:
@@ -275,7 +313,7 @@ class PpWaveFileCommand(PpSynchronousCommand):
                     remainder = len(float_samples) % 1024
                     if remainder != 0:
                         float_samples.extend([0.0] * (1024 - remainder))
-                    processed = steam_audio.process_sound(float_samples, 0, 0)
+                    processed = steam_audio.process_sound(float_samples, _angle_x, _angle_y)
                     if processed:
                         reverbed_generated = steam_audio.apply_reverb(processed)
                         if reverbed_generated:
@@ -290,7 +328,31 @@ class PpWaveFileCommand(PpSynchronousCommand):
             from logHandler import log
             log.error(f"Failed to apply reverb to PpWaveFileCommand: {e}", exc_info=True)
 
-        audio_bytes = ensure_mono(self.buf, self._channels, self._sample_rate)
+        audio_bytes = self.buf
+        cur_channels = self._channels
+        cur_sample_rate = self._sample_rate
+
+        _spatialized = False
+        if _audio3d and _handler and getattr(_handler.player, "steam_audio_active", False):
+            import array
+            arr = array.array('h')
+            arr.frombytes(audio_bytes)
+            if cur_channels == 2:
+                float_samples = [(arr[i] + arr[i+1]) / (2.0 * 32767.0) for i in range(0, len(arr), 2)]
+            else:
+                float_samples = [x / 32767.0 for x in arr]
+            remainder = len(float_samples) % 1024
+            if remainder:
+                float_samples.extend([0.0] * (1024 - remainder))
+            processed = _handler.player.steam_audio.process_sound(float_samples, _angle_x, _angle_y)
+            if processed:
+                audio_bytes = processed
+                cur_channels = 2
+                _spatialized = True
+
+        if not _spatialized:
+            audio_bytes = ensure_mono(audio_bytes, cur_channels, cur_sample_rate)
+
         fileWavePlayer = self.fileWavePlayer
         fileWavePlayer.stop()
         fileWavePlayer.feed(audio_bytes)

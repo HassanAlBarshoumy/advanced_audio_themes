@@ -602,6 +602,28 @@ class AudioThemesHandler:
             return True
         return False
 
+    def get_earcon_angles(self):
+        try:
+            import api
+            focus = api.getFocusObject()
+            obj = focus
+            location = getattr(obj, 'location', None)
+            if not location:
+                return 0.0, 0.0
+            desk_location = api.getDesktopObject().location
+            desktop_max_x = desk_location[2] if desk_location else 1920
+            desktop_max_y = desk_location[3] if desk_location else 1080
+            obj_x = location[0] + (location[2] / 2.0)
+            obj_y = location[1] + (location[3] / 2.0)
+            angle_x = ((obj_x - desktop_max_x / 2.0) / desktop_max_x) * 180.0
+            percent = (desktop_max_y - obj_y) / desktop_max_y
+            angle_y = 50.0 * percent + (-40.0)
+            angle_x = max(-90.0, min(90.0, angle_x))
+            angle_y = max(-90.0, min(90.0, angle_y))
+            return angle_x, angle_y
+        except Exception:
+            return 0.0, 0.0
+
     def get_typing_pack_for_app(self, app_name):
         with self._config_lock:
             global_pack = config.conf["audiothemes"].get("typing_sound_pack", "1blueSwitch")
