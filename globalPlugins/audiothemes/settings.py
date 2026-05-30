@@ -18,7 +18,7 @@ import config
 import gui
 import nvwave
 
-from .handler import AudioThemesHandler, audiotheme_changed, THEMES_DIR
+from .handler import AudioThemesHandler, audiotheme_changed, THEMES_DIR, _get_blacklisted_roles
 from .update_checker import check_for_updates
 log = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ class RoleSelectionDialog(wx.Dialog):
         mainSizer.Add(self.rolesListBox, 1, wx.ALL | wx.EXPAND, 10)
         
         self.role_ids = []
-        blacklisted = getattr(parent, 'blacklisted_roles', config.conf["audiothemes"].get("blacklisted_roles", []))
+        blacklisted = getattr(parent, 'blacklisted_roles', _get_blacklisted_roles())
         
         idx = 0
         for role_id, role_label in controlTypes.roleLabels.items():
@@ -929,7 +929,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.useSynthVolumeCheckbox.SetValue(_b(conf.get("use_synth_volume", True)))
         self.volumeSlider.SetValue(_i(conf.get("volume", 100)))
         self.disabledAppsEdit.SetValue(conf.get("disabled_apps", ""))
-        self.blacklisted_roles = conf.get("blacklisted_roles", [])
+        self.blacklisted_roles = _get_blacklisted_roles()
         
         duck_val = conf.get("audio_ducking_enabled", True)
         if isinstance(duck_val, str):
@@ -1134,7 +1134,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         conf["use_synth_volume"] = self.useSynthVolumeCheckbox.IsChecked()
         conf["volume"] = self.volumeSlider.GetValue()
         conf["disabled_apps"] = self.disabledAppsEdit.GetValue()
-        if hasattr(self, 'blacklisted_roles'):
+        if hasattr(self, 'blacklisted_roles') and isinstance(self.blacklisted_roles, list) and all(isinstance(r, int) for r in self.blacklisted_roles):
             conf["blacklisted_roles"] = self.blacklisted_roles
         conf["audio_ducking_enabled"] = self.audioDuckingCheckbox.IsChecked()
         conf["audio_ducking_volume"] = self.audioDuckingVolumeSlider.GetValue()

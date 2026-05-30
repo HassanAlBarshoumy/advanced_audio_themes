@@ -56,6 +56,13 @@ from controlTypes import OutputReason
 from config.configFlags import ReportLineIndentation
 
 
+def _get_blacklisted_roles():
+    try:
+        return config.conf["audiothemes"].get("blacklisted_roles", [])
+    except Exception:
+        return []
+
+
 original_getObjectPropertiesSpeech = None
 
 import json
@@ -1083,7 +1090,7 @@ def new_getPropertiesSpeech(
             else:
                 role_val = propertyValues['role']
                 if hasattr(role_val, 'value'): role_val = role_val.value
-                blacklisted_roles = config.conf["audiothemes"].get("blacklisted_roles", [])
+                blacklisted_roles = _get_blacklisted_roles()
                 user_wants_speech = (speak_roles or role_val == controlTypes.Role.HEADING) and role_val not in blacklisted_roles
                 if user_wants_speech and fmt != "sc":
                     result.extend(original_getPropertiesSpeech(reason, **propertyValues))
@@ -1094,7 +1101,7 @@ def new_getPropertiesSpeech(
         if 'role' in propertyValues and (not speak_roles or fmt == "sc"):
             role_val = propertyValues['role']
             if hasattr(role_val, 'value'): role_val = role_val.value
-            blacklisted_roles = config.conf["audiothemes"].get("blacklisted_roles", [])
+            blacklisted_roles = _get_blacklisted_roles()
             if not (role_val == controlTypes.Role.HEADING and role_val not in blacklisted_roles and fmt != "sc"):
                 return []
             
@@ -1114,7 +1121,7 @@ def new_getPropertiesSpeech(
             if earcon_signature:
                 role_val = propertyValues['role']
                 if hasattr(role_val, 'value'): role_val = role_val.value
-                blacklisted_roles = config.conf["audiothemes"].get("blacklisted_roles", [])
+                blacklisted_roles = _get_blacklisted_roles()
                 user_wants_speech = (speak_roles or role_val == controlTypes.Role.HEADING) and role_val not in blacklisted_roles
                 
                 if speechBehavior == 2 and customText:
@@ -1168,7 +1175,7 @@ def new_getPropertiesSpeech(
                 if not earcon_signature:
                     role_val = propertyValues['role']
                     if hasattr(role_val, 'value'): role_val = role_val.value
-                    blacklisted_roles = config.conf["audiothemes"].get("blacklisted_roles", [])
+                    blacklisted_roles = _get_blacklisted_roles()
                     user_wants_speech = (speak_roles or role_val == controlTypes.Role.HEADING) and role_val not in blacklisted_roles
                     
                     if fmt == "sc":
@@ -1182,7 +1189,7 @@ def new_getPropertiesSpeech(
                     else:
                         role_val = propertyValues['role']
                         if hasattr(role_val, 'value'): role_val = role_val.value
-                        blacklisted_roles = config.conf["audiothemes"].get("blacklisted_roles", [])
+                        blacklisted_roles = _get_blacklisted_roles()
                         user_wants_speech = (speak_roles or role_val == controlTypes.Role.HEADING) and role_val not in blacklisted_roles
                         if user_wants_speech and fmt != "sc":
                             speak_text_role = True

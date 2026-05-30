@@ -163,7 +163,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         self._last_focus_is_editable = False
         # Add the menu item for the audio themes studio
         self.studioMenuItem = gui.mainFrame.sysTrayIcon.menu.Append(
-            wx.ID_ANY,
+            wx.NewIdRef(),
             # Translators: label for the audio themes studio menu item
             _("&Audio Themes Studio"),
         )
@@ -173,7 +173,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
 
         # Add checkable menu item for quickly toggling audio themes
         self.toggleMenuItem = gui.mainFrame.sysTrayIcon.menu.AppendCheckItem(
-            wx.ID_ANY,
+            wx.NewIdRef(),
             _("Enable Audio Themes"),
         )
         self.toggleMenuItem.Check(config.conf["audiothemes"]["enable_audio_themes"])

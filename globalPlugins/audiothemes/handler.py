@@ -102,6 +102,13 @@ audiothemes_config_defaults = {
 }
 
 
+def _get_blacklisted_roles():
+    try:
+        return config.conf["audiothemes"].get("blacklisted_roles", [])
+    except Exception:
+        return []
+
+
 class SpecialProps(IntEnum):
     """Represents sounds defined by this addon."""
 
@@ -373,7 +380,7 @@ class AudioThemesHandler:
             if not self.player.speak_roles:
                 suppress = True
             
-            blacklisted_roles = config.conf["audiothemes"].get("blacklisted_roles", [])
+            blacklisted_roles = _get_blacklisted_roles()
             if role in blacklisted_roles:
                 suppress = True
                 
