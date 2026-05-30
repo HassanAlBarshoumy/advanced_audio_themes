@@ -330,12 +330,16 @@ def showPendingConflicts():
 		))
 		label.Name = _("The following add-ons are now included in Advanced Audio Themes. Select the ones you want to remove to prevent conflicts:")
 		sizer.Add(label, flag=wx.ALL | wx.EXPAND, border=10)
+		list_box = wx.StaticBox(dlg, label=_("Conflicting add-ons"))
+		list_box.Name = _("Conflicting add-ons")
+		list_sizer = wx.StaticBoxSizer(list_box, wx.VERTICAL)
 		checkboxes = []
 		for display in display_names:
 			cb = wx.CheckBox(dlg, label=display)
 			cb.Name = display
-			sizer.Add(cb, flag=wx.ALL | wx.EXPAND, border=5)
+			list_sizer.Add(cb, flag=wx.ALL | wx.EXPAND, border=5)
 			checkboxes.append(cb)
+		sizer.Add(list_sizer, proportion=1, flag=wx.ALL | wx.EXPAND, border=10)
 		dont_show = wx.CheckBox(dlg, label=_("Don't show this dialog again"))
 		dont_show.Name = _("Don't show this dialog again")
 		sizer.Add(dont_show, flag=wx.ALL | wx.EXPAND, border=10)
@@ -348,7 +352,7 @@ def showPendingConflicts():
 		btn_sizer.Add(cancel_btn, flag=wx.ALL, border=5)
 		sizer.Add(btn_sizer, flag=wx.ALIGN_CENTER | wx.ALL, border=10)
 		dlg.SetSizer(sizer)
-		dlg.SetSize((500, 400))
+		dlg.SetSize((500, 420))
 		dlg.CenterOnScreen()
 		dlg.Raise()
 		if dlg.ShowModal() == wx.ID_OK:
