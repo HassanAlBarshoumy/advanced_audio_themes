@@ -226,6 +226,18 @@ def monkeyPatch():
         original_getTextInfoSpeech_considerSpelling = speech.speech._getTextInfoSpeech_considerSpelling
         speech.speech._getTextInfoSpeech_considerSpelling = new_getTextInfoSpeech_considerSpelling
 
+    # Track speech time for audio ducking
+    global _speech_time_handler, _original_speak, last_speech_time
+    try:
+        _speech_time_handler = speech.manager.pre_synthSpeak.register(_track_speech_time)
+    except Exception:
+        try:
+            if speech.speech.speak is not _tracking_speak:
+                _original_speak = speech.speech.speak
+                speech.speech.speak = _tracking_speak
+        except Exception:
+            log.warning("Audio ducking: could not hook speech")
+
 def monkeyUnpatch():
     if original_getObjectPropertiesSpeech is not None:
         speech.speech.getObjectPropertiesSpeech = original_getObjectPropertiesSpeech
@@ -243,6 +255,20 @@ def monkeyUnpatch():
     if original_getTextInfoSpeech_considerSpelling is not None and hasattr(speech.speech, "_getTextInfoSpeech_considerSpelling"):
         speech.speech._getTextInfoSpeech_considerSpelling = original_getTextInfoSpeech_considerSpelling
 
+    # Restore speech time tracking for audio ducking
+    global _speech_time_handler, _original_speak
+    if _speech_time_handler is not None:
+        try:
+            _speech_time_handler.unregister()
+        except Exception:
+            pass
+        _speech_time_handler = None
+    if _original_speak is not None:
+        try:
+            speech.speech.speak = _original_speak
+        except Exception:
+            pass
+        _original_speak = None
 
 roleRules = None
 stateRules = None
@@ -257,6 +283,86 @@ negativeStateRules = {}
 formatRules = {}
 numericFormatRules = {}
 otherRules = {}
+
+
+# Audio ducking speech tracking
+last_speech_time = 0.0
+_speech_time_handler = None
+_original_speak = None
+_ducking_categories_json = ""
+_ducking_categories_dict = {}
+
+_DEFAULT_DUCKING_CATEGORIES = {
+    "theme_sounds": True,
+    "typing_sounds": True,
+    "earcons": True,
+    "browsernav": True,
+    "sentencenav": True,
+    "textnav": True,
+    "ui_beeps": True,
+}
+
+def _load_ducking_categories():
+    global _ducking_categories_json, _ducking_categories_dict
+    try:
+        raw = config.conf.get("audiothemes", {}).get("ducking_categories", "")
+        if raw == _ducking_categories_json:
+            return
+        _ducking_categories_json = raw
+        if raw:
+            import json
+            _ducking_categories_dict = json.loads(raw)
+        else:
+            _ducking_categories_dict = {}
+    except Exception:
+        _ducking_categories_dict = {}
+
+def _track_speech_time():
+    global last_speech_time
+    last_speech_time = time.time()
+
+def _tracking_speak(sequence):
+    global last_speech_time
+    last_speech_time = time.time()
+    if _original_speak:
+        _original_speak(sequence)
+
+def get_ducking_factor(category="theme_sounds"):
+    try:
+        if config.conf.get("audiothemes", {}).get("audio_ducking_enabled", True):
+            _load_ducking_categories()
+            if not _ducking_categories_dict.get(category, True):
+                return 1.0
+            if time.time() - last_speech_time < 1.0:
+                return config.conf.get("audiothemes", {}).get("audio_ducking_volume", 30) / 100.0
+    except Exception:
+        pass
+    return 1.0
+
+def apply_ducking_to_pcm(pcm_bytes, df, sample_width=2):
+    if df >= 1.0:
+        return pcm_bytes
+    import array
+    if sample_width == 2:
+        arr = array.array('h')
+        arr.frombytes(pcm_bytes)
+        for i in range(len(arr)):
+            arr[i] = int(arr[i] * df)
+        return arr.tobytes()
+    elif sample_width == 1:
+        arr = array.array('b')
+        arr.frombytes(pcm_bytes)
+        for i in range(len(arr)):
+            val = int((arr[i] - 128) * df)
+            arr[i] = max(0, min(255, val + 128))
+        return arr.tobytes()
+    elif sample_width == 4:
+        arr = array.array('i')
+        arr.frombytes(pcm_bytes)
+        for i in range(len(arr)):
+            arr[i] = int(arr[i] * df)
+        return arr.tobytes()
+    return pcm_bytes
 
 def updateRules():
     global roleRules, stateRules, negativeStateRules, formatRules, numericFormatRules, otherRules

@@ -162,8 +162,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         self._audio_beacon_location = None
         self._audio_beacon_desktop = None
         self._last_focus_is_editable = False
-        # Defer menu item creation — the sys tray icon may not be ready yet
-        wx.CallAfter(self._create_menu_items)
+        # Defer menu item creation — the main window may not be ready yet
+        wx.CallAfter(self._add_tray_menu_items)
 
         # Browse-mode navigation timer: polls the navigator object every 180ms.
         # This is the ONLY way to detect arrow-key movement inside a virtual
@@ -221,6 +221,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             "kb:h": "audioThemesHelp",
         }
         self._helpDialog = None
+        self._helpPending = False
         self._studioDialog = None
         self._rebindInstanceGestures()
         try:
@@ -228,107 +229,57 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         except Exception:
             pass
 
-    def _create_menu_items(self):
-        for id_val, handler in [
-            (20000, self.on_studio_item_clicked),
-            (20001, self.on_toggle_item_clicked),
-        ]:
-            gui.mainFrame.sysTrayIcon.Bind(wx.EVT_MENU, handler, id=id_val)
-        self._install_menu_hook()
+    def _on_toggle_from_menu(self, event):
+        state = event.IsChecked()
+        config.conf["audiothemes"]["enable_audio_themes"] = state
+        self.handler.configure()
+        if hasattr(self, '_tray_toggle_item') and self._tray_toggle_item:
+            self._tray_toggle_item.Check(state)
+        if state:
+            import ui
+            ui.message(_("Audio themes enabled"))
+        else:
+            import ui
+            ui.message(_("Audio themes disabled"))
 
-    def _install_menu_hook(self):
-        import ctypes
-        from ctypes import wintypes
-        user32 = ctypes.windll.user32
-        kernel32 = ctypes.windll.kernel32
+    def _add_tray_menu_items(self):
+        try:
+            import gui
+            import wx
+            tray = gui.mainFrame.sysTrayIcon
+            if not tray or not tray.menu:
+                wx.CallLater(500, self._add_tray_menu_items)
+                return
+            menu = tray.menu
+            self._tray_studio_item = menu.Append(
+                wx.ID_ANY,
+                _("&Audio Themes Studio"),
+                _("Open the Audio Theme Studio to create and edit themes")
+            )
+            tray.Bind(wx.EVT_MENU, self.on_studio_item_clicked, self._tray_studio_item)
+            self._tray_toggle_item = menu.AppendCheckItem(
+                wx.ID_ANY,
+                _("Enable Audio Themes"),
+                _("Toggle audio themes on or off")
+            )
+            self._tray_toggle_item.Check(config.conf["audiothemes"]["enable_audio_themes"])
+            tray.Bind(wx.EVT_MENU, self._on_toggle_from_menu, self._tray_toggle_item)
+        except Exception:
+            import logHandler
+            logHandler.log.error("AudioThemes: Failed to add tray menu items", exc_info=True)
 
-        user32.CallNextHookEx.argtypes = [
-            ctypes.c_void_p, ctypes.c_int, ctypes.c_size_t, ctypes.c_ssize_t
-        ]
-        user32.CallNextHookEx.restype = ctypes.c_ssize_t
-
-        user32.AppendMenuW.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint, ctypes.c_size_t, ctypes.c_wchar_p
-        ]
-        user32.AppendMenuW.restype = ctypes.c_bool
-        user32.GetMenuItemCount.argtypes = [ctypes.c_void_p]
-        user32.GetMenuItemCount.restype = ctypes.c_uint
-        user32.GetMenuItemID.argtypes = [ctypes.c_void_p, ctypes.c_int]
-        user32.GetMenuItemID.restype = ctypes.c_uint
-        user32.CheckMenuItem.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_uint]
-        user32.CheckMenuItem.restype = ctypes.c_uint
-
-        class CWPSTRUCT(ctypes.Structure):
-            _fields_ = [
-                ("lParam", wintypes.LPARAM),
-                ("wParam", wintypes.WPARAM),
-                ("message", wintypes.UINT),
-                ("hwnd", wintypes.HWND),
-            ]
-
-        WM_INITMENUPOPUP = 0x0117
-        HOOKPROC = ctypes.CFUNCTYPE(
-            ctypes.c_ssize_t, ctypes.c_int, ctypes.c_size_t, ctypes.c_ssize_t
-        )
-
-        def hook_proc(nCode, wParam, lParam):
-            if nCode >= 0:
-                cwp = ctypes.cast(
-                    ctypes.c_void_p(lParam),
-                    ctypes.POINTER(CWPSTRUCT)
-                ).contents
-                if cwp.message == WM_INITMENUPOPUP:
-                    hMenu = ctypes.c_void_p(cwp.wParam)
-                    try:
-                        if self._is_tray_menu(hMenu):
-                            if not self._hmenu_has_our_ids(hMenu):
-                                self._add_items_to_hmenu(hMenu)
-                            self._update_toggle_checkmark(hMenu)
-                    except Exception:
-                        pass
-            return user32.CallNextHookEx(None, nCode, wParam, lParam)
-
-        self._hook_proc = HOOKPROC(hook_proc)
-        thread_id = kernel32.GetCurrentThreadId()
-        self._hook_handle = user32.SetWindowsHookExW(
-            4, self._hook_proc, None, thread_id
-        )
-        if not self._hook_handle:
-            raise ctypes.WinError()
-
-    def _is_tray_menu(self, hMenu):
-        user32 = ctypes.windll.user32
-        for i in range(user32.GetMenuItemCount(hMenu)):
-            try:
-                if user32.GetMenuItemID(hMenu, i) in (wx.ID_EXIT, wx.ID_ABOUT):
-                    return True
-            except Exception:
-                pass
-        return False
-
-    def _hmenu_has_our_ids(self, hMenu):
-        user32 = ctypes.windll.user32
-        for i in range(user32.GetMenuItemCount(hMenu)):
-            if user32.GetMenuItemID(hMenu, i) in (20000, 20001):
-                return True
-        return False
-
-    def _add_items_to_hmenu(self, hMenu):
-        user32 = ctypes.windll.user32
-        user32.AppendMenuW(hMenu, 0x800, 0, None)
-        s1 = ctypes.create_unicode_buffer(_("&Audio Themes Studio"))
-        user32.AppendMenuW(hMenu, 0, 20000, s1)
-        s2 = ctypes.create_unicode_buffer(_("Enable Audio Themes"))
-        user32.AppendMenuW(hMenu, 0, 20001, s2)
-
-    def _update_toggle_checkmark(self, hMenu):
-        user32 = ctypes.windll.user32
-        for i in range(user32.GetMenuItemCount(hMenu)):
-            if user32.GetMenuItemID(hMenu, i) == 20001:
-                checked = config.conf["audiothemes"]["enable_audio_themes"]
-                flags = 0x0008 if checked else 0x0000
-                user32.CheckMenuItem(hMenu, i, flags | 0x0400)
-                break
+    def _remove_tray_menu_items(self):
+        try:
+            import gui
+            tray = gui.mainFrame.sysTrayIcon
+            if tray and tray.menu:
+                for attr in ("_tray_studio_item", "_tray_toggle_item"):
+                    item = getattr(self, attr, None)
+                    if item:
+                        tray.menu.Remove(item)
+                        setattr(self, attr, None)
+        except Exception:
+            pass
 
     def _hook_caretMovementScriptHelper(self, extraDetail, unit, direction, posConstant=textInfos.POSITION_CARET, *args, **kwargs):
         if self.orig_caretMovementScriptHelper:
@@ -371,7 +322,15 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         self.bindGestures(self._audioThemesLayerGestures)
         self.toggling = True
         import tones
-        tones.beep(200, 40)
+        try:
+            from . import frenzy
+            df = frenzy.get_ducking_factor("ui_beeps")
+            if df < 1.0:
+                tones.beep(200, 40, left=int(25*df), right=int(25*df))
+            else:
+                tones.beep(200, 40)
+        except Exception:
+            tones.beep(200, 40)
 
     def getScript(self, gesture):
         from keyboardHandler import KeyboardInputGesture
@@ -407,7 +366,15 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
 
     def script_error(self, gesture):
         import tones
-        tones.beep(420, 40)
+        try:
+            from . import frenzy
+            df = frenzy.get_ducking_factor("ui_beeps")
+            if df < 1.0:
+                tones.beep(420, 40, left=int(25*df), right=int(25*df))
+            else:
+                tones.beep(420, 40)
+        except Exception:
+            tones.beep(420, 40)
 
     @script(description=_("Shows audio themes commands help."))
     def script_audioThemesHelp(self, gesture):
@@ -417,6 +384,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                 return
             except Exception:
                 self._helpDialog = None
+        if self._helpPending:
+            return
+        self._helpPending = True
         import wx
         from gui import mainFrame
         
@@ -444,7 +414,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                 ]
             )
             self._helpDialog = dlg
-            dlg.Raise()
             if dlg.ShowModal() == wx.ID_OK:
                 sel = dlg.GetSelection()
                 if sel == 0:
@@ -479,6 +448,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
                     self.script_speakObject(None)
             dlg.Destroy()
             self._helpDialog = None
+            self._helpPending = False
         wx.CallAfter(runDialog)
 
     def terminate(self):
@@ -486,11 +456,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             gui.settingsDialogs.NVDASettingsDialog.categoryClasses.remove(
                 AudioThemesSettingsPanel
             )
-            user32 = ctypes.windll.user32
-            hMenu = int(gui.mainFrame.sysTrayIcon.menu.GetHandle())
-            if hMenu:
-                user32.RemoveMenu(hMenu, 20000, 0)
-                user32.RemoveMenu(hMenu, 20001, 0)
+            self._remove_tray_menu_items()
             self.restoreMonkeyPatches()
             self._unhook_keyboard()
             if self.orig_caretMovementScriptHelper:
@@ -863,13 +829,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         if isSameScript == 0:
             enabled = not config.conf["audiothemes"]["enable_audio_themes"]
             config.conf["audiothemes"]["enable_audio_themes"] = enabled
-            try:
-                user32 = ctypes.windll.user32
-                hMenu = int(gui.mainFrame.sysTrayIcon.menu.GetHandle())
-                if hMenu:
-                    user32.CheckMenuItem(hMenu, 20001, 8 if enabled else 0)
-            except Exception:
-                pass
+            if hasattr(self, '_tray_toggle_item') and self._tray_toggle_item:
+                self._tray_toggle_item.Check(enabled)
             self.handler.configure()
             if enabled:
                 ui.message(_("Enable audio themes"))
@@ -1143,8 +1104,18 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             
         ui.message(_("Audio beacon dropped at current location"))
         import tones
-        tones.beep(800, 100)
-        tones.beep(1200, 100)
+        try:
+            from . import frenzy
+            df = frenzy.get_ducking_factor("ui_beeps")
+            if df < 1.0:
+                tones.beep(800, 100, left=int(25*df), right=int(25*df))
+                tones.beep(1200, 100, left=int(25*df), right=int(25*df))
+            else:
+                tones.beep(800, 100)
+                tones.beep(1200, 100)
+        except Exception:
+            tones.beep(800, 100)
+            tones.beep(1200, 100)
 
     @script(description=_("Audio Sonar: Sweeps the active window to create an audio map of its elements."), gestures=['kb:NVDA+Alt+r'])
     def script_audioSonar(self, gesture):

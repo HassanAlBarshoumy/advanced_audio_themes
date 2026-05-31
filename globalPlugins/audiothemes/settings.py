@@ -20,6 +20,7 @@ import nvwave
 
 from .handler import AudioThemesHandler, audiotheme_changed, THEMES_DIR, _get_blacklisted_roles
 from .update_checker import check_for_updates
+from .frenzy import get_ducking_factor, _DEFAULT_DUCKING_CATEGORIES
 log = logging.getLogger(__name__)
 
 import addonHandler
@@ -155,41 +156,42 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # Translators: label for the checkbox to enable or disable audio themes
         self.enableThemesCheckbox = wx.CheckBox(page, -1, _("Enable audio themes"))
         self.innerPanel = innerPanel = wx.Panel(page)
+        self.themePanel = themePanel = wx.Panel(innerPanel)
         # Translators: label for a combobox containing a list of installed audio themes
-        installedThemesLabel = wx.StaticText(innerPanel, -1, _("Select theme:"))
-        self.installedThemesChoice = wx.Choice(innerPanel, -1, name=_("Select theme"))
+        installedThemesLabel = wx.StaticText(themePanel, -1, _("Select theme:"))
+        self.installedThemesChoice = wx.Choice(themePanel, -1, name=_("Select theme"))
         # Translators: label for a button to show info about an audio theme
-        self.aboutThemeButton = wx.Button(innerPanel, -1, _("&About"))
+        self.aboutThemeButton = wx.Button(themePanel, -1, _("&About"))
         # Translators: label for a button to remove an audio theme
-        self.removeThemeButton = wx.Button(innerPanel, -1, _("&Remove"))
+        self.removeThemeButton = wx.Button(themePanel, -1, _("&Remove"))
         # Translators: label for a button to add a new audio theme
-        self.addThemeButton = wx.Button(innerPanel, -1, _("Add &New..."))
+        self.addThemeButton = wx.Button(themePanel, -1, _("Add &New..."))
         # Translators: label for a button to open the themes store
-        self.storeThemeButton = wx.Button(innerPanel, -1, _("Themes Store"))
+        self.storeThemeButton = wx.Button(themePanel, -1, _("Themes Store"))
         # Translators: label for a button to open the Theme Studio
-        self.blenderThemeButton = wx.Button(innerPanel, -1, _("Theme Studio"))
+        self.blenderThemeButton = wx.Button(themePanel, -1, _("Theme Studio"))
         # Translators: label for a button to preview the selected theme
-        self.previewThemeButton = wx.Button(innerPanel, -1, _("P&review"))
+        self.previewThemeButton = wx.Button(themePanel, -1, _("P&review"))
         # Translators: label for a checkbox to toggle the 3D mode
-        self.play3dCheckbox = wx.CheckBox(innerPanel, -1, _("Play sounds in 3D mode"))
+        self.play3dCheckbox = wx.CheckBox(themePanel, -1, _("Play sounds in 3D mode"))
         # Translators: label for a checkbox to toggle the speaking of object role
         self.speakRoleCheckbox = wx.CheckBox(
-            innerPanel, -1, _("Speak roles such as button, edit box , link etc. ")
+            themePanel, -1, _("Speak roles such as button, edit box , link etc. ")
         )
         # Translators: label for a checkbox to toggle the use of audio themes during say all
         self.useInSayAllCheckbox = wx.CheckBox(
-            innerPanel, -1, _("Speak roles during say all")
+            themePanel, -1, _("Speak roles during say all")
         )
         # Translators: label for a checkbox to toggle whether the volume of this add-on should follow the synthesizer volume
         self.useSynthVolumeCheckbox = wx.CheckBox(
-            innerPanel, -1, _("Use speech synthesizer volume")
+            themePanel, -1, _("Use speech synthesizer volume")
         )
         # Translators: label for a slider to set the volume of this add-on
-        volumeLabel = wx.StaticText(innerPanel, -1, _("Audio themes volume:"))
+        volumeLabel = wx.StaticText(themePanel, -1, _("Audio themes volume:"))
         self.volumeSlider = wx.Slider(
-            innerPanel, -1, minValue=0, maxValue=100, name=_("Audio themes volume")
+            themePanel, -1, minValue=0, maxValue=100, name=_("Audio themes volume")
         )
-        innerSizer = wx.BoxSizer(wx.VERTICAL)
+        themeSizer = wx.BoxSizer(wx.VERTICAL)
         themesListSizer = wx.BoxSizer(wx.HORIZONTAL)
         themesListSizer.AddMany(
             [
@@ -208,24 +210,26 @@ class AudioThemesSettingsPanel(SettingsPanel):
                 (self.blenderThemeButton, 1, wx.ALL, 5),
             ]
         )
-        innerSizer.AddMany(
+        themeSizer.AddMany(
             [(themesListSizer, 1, wx.EXPAND, 10), (actionSizer, 1, wx.ALIGN_CENTER, 10)]
         )
-        innerSizer.AddSpacer(10)
+        themeSizer.AddSpacer(10)
         # Audio Ducking
-        self.audioDuckingCheckbox = wx.CheckBox(innerPanel, -1, _("Audio Ducking (lower volume when NVDA speaks)"))
-        duckingVolLabel = wx.StaticText(innerPanel, -1, _("Ducked Volume (%):"))
-        self.audioDuckingVolumeSlider = wx.Slider(innerPanel, -1, minValue=1, maxValue=100, name=_("Ducked Volume"))
+        self.audioDuckingCheckbox = wx.CheckBox(themePanel, -1, _("Audio Ducking (lower volume when NVDA speaks)"))
+        self.duckingCategoriesBtn = wx.Button(themePanel, -1, _("Ducking categories..."))
+        self.duckingCategoriesBtn.Bind(wx.EVT_BUTTON, self.onDuckingCategories)
+        self.duckingVolLabel = wx.StaticText(themePanel, -1, _("Ducked Volume (%):"))
+        self.audioDuckingVolumeSlider = wx.Slider(themePanel, -1, minValue=1, maxValue=100, name=_("Ducked Volume"))
         
         # Speak Roles Checkbox (alone)
         # Say All Roles Sizer
         sayAllRolesSizer = wx.BoxSizer(wx.HORIZONTAL)
         sayAllRolesSizer.Add(self.useInSayAllCheckbox, 0, wx.ALIGN_CENTER_VERTICAL)
-        self.selectRolesButton = wx.Button(innerPanel, -1, _("Select Roles..."))
+        self.selectRolesButton = wx.Button(themePanel, -1, _("Select Roles..."))
         self.selectRolesButton.Bind(wx.EVT_BUTTON, self.onSelectRoles)
         sayAllRolesSizer.Add(self.selectRolesButton, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
         
-        innerSizer.AddMany(
+        themeSizer.AddMany(
             [
                 (self.play3dCheckbox, 0, wx.ALL, 5),
                 (self.speakRoleCheckbox, 0, wx.ALL, 5),
@@ -234,20 +238,23 @@ class AudioThemesSettingsPanel(SettingsPanel):
                 (volumeLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10),
                 (self.volumeSlider, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 5),
                 (self.audioDuckingCheckbox, 0, wx.ALL, 5),
-                (duckingVolLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10),
+                (self.duckingCategoriesBtn, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 5),
+                (self.duckingVolLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10),
                 (self.audioDuckingVolumeSlider, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 5),
             ]
         )
         
-        innerSizer.Fit(innerPanel)
+        themeSizer.Fit(themePanel)
         
         # Application Blacklist
-        disabledAppsLabel = wx.StaticText(innerPanel, -1, _("Disable Audio Themes in these applications (comma separated):"))
-        self.disabledAppsEdit = wx.TextCtrl(innerPanel, -1, value="", name=_("Disable in applications"))
-        innerSizer.AddMany([
+        disabledAppsLabel = wx.StaticText(themePanel, -1, _("Disable Audio Themes in these applications (comma separated):"))
+        self.disabledAppsEdit = wx.TextCtrl(themePanel, -1, value="", name=_("Disable in applications"))
+        themeSizer.AddMany([
             (disabledAppsLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10),
             (self.disabledAppsEdit, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
         ])
+        
+        themePanel.SetSizer(themeSizer)
         
         # Typing Sounds Group
         self.typingSoundsCheckbox = wx.CheckBox(innerPanel, -1, _("Enable typing sounds"))
@@ -282,7 +289,6 @@ class AudioThemesSettingsPanel(SettingsPanel):
             (typingVolumeLabel, 1, wx.TOP | wx.LEFT | wx.RIGHT, 10),
             (self.typingSoundsVolumeSlider, 1, wx.BOTTOM | wx.LEFT | wx.RIGHT, 5),
         ])
-        innerSizer.Add(typingSizer, 0, wx.EXPAND | wx.ALL, 10)
         
         configActionSizer = wx.BoxSizer(wx.HORIZONTAL)
         self.exportConfigButton = wx.Button(innerPanel, -1, _("E&xport Configuration..."))
@@ -298,6 +304,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
                 (self.telegramButton, 1, wx.ALL, 5),
             ]
         )
+        
+        innerSizer = wx.BoxSizer(wx.VERTICAL)
+        innerSizer.Add(themePanel, 1, wx.EXPAND | wx.ALL, 0)
+        innerSizer.Add(typingSizer, 0, wx.EXPAND | wx.ALL, 10)
         innerSizer.Add(configActionSizer, 0, wx.ALIGN_CENTER | wx.ALL, 10)
         innerPanel.SetSizer(innerSizer)
         innerSizer.Fit(innerPanel)
@@ -318,7 +328,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.Bind(wx.EVT_BUTTON, self.onAboutTypingSounds, self.aboutTypingSoundsButton)
         self.Bind(
             wx.EVT_CHECKBOX,
-            lambda e: self.innerPanel.Enable(e.IsChecked()),
+            self._on_enable_themes_changed,
             self.enableThemesCheckbox,
         )
         self.Bind(
@@ -328,7 +338,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         )
         self.Bind(
             wx.EVT_CHECKBOX,
-            lambda e: self.audioDuckingVolumeSlider.Enable(e.IsChecked()),
+            self._on_ducking_changed,
             self.audioDuckingCheckbox,
         )
         self.Bind(
@@ -430,6 +440,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         spatial_enabled = self.typingSoundsSpatialCheckbox.GetValue()
         self.typingSoundsSmartSpatialCheckbox.Enable(enabled and spatial_enabled)
         self.typingPackCombobox.Enable(enabled)
+        self.aboutTypingSoundsButton.Enable(enabled)
         self.typingSoundsVolumeSlider.Enable(enabled)
 
     def setupAudioEnginePage(self, page):
@@ -913,6 +924,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
             self.blacklisted_roles = dlg.getBlacklistedRoles()
         dlg.Destroy()
 
+    def onDuckingCategories(self, event):
+        dlg = DuckingCategoriesDialog(self)
+        if dlg.ShowModal() == wx.ID_OK:
+            self._ducking_categories = dlg.getCategories()
+        dlg.Destroy()
+
     def _initialize_at_state(self):
         def _b(v):
             if isinstance(v, str): return v.lower() == 'true'
@@ -936,6 +953,15 @@ class AudioThemesSettingsPanel(SettingsPanel):
             duck_val = duck_val.lower() == 'true'
         self.audioDuckingCheckbox.SetValue(_b(bool(duck_val)))
         
+        duck_cat_str = conf.get("ducking_categories", "")
+        if duck_cat_str:
+            try:
+                self._ducking_categories = json.loads(duck_cat_str)
+            except Exception:
+                self._ducking_categories = dict(_DEFAULT_DUCKING_CATEGORIES)
+        else:
+            self._ducking_categories = dict(_DEFAULT_DUCKING_CATEGORIES)
+        
         duck_vol = conf.get("audio_ducking_volume", 30)
         if isinstance(duck_vol, str):
             try:
@@ -943,7 +969,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             except ValueError:
                 duck_vol = 30
         self.audioDuckingVolumeSlider.SetValue(_i(duck_vol))
-        self.audioDuckingVolumeSlider.Enable(bool(duck_val))
+        self._set_ducking_controls_visibility(bool(duck_val))
         
         unspoken_conf = config.conf["unspoken"]
         self.audioCacheCheckbox.SetValue(_b(unspoken_conf.get("AudioCache", True)))
@@ -1109,6 +1135,20 @@ class AudioThemesSettingsPanel(SettingsPanel):
             wx.CallAfter(lambda: self.downloadFFmpegButton.SetLabel(
                 _("&Download and Install FFmpeg")))
 
+    def _on_enable_themes_changed(self, event):
+        show = event.IsChecked()
+        self.themePanel.Show(show)
+        self.innerPanel.GetSizer().Layout()
+
+    def _on_ducking_changed(self, event):
+        self._set_ducking_controls_visibility(event.IsChecked())
+        self.innerPanel.GetSizer().Layout()
+
+    def _set_ducking_controls_visibility(self, show):
+        self.duckingCategoriesBtn.Show(show)
+        self.duckingVolLabel.Show(show)
+        self.audioDuckingVolumeSlider.Show(show)
+
     def _maintain_state(self):
         self.audio_themes = sorted(AudioThemesHandler.get_installed_themes())
         self.installedThemesChoice.Clear()
@@ -1117,7 +1157,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         for theme in self.audio_themes:
             if theme.folder == config.conf["audiothemes"]["active_theme"]:
                 self.installedThemesChoice.SetStringSelection(theme.name)
-        self.innerPanel.Enable(self.enableThemesCheckbox.IsChecked())
+        self._on_enable_themes_changed(DummyEvent(self.enableThemesCheckbox.IsChecked()))
         self.volumeSlider.Enable(not self.useSynthVolumeCheckbox.IsChecked())
         self.onThemeSelectionChanged(None)
         if hasattr(self, "appProfilesList"):
@@ -1138,6 +1178,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             conf["blacklisted_roles"] = self.blacklisted_roles
         conf["audio_ducking_enabled"] = self.audioDuckingCheckbox.IsChecked()
         conf["audio_ducking_volume"] = self.audioDuckingVolumeSlider.GetValue()
+        conf["ducking_categories"] = json.dumps(self._ducking_categories)
         
         if self.outputModeChoice.GetSelection() == 1:
             conf["output_mode"] = "mono"
@@ -1515,3 +1556,52 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
     def onCheckUpdates(self, event):
         check_for_updates(self)
+
+
+class DuckingCategoriesDialog(wx.Dialog):
+    CATEGORIES = [
+        ("theme_sounds", _("Theme sounds (roles, states, focus)")),
+        ("typing_sounds", _("Typing sounds")),
+        ("earcons", _("Phonetic punctuation earcons (Alt+P)")),
+        ("browsernav", _("BrowserNav sounds (indentation, navigation)")),
+        ("sentencenav", _("SentenceNav sounds (Alt+Up/Down)")),
+        ("textnav", _("TextNav sounds (Alt+Shift+Up/Down)")),
+        ("ui_beeps", _("UI feedback beeps (layer, error, beacon)")),
+    ]
+
+    def __init__(self, parent):
+        title = _("Audio Ducking Categories")
+        super().__init__(parent, title=title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        panel = wx.Panel(self)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        label = wx.StaticText(panel, -1, _("Select which sound categories should be ducked when NVDA speaks:"))
+        sizer.Add(label, 0, wx.ALL, 10)
+
+        self._checkboxes = {}
+        conf = config.conf.get("audiothemes", {})
+        cat_str = conf.get("ducking_categories", "")
+        if cat_str:
+            try:
+                categories = json.loads(cat_str)
+            except Exception:
+                categories = dict(_DEFAULT_DUCKING_CATEGORIES)
+        else:
+            categories = dict(_DEFAULT_DUCKING_CATEGORIES)
+
+        for key, label_text in self.CATEGORIES:
+            cb = wx.CheckBox(panel, -1, label_text)
+            cb.SetValue(categories.get(key, True))
+            self._checkboxes[key] = cb
+            sizer.Add(cb, 0, wx.ALL, 5)
+
+        btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        ok_btn = wx.Button(panel, wx.ID_OK)
+        cancel_btn = wx.Button(panel, wx.ID_CANCEL)
+        btn_sizer.Add(ok_btn, 0, wx.ALL, 5)
+        btn_sizer.Add(cancel_btn, 0, wx.ALL, 5)
+        sizer.Add(btn_sizer, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
+        panel.SetSizer(sizer)
+        self.SetClientSize(panel.GetBestSize())
+
+    def getCategories(self):
+        return {key: cb.IsChecked() for key, cb in self._checkboxes.items()}

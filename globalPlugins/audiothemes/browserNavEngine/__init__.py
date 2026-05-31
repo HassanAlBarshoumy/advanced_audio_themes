@@ -476,7 +476,15 @@ def sonifyTextInfoImpl(textInfo, lastTextInfo, includeCrackle):
         tone = min(tone, 20000)
 
         if tone != lastTone:
-            tones.beep(tone, 50, left=beepVolume, right=beepVolume)
+            try:
+                from .. import frenzy
+                df = frenzy.get_ducking_factor("browsernav")
+                if df < 1.0:
+                    tones.beep(tone, 50, left=int(beepVolume * df), right=int(beepVolume * df))
+                else:
+                    tones.beep(tone, 50, left=beepVolume, right=beepVolume)
+            except Exception:
+                tones.beep(tone, 50, left=beepVolume, right=beepVolume)
         lastTone = tone
 
     if (
@@ -1329,7 +1337,15 @@ class BrowserNavMixin:
                         elif focus.role == ROLE_EDITABLETEXT:
                             goodCounter += 1
                             if goodCounter > 10:
-                                tones.beep(1000, 100)
+                                try:
+                                    from .. import frenzy
+                                    df = frenzy.get_ducking_factor("browsernav")
+                                    if df < 1.0:
+                                        tones.beep(1000, 100, left=int(25*df), right=int(25*df))
+                                    else:
+                                        tones.beep(1000, 100)
+                                except Exception:
+                                    tones.beep(1000, 100)
                                 break
                             yield 10
                         else:

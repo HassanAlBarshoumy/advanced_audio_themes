@@ -360,7 +360,15 @@ class EditTextDialog(wx.Dialog):
             newCaretOffset = len(text) - caretOffsetFromEnd
             self.textCtrl.SetInsertionPoint(newCaretOffset)
         core.callLater(10, updateLineEndings)
-        tones.beep(500, 50)
+        try:
+            from .. import frenzy
+            df = frenzy.get_ducking_factor("browsernav")
+            if df < 1.0:
+                tones.beep(500, 50, left=int(25*df), right=int(25*df))
+            else:
+                tones.beep(500, 50)
+        except Exception:
+            tones.beep(500, 50)
         event.Skip()
 
     def onClipboardPaste2(self, event):

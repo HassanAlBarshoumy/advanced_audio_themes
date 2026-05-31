@@ -50,6 +50,21 @@ _reverb_cache = {}
 _reverb_cache_lock = threading.Lock()
 _REVERB_CACHE_MAX = 50
 
+def _apply_ducking(pcm_bytes, df):
+    if df >= 1.0:
+        return pcm_bytes
+    try:
+        from . import frenzy
+        return frenzy.apply_ducking_to_pcm(pcm_bytes, df)
+    except Exception:
+        pass
+    import array
+    arr = array.array('h')
+    arr.frombytes(pcm_bytes)
+    for i in range(len(arr)):
+        arr[i] = int(arr[i] * df)
+    return arr.tobytes()
+
 def _reverb_cache_put(key, value):
     """Add to reverb cache with LRU eviction when exceeding max size."""
     with _reverb_cache_lock:
@@ -77,6 +92,16 @@ class PpBeepCommand(PpSynchronousCommand):
     def run(self):
         from NVDAHelper import generateBeep
         hz,length,left,right = self.hz, self.length, self.left, self.right
+
+        # Apply audio ducking
+        try:
+            from . import frenzy
+            df = frenzy.get_ducking_factor("earcons")
+            if df < 1.0:
+                left = int(left * df)
+                right = int(right * df)
+        except Exception:
+            pass
 
         _angle_x, _angle_y = 0, 0
         _audio3d = config.conf.get("audiothemes", {}).get("audio3d", False)
@@ -275,6 +300,14 @@ class PpWaveFileCommand(PpSynchronousCommand):
         if self.startAdjustment < 0:
             time.sleep(-self.startAdjustment / 1000.0)
 
+        # Apply audio ducking factor
+        _ducking_factor = 1.0
+        try:
+            from . import frenzy
+            _ducking_factor = frenzy.get_ducking_factor("earcons")
+        except Exception:
+            pass
+
         _angle_x, _angle_y = 0, 0
         _audio3d = config.conf.get("audiothemes", {}).get("audio3d", False)
         _handler = None
@@ -295,7 +328,7 @@ class PpWaveFileCommand(PpSynchronousCommand):
                 if packed is not None:
                     rp = get_pooled_player(2, self._sample_rate, False)
                     rp.stop()
-                    rp.feed(packed)
+                    rp.feed(_apply_ducking(packed, _ducking_factor))
                     rp.idle()
                     self.fileWavePlayer = rp
                     return
@@ -320,7 +353,7 @@ class PpWaveFileCommand(PpSynchronousCommand):
                             _reverb_cache_put(cache_key, reverbed_generated)
                             rp = get_pooled_player(2, self._sample_rate, False)
                             rp.stop()
-                            rp.feed(reverbed_generated)
+                            rp.feed(_apply_ducking(reverbed_generated, _ducking_factor))
                             rp.idle()
                             self.fileWavePlayer = rp
                             return
@@ -355,7 +388,7 @@ class PpWaveFileCommand(PpSynchronousCommand):
 
         fileWavePlayer = self.fileWavePlayer
         fileWavePlayer.stop()
-        fileWavePlayer.feed(audio_bytes)
+        fileWavePlayer.feed(_apply_ducking(audio_bytes, _ducking_factor))
         fileWavePlayer.idle()
 
     def getDuration(self):

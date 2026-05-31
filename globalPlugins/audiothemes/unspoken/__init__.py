@@ -505,21 +505,12 @@ class UnspokenPlayer:
 			if config.conf["unspoken"]["HRTF"]:
 				base_vol += 0.25
 				
-		# Apply Audio Ducking if NVDA is speaking
+		# Apply Audio Ducking if NVDA recently spoke
 		try:
-			import time
-			try:
-				from .. import frenzy
-				last_speech_time = frenzy.last_speech_time
-			except (ImportError, AttributeError):
-				last_speech_time = 0
-			ducking_enabled = config.conf.get("audiothemes", {}).get("audio_ducking_enabled", True)
-			if ducking_enabled and (speech.isSpeaking() or time.time() - last_speech_time < 0.5):
-				duck_factor = config.conf.get("audiothemes", {}).get("audio_ducking_volume", 30) / 100.0
-				base_vol *= duck_factor
-		except Exception as e:
-		    import logging
-		    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
+			from .. import frenzy
+			base_vol *= frenzy.get_ducking_factor("theme_sounds")
+		except Exception:
+			pass
 		return clamp(base_vol, 0.0, 1.5)
 
 	def _play_audio_data(self, audio_bytes):
@@ -542,12 +533,26 @@ class UnspokenPlayer:
 			return
 
 		if sound.get("is_ogg"):
-			import nvwave
+			path = sound.get("path")
 			try:
-				nvwave.playWaveFile(sound.get("path"), asynchronous=True)
-			except Exception as e:
-			    import logging
-			    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
+				import wave as _wave_module
+				with _wave_module.open(path, "rb") as wf:
+					frames = wf.readframes(wf.getnframes())
+					sw = wf.getsampwidth()
+					ch = wf.getnchannels()
+					sr = wf.getframerate()
+				from .. import frenzy
+				df = frenzy.get_ducking_factor("theme_sounds")
+				frames = frenzy.apply_ducking_to_pcm(frames, df, sw)
+				player = nvwave.WavePlayer(channels=ch, samplesPerSec=sr, bitsPerSample=sw*8, wantDucking=False)
+				player.feed(frames)
+				player.idle()
+			except Exception:
+				try:
+					nvwave.playWaveFile(path, asynchronous=True)
+				except Exception as e:
+					import logging
+					logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
 			return
 		if "data" not in sound:
 			return
@@ -729,19 +734,10 @@ class UnspokenPlayer:
 			
 			# Apply Audio Ducking to typing sounds
 			try:
-				import time
-				try:
-					from .. import frenzy
-					last_speech_time = frenzy.last_speech_time
-				except (ImportError, AttributeError):
-					last_speech_time = 0
-				ducking_enabled = config.conf.get("audiothemes", {}).get("audio_ducking_enabled", True)
-				if ducking_enabled and (speech.isSpeaking() or time.time() - last_speech_time < 0.5):
-					duck_factor = config.conf.get("audiothemes", {}).get("audio_ducking_volume", 30) / 100.0
-					final_volume *= duck_factor
-			except Exception as e:
-			    import logging
-			    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
+				from .. import frenzy
+				final_volume *= frenzy.get_ducking_factor("typing_sounds")
+			except Exception:
+				pass
 		else:
 			final_volume = self._compute_volume()
 			is_typing_sound = False
@@ -807,11 +803,26 @@ class UnspokenPlayer:
 			return
 		if sound.get("is_ogg") and "data" not in sound:
 			import nvwave
+			category = "typing_sounds" if is_typing_sound else "theme_sounds"
 			try:
-				nvwave.playWaveFile(path, asynchronous=True)
-			except Exception as e:
-			    import logging
-			    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
+				import wave as _wave_module
+				with _wave_module.open(path, "rb") as wf:
+					frames = wf.readframes(wf.getnframes())
+					sw = wf.getsampwidth()
+					ch = wf.getnchannels()
+					sr = wf.getframerate()
+				from .. import frenzy
+				df = frenzy.get_ducking_factor(category)
+				frames = frenzy.apply_ducking_to_pcm(frames, df, sw)
+				player = nvwave.WavePlayer(channels=ch, samplesPerSec=sr, bitsPerSample=sw*8, wantDucking=False)
+				player.feed(frames)
+				player.idle()
+			except Exception:
+				try:
+					nvwave.playWaveFile(path, asynchronous=True)
+				except Exception as e:
+				    import logging
+				    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
 			return
 		
 		adjusted_audio = _apply_volume(sound["data"], final_volume)

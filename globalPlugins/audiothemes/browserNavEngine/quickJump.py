@@ -1084,6 +1084,14 @@ def playBiwInThread(bookmark=None, earcon=None, volume=None):
         unpacked[i] = int(unpacked[i] * volume/100)
     packed = struct.pack(f"<{n}h", *unpacked)
     buf = ensure_mono(packed, f.getnchannels(), f.getframerate())
+    # Apply audio ducking
+    try:
+        from .. import frenzy
+        df = frenzy.get_ducking_factor("browsernav")
+        if df < 1.0:
+            buf = frenzy.apply_ducking_to_pcm(buf, df, 2)
+    except Exception:
+        pass
     try:
         outputDevice=config.conf["speech"]["outputDevice"]
     except KeyError:
@@ -1142,7 +1150,15 @@ earconModify = "3d/search-hit.wav"
 earconAdd = "3d/search-miss.wav"
 def playDiffEarcons(delete, modify, add):
     if add or modify or delete:
-        tones.beep(100, 5)
+        try:
+            from .. import frenzy
+            df = frenzy.get_ducking_factor("browsernav")
+            if df < 1.0:
+                tones.beep(100, 5, left=int(25*df), right=int(25*df))
+            else:
+                tones.beep(100, 5)
+        except Exception:
+            tones.beep(100, 5)
     if False:
         if delete:
             playBiw(earcon=earconDelete)
@@ -2757,7 +2773,15 @@ class EditBookmarkDialog(wx.Dialog):
     def onChar(self, event):
         keyCode = event.GetKeyCode ()
         if keyCode == 32: #space
-            tones.beep(500, 50)
+            try:
+                from .. import frenzy
+                df = frenzy.get_ducking_factor("browsernav")
+                if df < 1.0:
+                    tones.beep(500, 50, left=int(25*df), right=int(25*df))
+                else:
+                    tones.beep(500, 50)
+            except Exception:
+                tones.beep(500, 50)
             index = self.availableAttributesListBox.control.Selection
             if index >= 0:
                 item = self.attrChoices[index]
@@ -2834,7 +2858,15 @@ class EditBookmarkDialog(wx.Dialog):
                 _snippet = text
                 tempRule = self.make(snippet=text, quiet=True)
                 if tempRule.compileError is None:
-                    tones.beep(500, 50)
+                    try:
+                        from .. import frenzy
+                        df = frenzy.get_ducking_factor("browsernav")
+                        if df < 1.0:
+                            tones.beep(500, 50, left=int(25*df), right=int(25*df))
+                        else:
+                            tones.beep(500, 50)
+                    except Exception:
+                        tones.beep(500, 50)
                     _good = True
                 else:
                     gui.messageBox(str(tempRule.compileError), _("Script compilation failed "), wx.OK|wx.ICON_WARNING, self)

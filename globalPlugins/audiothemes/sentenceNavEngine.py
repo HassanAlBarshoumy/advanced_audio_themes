@@ -592,7 +592,16 @@ class SentenceNavMixin:
             prev = i
         return result
 
-    def _sn_fancyBeep(self, chord, length, left=10, right=10):
+    def _sn_fancyBeep(self, chord, length, left=10, right=10, category="sentencenav"):
+        # Apply audio ducking
+        try:
+            from .. import frenzy
+            df = frenzy.get_ducking_factor(category)
+            if df < 1.0:
+                left = int(left * df)
+                right = int(right * df)
+        except Exception:
+            pass
         beepLen = length
         freqs = self._sn_getChordFrequencies(chord)
         intSize = 8
@@ -767,7 +776,7 @@ class SentenceNavMixin:
                     pass
                 else:
                     volume = getSNConfig("noNextTextChimeVolume")
-                    self._sn_fancyBeep("HF", 100, volume, volume)
+                    self._sn_fancyBeep("HF", 100, volume, volume, category="textnav")
                 
                 if getSNConfig("noNextTextMessage"):
                     ui.message(errorMsg)
@@ -784,7 +793,7 @@ class SentenceNavMixin:
             if len(boundaries) >= 3:
                 textInfo.updateCaret()
                 from .browserNavEngine.beeper import Beeper
-                Beeper().simpleCrackle(distance, getSNConfig("textCrackleVolume"))
+                Beeper().simpleCrackle(distance, getSNConfig("textCrackleVolume"), category="textnav")
                 if getSNConfig("speakFormatted"):
                     speech.speakTextInfo(textInfo, reason=REASON_CARET)
                 else:

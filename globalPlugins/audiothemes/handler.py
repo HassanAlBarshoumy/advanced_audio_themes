@@ -100,6 +100,7 @@ audiothemes_config_defaults = {
     "ffmpeg_path": "string(default='')",
     "enable_ffmpeg": "boolean(default=False)",
     "dont_show_conflicts": "boolean(default=False)",
+    "ducking_categories": "string(default='{\"theme_sounds\":true,\"typing_sounds\":true,\"earcons\":true,\"browsernav\":true,\"sentencenav\":true,\"textnav\":true,\"ui_beeps\":true}')",
 }
 
 

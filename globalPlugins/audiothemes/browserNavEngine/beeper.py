@@ -50,7 +50,15 @@ class Beeper:
 
 
 
-    def fancyCrackle(self, levels, volume, initialDelay=0):
+    def fancyCrackle(self, levels, volume, initialDelay=0, category="browsernav"):
+        # Apply audio ducking
+        try:
+            from .. import frenzy
+            df = frenzy.get_ducking_factor(category)
+            if df < 1.0:
+                volume = int(volume * df)
+        except Exception:
+            pass
         l = len(levels)
         coef = 10
         l = coef * math.log(
@@ -75,8 +83,8 @@ class Beeper:
         self.player.stop()
         threading.Thread(target=lambda:self.player.feed(buf.raw)).start()
 
-    def simpleCrackle(self, n, volume, initialDelay=0):
-        return self.fancyCrackle([0] * n, volume, initialDelay=initialDelay)
+    def simpleCrackle(self, n, volume, initialDelay=0, category="browsernav"):
+        return self.fancyCrackle([0] * n, volume, initialDelay=initialDelay, category=category)
 
 
     NOTES = "A,B,H,C,C#,D,D#,E,F,F#,G,G#".split(",")
@@ -95,6 +103,15 @@ class Beeper:
         return result
 
     def fancyBeep(self, chord, length, left=10, right=10):
+        # Apply audio ducking
+        try:
+            from .. import frenzy
+            df = frenzy.get_ducking_factor("browsernav")
+            if df < 1.0:
+                left = int(left * df)
+                right = int(right * df)
+        except Exception:
+            pass
         beepLen = length
         freqs = self.getChordFrequencies(chord)
         intSize = 8 # bytes
@@ -194,10 +211,19 @@ def skippedParagraphChime():
         spcFile.close()
     def playSkipParagraphChime():
         spcPlayer.stop()
+        # Apply audio ducking
+        buf = spcBuf
+        try:
+            from .. import frenzy
+            df = frenzy.get_ducking_factor("browsernav")
+            if df < 1.0:
+                buf = frenzy.apply_ducking_to_pcm(buf, df)
+        except Exception:
+            pass
         spcPlayer.feed(
             ensure_mono(
                 adjustVolume(
-                    spcBuf,
+                    buf,
                     getConfig("skipChimeVolume")
                 ),
                 spcChannels,
