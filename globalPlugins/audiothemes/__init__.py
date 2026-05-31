@@ -224,10 +224,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         self._helpPending = False
         self._studioDialog = None
         self._rebindInstanceGestures()
-        try:
-            wx.CallAfter(showPendingConflicts)
-        except Exception:
-            pass
+        wx.CallAfter(showPendingConflicts)
 
     def _on_toggle_from_menu(self, event):
         state = event.IsChecked()

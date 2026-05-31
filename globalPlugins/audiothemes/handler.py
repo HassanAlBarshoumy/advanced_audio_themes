@@ -27,6 +27,7 @@ import speech
 from speech.sayAll import SayAllHandler
 
 import addonHandler
+from logHandler import log
 try:
     addonHandler.initTranslation()
 except AttributeError:
@@ -306,12 +307,15 @@ def showPendingConflicts():
 			with open(CONFLICT_PENDING_FILE, "w") as f:
 				json.dump(found, f)
 	except Exception:
-		pass
+		log.exception("Failed to check for conflicting add-ons")
 	try:
 		with open(CONFLICT_PENDING_FILE, "r") as f:
 			found_ids = json.load(f)
 		os.remove(CONFLICT_PENDING_FILE)
+	except FileNotFoundError:
+		return
 	except Exception:
+		log.exception("Failed to read pending conflicts file")
 		return
 	display_names = [conflicting_ids.get(n, n) for n in found_ids]
 	import gui
@@ -356,15 +360,24 @@ def showPendingConflicts():
 		if dlg.ShowModal() == wx.ID_OK:
 			if dont_show.IsChecked():
 				config.conf["audiothemes"]["dont_show_conflicts"] = True
+			removed = 0
 			for i, name in enumerate(found_ids):
-				if conflict_list.IsChecked(i):
+				if conflict_list.IsItemChecked(i):
 					for addon in addonHandler.getAvailableAddons():
 						if addon.name == name and not addon.isPendingRemove:
 							addon.requestRemove()
+							removed += 1
+			if removed:
+				wx.MessageBox(
+					_("The selected conflicting add-ons will be removed after you restart NVDA."),
+					_("Restart Required"),
+					wx.OK | wx.ICON_INFORMATION
+				)
 		dlg.Destroy()
 	except Exception:
-		pass
-	gui.mainFrame.postPopup()
+		log.exception("Failed to process conflicting add-ons dialog")
+	finally:
+		gui.mainFrame.postPopup()
 
 
 _typing_dir_cache = {}
