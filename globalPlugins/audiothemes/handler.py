@@ -219,6 +219,45 @@ class AudioTheme:
             "summary": self.summary
         }
 
+    _STAPLE_ROLES = (
+        controlTypes.Role.LISTITEM,
+        controlTypes.Role.BUTTON,
+        controlTypes.Role.CHECKBOX,
+        controlTypes.Role.RADIOBUTTON,
+        controlTypes.Role.TREEVIEWITEM,
+        controlTypes.Role.EDIT,
+        controlTypes.Role.COMBOBOX,
+        controlTypes.Role.TAB,
+        controlTypes.Role.SLIDER,
+        SpecialProps.first,
+        SpecialProps.last,
+    )
+
+    def _auto_create_missing_sounds(self, new_sounds, available, player):
+        created = 0
+        for target_role in self._STAPLE_ROLES:
+            if target_role in new_sounds:
+                continue
+            if not new_sounds:
+                return created
+            src_role = next(iter(new_sounds))
+            src_obj = new_sounds[src_role]
+            src_path = src_obj.get("path") if isinstance(src_obj, dict) else getattr(src_obj, 'path', None)
+            if not src_path or not os.path.isfile(src_path):
+                continue
+            _, ext = os.path.splitext(src_path)
+            name = role_int_to_name.get(target_role, str(target_role.value if hasattr(target_role, 'value') else target_role))
+            dst = os.path.join(self.directory, f"{name}{ext}")
+            try:
+                import shutil
+                shutil.copy2(src_path, dst)
+            except Exception:
+                continue
+            available.add(f"{name}{ext}".lower())
+            new_sounds[target_role] = player.make_sound_object(dst)
+            created += 1
+        return created
+
     def load(self, player):
         with self._lock:
             if self.sounds:
@@ -237,6 +276,7 @@ class AudioTheme:
             rep_role = self.is_valid_audio_file(path)
             if rep_role is not None:
                 new_sounds[rep_role] = player.make_sound_object(path)
+        self._auto_create_missing_sounds(new_sounds, available, player)
         with self._lock:
             self.sounds = new_sounds
             self.available_files = available
