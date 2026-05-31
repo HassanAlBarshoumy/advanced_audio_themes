@@ -786,10 +786,16 @@ class AudioThemesHandler:
     @classmethod
     def get_theme_from_folder(cls, folderpath):
         expected = os.path.join(THEMES_DIR, folderpath)
+        if not os.path.isdir(expected):
+            return None
         info_file = os.path.join(expected, INFO_FILE_NAME)
         if os.path.isfile(info_file):
             info = cls.load_info_file(info_file)
             return AudioTheme(directory=expected, **info)
+        name = os.path.basename(expected)
+        info = {"name": name, "author": "Unknown", "summary": name}
+        cls.write_info_file(info_file, info)
+        return AudioTheme(directory=expected, **info)
 
     @classmethod
     def get_installed_themes(cls):

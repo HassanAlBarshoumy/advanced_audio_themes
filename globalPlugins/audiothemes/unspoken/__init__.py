@@ -429,8 +429,20 @@ class UnspokenPlayer:
 					elif sample_width == 1:
 						float_samples = array('f', [(s - 128) / 128.0 for s in frames])
 						loaded = (float_samples, sample_rate, channels)
-					else:
-						log.error(f"Unsupported sample width: {sample_width}")
+					elif sample_width == 3:
+						import struct
+						count = len(frames) // 3
+						float_samples = array('f', [0.0]) * count
+						for i in range(count):
+							offset = i * 3
+							three_bytes = frames[offset:offset+3]
+							if three_bytes[2] < 128:
+								padded = three_bytes + b'\x00'
+							else:
+								padded = three_bytes + b'\xff'
+							s = struct.unpack('<i', padded)[0]
+							float_samples[i] = s / 8388608.0
+						loaded = (float_samples, sample_rate, channels)
 			except Exception as e:
 				log.error(f"Failed to load {path}: {e}")
 
