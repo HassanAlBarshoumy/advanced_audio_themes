@@ -562,7 +562,14 @@ class AudioThemesHandler:
         self.player.wet_level = unspoken_config["WetLevel"]
         self.player.dry_level = unspoken_config["DryLevel"]
         self.player.width = unspoken_config["Width"]
-        self.disabled_apps = user_config["disabled_apps"].split(',') if user_config["disabled_apps"] else []
+        self.disabled_apps = []
+        if user_config["disabled_apps"]:
+            for p in user_config["disabled_apps"].split(','):
+                p = p.strip().lower()
+                if p and not p.endswith('.exe'):
+                    p += '.exe'
+                if p:
+                    self.disabled_apps.append(p)
 
     def play(self, obj_info, sound):
         """
@@ -575,9 +582,8 @@ class AudioThemesHandler:
         # Use pre-extracted foreground app name from snapshot (no COM call here).
         foreground_app = obj_info.get("foreground_app") if isinstance(obj_info, dict) else None
         if foreground_app and not force_3d:
-            import fnmatch
             app_l = foreground_app.lower()
-            if any(fnmatch.fnmatch(app_l, p.lower()) for p in self.disabled_apps):
+            if any(p in app_l for p in self.disabled_apps):
                 return
 
         theme = self.get_theme_for_app(foreground_app)
@@ -624,9 +630,8 @@ class AudioThemesHandler:
             
         foreground_app = getattr(self, '_current_app_name', None)
         if foreground_app:
-            import fnmatch
             app_l = foreground_app.lower()
-            if any(fnmatch.fnmatch(app_l, p.lower()) for p in self.disabled_apps):
+            if any(p in app_l for p in self.disabled_apps):
                 return False
             
         theme = self.get_theme_for_app(foreground_app)
@@ -700,9 +705,8 @@ class AudioThemesHandler:
             
         foreground_app = getattr(self, '_current_app_name', None)
         if foreground_app:
-            import fnmatch
             app_l = foreground_app.lower()
-            if any(fnmatch.fnmatch(app_l, p.lower()) for p in self.disabled_apps):
+            if any(p in app_l for p in self.disabled_apps):
                 return
             
         theme = self.get_theme_for_app(foreground_app)
