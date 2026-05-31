@@ -360,6 +360,9 @@ class EditTextDialog(wx.Dialog):
             newCaretOffset = len(text) - caretOffsetFromEnd
             self.textCtrl.SetInsertionPoint(newCaretOffset)
         core.callLater(10, updateLineEndings)
+        from ..utils import is_sound_suppressed
+        if is_sound_suppressed("browsernav"):
+            return
         try:
             from .. import frenzy
             df = frenzy.get_ducking_factor("browsernav")

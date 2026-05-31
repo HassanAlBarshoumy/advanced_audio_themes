@@ -146,6 +146,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         utils.threadPool.restart()
         self.handler = AudioThemesHandler()
         GlobalPlugin._instance_handler = self.handler
+        from .utils import _set_handler_ref
+        _set_handler_ref(self.handler)
         
         # Patch Quick Nav Interceptor
         self.quicknav_interceptor = quicknav.BrowseModeQuickNavInterceptor(self.handler)
@@ -318,6 +320,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             return
         self.bindGestures(self._audioThemesLayerGestures)
         self.toggling = True
+        from .utils import is_sound_suppressed
+        if is_sound_suppressed("ui_beeps"):
+            return
         import tones
         try:
             from . import frenzy
@@ -362,6 +367,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         pass
 
     def script_error(self, gesture):
+        from .utils import is_sound_suppressed
+        if is_sound_suppressed("ui_beeps"):
+            return
         import tones
         try:
             from . import frenzy
@@ -573,7 +581,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             self._last_navigator_object = obj
         # Cache foreground app name on handler (avoids COM calls in keyboard hook)
         try:
-            self.handler._current_app_name = obj.appModule.appName
+            self.handler._current_app_name = obj.appModule.appName if obj.appModule else None
         except Exception:
             self.handler._current_app_name = None
         try:
@@ -868,7 +876,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         except Exception as e:
             log.debugWarning(f"event_show nextHandler: {e}")
     def event_documentLoadComplete(self, obj, nextHandler):
-        from logHandler import log
         # Cache app name on handler
         try:
             self.handler._current_app_name = obj.appModule.appName if obj.appModule else None
@@ -1100,6 +1107,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
             self._audio_beacon_desktop = tuple(desktop.location)
             
         ui.message(_("Audio beacon dropped at current location"))
+        from .utils import is_sound_suppressed
+        if is_sound_suppressed("ui_beeps"):
+            return
         import tones
         try:
             from . import frenzy

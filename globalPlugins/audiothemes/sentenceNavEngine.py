@@ -593,6 +593,9 @@ class SentenceNavMixin:
         return result
 
     def _sn_fancyBeep(self, chord, length, left=10, right=10, category="sentencenav"):
+        from .utils import is_sound_suppressed
+        if is_sound_suppressed(category):
+            return
         # Apply audio ducking
         try:
             from .. import frenzy

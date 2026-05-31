@@ -21,7 +21,7 @@ import ui
 import wave
 
 from . addonConfig import *
-from ..utils import ensure_mono
+from ..utils import ensure_mono, is_sound_suppressed
 
 class Beeper:
     BASE_FREQ = speech.IDT_BASE_FREQUENCY
@@ -51,6 +51,8 @@ class Beeper:
 
 
     def fancyCrackle(self, levels, volume, initialDelay=0, category="browsernav"):
+        if is_sound_suppressed(category):
+            return
         # Apply audio ducking
         try:
             from .. import frenzy
@@ -103,6 +105,8 @@ class Beeper:
         return result
 
     def fancyBeep(self, chord, length, left=10, right=10):
+        if is_sound_suppressed("browsernav"):
+            return
         # Apply audio ducking
         try:
             from .. import frenzy

@@ -102,6 +102,7 @@ audiothemes_config_defaults = {
     "enable_ffmpeg": "boolean(default=False)",
     "dont_show_conflicts": "boolean(default=False)",
     "ducking_categories": "string(default='{\"theme_sounds\":true,\"typing_sounds\":true,\"earcons\":true,\"browsernav\":true,\"sentencenav\":true,\"textnav\":true,\"ui_beeps\":true}')",
+    "disabled_apps_suppress_categories": "string(default='{\"theme_sounds\":true,\"typing_sounds\":true,\"earcons\":true,\"browsernav\":true,\"sentencenav\":true,\"textnav\":true,\"ui_beeps\":true}')",
 }
 
 
@@ -563,11 +564,10 @@ class AudioThemesHandler:
         self.player.dry_level = unspoken_config["DryLevel"]
         self.player.width = unspoken_config["Width"]
         self.disabled_apps = []
-        if user_config["disabled_apps"]:
-            for p in user_config["disabled_apps"].split(','):
-                p = p.strip().lower()
-                if p and not p.endswith('.exe'):
-                    p += '.exe'
+        raw_disabled = user_config["disabled_apps"]
+        if raw_disabled:
+            for p in raw_disabled.split(','):
+                p = p.strip().lower().removesuffix('.exe')
                 if p:
                     self.disabled_apps.append(p)
 
@@ -579,13 +579,18 @@ class AudioThemesHandler:
         if not force_3d and (not self.enabled or (self.active_theme is None)):
             return
 
-        # Use pre-extracted foreground app name from snapshot (no COM call here).
-        foreground_app = obj_info.get("foreground_app") if isinstance(obj_info, dict) else None
-        if foreground_app and not force_3d:
-            app_l = foreground_app.lower()
-            if any(p in app_l for p in self.disabled_apps):
-                return
+        # Check suppression via _current_app_name (always up to date,
+        # unlike the snapshot's foreground_app which may be stale from the queue).
+        if not force_3d:
+            cur_app = getattr(self, '_current_app_name', None)
+            if cur_app:
+                app_l = cur_app.lower()
+                if any(p in app_l for p in self.disabled_apps):
+                    from .utils import is_sound_suppressed
+                    if is_sound_suppressed("theme_sounds"):
+                        return
 
+        foreground_app = obj_info.get("foreground_app") if isinstance(obj_info, dict) else None
         theme = self.get_theme_for_app(foreground_app)
         if not theme and force_3d:
             theme = self.active_theme
@@ -632,15 +637,17 @@ class AudioThemesHandler:
         if foreground_app:
             app_l = foreground_app.lower()
             if any(p in app_l for p in self.disabled_apps):
-                return False
-            
+                from .utils import is_sound_suppressed
+                if is_sound_suppressed("theme_sounds"):
+                    return False
+
         theme = self.get_theme_for_app(foreground_app)
-            
+
         if not any(sound_name.endswith('.' + ext) for ext in SUPPORTED_FILE_TYPES):
             sound_name += '.wav'
-            
+
         sound_path = os.path.join(theme.directory, sound_name)
-        
+
         # Check pre-indexed files in memory to eliminate Disk I/O
         if sound_name.lower() in getattr(theme, 'available_files', set()):
             self.player.play_file(
@@ -707,10 +714,12 @@ class AudioThemesHandler:
         if foreground_app:
             app_l = foreground_app.lower()
             if any(p in app_l for p in self.disabled_apps):
-                return
-            
+                from .utils import is_sound_suppressed
+                if is_sound_suppressed("typing_sounds"):
+                    return
+
         theme = self.get_theme_for_app(foreground_app)
-            
+
         import random
         # 1. Check if the active theme has its own typingSounds folder
         theme_typing_dir = os.path.join(theme.directory, "typingSounds")

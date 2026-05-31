@@ -476,6 +476,8 @@ def sonifyTextInfoImpl(textInfo, lastTextInfo, includeCrackle):
         tone = min(tone, 20000)
 
         if tone != lastTone:
+            if utils.is_sound_suppressed("browsernav"):
+                return
             try:
                 from .. import frenzy
                 df = frenzy.get_ducking_factor("browsernav")
@@ -1337,6 +1339,8 @@ class BrowserNavMixin:
                         elif focus.role == ROLE_EDITABLETEXT:
                             goodCounter += 1
                             if goodCounter > 10:
+                                if utils.is_sound_suppressed("browsernav"):
+                                    break
                                 try:
                                     from .. import frenzy
                                     df = frenzy.get_ducking_factor("browsernav")

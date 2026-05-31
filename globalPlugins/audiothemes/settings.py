@@ -249,9 +249,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # Application Blacklist
         disabledAppsLabel = wx.StaticText(themePanel, -1, _("Disable Audio Themes in these applications (comma separated):"))
         self.disabledAppsEdit = wx.TextCtrl(themePanel, -1, value="", name=_("Disable in applications"))
+        self.suppressCategoriesBtn = wx.Button(themePanel, -1, _("Categories to suppress in disabled apps..."))
+        self.suppressCategoriesBtn.Bind(wx.EVT_BUTTON, self.onSuppressCategories)
         themeSizer.AddMany([
             (disabledAppsLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10),
-            (self.disabledAppsEdit, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+            (self.disabledAppsEdit, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5),
+            (self.suppressCategoriesBtn, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 5)
         ])
         
         themePanel.SetSizer(themeSizer)
@@ -930,6 +933,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
             self._ducking_categories = dlg.getCategories()
         dlg.Destroy()
 
+    def onSuppressCategories(self, event):
+        dlg = SuppressCategoriesDialog(self)
+        if dlg.ShowModal() == wx.ID_OK:
+            self._suppress_categories = dlg.getCategories()
+        dlg.Destroy()
+
     def _initialize_at_state(self):
         def _b(v):
             if isinstance(v, str): return v.lower() == 'true'
@@ -961,7 +970,16 @@ class AudioThemesSettingsPanel(SettingsPanel):
                 self._ducking_categories = dict(_DEFAULT_DUCKING_CATEGORIES)
         else:
             self._ducking_categories = dict(_DEFAULT_DUCKING_CATEGORIES)
-        
+
+        suppress_cat_str = conf.get("disabled_apps_suppress_categories", "")
+        if suppress_cat_str:
+            try:
+                self._suppress_categories = json.loads(suppress_cat_str)
+            except Exception:
+                self._suppress_categories = dict(_DEFAULT_DUCKING_CATEGORIES)
+        else:
+            self._suppress_categories = dict(_DEFAULT_DUCKING_CATEGORIES)
+
         duck_vol = conf.get("audio_ducking_volume", 30)
         if isinstance(duck_vol, str):
             try:
@@ -1179,7 +1197,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
         conf["audio_ducking_enabled"] = self.audioDuckingCheckbox.IsChecked()
         conf["audio_ducking_volume"] = self.audioDuckingVolumeSlider.GetValue()
         conf["ducking_categories"] = json.dumps(self._ducking_categories)
-        
+        if hasattr(self, '_suppress_categories'):
+            conf["disabled_apps_suppress_categories"] = json.dumps(self._suppress_categories)
+
         if self.outputModeChoice.GetSelection() == 1:
             conf["output_mode"] = "mono"
         else:
@@ -1580,6 +1600,55 @@ class DuckingCategoriesDialog(wx.Dialog):
         self._checkboxes = {}
         conf = config.conf.get("audiothemes", {})
         cat_str = conf.get("ducking_categories", "")
+        if cat_str:
+            try:
+                categories = json.loads(cat_str)
+            except Exception:
+                categories = dict(_DEFAULT_DUCKING_CATEGORIES)
+        else:
+            categories = dict(_DEFAULT_DUCKING_CATEGORIES)
+
+        for key, label_text in self.CATEGORIES:
+            cb = wx.CheckBox(panel, -1, label_text)
+            cb.SetValue(categories.get(key, True))
+            self._checkboxes[key] = cb
+            sizer.Add(cb, 0, wx.ALL, 5)
+
+        btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        ok_btn = wx.Button(panel, wx.ID_OK)
+        cancel_btn = wx.Button(panel, wx.ID_CANCEL)
+        btn_sizer.Add(ok_btn, 0, wx.ALL, 5)
+        btn_sizer.Add(cancel_btn, 0, wx.ALL, 5)
+        sizer.Add(btn_sizer, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
+        panel.SetSizer(sizer)
+        self.SetClientSize(panel.GetBestSize())
+
+    def getCategories(self):
+        return {key: cb.IsChecked() for key, cb in self._checkboxes.items()}
+
+
+class SuppressCategoriesDialog(wx.Dialog):
+    CATEGORIES = [
+        ("theme_sounds", _("Theme sounds (roles, states, focus)")),
+        ("typing_sounds", _("Typing sounds")),
+        ("earcons", _("Phonetic punctuation earcons (Alt+P)")),
+        ("browsernav", _("BrowserNav sounds (indentation, navigation)")),
+        ("sentencenav", _("SentenceNav sounds (Alt+Up/Down)")),
+        ("textnav", _("TextNav sounds (Alt+Shift+Up/Down)")),
+        ("ui_beeps", _("UI feedback beeps (layer, error, beacon)")),
+    ]
+
+    def __init__(self, parent):
+        title = _("Categories to Suppress in Disabled Apps")
+        super().__init__(parent, title=title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        panel = wx.Panel(self)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        label = wx.StaticText(panel, -1, _("Select which sound categories to suppress when the foreground app is in the disabled list:"))
+        sizer.Add(label, 0, wx.ALL, 10)
+
+        self._checkboxes = {}
+        conf = config.conf.get("audiothemes", {})
+        cat_str = conf.get("disabled_apps_suppress_categories", "")
         if cat_str:
             try:
                 categories = json.loads(cat_str)

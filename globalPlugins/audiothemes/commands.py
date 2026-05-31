@@ -90,6 +90,8 @@ class PpBeepCommand(PpSynchronousCommand):
         self.reverbPlayer = None
 
     def run(self):
+        if is_sound_suppressed("earcons"):
+            return
         from NVDAHelper import generateBeep
         hz,length,left,right = self.hz, self.length, self.left, self.right
 
@@ -296,6 +298,8 @@ class PpWaveFileCommand(PpSynchronousCommand):
         self._loaded = True
 
     def run(self):
+        if is_sound_suppressed("earcons"):
+            return
         self._ensureLoaded()
         if self.startAdjustment < 0:
             time.sleep(-self.startAdjustment / 1000.0)

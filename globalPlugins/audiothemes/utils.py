@@ -6,6 +6,7 @@
 
 import api
 import config
+import json
 import os
 from queue import Queue
 from logHandler import log
@@ -203,8 +204,7 @@ _cached_blacklist_set = set()
 
 def isAppBlacklisted():
     try:
-        from . import __init__ as aat_init
-        handler = getattr(aat_init.GlobalPlugin, '_instance_handler', None)
+        handler = _handler_ref
         appName = getattr(handler, '_current_app_name', "")
     except Exception:
         appName = ""
@@ -248,8 +248,7 @@ def getCurrentURLSafe():
 
 def getCurrentContext():
     try:
-        from . import __init__ as aat_init
-        handler = getattr(aat_init.GlobalPlugin, '_instance_handler', None)
+        handler = _handler_ref
         appName = getattr(handler, '_current_app_name', "")
         windowTitle = getattr(handler, '_current_window_title', "")
         url = getattr(handler, '_current_url', "")
@@ -257,6 +256,52 @@ def getCurrentContext():
         appName, windowTitle, url = "", "", ""
         
     return appName, windowTitle, url
+
+# Cached handler reference set by __init__ to avoid import issues on worker threads.
+_handler_ref = None
+
+def _set_handler_ref(handler):
+    global _handler_ref
+    _handler_ref = handler
+
+_suppressed_categories_json = ""
+_suppressed_categories_dict = {}
+
+def _load_suppressed_categories():
+    global _suppressed_categories_json, _suppressed_categories_dict
+    try:
+        raw = config.conf.get("audiothemes", {}).get("disabled_apps_suppress_categories", "")
+        if raw == _suppressed_categories_json:
+            return
+        _suppressed_categories_json = raw
+        if raw:
+            _suppressed_categories_dict = json.loads(raw)
+        else:
+            _suppressed_categories_dict = {}
+    except Exception:
+        _suppressed_categories_dict = {}
+
+def is_sound_suppressed(category):
+    """Return True if the given sound category should be suppressed
+    because the foreground app is in the disabled_apps list.
+    """
+    try:
+        handler = _handler_ref
+        if handler is None:
+            return False
+        app_name = getattr(handler, '_current_app_name', None)
+        disabled_apps = getattr(handler, 'disabled_apps', [])
+        if not app_name:
+            return False
+        if not disabled_apps:
+            return False
+        app_l = app_name.lower()
+        if not any(p in app_l for p in disabled_apps):
+            return False
+        _load_suppressed_categories()
+        return _suppressed_categories_dict.get(category, True)
+    except Exception:
+        return False
 
 def getProsodyClass(prosodyName):
     className = prosodyName

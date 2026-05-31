@@ -1064,6 +1064,9 @@ def playBiw(bookmark=None, earcon=None, volume=None):
     thread.start()
 
 def playBiwInThread(bookmark=None, earcon=None, volume=None):
+    from ..utils import is_sound_suppressed
+    if is_sound_suppressed("browsernav"):
+        return
     if volume is None:
         volume = bookmark.wavFileVolume if bookmark is not None else 100
     volume = 1.0 * volume
