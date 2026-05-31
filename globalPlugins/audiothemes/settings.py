@@ -1503,20 +1503,62 @@ class AudioThemesSettingsPanel(SettingsPanel):
             self._maintain_state()
 
     def onAdd(self, event):
-        openFileDlg = wx.FileDialog(
-            self,
-            # Translators: the title of a file dialog to browse to an audio theme package
-            message=_("Choose an audio theme package"),
-            # Translators: theme file type description
-            wildcard=_("Audio Theme Packages") + " (*.atp)|*.atp",
-            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
-        )
-        if openFileDlg.ShowModal() == wx.ID_OK:
-            filename = openFileDlg.GetPath().strip()
-            openFileDlg.Destroy()
-            if filename:
-                AudioThemesHandler.install_audio_themePackage(filename)
-                self._maintain_state()
+        dlg = wx.Dialog(self, title=_("Add Audio Theme"))
+        outer = wx.BoxSizer(wx.VERTICAL)
+        
+        # Translators: label for ZIP/.atp import button
+        zipBtn = wx.Button(dlg, -1, _("Import &ZIP or .atp file..."))
+        # Translators: label for folder import button
+        folderBtn = wx.Button(dlg, -1, _("Import &folder..."))
+        # Translators: label for cancel button
+        cancelBtn = wx.Button(dlg, wx.ID_CANCEL, _("&Cancel"))
+        
+        btnSizer = wx.BoxSizer(wx.VERTICAL)
+        btnSizer.Add(zipBtn, 0, wx.EXPAND | wx.ALL, 5)
+        btnSizer.Add(folderBtn, 0, wx.EXPAND | wx.ALL, 5)
+        btnSizer.Add(cancelBtn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+        outer.Add(btnSizer, 1, wx.EXPAND | wx.ALL, 15)
+        dlg.SetSizer(outer)
+        dlg.Fit()
+        dlg.CentreOnParent()
+        
+        def onZip(evt):
+            fd = wx.FileDialog(
+                self,
+                # Translators: the title of a file dialog to browse to an audio theme package
+                message=_("Choose an audio theme package"),
+                # Translators: theme file type description
+                wildcard=_("Audio Theme Packages") + " (*.atp;*.zip)|*.atp;*.zip",
+                style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
+            )
+            if fd.ShowModal() == wx.ID_OK:
+                dlg.result = ("zip", fd.GetPath().strip())
+            fd.Destroy()
+            dlg.EndModal(wx.ID_OK)
+        
+        def onFolder(evt):
+            dd = wx.DirDialog(
+                self,
+                # Translators: the title of a folder dialog to browse to an audio theme folder
+                message=_("Choose a folder containing audio theme files"),
+            )
+            if dd.ShowModal() == wx.ID_OK:
+                dlg.result = ("folder", dd.GetPath().strip())
+            dd.Destroy()
+            dlg.EndModal(wx.ID_OK)
+        
+        zipBtn.Bind(wx.EVT_BUTTON, onZip)
+        folderBtn.Bind(wx.EVT_BUTTON, onFolder)
+        cancelBtn.Bind(wx.EVT_BUTTON, lambda evt: dlg.EndModal(wx.ID_CANCEL))
+        
+        if dlg.ShowModal() == wx.ID_OK and hasattr(dlg, 'result') and dlg.result:
+            action, path = dlg.result
+            if action == "zip":
+                AudioThemesHandler.install_audio_themePackage(path)
+            else:
+                AudioThemesHandler.install_audio_themeFolder(path)
+            self._maintain_state()
+        dlg.Destroy()
 
     def onThemeSelectionChanged(self, event):
         flag = self.selected_theme is not None

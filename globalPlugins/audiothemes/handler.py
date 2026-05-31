@@ -888,6 +888,20 @@ class AudioThemesHandler:
                 os.rename(identified_path, target_path)
 
     @classmethod
+    def install_audio_themeFolder(cls, source_path):
+        cls._invalidate_themes_cache()
+        folder_name = os.path.basename(os.path.normpath(source_path))
+        safe_name = cls._sanitize_folder_name(folder_name)
+        target_path = os.path.join(THEMES_DIR, safe_name)
+        if os.path.isdir(target_path):
+            shutil.rmtree(target_path)
+        shutil.copytree(source_path, target_path)
+        info_file = os.path.join(target_path, INFO_FILE_NAME)
+        if not os.path.isfile(info_file):
+            info = {"name": folder_name, "author": "Unknown", "summary": folder_name}
+            cls.write_info_file(info_file, info)
+
+    @classmethod
     def install_typing_soundPackage(cls, pack_path):
         import json
         pack_name = "Imported_" + uuid4().hex[:8]
