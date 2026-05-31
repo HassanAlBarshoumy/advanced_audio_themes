@@ -121,6 +121,21 @@ def _get_blacklisted_roles():
     return [19]
 
 
+def _fix_corrupted_blacklisted_roles():
+    """Remove corrupted blacklisted_roles from raw config to prevent VdtTypeError on write."""
+    try:
+        raw = config.conf._configObj
+        section = raw.get("audiothemes")
+        if section is None:
+            return
+        val = section.get("blacklisted_roles")
+        if val is not None and isinstance(val, str):
+            section.pop("blacklisted_roles")
+            raw.write()
+    except Exception:
+        pass
+
+
 class SpecialProps(IntEnum):
     """Represents sounds defined by this addon."""
 
