@@ -103,6 +103,8 @@ audiothemes_config_defaults = {
     "dont_show_conflicts": "boolean(default=False)",
     "ducking_categories": "string(default='{\"theme_sounds\":true,\"typing_sounds\":true,\"earcons\":true,\"browsernav\":true,\"sentencenav\":true,\"textnav\":true,\"ui_beeps\":true}')",
     "disabled_apps_suppress_categories": "string(default='{\"theme_sounds\":true,\"typing_sounds\":true,\"earcons\":true,\"browsernav\":true,\"sentencenav\":true,\"textnav\":true,\"ui_beeps\":true}')",
+    "check_for_updates_auto": "boolean(default=True)",
+    "check_for_updates_prerelease": "boolean(default=False)",
 }
 
 

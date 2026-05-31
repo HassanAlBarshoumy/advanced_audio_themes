@@ -299,6 +299,15 @@ class AudioThemesSettingsPanel(SettingsPanel):
         ])
         
         configActionSizer = wx.BoxSizer(wx.HORIZONTAL)
+        # Translators: label for a checkbox to enable automatic update checking
+        self.autoUpdateCheckbox = wx.CheckBox(innerPanel, -1, _("Check for updates &automatically"))
+        # Translators: label for a checkbox to include pre-release versions in updates
+        self.prereleaseUpdateCheckbox = wx.CheckBox(innerPanel, -1, _("Include &pre-release (beta) versions"))
+        
+        updateSizer = wx.BoxSizer(wx.VERTICAL)
+        updateSizer.Add(self.autoUpdateCheckbox, 0, wx.LEFT | wx.RIGHT | wx.TOP, 5)
+        updateSizer.Add(self.prereleaseUpdateCheckbox, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 5)
+        
         self.exportConfigButton = wx.Button(innerPanel, -1, _("E&xport Configuration..."))
         self.importConfigButton = wx.Button(innerPanel, -1, _("I&mport Configuration..."))
         self.checkUpdatesButton = wx.Button(innerPanel, -1, _("Check for &Updates..."))
@@ -316,6 +325,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         innerSizer = wx.BoxSizer(wx.VERTICAL)
         innerSizer.Add(themePanel, 1, wx.EXPAND | wx.ALL, 0)
         innerSizer.Add(typingSizer, 0, wx.EXPAND | wx.ALL, 10)
+        innerSizer.Add(updateSizer, 0, wx.LEFT | wx.RIGHT | wx.TOP, 10)
         innerSizer.Add(configActionSizer, 0, wx.ALIGN_CENTER | wx.ALL, 10)
         innerPanel.SetSizer(innerSizer)
         innerSizer.Fit(innerPanel)
@@ -981,6 +991,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.volumeSlider.SetValue(_i(conf.get("volume", 100)))
         self.disabledAppsEdit.SetValue(conf.get("disabled_apps", ""))
         self.blacklisted_roles = _get_blacklisted_roles()
+        self.autoUpdateCheckbox.SetValue(_b(conf.get("check_for_updates_auto", True)))
+        self.prereleaseUpdateCheckbox.SetValue(_b(conf.get("check_for_updates_prerelease", False)))
         
         duck_val = conf.get("audio_ducking_enabled", True)
         if isinstance(duck_val, str):
@@ -1285,6 +1297,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
         conf["use_synth_volume"] = self.useSynthVolumeCheckbox.IsChecked()
         conf["volume"] = self.volumeSlider.GetValue()
         conf["disabled_apps"] = self.disabledAppsEdit.GetValue()
+        conf["check_for_updates_auto"] = self.autoUpdateCheckbox.IsChecked()
+        conf["check_for_updates_prerelease"] = self.prereleaseUpdateCheckbox.IsChecked()
         if hasattr(self, 'blacklisted_roles') and isinstance(self.blacklisted_roles, list) and all(isinstance(r, int) for r in self.blacklisted_roles):
             conf["blacklisted_roles"] = json.dumps(self.blacklisted_roles)
         else:
@@ -1671,7 +1685,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
                     wx.MessageBox(_("Error importing configuration:\n{}").format(str(e)), _("Error"), style=wx.ICON_ERROR)
 
     def onCheckUpdates(self, event):
-        check_for_updates(self)
+        prerelease = self.prereleaseUpdateCheckbox.IsChecked()
+        check_for_updates(self, prerelease=prerelease)
 
 
 class DuckingCategoriesDialog(wx.Dialog):

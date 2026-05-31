@@ -39,6 +39,7 @@ import textInfos
 from .handler import AudioThemesHandler, SpecialProps, showPendingConflicts
 from .settings import AudioThemesSettingsPanel
 from .studio import AudioThemesStudioStartupDialog
+from .update_checker import check_for_updates_auto
 
 from . import phoneticPunctuation as pp
 from . import utils
@@ -166,6 +167,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         self._last_focus_is_editable = False
         # Defer menu item creation — the main window may not be ready yet
         wx.CallAfter(self._add_tray_menu_items)
+
+        # Auto-check for updates (runs in background thread, respects config)
+        wx.CallAfter(check_for_updates_auto)
 
         # Browse-mode navigation timer: polls the navigator object every 180ms.
         # This is the ONLY way to detect arrow-key movement inside a virtual
