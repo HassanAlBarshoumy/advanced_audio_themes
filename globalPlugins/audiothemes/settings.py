@@ -122,9 +122,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.setupAudioFormatsPage(self.audioFormatsPage)
         self.notebook.AddPage(self.audioFormatsPage, _("Audio Formats"))
 
-        # Tab 4: Earcons and Speech Rules
-        from .phoneticPunctuationGui import RulesDialog
-        self.rulesPage = RulesDialog(self.notebook)
+        # Tab 4: Earcons and Speech Rules (lazy loaded)
+        self._rulesPage = None
+        self._rulesLoaded = False
+        self.rulesPage = wx.Panel(self.notebook)
         self.notebook.AddPage(self.rulesPage, _("Earcons & Speech Rules"))
 
         # Tab 5: Miscellaneous
@@ -132,7 +133,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.setupMiscPage(self.miscPage)
         self.notebook.AddPage(self.miscPage, _("Miscellaneous"))
 
-        # Tab 5: Speech Order (Control Type Before Label)
+        # Tab 5: Speech Order (Control Type Before Label) — per-role grid lazy loaded
+        self._speechOrderLoaded = False
         self.speechOrderPage = wx.Panel(self.notebook)
         self.setupSpeechOrderPage(self.speechOrderPage)
         self.notebook.AddPage(self.speechOrderPage, _("Speech Order"))
@@ -142,12 +144,15 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.setupAppProfilesPage(self.appProfilesPage)
         self.notebook.AddPage(self.appProfilesPage, _("App Profiles"))
 
-        # Tab 7: QuickSearch Websites & Bookmarks
-        from .browserNavEngine.quickJump import SettingsDialog as QuickJumpSettingsDialog
-        self.quickJumpPage = QuickJumpSettingsDialog(self.notebook)
+        # Tab 7: QuickSearch Websites & Bookmarks (lazy loaded)
+        self._quickJumpPage = None
+        self._quickJumpLoaded = False
+        self.quickJumpPage = wx.Panel(self.notebook)
         self.notebook.AddPage(self.quickJumpPage, _("QuickSearch & Bookmarks"))
 
         settingsSizer.Add(self.notebook, 1, wx.EXPAND | wx.ALL, 5)
+
+        self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._onLazyLoadTab)
 
         self._initialize_at_state()
         self._maintain_state()
@@ -595,7 +600,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         perRoleLabel = wx.StaticText(page, -1, _("Customize announcement format per role:"))
         sizer.Add(perRoleLabel, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 5)
         
-        # Build role list
+        # Build role list (fast — just iterates enum)
         self._role_list = []
         try:
             for role in controlTypes.Role:
@@ -619,7 +624,6 @@ class AudioThemesSettingsPanel(SettingsPanel):
             ("rsc", _("Role and state, then name")),
             ("sc", _("State, then name")),
         )
-        perRoleFormatNames = [name for code, name in self._PER_ROLE_FORMATS]
         
         # Search box for filtering roles
         searchSizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -629,55 +633,76 @@ class AudioThemesSettingsPanel(SettingsPanel):
         searchSizer.Add(self.roleSearchEdit, 1, wx.EXPAND | wx.ALL, 5)
         sizer.Add(searchSizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5)
         
-        # Scrolled panel for the per-role list
-        self.scrolled = wx.ScrolledWindow(page, style=wx.VSCROLL | wx.BORDER_SIMPLE)
-        self.scrolled.SetScrollRate(0, 20)
-        self.scrolled.SetMinSize((-1, 200))
-        self.scrollSizer = wx.FlexGridSizer(cols=2, vgap=4, hgap=8)
-        self.scrollSizer.AddGrowableCol(1, 1)
-        
-        self._roleFormatChoices = {}
-        self._roleRowControls = []  # To keep track of (label_ctrl, choice_ctrl, role_label_text)
-        
-        for role, label in self._role_list:
-            roleLbl = wx.StaticText(self.scrolled, -1, label)
-            ch = wx.Choice(self.scrolled, -1, choices=perRoleFormatNames)
-            ch.SetSelection(0)  # default: use global
-            self.scrollSizer.Add(roleLbl, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 4)
-            self.scrollSizer.Add(ch, 1, wx.EXPAND | wx.RIGHT, 4)
-            self._roleFormatChoices[role] = ch
-            self._roleRowControls.append((roleLbl, ch, label.lower()))
-        
-        self.scrolled.SetSizer(self.scrollSizer)
-        self.scrollSizer.Fit(self.scrolled)
-        self.scrolled.FitInside()
-        sizer.Add(self.scrolled, 1, wx.EXPAND | wx.ALL, 5)
-        
         page.SetSizer(sizer)
         
         self.roleSearchEdit.Bind(wx.EVT_TEXT, self.onRoleSearch)
 
     def onRoleSearch(self, event):
-        query = self.roleSearchEdit.GetValue().lower()
+        if not hasattr(self, 'roleListCtrl'):
+            return
+        self._populateRoleList(self.roleSearchEdit.GetValue().lower())
+
+    def _createRoleGrid(self):
+        self._gridFormatNames = [name for code, name in self._PER_ROLE_FORMATS]
+        self._roleFormats = {}
         
-        # Detach all elements temporarily to avoid destroying them
-        while self.scrollSizer.GetItemCount() > 0:
-            self.scrollSizer.Detach(0)
+        self.roleListCtrl = wx.ListCtrl(self.speechOrderPage, style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.BORDER_SIMPLE)
+        self.roleListCtrl.AppendColumn(_("Role"), width=200)
+        self.roleListCtrl.AppendColumn(_("Format"), width=200)
+        self.roleListCtrl.SetMinSize((-1, 200))
         
-        visible_count = 0
-        for roleLbl, ch, label_text in self._roleRowControls:
-            if query in label_text:
-                roleLbl.Show()
-                ch.Show()
-                self.scrollSizer.Add(roleLbl, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 4)
-                self.scrollSizer.Add(ch, 1, wx.EXPAND | wx.RIGHT, 4)
-                visible_count += 1
-            else:
-                roleLbl.Hide()
-                ch.Hide()
+        sizer = self.speechOrderPage.GetSizer()
+        sizer.Add(self.roleListCtrl, 1, wx.EXPAND | wx.ALL, 5)
         
-        self.scrolled.Layout()
-        self.scrolled.FitInside()
+        self.roleFormatChoice = wx.Choice(self.speechOrderPage, -1, choices=self._gridFormatNames)
+        self.roleFormatChoice.Enable(False)
+        sizer.Add(self.roleFormatChoice, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 5)
+        sizer.Layout()
+        
+        self._populateRoleList()
+        self.roleListCtrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self._onRoleSelected)
+        self.roleFormatChoice.Bind(wx.EVT_CHOICE, self._onRoleFormatChanged)
+        
+        self._initSpeechOrderFormats()
+        self._speechOrderLoaded = True
+
+    def _populateRoleList(self, filterText=""):
+        self.roleListCtrl.DeleteAllItems()
+        for role, label in self._role_list:
+            if filterText and filterText not in label.lower():
+                continue
+            code = self._roleFormats.get(role, "global")
+            fmtName = self._gridFormatNames[0]
+            for i, (c, n) in enumerate(self._PER_ROLE_FORMATS):
+                if c == code:
+                    fmtName = self._gridFormatNames[i]
+                    break
+            idx = self.roleListCtrl.Append([label, fmtName])
+            self.roleListCtrl.SetItemData(idx, role.value)
+
+    def _onRoleSelected(self, event):
+        idx = event.GetIndex()
+        roleValue = self.roleListCtrl.GetItemData(idx)
+        role = controlTypes.Role(roleValue)
+        code = self._roleFormats.get(role, "global")
+        for i, (c, n) in enumerate(self._PER_ROLE_FORMATS):
+            if c == code:
+                self.roleFormatChoice.SetSelection(i)
+                break
+        self.roleFormatChoice.Enable(True)
+
+    def _onRoleFormatChanged(self, event):
+        idx = self.roleListCtrl.GetFirstSelected()
+        if idx == -1:
+            return
+        roleValue = self.roleListCtrl.GetItemData(idx)
+        role = controlTypes.Role(roleValue)
+        sel = self.roleFormatChoice.GetSelection()
+        if sel == wx.NOT_FOUND:
+            return
+        code = self._PER_ROLE_FORMATS[sel][0]
+        self._roleFormats[role] = code
+        self.roleListCtrl.SetItem(idx, 1, self._gridFormatNames[sel])
 
     @property
     def selected_theme(self):
@@ -1049,13 +1074,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
         except Exception:
             self._app_profiles_cache = {}
 
-        for role, ch in self._roleFormatChoices.items():
-            role_key = str(role.value) if hasattr(role, 'value') else str(role)
-            saved_fmt = roleFormatsDict.get(role_key, "global")
-            for idx, (code, name) in enumerate(self._PER_ROLE_FORMATS):
-                if code == saved_fmt:
-                    ch.SetSelection(idx)
-                    break
+        if hasattr(self, '_roleFormats'):
+            for role, label in self._role_list:
+                role_key = str(role.value) if hasattr(role, 'value') else str(role)
+                self._roleFormats[role] = roleFormatsDict.get(role_key, "global")
+            self._populateRoleList()
         
         unspoken_conf = config.conf["unspoken"]
         self.enableReverbCheckbox.SetValue(_b(unspoken_conf["Reverb"]))
@@ -1177,9 +1200,79 @@ class AudioThemesSettingsPanel(SettingsPanel):
                 self.installedThemesChoice.SetStringSelection(theme.name)
         self._on_enable_themes_changed(DummyEvent(self.enableThemesCheckbox.IsChecked()))
         self.volumeSlider.Enable(not self.useSynthVolumeCheckbox.IsChecked())
+        self._suppressPreview = True
         self.onThemeSelectionChanged(None)
+        self._suppressPreview = False
         if hasattr(self, "appProfilesList"):
             self._updateAppProfilesList()
+
+    def _onLazyLoadTab(self, event):
+        event.Skip()
+        idx = event.GetSelection()
+        page = self.notebook.GetPage(idx)
+        if page is self.rulesPage and not self._rulesLoaded:
+            wx.CallAfter(self._loadRulesPage)
+        elif page is self.quickJumpPage and not self._quickJumpLoaded:
+            wx.CallAfter(self._loadQuickJumpPage)
+        elif page is self.speechOrderPage and not self._speechOrderLoaded:
+            wx.CallAfter(self._loadSpeechOrderPage)
+
+    def _loadRulesPage(self):
+        if self._rulesLoaded:
+            return
+        from .phoneticPunctuationGui import RulesDialog
+        real = RulesDialog(self.notebook)
+        idx = self._getPageIndex(self.rulesPage)
+        if idx < 0:
+            real.Destroy()
+            return
+        self.notebook.DeletePage(idx)
+        self.notebook.InsertPage(idx, real, _("Earcons & Speech Rules"))
+        self._rulesPage = real
+        self._rulesLoaded = True
+        if self.notebook.GetSelection() != idx:
+            self.notebook.SetSelection(idx)
+
+    def _loadQuickJumpPage(self):
+        if self._quickJumpLoaded:
+            return
+        from .browserNavEngine.quickJump import SettingsDialog as QuickJumpSettingsDialog
+        real = QuickJumpSettingsDialog(self.notebook)
+        idx = self._getPageIndex(self.quickJumpPage)
+        if idx < 0:
+            real.Destroy()
+            return
+        self.notebook.DeletePage(idx)
+        self.notebook.InsertPage(idx, real, _("QuickSearch & Bookmarks"))
+        self._quickJumpPage = real
+        self._quickJumpLoaded = True
+        if self.notebook.GetSelection() != idx:
+            self.notebook.SetSelection(idx)
+
+    def _loadSpeechOrderPage(self):
+        if self._speechOrderLoaded:
+            return
+        self._createRoleGrid()
+
+    def _initSpeechOrderFormats(self):
+        conf = config.conf.get("audiothemes", {})
+        try:
+            roleFormatsJson = conf.get("roleAnnounceFormats", "{}")
+            roleFormatsDict = json.loads(roleFormatsJson)
+        except Exception as e:
+            log.debug(f"Could not load role formats: {e}")
+            roleFormatsDict = {}
+        for role, label in self._role_list:
+            role_key = str(role.value) if hasattr(role, 'value') else str(role)
+            saved_fmt = roleFormatsDict.get(role_key, "global")
+            self._roleFormats[role] = saved_fmt
+        self._populateRoleList()
+
+    def _getPageIndex(self, page):
+        for i in range(self.notebook.GetPageCount()):
+            if self.notebook.GetPage(i) is page:
+                return i
+        return -1
 
     def onSave(self):
         conf = config.conf["audiothemes"]
@@ -1219,15 +1312,14 @@ class AudioThemesSettingsPanel(SettingsPanel):
         if self.announceFormatChoice.GetSelection() != wx.NOT_FOUND:
             conf["announceFormat"] = self.ANNOUNCE_FORMATS[self.announceFormatChoice.GetSelection()][0]
         
-        # Per-role formats
-        roleFormatsDict = {}
-        for role, ch in self._roleFormatChoices.items():
-            sel = ch.GetSelection()
-            if sel != wx.NOT_FOUND and sel > 0:  # skip index 0 = "global"
-                code = self._PER_ROLE_FORMATS[sel][0]
-                role_key = str(role.value) if hasattr(role, 'value') else str(role)
-                roleFormatsDict[role_key] = code
-        conf["roleAnnounceFormats"] = json.dumps(roleFormatsDict)
+        # Per-role formats (only if tab was loaded)
+        if hasattr(self, '_roleFormats'):
+            roleFormatsDict = {}
+            for role, code in self._roleFormats.items():
+                if code != "global":
+                    role_key = str(role.value) if hasattr(role, 'value') else str(role)
+                    roleFormatsDict[role_key] = code
+            conf["roleAnnounceFormats"] = json.dumps(roleFormatsDict)
         
         # App Profiles
         if hasattr(self, "_app_profiles_cache"):
@@ -1247,8 +1339,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
         unspoken_conf["WetLevel"] = self.wetLevelSlider.GetValue()
         unspoken_conf["DryLevel"] = self.dryLevelSlider.GetValue()
         unspoken_conf["Width"] = self.widthSlider.GetValue()
-        self.rulesPage.onSave()
-        self.quickJumpPage.onSave()
+        if self._rulesLoaded and hasattr(self._rulesPage, 'onSave'):
+            self._rulesPage.onSave()
+        if self._quickJumpLoaded and hasattr(self._quickJumpPage, 'onSave'):
+            self._quickJumpPage.onSave()
         # Miscellaneous tab — SentenceNav settings
         from .sentenceNavEngine import setSNConfig, regexCache
         snConf = config.conf["sentencenav"]
@@ -1317,10 +1411,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
         audiotheme_changed.notify()
 
     def onDiscard(self):
-        if hasattr(self.rulesPage, "onDiscard"):
-            self.rulesPage.onDiscard()
-        if hasattr(self.quickJumpPage, "onDiscard"):
-            self.quickJumpPage.onDiscard()
+        if self._rulesLoaded and hasattr(self._rulesPage, "onDiscard"):
+            self._rulesPage.onDiscard()
+        if self._quickJumpLoaded and hasattr(self._quickJumpPage, "onDiscard"):
+            self._quickJumpPage.onDiscard()
 
     def onPreviewTheme(self, event):
         theme = self.selected_theme
@@ -1419,8 +1513,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
             self._playThemePreview(self.selected_theme)
 
     def _playThemePreview(self, theme):
-        """Play a sample sound from the given theme as a preview."""
-        # Try common sound names in order of preference
+        if getattr(self, '_suppressPreview', False):
+            return
         preview_names = ["button.ogg", "button.wav", "button.mp3", "button.flac", "link.ogg", "link.wav", "link.mp3", "link.flac", "checkbox.ogg", "checkbox.wav", "checkbox.mp3", "checkbox.flac"]
         theme_dir = os.path.join(THEMES_DIR, theme.folder)
         for name in preview_names:

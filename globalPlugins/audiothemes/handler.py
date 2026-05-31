@@ -225,7 +225,7 @@ class AudioTheme:
         controlTypes.Role.CHECKBOX,
         controlTypes.Role.RADIOBUTTON,
         controlTypes.Role.TREEVIEWITEM,
-        controlTypes.Role.EDIT,
+        controlTypes.Role.EDITABLETEXT,
         controlTypes.Role.COMBOBOX,
         controlTypes.Role.TAB,
         controlTypes.Role.SLIDER,
@@ -435,6 +435,7 @@ _typing_dir_cache = {}
 
 class AudioThemesHandler:
     """Query and manage audio themes."""
+    _installed_themes_cache = None
 
     def __init__(self):
         config.conf.spec["audiothemes"] = audiothemes_config_defaults
@@ -839,11 +840,20 @@ class AudioThemesHandler:
 
     @classmethod
     def get_installed_themes(cls):
+        if cls._installed_themes_cache is not None:
+            return cls._installed_themes_cache
+        result = []
         for folder in os.listdir(THEMES_DIR):
             theme = cls.get_theme_from_folder(folder)
             if theme is None:
                 continue
-            yield theme
+            result.append(theme)
+        cls._installed_themes_cache = result
+        return result
+
+    @classmethod
+    def _invalidate_themes_cache(cls):
+        cls._installed_themes_cache = None
 
     @staticmethod
     def _sanitize_folder_name(name):
@@ -853,6 +863,7 @@ class AudioThemesHandler:
 
     @classmethod
     def install_audio_themePackage(cls, theme_pack):
+        cls._invalidate_themes_cache()
         identified_path = os.path.join(THEMES_DIR, uuid4().hex).lower()
         with ZipFile(theme_pack, "r") as pack:
             if pack.infolist()[0].is_dir():
@@ -921,6 +932,7 @@ class AudioThemesHandler:
 
     @staticmethod
     def remove_audio_theme(theme):
+        AudioThemesHandler._invalidate_themes_cache()
         if theme.name == "Default":
             config.conf["audiothemes"]["default_theme_deleted"] = True
         theme.deactivate()
@@ -944,7 +956,6 @@ class AudioThemesHandler:
                 file = os.path.join(source_dir, filename)
                 if os.path.isfile(file):
                     zip.write(file, filename)
-
 
 
 def get_typing_sound_packs():
