@@ -59,8 +59,6 @@ except AttributeError:
     pass
 
 utils.initConfiguration()
-from .handler import _fix_corrupted_blacklisted_roles
-_fix_corrupted_blacklisted_roles()
 pp.reloadRules()
 
 from . import quicknav

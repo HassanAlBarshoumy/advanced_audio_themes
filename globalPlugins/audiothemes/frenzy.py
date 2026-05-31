@@ -58,9 +58,11 @@ from config.configFlags import ReportLineIndentation
 
 def _get_blacklisted_roles():
     try:
-        val = config.conf["audiothemes"].get("blacklisted_roles", [])
-        if isinstance(val, list) and all(isinstance(r, int) for r in val):
-            return val
+        val = config.conf["audiothemes"].get("blacklisted_roles", "[19]")
+        if isinstance(val, list):
+            if all(isinstance(r, int) for r in val):
+                return val
+            return [19]
         if isinstance(val, str):
             import json
             parsed = json.loads(val)
@@ -69,21 +71,6 @@ def _get_blacklisted_roles():
     except Exception:
         pass
     return [19]
-
-
-def _fix_corrupted_blacklisted_roles():
-    """Remove corrupted blacklisted_roles from raw config to prevent VdtTypeError on write."""
-    try:
-        raw = config.conf._configObj
-        section = raw.get("audiothemes")
-        if section is None:
-            return
-        val = section.get("blacklisted_roles")
-        if val is not None and isinstance(val, str):
-            section.pop("blacklisted_roles")
-            raw.write()
-    except Exception:
-        pass
 
 
 original_getObjectPropertiesSpeech = None

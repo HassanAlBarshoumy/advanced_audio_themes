@@ -85,7 +85,7 @@ audiothemes_config_defaults = {
     "migrated_to_named_files": "boolean(default=False)",
     "disabled_apps": "string(default='')",
     "default_theme_deleted": "boolean(default=False)",
-    "blacklisted_roles": "int_list(default=[19])",
+    "blacklisted_roles": "string(default='[19]')",
     "typing_sounds": "boolean(default=True)",
     "typing_sounds_edit_only": "boolean(default=True)",
     "typing_sounds_volume": "integer(default=10)",
@@ -108,9 +108,11 @@ audiothemes_config_defaults = {
 
 def _get_blacklisted_roles():
     try:
-        val = config.conf["audiothemes"].get("blacklisted_roles", [])
-        if isinstance(val, list) and all(isinstance(r, int) for r in val):
-            return val
+        val = config.conf["audiothemes"].get("blacklisted_roles", "[19]")
+        if isinstance(val, list):
+            if all(isinstance(r, int) for r in val):
+                return val
+            return [19]
         if isinstance(val, str):
             import json
             parsed = json.loads(val)
@@ -119,21 +121,6 @@ def _get_blacklisted_roles():
     except Exception:
         pass
     return [19]
-
-
-def _fix_corrupted_blacklisted_roles():
-    """Remove corrupted blacklisted_roles from raw config to prevent VdtTypeError on write."""
-    try:
-        raw = config.conf._configObj
-        section = raw.get("audiothemes")
-        if section is None:
-            return
-        val = section.get("blacklisted_roles")
-        if val is not None and isinstance(val, str):
-            section.pop("blacklisted_roles")
-            raw.write()
-    except Exception:
-        pass
 
 
 class SpecialProps(IntEnum):

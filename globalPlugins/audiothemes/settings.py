@@ -1193,19 +1193,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
         conf["volume"] = self.volumeSlider.GetValue()
         conf["disabled_apps"] = self.disabledAppsEdit.GetValue()
         if hasattr(self, 'blacklisted_roles') and isinstance(self.blacklisted_roles, list) and all(isinstance(r, int) for r in self.blacklisted_roles):
-            try:
-                conf["blacklisted_roles"] = self.blacklisted_roles
-            except Exception:
-                from .handler import _fix_corrupted_blacklisted_roles
-                _fix_corrupted_blacklisted_roles()
-                conf["blacklisted_roles"] = self.blacklisted_roles
+            conf["blacklisted_roles"] = json.dumps(self.blacklisted_roles)
         else:
-            try:
-                conf["blacklisted_roles"] = [19]
-            except Exception:
-                from .handler import _fix_corrupted_blacklisted_roles
-                _fix_corrupted_blacklisted_roles()
-                conf["blacklisted_roles"] = [19]
+            conf["blacklisted_roles"] = json.dumps([19])
         conf["audio_ducking_enabled"] = self.audioDuckingCheckbox.IsChecked()
         conf["audio_ducking_volume"] = self.audioDuckingVolumeSlider.GetValue()
         conf["ducking_categories"] = json.dumps(self._ducking_categories)
