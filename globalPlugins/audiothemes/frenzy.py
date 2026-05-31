@@ -58,9 +58,17 @@ from config.configFlags import ReportLineIndentation
 
 def _get_blacklisted_roles():
     try:
-        return config.conf["audiothemes"].get("blacklisted_roles", [])
+        val = config.conf["audiothemes"].get("blacklisted_roles", [])
+        if isinstance(val, list) and all(isinstance(r, int) for r in val):
+            return val
+        if isinstance(val, str):
+            import json
+            parsed = json.loads(val)
+            if isinstance(parsed, list) and all(isinstance(r, int) for r in parsed):
+                return parsed
     except Exception:
-        return []
+        pass
+    return [19]
 
 
 original_getObjectPropertiesSpeech = None

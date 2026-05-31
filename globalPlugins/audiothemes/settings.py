@@ -1194,6 +1194,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
         conf["disabled_apps"] = self.disabledAppsEdit.GetValue()
         if hasattr(self, 'blacklisted_roles') and isinstance(self.blacklisted_roles, list) and all(isinstance(r, int) for r in self.blacklisted_roles):
             conf["blacklisted_roles"] = self.blacklisted_roles
+        else:
+            conf["blacklisted_roles"] = [19]
         conf["audio_ducking_enabled"] = self.audioDuckingCheckbox.IsChecked()
         conf["audio_ducking_volume"] = self.audioDuckingVolumeSlider.GetValue()
         conf["ducking_categories"] = json.dumps(self._ducking_categories)
