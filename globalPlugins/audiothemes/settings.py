@@ -987,6 +987,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.navLayerTimeoutCheckbox = wx.CheckBox(page, -1, _("Auto-exit layer after 10 seconds of inactivity") if "_" in globals() else "Auto-exit layer after 10 seconds of inactivity")
         navLayerBox.Add(self.navLayerTimeoutCheckbox, 0, wx.ALL, 5)
 
+        # Play Sounds
+        self.navLayerPlaySoundsCheckbox = wx.CheckBox(page, -1, _("Play sounds for layer actions") if "_" in globals() else "Play sounds for layer actions")
+        navLayerBox.Add(self.navLayerPlaySoundsCheckbox, 0, wx.ALL, 5)
+
         # Available Modes
         modeLabel = wx.StaticText(page, -1, _("Active Navigation Modes:") if "_" in globals() else "Active Navigation Modes:")
         navLayerBox.Add(modeLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
@@ -1211,6 +1215,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         nlConf = config.conf.get("audiothemes", {})
         self.navLayerPassThroughCheckbox.SetValue(_b(nlConf.get("navLayerPassThrough", True)))
         self.navLayerTimeoutCheckbox.SetValue(_b(nlConf.get("navLayerTimeout", True)))
+        self.navLayerPlaySoundsCheckbox.SetValue(_b(nlConf.get("navLayerPlaySounds", True)))
 
         import json
         try:
@@ -1503,6 +1508,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # Miscellaneous tab — Navigation Layer settings
         conf["navLayerPassThrough"] = self.navLayerPassThroughCheckbox.GetValue()
         conf["navLayerTimeout"] = self.navLayerTimeoutCheckbox.GetValue()
+        conf["navLayerPlaySounds"] = self.navLayerPlaySoundsCheckbox.GetValue()
         
         checked_indices = self.navLayerModesList.GetCheckedItems()
         enabled_ids = [self.navLayerAllModes[i]["id"] for i in checked_indices]

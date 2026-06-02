@@ -97,6 +97,7 @@ audiothemes_config_defaults = {
     "app_profiles": "string(default='{}')",
     "navLayerPassThrough": "boolean(default=True)",
     "navLayerTimeout": "boolean(default=True)",
+    "navLayerPlaySounds": "boolean(default=True)",
     "navLayerEnabledModes": "string(default='')",
     "audio_ducking_enabled": "boolean(default=False)",
     "audio_ducking_volume": "integer(default=6)",

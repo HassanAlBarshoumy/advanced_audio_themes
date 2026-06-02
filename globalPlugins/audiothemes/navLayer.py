@@ -22,6 +22,13 @@ class NavLayerMixin:
     Mixin to provide a navigation layer for cycling through various modes.
     """
     
+    def _playNavTone(self, pitch, duration):
+        import config
+        nlConf = config.conf.get("audiothemes", {})
+        if nlConf.get("navLayerPlaySounds", True):
+            import tones
+            tones.beep(pitch, duration)
+
     _ALL_MODES = [
         {"id": "character", "name": _("Character") if "_" in globals() else "Character", "type": "key", "prev": "leftArrow", "next": "rightArrow"},
         {"id": "word", "name": _("Word") if "_" in globals() else "Word", "type": "key", "prev": "control+leftArrow", "next": "control+rightArrow"},
@@ -140,8 +147,8 @@ class NavLayerMixin:
                 
         self.bindGestures(self._navLayerGestures)
         
-        tones.beep(600, 50)
-        wx.CallLater(60, lambda: tones.beep(800, 50))
+        self._playNavTone(600, 50)
+        wx.CallLater(60, lambda: self._playNavTone(800, 50))
         
         mode = self._activeModes[self._navLayerModeIndex]
         ui.message(mode["name"])
@@ -151,14 +158,14 @@ class NavLayerMixin:
     def script_navLayerNextMode(self, gesture):
         if not self._activeModes: return
         self._navLayerModeIndex = (self._navLayerModeIndex + 1) % len(self._activeModes)
-        tones.beep(1200, 30)
+        self._playNavTone(1200, 30)
         ui.message(self._activeModes[self._navLayerModeIndex]["name"])
 
     @script(description="Previous navigation mode.")
     def script_navLayerPreviousMode(self, gesture):
         if not self._activeModes: return
         self._navLayerModeIndex = (self._navLayerModeIndex - 1) % len(self._activeModes)
-        tones.beep(1000, 30)
+        self._playNavTone(1000, 30)
         ui.message(self._activeModes[self._navLayerModeIndex]["name"])
 
     @script(description="Move to previous unit in navigation layer.")
@@ -171,7 +178,7 @@ class NavLayerMixin:
 
     @script(description="Copy current unit.")
     def script_navLayerCopy(self, gesture):
-        tones.beep(1500, 40)
+        self._playNavTone(1500, 40)
         # Bypasses KeyboardInputGesture entirely to avoid Arabic layout LookupError
         winUser.keybd_event(winUser.VK_CONTROL, 0, 0, 0)
         winUser.keybd_event(ord('C'), 0, 0, 0)
@@ -180,7 +187,7 @@ class NavLayerMixin:
 
     @script(description="Spell current unit.")
     def script_navLayerSpell(self, gesture):
-        tones.beep(1500, 40)
+        self._playNavTone(1500, 40)
         mode = self._activeModes[self._navLayerModeIndex]
         obj = api.getNavigatorObject()
         if not obj:
@@ -228,8 +235,8 @@ class NavLayerMixin:
         if hasattr(self, '_rebindInstanceGestures'):
             self._rebindInstanceGestures()
         
-        tones.beep(800, 50)
-        wx.CallAfter(wx.CallLater, 60, lambda: tones.beep(600, 50))
+        self._playNavTone(800, 50)
+        wx.CallAfter(wx.CallLater, 60, lambda: self._playNavTone(600, 50))
         ui.message(_("Exited navigation layer") if "_" in globals() else "Exited navigation layer")
 
     def _sendNormalKey(self, keyName):
@@ -237,7 +244,7 @@ class NavLayerMixin:
         try:
             gest = keyboardHandler.KeyboardInputGesture.fromName(keyName)
         except LookupError:
-            tones.beep(300, 100)
+            self._playNavTone(300, 100)
             return
             
         self._navLayerActive = False
@@ -274,7 +281,7 @@ class NavLayerMixin:
         mode = self._activeModes[self._navLayerModeIndex]
         
         if mode["type"] == "key":
-            tones.beep(400, 20)
+            self._playNavTone(400, 20)
             key = mode["prev"] if direction == -1 else mode["next"]
             self._sendNormalKey(key)
             
@@ -284,11 +291,11 @@ class NavLayerMixin:
             
             # If we are not inside a valid treeInterceptor or passThrough is True (Browse Mode is OFF)
             if not ti or getattr(ti, "passThrough", True):
-                tones.beep(300, 100) # Error beep
+                self._playNavTone(300, 100) # Error beep
                 ui.message(_("Not supported here") if "_" in globals() else "Not supported here")
                 return
                 
-            tones.beep(400, 20)
+            self._playNavTone(400, 20)
             vk = mode["vk"]
             shift = (direction == -1)
             self._sendVKKey(vk, shift=shift)
