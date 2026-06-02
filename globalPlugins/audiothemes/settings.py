@@ -976,6 +976,19 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         sizer.Add(bnBox, 0, wx.EXPAND | wx.ALL, 10)
 
+        # --- Navigation Layer group ---
+        navLayerBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Navigation Layer (NVDA+Windows+N)") if "_" in globals() else "Navigation Layer (NVDA+Windows+N)")
+
+        # Pass-through Unknown Keys
+        self.navLayerPassThroughCheckbox = wx.CheckBox(page, -1, _("Pass-through unknown keys (Auto-exit on typing)") if "_" in globals() else "Pass-through unknown keys (Auto-exit on typing)")
+        navLayerBox.Add(self.navLayerPassThroughCheckbox, 0, wx.ALL, 5)
+
+        # Auto-Exit Timeout
+        self.navLayerTimeoutCheckbox = wx.CheckBox(page, -1, _("Auto-exit layer after 10 seconds of inactivity") if "_" in globals() else "Auto-exit layer after 10 seconds of inactivity")
+        navLayerBox.Add(self.navLayerTimeoutCheckbox, 0, wx.ALL, 5)
+
+        sizer.Add(navLayerBox, 0, wx.EXPAND | wx.ALL, 10)
+
         noteLabel = wx.StaticText(page, -1, _("Note: These settings adjust the audio feedback for SentenceNav, TextNav, and BrowserNav integrations."))
         sizer.Add(noteLabel, 0, wx.ALL, 10)
 
@@ -1181,6 +1194,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.crackleVolumeSlider.SetValue(_i(bnConf["crackleVolume"]))
         self.beepVolumeSlider.SetValue(_i(bnConf["beepVolume"]))
         self.skipChimeVolumeSlider.SetValue(_i(bnConf["skipChimeVolume"]))
+
+        # Miscellaneous tab — Navigation Layer settings
+        nlConf = config.conf.get("audiothemes", {})
+        self.navLayerPassThroughCheckbox.SetValue(_b(nlConf.get("navLayerPassThrough", True)))
+        self.navLayerTimeoutCheckbox.SetValue(_b(nlConf.get("navLayerTimeout", True)))
 
         # Audio Formats tab — FFmpeg
         audioConf = config.conf["audiothemes"]
@@ -1455,6 +1473,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
         bnConf["crackleVolume"] = self.crackleVolumeSlider.GetValue()
         bnConf["beepVolume"] = self.beepVolumeSlider.GetValue()
         bnConf["skipChimeVolume"] = self.skipChimeVolumeSlider.GetValue()
+
+        # Miscellaneous tab — Navigation Layer settings
+        conf["navLayerPassThrough"] = self.navLayerPassThroughCheckbox.GetValue()
+        conf["navLayerTimeout"] = self.navLayerTimeoutCheckbox.GetValue()
 
         # Audio Formats tab — FFmpeg
         conf["enable_ffmpeg"] = self.ffmpegEnableCheckbox.IsChecked()
