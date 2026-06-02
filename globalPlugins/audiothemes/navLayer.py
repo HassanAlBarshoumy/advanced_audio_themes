@@ -18,19 +18,37 @@ except AttributeError:
 
 class NavLayerMixin:
     """
-    Mixin to provide a navigation layer for cycling through modes:
-    Character, Word, Line, Sentence, Paragraph, Heading, Link, Form Field.
+    Mixin to provide a navigation layer for cycling through various modes.
     """
     
-    _navLayerModes = [
-        _("Character") if "_" in globals() else "Character",
-        _("Word") if "_" in globals() else "Word",
-        _("Line") if "_" in globals() else "Line",
-        _("Sentence") if "_" in globals() else "Sentence",
-        _("Paragraph") if "_" in globals() else "Paragraph",
-        _("Heading") if "_" in globals() else "Heading",
-        _("Link") if "_" in globals() else "Link",
-        _("Form Field") if "_" in globals() else "Form Field"
+    _ALL_MODES = [
+        {"id": "character", "name": _("Character") if "_" in globals() else "Character", "type": "key", "prev": "leftArrow", "next": "rightArrow"},
+        {"id": "word", "name": _("Word") if "_" in globals() else "Word", "type": "key", "prev": "control+leftArrow", "next": "control+rightArrow"},
+        {"id": "line", "name": _("Lines") if "_" in globals() else "Lines", "type": "key", "prev": "upArrow", "next": "downArrow"},
+        {"id": "sentence", "name": _("Sentence") if "_" in globals() else "Sentence", "type": "key", "prev": "alt+upArrow", "next": "alt+downArrow"},
+        {"id": "paragraph", "name": _("Paragraph") if "_" in globals() else "Paragraph", "type": "key", "prev": "control+upArrow", "next": "control+downArrow"},
+        {"id": "heading", "name": _("Headings") if "_" in globals() else "Headings", "type": "script", "prev": "script_previousHeading", "next": "script_nextHeading"},
+        {"id": "link", "name": _("Links") if "_" in globals() else "Links", "type": "script", "prev": "script_previousLink", "next": "script_nextLink"},
+        {"id": "unvisitedLink", "name": _("Unvisited links") if "_" in globals() else "Unvisited links", "type": "script", "prev": "script_previousUnvisitedLink", "next": "script_nextUnvisitedLink"},
+        {"id": "visitedLink", "name": _("Visited links") if "_" in globals() else "Visited links", "type": "script", "prev": "script_previousVisitedLink", "next": "script_nextVisitedLink"},
+        {"id": "formField", "name": _("Form fields") if "_" in globals() else "Form fields", "type": "script", "prev": "script_previousFormField", "next": "script_nextFormField"},
+        {"id": "button", "name": _("Buttons") if "_" in globals() else "Buttons", "type": "script", "prev": "script_previousButton", "next": "script_nextButton"},
+        {"id": "editField", "name": _("Edit fields") if "_" in globals() else "Edit fields", "type": "script", "prev": "script_previousEdit", "next": "script_nextEdit"},
+        {"id": "checkBox", "name": _("Check boxes") if "_" in globals() else "Check boxes", "type": "script", "prev": "script_previousCheckBox", "next": "script_nextCheckBox"},
+        {"id": "comboBox", "name": _("Combo boxes") if "_" in globals() else "Combo boxes", "type": "script", "prev": "script_previousComboBox", "next": "script_nextComboBox"},
+        {"id": "radioButton", "name": _("Radio buttons") if "_" in globals() else "Radio buttons", "type": "script", "prev": "script_previousRadioButton", "next": "script_nextRadioButton"},
+        {"id": "graphic", "name": _("Images") if "_" in globals() else "Images", "type": "script", "prev": "script_previousGraphic", "next": "script_nextGraphic"},
+        {"id": "list", "name": _("Lists") if "_" in globals() else "Lists", "type": "script", "prev": "script_previousList", "next": "script_nextList"},
+        {"id": "listItem", "name": _("List items") if "_" in globals() else "List items", "type": "script", "prev": "script_previousListItem", "next": "script_nextListItem"},
+        {"id": "table", "name": _("Tables") if "_" in globals() else "Tables", "type": "script", "prev": "script_previousTable", "next": "script_nextTable"},
+        {"id": "frame", "name": _("Frames") if "_" in globals() else "Frames", "type": "script", "prev": "script_previousFrame", "next": "script_nextFrame"},
+        {"id": "article", "name": _("Articles") if "_" in globals() else "Articles", "type": "script", "prev": "script_previousArticle", "next": "script_nextArticle"},
+        {"id": "landmark", "name": _("Landmarks") if "_" in globals() else "Landmarks", "type": "script", "prev": "script_previousLandmark", "next": "script_nextLandmark"},
+        {"id": "separator", "name": _("Separators") if "_" in globals() else "Separators", "type": "script", "prev": "script_previousSeparator", "next": "script_nextSeparator"},
+        {"id": "quote", "name": _("Quotes") if "_" in globals() else "Quotes", "type": "script", "prev": "script_previousBlockQuote", "next": "script_nextBlockQuote"},
+        {"id": "object", "name": _("Objects") if "_" in globals() else "Objects", "type": "script", "prev": "script_previousEmbeddedObject", "next": "script_nextEmbeddedObject"},
+        {"id": "textBlock", "name": _("text blocks") if "_" in globals() else "text blocks", "type": "script", "prev": "script_previousNotLinkBlock", "next": "script_nextNotLinkBlock"},
+        {"id": "search", "name": _("Searches") if "_" in globals() else "Searches", "type": "script", "prev": "script_findPrevious", "next": "script_findNext"},
     ]
 
     def __init__(self, *args, **kwargs):
@@ -38,6 +56,7 @@ class NavLayerMixin:
         self._navLayerActive = False
         self._navLayerModeIndex = 0
         self._navLayerTimer = None
+        self._activeModes = []
         
         self._navLayerGestures = {
             "kb:leftArrow": "navLayerPreviousMode",
@@ -49,6 +68,22 @@ class NavLayerMixin:
             "kb:s": "navLayerSpell",
             "kb:r": "navLayerReadAll"
         }
+
+    def _loadActiveModes(self):
+        nlConf = config.conf.get("audiothemes", {})
+        import json
+        try:
+            enabled_ids = json.loads(nlConf.get("navLayerEnabledModes", "[]"))
+        except Exception:
+            enabled_ids = []
+            
+        if not enabled_ids:
+            # Default fallback if nothing saved
+            enabled_ids = [m["id"] for m in self._ALL_MODES]
+            
+        self._activeModes = [m for m in self._ALL_MODES if m["id"] in enabled_ids]
+        if not self._activeModes:
+            self._activeModes = [self._ALL_MODES[2]] # Fallback to Line
 
     def getScript(self, gesture):
         if self._navLayerActive:
@@ -97,29 +132,39 @@ class NavLayerMixin:
             self._doNavLayerExit()
             return
 
+        self._loadActiveModes()
         self._navLayerActive = True
-        self._navLayerModeIndex = 2  # Default to Line
+        
+        # Try to default to Line or first mode
+        self._navLayerModeIndex = 0
+        for i, m in enumerate(self._activeModes):
+            if m["id"] == "line":
+                self._navLayerModeIndex = i
+                break
+                
         self.bindGestures(self._navLayerGestures)
         
         # Play enter sound
         tones.beep(600, 50)
         wx.CallLater(60, lambda: tones.beep(800, 50))
         
-        mode_name = self._navLayerModes[self._navLayerModeIndex]
-        ui.message(f"{mode_name}")
+        mode = self._activeModes[self._navLayerModeIndex]
+        ui.message(mode["name"])
         self._resetNavLayerTimer()
 
     @script(description="Next navigation mode.")
     def script_navLayerNextMode(self, gesture):
-        self._navLayerModeIndex = (self._navLayerModeIndex + 1) % len(self._navLayerModes)
+        if not self._activeModes: return
+        self._navLayerModeIndex = (self._navLayerModeIndex + 1) % len(self._activeModes)
         tones.beep(1200, 30)
-        ui.message(self._navLayerModes[self._navLayerModeIndex])
+        ui.message(self._activeModes[self._navLayerModeIndex]["name"])
 
     @script(description="Previous navigation mode.")
     def script_navLayerPreviousMode(self, gesture):
-        self._navLayerModeIndex = (self._navLayerModeIndex - 1) % len(self._navLayerModes)
+        if not self._activeModes: return
+        self._navLayerModeIndex = (self._navLayerModeIndex - 1) % len(self._activeModes)
         tones.beep(1000, 30)
-        ui.message(self._navLayerModes[self._navLayerModeIndex])
+        ui.message(self._activeModes[self._navLayerModeIndex]["name"])
 
     @script(description="Move to previous unit in navigation layer.")
     def script_navLayerMovePrevious(self, gesture):
@@ -137,19 +182,20 @@ class NavLayerMixin:
     @script(description="Spell current unit.")
     def script_navLayerSpell(self, gesture):
         tones.beep(1500, 40)
-        mode = self._navLayerModeIndex
+        mode = self._activeModes[self._navLayerModeIndex]
         obj = api.getNavigatorObject()
         if not obj:
             return
         try:
             info = obj.makeTextInfo(api.textInfos.POSITION_CARET)
-            if mode == 1:
+            m_id = mode["id"]
+            if m_id == "word":
                 info.expand(api.textInfos.UNIT_WORD)
-            elif mode == 2:
+            elif m_id == "line":
                 info.expand(api.textInfos.UNIT_LINE)
-            elif mode == 3:
+            elif m_id == "sentence":
                 info.expand(api.textInfos.UNIT_SENTENCE)
-            elif mode == 4:
+            elif m_id == "paragraph":
                 info.expand(api.textInfos.UNIT_PARAGRAPH)
             else:
                 info.expand(api.textInfos.UNIT_WORD) # default fallback
@@ -201,35 +247,35 @@ class NavLayerMixin:
                 wx.CallLater(50, self.bindGestures, self._navLayerGestures)
 
     def _performNavAction(self, direction):
-        tones.beep(400, 20)
-        mode = self._navLayerModeIndex
+        if not self._activeModes: return
+        mode = self._activeModes[self._navLayerModeIndex]
         
-        # 0: Character
-        if mode == 0:
-            key = "leftArrow" if direction == -1 else "rightArrow"
-        # 1: Word
-        elif mode == 1:
-            key = "control+leftArrow" if direction == -1 else "control+rightArrow"
-        # 2: Line
-        elif mode == 2:
-            key = "upArrow" if direction == -1 else "downArrow"
-        # 3: Sentence
-        elif mode == 3:
-            key = "alt+upArrow" if direction == -1 else "alt+downArrow"
-        # 4: Paragraph
-        elif mode == 4:
-            key = "control+upArrow" if direction == -1 else "control+downArrow"
-        # 5: Heading
-        elif mode == 5:
-            key = "shift+h" if direction == -1 else "h"
-        # 6: Link
-        elif mode == 6:
-            key = "shift+k" if direction == -1 else "k"
-        # 7: Form Field
-        elif mode == 7:
-            key = "shift+f" if direction == -1 else "f"
-        else:
-            return
-
-        self._sendNormalKey(key)
-
+        if mode["type"] == "key":
+            tones.beep(400, 20)
+            key = mode["prev"] if direction == -1 else mode["next"]
+            self._sendNormalKey(key)
+            
+        elif mode["type"] == "script":
+            obj = api.getFocusObject()
+            if not obj or not getattr(obj, "treeInterceptor", None):
+                tones.beep(300, 100) # Error beep
+                ui.message(_("Not supported here") if "_" in globals() else "Not supported here")
+                return
+            
+            scriptName = mode["prev"] if direction == -1 else mode["next"]
+            try:
+                func = getattr(obj.treeInterceptor, scriptName)
+                import scriptHandler
+                tones.beep(400, 20)
+                # Temporarily unbind to allow script to work properly
+                self.clearGestureBindings()
+                if hasattr(self, '_rebindInstanceGestures'):
+                    self._rebindInstanceGestures()
+                try:
+                    scriptHandler.executeScript(func, None)
+                finally:
+                    if self._navLayerActive:
+                        wx.CallLater(50, self.bindGestures, self._navLayerGestures)
+            except AttributeError:
+                tones.beep(300, 100) # Error beep
+                ui.message(_("Not supported here") if "_" in globals() else "Not supported here")

@@ -987,6 +987,18 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.navLayerTimeoutCheckbox = wx.CheckBox(page, -1, _("Auto-exit layer after 10 seconds of inactivity") if "_" in globals() else "Auto-exit layer after 10 seconds of inactivity")
         navLayerBox.Add(self.navLayerTimeoutCheckbox, 0, wx.ALL, 5)
 
+        # Available Modes
+        modeLabel = wx.StaticText(page, -1, _("Active Navigation Modes:") if "_" in globals() else "Active Navigation Modes:")
+        navLayerBox.Add(modeLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
+        
+        from .navLayer import NavLayerMixin
+        self.navLayerAllModes = NavLayerMixin._ALL_MODES
+        self.navLayerModeNames = [m["name"] for m in self.navLayerAllModes]
+        self.navLayerModesList = wx.CheckListBox(page, -1, choices=self.navLayerModeNames)
+        # Set a fixed height or min size so it doesn't collapse
+        self.navLayerModesList.SetMinSize((-1, 150))
+        navLayerBox.Add(self.navLayerModesList, 0, wx.EXPAND | wx.ALL, 5)
+
         sizer.Add(navLayerBox, 0, wx.EXPAND | wx.ALL, 10)
 
         noteLabel = wx.StaticText(page, -1, _("Note: These settings adjust the audio feedback for SentenceNav, TextNav, and BrowserNav integrations."))
@@ -1199,6 +1211,16 @@ class AudioThemesSettingsPanel(SettingsPanel):
         nlConf = config.conf.get("audiothemes", {})
         self.navLayerPassThroughCheckbox.SetValue(_b(nlConf.get("navLayerPassThrough", True)))
         self.navLayerTimeoutCheckbox.SetValue(_b(nlConf.get("navLayerTimeout", True)))
+
+        import json
+        try:
+            enabled_ids = json.loads(nlConf.get("navLayerEnabledModes", "[]"))
+        except Exception:
+            enabled_ids = []
+        if not enabled_ids:
+            enabled_ids = [m["id"] for m in self.navLayerAllModes]
+        for i, m in enumerate(self.navLayerAllModes):
+            self.navLayerModesList.Check(i, m["id"] in enabled_ids)
 
         # Audio Formats tab — FFmpeg
         audioConf = config.conf["audiothemes"]
@@ -1477,6 +1499,13 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # Miscellaneous tab — Navigation Layer settings
         conf["navLayerPassThrough"] = self.navLayerPassThroughCheckbox.GetValue()
         conf["navLayerTimeout"] = self.navLayerTimeoutCheckbox.GetValue()
+        
+        import json
+        enabled_ids = []
+        for i, m in enumerate(self.navLayerAllModes):
+            if self.navLayerModesList.IsChecked(i):
+                enabled_ids.append(m["id"])
+        conf["navLayerEnabledModes"] = json.dumps(enabled_ids)
 
         # Audio Formats tab — FFmpeg
         conf["enable_ffmpeg"] = self.ffmpegEnableCheckbox.IsChecked()
