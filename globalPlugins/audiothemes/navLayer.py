@@ -240,28 +240,34 @@ class NavLayerMixin:
             tones.beep(300, 100)
             return
             
+        self._navLayerActive = False
         self.clearGestureBindings()
         if hasattr(self, '_rebindInstanceGestures'):
             self._rebindInstanceGestures()
         try:
             inputCore.manager.executeGesture(gest)
         finally:
-            if self._navLayerActive:
-                wx.CallLater(50, self.bindGestures, self._navLayerGestures)
+            self._navLayerActive = True
+            wx.CallLater(50, self.bindGestures, self._navLayerGestures)
 
     def _sendVKKey(self, vk, shift=False):
         import inputCore
-        modifiers = ("shift",) if shift else ()
+        import winUser
+        modifiers = set()
+        if shift:
+            modifiers.add((winUser.VK_SHIFT, False))
+            
         gest = keyboardHandler.KeyboardInputGesture(modifiers, vk, 0, False)
         
+        self._navLayerActive = False
         self.clearGestureBindings()
         if hasattr(self, '_rebindInstanceGestures'):
             self._rebindInstanceGestures()
         try:
             inputCore.manager.executeGesture(gest)
         finally:
-            if self._navLayerActive:
-                wx.CallLater(50, self.bindGestures, self._navLayerGestures)
+            self._navLayerActive = True
+            wx.CallLater(50, self.bindGestures, self._navLayerGestures)
 
     def _performNavAction(self, direction):
         if not self._activeModes: return
