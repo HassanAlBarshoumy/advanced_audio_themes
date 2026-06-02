@@ -994,8 +994,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
         from .navLayer import NavLayerMixin
         self.navLayerAllModes = NavLayerMixin._ALL_MODES
         self.navLayerModeNames = [m["name"] for m in self.navLayerAllModes]
-        self.navLayerModesList = wx.CheckListBox(page, -1, choices=self.navLayerModeNames)
-        # Set a fixed height or min size so it doesn't collapse
+        from gui.nvdaControls import CustomCheckListBox
+        self.navLayerModesList = CustomCheckListBox(page, -1, choices=self.navLayerModeNames)
         self.navLayerModesList.SetMinSize((-1, 150))
         navLayerBox.Add(self.navLayerModesList, 0, wx.EXPAND | wx.ALL, 5)
 
@@ -1219,8 +1219,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
             enabled_ids = []
         if not enabled_ids:
             enabled_ids = [m["id"] for m in self.navLayerAllModes]
+        checked_indices = []
         for i, m in enumerate(self.navLayerAllModes):
-            self.navLayerModesList.Check(i, m["id"] in enabled_ids)
+            if m["id"] in enabled_ids:
+                checked_indices.append(i)
+        self.navLayerModesList.SetCheckedItems(checked_indices)
 
         # Audio Formats tab — FFmpeg
         audioConf = config.conf["audiothemes"]
@@ -1501,10 +1504,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
         conf["navLayerTimeout"] = self.navLayerTimeoutCheckbox.GetValue()
         
         import json
-        enabled_ids = []
-        for i, m in enumerate(self.navLayerAllModes):
-            if self.navLayerModesList.IsChecked(i):
-                enabled_ids.append(m["id"])
+        checked_indices = self.navLayerModesList.GetCheckedItems()
+        enabled_ids = [self.navLayerAllModes[i]["id"] for i in checked_indices]
         conf["navLayerEnabledModes"] = json.dumps(enabled_ids)
 
         # Audio Formats tab — FFmpeg
