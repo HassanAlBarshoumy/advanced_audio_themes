@@ -229,7 +229,7 @@ class NavLayerMixin:
             self._rebindInstanceGestures()
         
         tones.beep(800, 50)
-        wx.CallLater(60, lambda: tones.beep(600, 50))
+        wx.CallAfter(wx.CallLater, 60, lambda: tones.beep(600, 50))
         ui.message(_("Exited navigation layer") if "_" in globals() else "Exited navigation layer")
 
     def _sendNormalKey(self, keyName):
@@ -248,7 +248,7 @@ class NavLayerMixin:
             inputCore.manager.executeGesture(gest)
         finally:
             self._navLayerActive = True
-            wx.CallLater(50, self.bindGestures, self._navLayerGestures)
+            wx.CallAfter(wx.CallLater, 50, self.bindGestures, self._navLayerGestures)
 
     def _sendVKKey(self, vk, shift=False):
         import inputCore
@@ -267,7 +267,7 @@ class NavLayerMixin:
             inputCore.manager.executeGesture(gest)
         finally:
             self._navLayerActive = True
-            wx.CallLater(50, self.bindGestures, self._navLayerGestures)
+            wx.CallAfter(wx.CallLater, 50, self.bindGestures, self._navLayerGestures)
 
     def _performNavAction(self, direction):
         if not self._activeModes: return
