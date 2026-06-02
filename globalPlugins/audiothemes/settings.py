@@ -1366,6 +1366,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         return -1
 
     def onSave(self):
+        import json
         conf = config.conf["audiothemes"]
         conf["enable_audio_themes"] = self.enableThemesCheckbox.IsChecked()
         if self.selected_theme is not None:
@@ -1503,7 +1504,6 @@ class AudioThemesSettingsPanel(SettingsPanel):
         conf["navLayerPassThrough"] = self.navLayerPassThroughCheckbox.GetValue()
         conf["navLayerTimeout"] = self.navLayerTimeoutCheckbox.GetValue()
         
-        import json
         checked_indices = self.navLayerModesList.GetCheckedItems()
         enabled_ids = [self.navLayerAllModes[i]["id"] for i in checked_indices]
         conf["navLayerEnabledModes"] = json.dumps(enabled_ids)
