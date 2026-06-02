@@ -248,7 +248,7 @@ class NavLayerMixin:
             inputCore.manager.executeGesture(gest)
         finally:
             self._navLayerActive = True
-            wx.CallAfter(wx.CallLater, 50, self.bindGestures, self._navLayerGestures)
+            self.bindGestures(self._navLayerGestures)
 
     def _sendVKKey(self, vk, shift=False):
         import inputCore
@@ -267,7 +267,7 @@ class NavLayerMixin:
             inputCore.manager.executeGesture(gest)
         finally:
             self._navLayerActive = True
-            wx.CallAfter(wx.CallLater, 50, self.bindGestures, self._navLayerGestures)
+            self.bindGestures(self._navLayerGestures)
 
     def _performNavAction(self, direction):
         if not self._activeModes: return
