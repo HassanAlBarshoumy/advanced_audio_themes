@@ -67,8 +67,9 @@ from . import quicknav
 # Initialize SentenceNav config section
 initSentenceNavConfiguration()
 
+from .navLayer import NavLayerMixin
 
-class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.GlobalPlugin):
+class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPluginHandler.GlobalPlugin):
 
     browser_apps = ["firefox", "iexplore", "chrome", "opera", "edge"]
     scriptCategory = "Advanced Audio Themes"
@@ -316,6 +317,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, globalPluginHandler.Global
         self.bindGesture("kb:Alt+Windows+UpArrow", "previousPhrase")
         self.bindGesture("kb:Alt+Shift+DownArrow", "nextText")
         self.bindGesture("kb:Alt+Shift+UpArrow", "previousText")
+        
+        # Navigation Layer
+        self.bindGesture("kb:NVDA+windows+n", "navigationLayer")
 
     @script(description=_("Audio themes command layer. Press this then a command key (e.g. h for help)."), gestures=['kb:NVDA+shift+a'])
     def script_audioThemesLayer(self, gesture):

@@ -485,6 +485,16 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.trimSilenceCheckbox = wx.CheckBox(page, -1, _("Trim silence from beginning and end of sounds"))
         engineSizer.Add(self.trimSilenceCheckbox, 0, wx.ALL, 5)
 
+        trimSizer = wx.BoxSizer(wx.HORIZONTAL)
+        trimThresholdLabel = wx.StaticText(page, -1, _("Threshold:"))
+        self.trimThresholdSlider = wx.Slider(page, -1, minValue=0, maxValue=100, name=_("Trim silence threshold"))
+        self.trimThresholdValueLabel = wx.StaticText(page, -1, "0.01")
+        trimSizer.Add(trimThresholdLabel, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5)
+        trimSizer.Add(self.trimThresholdSlider, 1, wx.EXPAND | wx.ALL, 5)
+        trimSizer.Add(self.trimThresholdValueLabel, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5)
+        engineSizer.Add(trimSizer, 0, wx.EXPAND)
+        self.trimThresholdSlider.Bind(wx.EVT_SLIDER, self._onTrimThresholdChanged)
+
         # Noise Gate
         self.noiseGateCheckbox = wx.CheckBox(page, -1, _("Noise Gate (Remove background noise below threshold)"))
         engineSizer.Add(self.noiseGateCheckbox, 0, wx.ALL, 5)
@@ -584,6 +594,21 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.dampingSlider.Enable(enabled)
         self.dryLevelSlider.Enable(enabled)
         self.widthSlider.Enable(enabled)
+
+    def _slider_to_threshold(self, val):
+        return val / 100.0 * 0.5
+
+    def _threshold_to_slider(self, val):
+        return int(round(val / 0.5 * 100))
+
+    def _onTrimThresholdChanged(self, event):
+        val = self.trimThresholdSlider.GetValue()
+        threshold = self._slider_to_threshold(val)
+        if threshold == 0:
+            self.trimThresholdValueLabel.SetLabel(_("0 (off)"))
+        else:
+            self.trimThresholdValueLabel.SetLabel(f"{threshold:.3f}")
+        self.trimThresholdSlider.Enable(self.trimSilenceCheckbox.GetValue())
 
     def setupSpeechOrderPage(self, page):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -1035,6 +1060,17 @@ class AudioThemesSettingsPanel(SettingsPanel):
         if isinstance(trim_sil, str):
             trim_sil = trim_sil.lower() == "true"
         self.trimSilenceCheckbox.SetValue(_b(bool(trim_sil)))
+        trim_threshold = unspoken_conf.get("TrimSilenceThreshold", 0.01)
+        if isinstance(trim_threshold, str):
+            try:
+                trim_threshold = float(trim_threshold)
+            except ValueError:
+                trim_threshold = 0.01
+        slider_val = self._threshold_to_slider(float(trim_threshold))
+        self.trimThresholdSlider.SetValue(slider_val)
+        self._onTrimThresholdChanged(None)
+        self.trimThresholdSlider.Enable(self.trimSilenceCheckbox.GetValue())
+        self.trimThresholdValueLabel.Enable(self.trimSilenceCheckbox.GetValue())
         self.noiseGateCheckbox.SetValue(_b(unspoken_conf.get("NoiseGate", False)))
         self.bassBoostCheckbox.SetValue(_b(unspoken_conf.get("BassBoost", False)))
         
@@ -1345,6 +1381,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
         unspoken_conf["SmoothEnvelope"] = self.smoothEnvelopeCheckbox.GetValue()
         unspoken_conf["SmoothPanning"] = self.smoothPanningCheckbox.GetValue()
         unspoken_conf["TrimSilence"] = self.trimSilenceCheckbox.GetValue()
+        slider_val = self.trimThresholdSlider.GetValue()
+        unspoken_conf["TrimSilenceThreshold"] = self._slider_to_threshold(slider_val)
         unspoken_conf["NoiseGate"] = self.noiseGateCheckbox.GetValue()
         unspoken_conf["BassBoost"] = self.bassBoostCheckbox.GetValue()
         unspoken_conf["Reverb"] = self.enableReverbCheckbox.IsChecked()

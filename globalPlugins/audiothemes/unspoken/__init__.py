@@ -163,14 +163,16 @@ def trim_silence_array(audio_data, threshold=0.01):
 			break
 	else:
 		return []
-	start = start & ~1  # align to even (fast bit-mask)
+	start &= ~1
 	end = data_len
 	for i in range(data_len - 1, -1, -1):
 		if abs(audio_data[i]) > threshold:
 			end = i + 1
 			break
 	if end & 1:
-		end = min(data_len, end + 1)
+		end += 1
+	if end > data_len:
+		end = data_len & ~1
 	return audio_data[start:end]
 
 # taken from Stackoverflow. Don't ask.
@@ -209,6 +211,7 @@ class UnspokenPlayer:
 			"SmoothEnvelope": "boolean(default=False)",
 			"SmoothPanning": "boolean(default=True)",
 			"TrimSilence": "boolean(default=True)",
+			"TrimSilenceThreshold": "float(default=0.01)",
 		}
 		log.debug("Initializing Steam Audio")
 		self.steam_audio = steam_audio.get_steam_audio()
@@ -466,8 +469,11 @@ class UnspokenPlayer:
 		# Note: mono downmix is NOT done here — it happens at playback time
 		# based on active 3D/mono mode, so cached data preserves original channels
 
-		if config.conf["unspoken"].get("TrimSilence", False):
-			float_samples = trim_silence_array(float_samples, threshold=0.01)
+		if config.conf["unspoken"].get("TrimSilence", True):
+			threshold = float(config.conf["unspoken"].get("TrimSilenceThreshold", 0.01))
+			float_samples = trim_silence_array(float_samples, threshold=threshold)
+		if not float_samples:
+			float_samples = array('f', [0.0]) * 1024
 
 		if config.conf["unspoken"].get("SmartVolume", True):
 			if float_samples:
