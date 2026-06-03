@@ -35,6 +35,8 @@ import globalCommands
 import eventHandler
 import ui
 import textInfos
+import logHandler
+log = logHandler.log
 
 from .handler import AudioThemesHandler, SpecialProps, showPendingConflicts
 from .settings import AudioThemesSettingsPanel
@@ -596,6 +598,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             nextHandler()
         except UnboundLocalError:
             pass
+        except StopIteration:
+            raise
         except Exception as e:
             log.debugWarning(f"event_gainFocus nextHandler: {e}")
         obj_info = self._snapshot_obj(obj)
@@ -665,6 +669,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             return
         try:
             nextHandler()
+        except StopIteration:
+            raise
         except Exception as e:
             log.debugWarning(f"event_becomeNavigatorObject nextHandler: {e}")
         self._last_play_time = time.monotonic()
@@ -706,6 +712,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             log.debug(f"AudioThemes event_valueChange: {e}")
         try:
             nextHandler()
+        except StopIteration:
+            raise
         except Exception as e:
             log.debugWarning(f"event_valueChange nextHandler: {e}")
     def _is_editable(self, obj):
@@ -869,6 +877,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 log.debugWarning(f"event_mouseMove snapshot: {e}")
         try:
             nextHandler()
+        except StopIteration:
+            raise
         except Exception as e:
             log.debugWarning(f"event_mouseMove nextHandler: {e}")
     def event_show(self, obj, nextHandler):
@@ -881,6 +891,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             log.debugWarning(f"event_show: {e}")
         try:
             nextHandler()
+        except StopIteration:
+            raise
         except Exception as e:
             log.debugWarning(f"event_show nextHandler: {e}")
     def event_documentLoadComplete(self, obj, nextHandler):
@@ -897,6 +909,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             log.debug(f"AudioThemes event_documentLoadComplete: {e}")
         try:
             nextHandler()
+        except StopIteration:
+            raise
         except Exception as e:
             log.debugWarning(f"event_documentLoadComplete nextHandler: {e}")
     def playObject(self, obj_info):

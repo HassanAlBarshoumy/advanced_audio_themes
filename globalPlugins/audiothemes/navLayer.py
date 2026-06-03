@@ -103,6 +103,7 @@ class NavLayerMixin:
                     self._doNavLayerExit()
                     return super().getScript(gesture)
                 else:
+                    self._resetNavLayerTimer()
                     def dummy_script(gesture):
                         pass
                     return dummy_script
