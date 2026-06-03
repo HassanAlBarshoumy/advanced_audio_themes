@@ -172,7 +172,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         wx.CallAfter(self._add_tray_menu_items)
 
         # Auto-check for updates (runs in background thread, respects config)
-        wx.CallAfter(check_for_updates_auto)
+        # Delayed 15 seconds to let the add-on fully initialize first
+        wx.CallLater(15000, check_for_updates_auto)
 
         # Browse-mode navigation timer: polls the navigator object every 180ms.
         # This is the ONLY way to detect arrow-key movement inside a virtual
@@ -484,7 +485,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self._navigation_timer.Stop()
             # Shut down the shared thread pool cleanly so worker threads do not
             # linger after the add-on is unloaded.
-            utils.threadPool.shutdown(wait=True)
+            utils.threadPool.shutdown(wait=False)
         # ── BrowserNav termination ──
         with suppress(Exception):
             self.terminateBrowserNav()

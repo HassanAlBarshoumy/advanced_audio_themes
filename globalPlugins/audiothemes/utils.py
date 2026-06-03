@@ -165,7 +165,8 @@ class ThreadPool:
         if wait:
             for w in self._workers:
                 w.join(timeout=3.0)
-        self._workers.clear()
+        else:
+            self._workers.clear()
 
     def restart(self):
         """Respawn workers if they were cleared."""

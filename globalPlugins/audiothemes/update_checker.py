@@ -87,7 +87,30 @@ def get_latest_version_info(prerelease=False):
     return None, None, None, None
 
 
-def download_addon(url, callback):
+def download_addon(url, callback, parent=None):
+    progress_dlg = [None]
+
+    def _show_progress():
+        dlg = wx.ProgressDialog(
+            _("Downloading Update"),
+            _("Downloading the latest version..."),
+            parent=parent,
+            style=wx.PD_APP_MODAL
+        )
+        dlg.Show()
+        progress_dlg[0] = dlg
+
+    def _pulse_progress():
+        dlg = progress_dlg[0]
+        if dlg:
+            dlg.Pulse()
+
+    def _close_progress():
+        dlg = progress_dlg[0]
+        if dlg:
+            dlg.Destroy()
+            progress_dlg[0] = None
+
     def _download():
         try:
             ctx = ssl.create_default_context()
@@ -95,10 +118,18 @@ def download_addon(url, callback):
             resp = urlopen(req, timeout=60, context=ctx)
             ext = os.path.splitext(url.split("/")[-1])[1] or ".nvda-addon"
             fd, path = tempfile.mkstemp(suffix=ext, prefix="audiothemes_update_")
+            wx.CallAfter(_show_progress)
             with os.fdopen(fd, "wb") as f:
-                f.write(resp.read())
+                while True:
+                    chunk = resp.read(8192)
+                    if not chunk:
+                        break
+                    f.write(chunk)
+                    wx.CallAfter(_pulse_progress)
+            wx.CallAfter(_close_progress)
             wx.CallAfter(callback, True, path, None)
         except Exception as e:
+            wx.CallAfter(_close_progress)
             wx.CallAfter(callback, False, None, str(e))
     threading.Thread(target=_download, daemon=True).start()
 
@@ -145,7 +176,14 @@ def check_for_updates(parent=None, prerelease=False):
                         _("Update Check"),
                         style=wx.ICON_INFORMATION
                     )
-                    os.startfile(path)
+                    try:
+                        os.startfile(path)
+                    except Exception as e:
+                        wx.MessageBox(
+                            _("Failed to open the update file: {error}").format(error=str(e)),
+                            _("Update Error"),
+                            style=wx.ICON_ERROR
+                        )
                 else:
                     wx.MessageBox(
                         _("Failed to download the update: {error}").format(error=error or _("Unknown error")),
@@ -190,7 +228,25 @@ def check_for_updates_auto():
         if result == wx.YES and download_url:
             def on_download(success, path, error):
                 if success and path:
-                    os.startfile(path)
+                    wx.MessageBox(
+                        _("Download complete. The add-on installation dialog will now open."),
+                        _("Update Check"),
+                        style=wx.ICON_INFORMATION
+                    )
+                    try:
+                        os.startfile(path)
+                    except Exception as e:
+                        wx.MessageBox(
+                            _("Failed to open the update file: {error}").format(error=str(e)),
+                            _("Update Error"),
+                            style=wx.ICON_ERROR
+                        )
+                else:
+                    wx.MessageBox(
+                        _("Failed to download the update: {error}").format(error=error or _("Unknown error")),
+                        _("Update Error"),
+                        style=wx.ICON_ERROR
+                    )
             download_addon(download_url, on_download)
 
     threading.Thread(target=_check_thread, daemon=True).start()
