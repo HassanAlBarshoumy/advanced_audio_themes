@@ -92,7 +92,7 @@ class PpBeepCommand(PpSynchronousCommand):
     def run(self):
         if is_sound_suppressed("earcons"):
             return
-        from NVDAHelper import generateBeep
+        from NVDAHelper.localLib import generateBeep
         hz,length,left,right = self.hz, self.length, self.left, self.right
 
         # Apply audio ducking

@@ -395,7 +395,7 @@ class SentenceNavMixin:
         def slideForward(i):
             if i == 0:
                 return i
-            while i < len(text) and text[i] in "\n\t ":
+            while i < len(text) and text[i].isspace():
                 i += 1
             return i
         result = map(slideForward, result)
@@ -608,7 +608,7 @@ class SentenceNavMixin:
         beepLen = length
         freqs = self._sn_getChordFrequencies(chord)
         intSize = 8
-        bufSize = max([NVDAHelper.generateBeep(None, freq, beepLen, right, left) for freq in freqs])
+        bufSize = max([NVDAHelper.localLib.generateBeep(None, freq, beepLen, right, left) for freq in freqs])
         if bufSize % intSize != 0:
             bufSize += intSize
             bufSize -= (bufSize % intSize)
@@ -616,7 +616,7 @@ class SentenceNavMixin:
         result = [0] * (bufSize // intSize)
         for freq in freqs:
             buf = ctypes.create_string_buffer(bufSize)
-            NVDAHelper.generateBeep(buf, freq, beepLen, right, left)
+            NVDAHelper.localLib.generateBeep(buf, freq, beepLen, right, left)
             bb = bytearray(buf)
             unpacked = struct.unpack("<%dQ" % (bufSize // intSize), bb)
             result = map(operator.add, result, unpacked)
@@ -649,14 +649,14 @@ class SentenceNavMixin:
             elif increment < 0:
                 focus.script_caret_previousSentence(gesture)
             return
-        if focus.role in [ROLE_COMBOBOX, ROLE_LISTITEM, ROLE_BUTTON]:
+        if hasattr(focus, "treeInterceptor") and focus.treeInterceptor is not None and hasattr(focus.treeInterceptor, "makeTextInfo"):
+            focus = focus.treeInterceptor
+        elif focus.role in [ROLE_COMBOBOX, ROLE_LISTITEM, ROLE_BUTTON]:
             try:
                 focus.treeInterceptor.script_collapseOrExpandControl(gesture)
             except AttributeError:
                 gesture.send()
             return
-        if hasattr(focus, "treeInterceptor") and focus.treeInterceptor is not None and hasattr(focus.treeInterceptor, "makeTextInfo"):
-            focus = focus.treeInterceptor
         try:
             caretInfo = focus.makeTextInfo(textInfos.POSITION_CARET)
         except NotImplementedError:
