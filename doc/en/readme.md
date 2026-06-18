@@ -95,6 +95,10 @@ Earcons and Speech Rules allow NVDA to play earcons as well as other speech effe
 * **Alt+Arrows:** Advanced Sentence/Phrase Navigation.
 * **NVDA+Alt+Arrows:** Advanced Web Navigation (BrowserNav).
 
+## Translators
+
+- **Spanish:** Luis Carlos González Morales
+
 ## Support
 
 For any issues, requests, or bug reports, please refer to the official contact point:

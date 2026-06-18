@@ -95,6 +95,10 @@
 * **Alt+方向键:** 高级句子/短语导航 (SentenceNav)。
 * **NVDA+Alt+方向键:** 高级网页浏览导航 (BrowserNav)。
 
+## 翻译人员
+
+- **西班牙语:** Luis Carlos González Morales
+
 ## 支持与反馈
 
 如有任何问题、功能建议或错误报告，请联系开发者的官方渠道：
