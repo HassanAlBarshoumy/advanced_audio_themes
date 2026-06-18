@@ -252,13 +252,9 @@ class Context:
             self.caretIndex = len(self.texts[index - 1]) - 1
             self.caretInfo = None
         else:
-            if index != self.current or self.caretInfo is None:
-                self.current = index
-                self.caretIndex = offset
-                self.caretInfo = None
-            else:
-                self.caretInfo.move(textInfos.UNIT_CHARACTER, offset - self.caretIndex)
-                self.caretIndex = offset
+            self.current = index
+            self.caretIndex = offset
+            self.caretInfo = None
 
     def find(self, textInfo):
         which = "start"
@@ -672,15 +668,20 @@ class SentenceNavMixin:
             newCaret = ti.copy()
             newCaret.collapse()
             newCaret.updateCaret()
+            # Verify caret moved on VirtualBuffer; retry once if stuck
+            try:
+                checkCaret = focus.makeTextInfo(textInfos.POSITION_CARET)
+                checkCaret.collapse()
+                if newCaret.compareEndPoints(checkCaret, "startToStart") != 0:
+                    newCaret.updateCaret()
+            except Exception:
+                pass
             review.handleCaretMove(newCaret)
             braille.handler.handleCaretMove(focus)
             vision.handler.handleCaretMove(focus)
         if willSayAllResume(gesture):
             return
-        if getSNConfig("speakFormatted"):
-            speech.speakTextInfo(ti, reason=REASON_CARET)
-        else:
-            speech.speakText(sentenceStr)
+        speech.speakText(sentenceStr)
 
     # ── Scripts (bound to Alt+Arrows) ──
 
