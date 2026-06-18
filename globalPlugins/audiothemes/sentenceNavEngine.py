@@ -324,7 +324,7 @@ def getRegex(lang):
         if getSNConfig("breakOnWikiReferences"):
             wikiReference = re_grp("\\[[\\w\\s]+\\]")
             rr += wikiReference + "*"
-        rr += "\\s*"
+        rr += "\\s+"
         if bi == 1:
             rr += nla(re_set(getSNConfig("lowerCaseLetters", lang), allowRanges=True))
         rrr.append(rr)
@@ -392,6 +392,13 @@ class SentenceNavMixin:
     @functools.lru_cache(maxsize=100)
     def splitParagraphIntoSentences(text, regex):
         result = [m.end() for m in regex.finditer(text)]
+        def slideForward(i):
+            if i == 0:
+                return i
+            while i < len(text) and text[i].isspace():
+                i += 1
+            return i
+        result = map(slideForward, result)
         result = sorted(list(set(result)))
         return result
 
