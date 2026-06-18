@@ -509,7 +509,7 @@ class SentenceNavMixin:
         sentenceStr, startTi, startOffset, endTi, endOffset = self.expandSentence(
             context, regex, direction, compatibilityFunc=compatibilityFunc)
         if direction == 0:
-            return sentenceStr, context.makeSentenceInfo(startTi, startOffset, endTi, endOffset)
+            return sentenceStr, context.makeSentenceInfo(startTi, startOffset, endTi, endOffset), startOffset
         elif direction > 0:
             cindex = -1
         else:
@@ -524,7 +524,7 @@ class SentenceNavMixin:
                 paragraph = self.nextParagraph(paragraph, direction, shouldTurnPageIfNecessary=True)
                 if paragraph is None:
                     self._sn_chimeNoNextSentence(errorMsg)
-                    return (None, None)
+                    return (None, None, None)
                 if not speech.isBlank(paragraph.text):
                     break
             self._sn_chimeCrossParagraphBorder()
@@ -546,7 +546,7 @@ class SentenceNavMixin:
             ):
                 self._sn_chimeCrossParagraphBorder()
         info = context.makeSentenceInfo(startTi2, startOffset2, endTi2, endOffset2)
-        return sentenceStr2, info
+        return sentenceStr2, info, startOffset2
 
     # --- Chime helpers ---
     def _sn_chimeNoNextSentence(self, errorMsg="Error"):
@@ -631,6 +631,8 @@ class SentenceNavMixin:
         return False
 
     # --- Core move ---
+    _sn_virtualCaret = None  # (paraTextHash, caretIndex) - bypass VB caret drift
+
     def _sn_move(self, gesture, regex, increment, errorMsg):
         focus = api.getFocusObject()
         if not getSNConfig("enableInWord") and (
@@ -659,23 +661,24 @@ class SentenceNavMixin:
             gesture.send()
             return
         caretIndex, paragraphInfo = getCaretIndexWithinParagraph(caretInfo)
+        paraText = preprocessNewLines(paragraphInfo.text)
+        # Use virtual caret to bypass VB caret drift on treeInterceptors
+        if self._sn_virtualCaret is not None and self._sn_virtualCaret[0] == paraText:
+            caretIndex = self._sn_virtualCaret[1]
         context = Context(paragraphInfo, caretIndex, caretInfo)
         reconstructMode = getSNConfig("reconstructMode")
-        sentenceStr, ti = self.moveExtended(context, increment, regex=regex, errorMsg=errorMsg, reconstructMode=reconstructMode)
+        sentenceStr, ti, sn_startOffset = self.moveExtended(context, increment, regex=regex, errorMsg=errorMsg, reconstructMode=reconstructMode)
         if ti is None:
+            self._sn_virtualCaret = None
             return
         if increment != 0:
+            if sn_startOffset is not None:
+                self._sn_virtualCaret = (paraText, sn_startOffset)
             newCaret = ti.copy()
             newCaret.collapse()
             newCaret.updateCaret()
-            # Verify caret moved on VirtualBuffer; retry once if stuck
-            try:
-                checkCaret = focus.makeTextInfo(textInfos.POSITION_CARET)
-                checkCaret.collapse()
-                if newCaret.compareEndPoints(checkCaret, "startToStart") != 0:
-                    newCaret.updateCaret()
-            except Exception:
-                pass
+            if hasattr(focus, "_setCaret"):
+                focus._setCaret(newCaret)
             review.handleCaretMove(newCaret)
             braille.handler.handleCaretMove(focus)
             vision.handler.handleCaretMove(focus)
