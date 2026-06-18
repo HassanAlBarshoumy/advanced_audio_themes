@@ -18,7 +18,7 @@ import config
 import gui
 import nvwave
 
-from .handler import AudioThemesHandler, audiotheme_changed, THEMES_DIR, _get_blacklisted_roles
+from .handler import AudioThemesHandler, audiotheme_changed, THEMES_DIR, _get_blacklisted_roles, theme_roles, role_name_to_int, role_int_to_name, SpecialProps
 from .update_checker import check_for_updates
 from .frenzy import get_ducking_factor, _DEFAULT_DUCKING_CATEGORIES
 log = logging.getLogger(__name__)
@@ -248,6 +248,38 @@ class AudioThemesSettingsPanel(SettingsPanel):
                 (self.audioDuckingVolumeSlider, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 5),
             ]
         )
+        
+        # First/Last item fallback controls
+        # Build role list for custom selectors (exclude first/last to avoid circular refs)
+        self.fl_choices = []
+        self.fl_names = []
+        for r_int, r_label in theme_roles.items():
+            if r_int in (SpecialProps.first, SpecialProps.last):
+                continue
+            r_name = role_int_to_name.get(r_int)
+            if r_name:
+                self.fl_choices.append(r_label)
+                self.fl_names.append(r_name)
+        # Translators: label for a combobox to choose first/last item fallback behavior
+        flLabel = wx.StaticText(themePanel, -1, _("When no sound for first/last item:"))
+        self.firstlastFallbackChoice = wx.Choice(themePanel, -1, choices=[
+            _("Play the item's role sound"),
+            _("Don't play any sound"),
+            _("Play the first available sound"),
+            _("Use custom role sounds"),
+        ], name=_("First/Last item fallback"))
+        themeSizer.Add(flLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
+        themeSizer.Add(self.firstlastFallbackChoice, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+        # Custom role selectors for first and last
+        self.firstRoleLabel = wx.StaticText(themePanel, -1, _("First item sound:"))
+        self.firstRoleChoice = wx.Choice(themePanel, -1, choices=self.fl_choices, name=_("First item fallback role"))
+        self.lastRoleLabel = wx.StaticText(themePanel, -1, _("Last item sound:"))
+        self.lastRoleChoice = wx.Choice(themePanel, -1, choices=self.fl_choices, name=_("Last item fallback role"))
+        themeSizer.Add(self.firstRoleLabel, 0, wx.LEFT | wx.RIGHT, 10)
+        themeSizer.Add(self.firstRoleChoice, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+        themeSizer.Add(self.lastRoleLabel, 0, wx.LEFT | wx.RIGHT, 10)
+        themeSizer.Add(self.lastRoleChoice, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+        self.Bind(wx.EVT_CHOICE, self._on_fl_fallback_changed, self.firstlastFallbackChoice)
         
         themeSizer.Fit(themePanel)
         
@@ -1122,7 +1154,26 @@ class AudioThemesSettingsPanel(SettingsPanel):
             self.typingPackCombobox.SetStringSelection(pack)
         self.typingSoundsVolumeSlider.SetValue(_i(conf.get("typing_sounds_volume", 100)))
         self._update_typing_controls()
-        
+
+        # First/Last item fallback
+        fl_map = {"role": 0, "silence": 1, "first_available": 2, "custom_role": 3}
+        fl_val = conf.get("firstlast_fallback", "role")
+        fl_idx = fl_map.get(fl_val, 0)
+        self.firstlastFallbackChoice.SetSelection(fl_idx)
+        # Set custom role selectors
+        f_name = conf.get("first_fallback_role_name", "listitem")
+        l_name = conf.get("last_fallback_role_name", "listitem")
+        f_idx = self.fl_names.index(f_name) if f_name in self.fl_names else 0
+        l_idx = self.fl_names.index(l_name) if l_name in self.fl_names else 0
+        self.firstRoleChoice.SetSelection(f_idx)
+        self.lastRoleChoice.SetSelection(l_idx)
+        # Show/hide custom role selectors
+        show_custom = fl_idx == 3
+        self.firstRoleLabel.Show(show_custom)
+        self.firstRoleChoice.Show(show_custom)
+        self.lastRoleLabel.Show(show_custom)
+        self.lastRoleChoice.Show(show_custom)
+
         # Speech Order
         fmt = conf.get("announceFormat", "0")
         for i, (f, n) in enumerate(self.ANNOUNCE_FORMATS):
@@ -1286,6 +1337,14 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.duckingVolLabel.Show(show)
         self.audioDuckingVolumeSlider.Show(show)
 
+    def _on_fl_fallback_changed(self, event):
+        show = self.firstlastFallbackChoice.GetSelection() == 3
+        self.firstRoleLabel.Show(show)
+        self.firstRoleChoice.Show(show)
+        self.lastRoleLabel.Show(show)
+        self.lastRoleChoice.Show(show)
+        self.themePanel.GetSizer().Layout()
+
     def _maintain_state(self):
         self.audio_themes = sorted(AudioThemesHandler.get_installed_themes())
         self.installedThemesChoice.Clear()
@@ -1406,7 +1465,17 @@ class AudioThemesSettingsPanel(SettingsPanel):
         if self.typingPackCombobox.GetSelection() != wx.NOT_FOUND:
             conf["typing_sound_pack"] = self.typingPackCombobox.GetStringSelection()
         conf["typing_sounds_volume"] = self.typingSoundsVolumeSlider.GetValue()
-        
+
+        # First/Last item fallback
+        fl_map = {0: "role", 1: "silence", 2: "first_available", 3: "custom_role"}
+        sel = self.firstlastFallbackChoice.GetSelection()
+        if sel != wx.NOT_FOUND:
+            conf["firstlast_fallback"] = fl_map.get(sel, "role")
+        if self.firstRoleChoice.GetSelection() != wx.NOT_FOUND:
+            conf["first_fallback_role_name"] = self.fl_names[self.firstRoleChoice.GetSelection()]
+        if self.lastRoleChoice.GetSelection() != wx.NOT_FOUND:
+            conf["last_fallback_role_name"] = self.fl_names[self.lastRoleChoice.GetSelection()]
+
         # Speech Order
         if self.announceFormatChoice.GetSelection() != wx.NOT_FOUND:
             conf["announceFormat"] = self.ANNOUNCE_FORMATS[self.announceFormatChoice.GetSelection()][0]

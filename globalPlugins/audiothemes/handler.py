@@ -109,6 +109,9 @@ audiothemes_config_defaults = {
     "disabled_apps_suppress_categories": "string(default='{\"theme_sounds\":true,\"typing_sounds\":true,\"earcons\":true,\"browsernav\":true,\"sentencenav\":true,\"textnav\":true,\"ui_beeps\":true}')",
     "check_for_updates_auto": "boolean(default=True)",
     "check_for_updates_prerelease": "boolean(default=False)",
+    "firstlast_fallback": "string(default='role')",
+    "first_fallback_role_name": "string(default='listitem')",
+    "last_fallback_role_name": "string(default='listitem')",
 }
 
 
@@ -235,8 +238,6 @@ class AudioTheme:
         controlTypes.Role.COMBOBOX,
         controlTypes.Role.TAB,
         controlTypes.Role.SLIDER,
-        SpecialProps.first,
-        SpecialProps.last,
     )
 
     def _auto_create_missing_sounds(self, new_sounds, available, player):
@@ -657,6 +658,22 @@ class AudioThemesHandler:
 
         with theme._lock:
             sound_obj = theme.sounds.get(sound)
+            if sound_obj is None and isinstance(obj_info, dict):
+                role = obj_info.get("role", 0)
+                if role and sound in (SpecialProps.first, SpecialProps.last):
+                    fb = config.conf["audiothemes"].get("firstlast_fallback", "role")
+                    if fb == "role":
+                        sound_obj = theme.sounds.get(role)
+                    elif fb == "first_available" and theme.sounds:
+                        sound_obj = next(iter(theme.sounds.values()))
+                    elif fb == "custom_role":
+                        if sound == SpecialProps.first:
+                            name = config.conf["audiothemes"].get("first_fallback_role_name", "listitem")
+                        else:
+                            name = config.conf["audiothemes"].get("last_fallback_role_name", "listitem")
+                        target = role_name_to_int.get(name)
+                        if target is not None:
+                            sound_obj = theme.sounds.get(target)
             if sound_obj is None and force_3d:
                 import controlTypes
                 sound_obj = theme.sounds.get(controlTypes.Role.BUTTON)
