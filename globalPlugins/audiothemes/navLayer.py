@@ -195,28 +195,21 @@ class NavLayerMixin:
             return
         try:
             m_id = mode["id"]
-            if m_id == "sentence":
-                from .sentenceNavEngine import getCaretIndexWithinParagraph, Context, getRegex, getCurrentLanguage
-                focus = obj
-                if hasattr(obj, "treeInterceptor") and obj.treeInterceptor is not None and hasattr(obj.treeInterceptor, "makeTextInfo"):
-                    focus = obj.treeInterceptor
-                caretInfo = focus.makeTextInfo(api.textInfos.POSITION_CARET)
-                caretIndex, paragraphInfo = getCaretIndexWithinParagraph(caretInfo)
-                context = Context(paragraphInfo, caretIndex, caretInfo)
-                regex = getRegex(getCurrentLanguage())
-                sentenceStr, _, _, _, _ = self.expandSentence(context, regex, 0)
-                text = sentenceStr
+            focus = obj
+            if hasattr(obj, "treeInterceptor") and obj.treeInterceptor is not None and hasattr(obj.treeInterceptor, "makeTextInfo"):
+                focus = obj.treeInterceptor
+            info = focus.makeTextInfo(api.textInfos.POSITION_CARET)
+            if m_id == "word":
+                info.expand(api.textInfos.UNIT_WORD)
+            elif m_id == "line":
+                info.expand(api.textInfos.UNIT_LINE)
+            elif m_id == "sentence":
+                info.expand(api.textInfos.UNIT_SENTENCE)
+            elif m_id == "paragraph":
+                info.expand(api.textInfos.UNIT_PARAGRAPH)
             else:
-                info = obj.makeTextInfo(api.textInfos.POSITION_CARET)
-                if m_id == "word":
-                    info.expand(api.textInfos.UNIT_WORD)
-                elif m_id == "line":
-                    info.expand(api.textInfos.UNIT_LINE)
-                elif m_id == "paragraph":
-                    info.expand(api.textInfos.UNIT_PARAGRAPH)
-                else:
-                    info.expand(api.textInfos.UNIT_WORD)
-                text = info.text
+                info.expand(api.textInfos.UNIT_WORD)
+            text = info.text
             import speech
             speech.speakText(text, symbolLevel=speech.symbolLevel.ALL)
             import speech.spelling
