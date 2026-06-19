@@ -679,6 +679,8 @@ class AudioThemesHandler:
                 sound_obj = theme.sounds.get(controlTypes.Role.BUTTON)
                 if sound_obj is None and theme.sounds:
                     sound_obj = next(iter(theme.sounds.values()))
+            if sound_obj is None and theme.sounds:
+                sound_obj = next(iter(theme.sounds.values()))
                     
         if sound_obj is None:
             return

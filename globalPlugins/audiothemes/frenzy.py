@@ -1365,7 +1365,7 @@ def new_getControlFieldSpeech(
                                 getattr(controlTypes.Role.WINDOW, "value", controlTypes.Role.WINDOW)
                             }
                             if role_val not in ignored:
-                                plugin._unspoken_play_role(role_val, attrs.get("states", set()))
+                                pass  # placeholder - reserved for future use
                         break
         except Exception:
             pass

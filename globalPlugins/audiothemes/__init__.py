@@ -904,7 +904,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self.handler._current_app_name = None
         try:
             if appModuleHandler.getAppNameFromProcessID(obj.processID) in self.browser_apps:
-                obj_info = self._snapshot_obj(obj)
+                obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.loaded)
                 utils.threadPool.add_task(self.playObject, obj_info)
         except Exception as e:
             log.debug(f"AudioThemes event_documentLoadComplete: {e}")
@@ -929,8 +929,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
             foreground_app = obj_info.get("foreground_app")
             theme = self.handler.get_theme_for_app(foreground_app)
-            
-            played_state = False
 
             current_states = obj_info.get("states", frozenset())
 
@@ -942,39 +940,43 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                         has_state_snd = state_snd in theme.sounds
                     if has_state_snd:
                         self.handler.play(obj_info, state_snd)
-                        played_state = True
-                        break  # Prevent sound duplication if object has multiple states
 
-            # --- Role-based sound -------------------------------------------
-            if not played_state:
-                order = self.getOrder(obj_info)
-                snd = obj_info.get("snd")
-                if snd is None:
-                    is_protected = (
-                        controlTypes.State.PROTECTED in current_states
-                    )
-                    if is_protected:
-                        snd = SpecialProps.protected
-                    elif order:
-                        snd = order
-                    else:
-                        snd = obj_info.get("role", 0)
-                        if not snd and not obj_info.get("force_3d", False):
-                            return
+            # --- Role-based sound (always played, regardless of state sounds) ---
+            order = self.getOrder(obj_info)
+            snd = obj_info.get("snd")
+            if snd is None:
+                is_protected = (
+                    controlTypes.State.PROTECTED in current_states
+                )
+                if is_protected:
+                    snd = SpecialProps.protected
+                elif order:
+                    snd = order
+                else:
+                    snd = obj_info.get("role", 0)
+                    if not snd and not obj_info.get("force_3d", False):
+                        return
 
-                self.handler.play(obj_info, snd)
+            self.handler.play(obj_info, snd)
 
         except Exception as e:
             log.debugWarning(f"playObject failed: {e}")
             return
 
     def getOrder(self, obj_info, parrole=None, chrole=None):
-        """Determine first/last item in a list from pre-extracted dict."""
+        """Determine first/last item in a list or tree from pre-extracted dict."""
+        role = obj_info.get("role")
         if parrole is None:
-            parrole = controlTypes.Role.LIST.value
+            if role == controlTypes.Role.TREEVIEWITEM:
+                parrole = controlTypes.Role.TREEVIEW.value
+            else:
+                parrole = controlTypes.Role.LIST.value
         if chrole is None:
-            chrole = controlTypes.Role.LISTITEM.value
-        if obj_info.get("role") != chrole:
+            if role == controlTypes.Role.TREEVIEWITEM:
+                chrole = controlTypes.Role.TREEVIEWITEM.value
+            else:
+                chrole = controlTypes.Role.LISTITEM.value
+        if role != chrole:
             return None
         parent_role = obj_info.get("parent_role")
         if parent_role is not None and parent_role != parrole:
