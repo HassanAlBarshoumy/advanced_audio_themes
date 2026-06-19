@@ -1365,7 +1365,14 @@ def new_getControlFieldSpeech(
                                 getattr(controlTypes.Role.WINDOW, "value", controlTypes.Role.WINDOW)
                             }
                             if role_val not in ignored:
-                                pass  # placeholder - reserved for future use
+                                # Play Audio Themes role sound during speech
+                                heading_level = None
+                                if role == controlTypes.Role.HEADING:
+                                    try:
+                                        heading_level = int(attrs.get('level', 0) or 0)
+                                    except (ValueError, TypeError):
+                                        pass
+                                plugin._unspoken_play_role(role_val, attrs.get('states', set()), heading_level=heading_level)
                         break
         except Exception:
             pass

@@ -24,7 +24,7 @@ import time
 import wx
 import config
 import globalPluginHandler
-import appModuleHandler
+
 import scriptHandler
 from scriptHandler import script
 import NVDAObjects
@@ -73,7 +73,6 @@ from .navLayer import NavLayerMixin
 
 class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPluginHandler.GlobalPlugin):
 
-    browser_apps = ["firefox", "iexplore", "chrome", "opera", "edge"]
     scriptCategory = "Advanced Audio Themes"
 
     # -- COM-safety: extract everything on the main thread ---------------
@@ -90,6 +89,30 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             info["role"] = obj.role
         except Exception:
             info["role"] = 0
+        # Map HEADING roles with level 7-9 to SpecialProps heading7/8/9
+        if info.get("role", 0) == controlTypes.Role.HEADING:
+            heading_level = None
+            try:
+                val = obj.value
+                if val is not None:
+                    heading_level = int(val)
+            except Exception:
+                pass
+            if heading_level is None or heading_level < 1 or heading_level > 9:
+                try:
+                    val = obj.description
+                    if val and val.isdigit():
+                        heading_level = int(val)
+                except Exception:
+                    pass
+            if heading_level is not None and heading_level >= 7:
+                h_key = {
+                    7: SpecialProps.heading7,
+                    8: SpecialProps.heading8,
+                    9: SpecialProps.heading9,
+                }.get(heading_level)
+                if h_key is not None:
+                    info["role"] = h_key.value
         try:
             info["states"] = frozenset(obj.states)
         except Exception:
@@ -903,9 +926,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception:
             self.handler._current_app_name = None
         try:
-            if appModuleHandler.getAppNameFromProcessID(obj.processID) in self.browser_apps:
-                obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.loaded)
-                utils.threadPool.add_task(self.playObject, obj_info)
+            obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.loaded)
+            utils.threadPool.add_task(self.playObject, obj_info)
         except Exception as e:
             log.debug(f"AudioThemes event_documentLoadComplete: {e}")
         try:
@@ -932,16 +954,29 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
             current_states = obj_info.get("states", frozenset())
 
+            suppress_role = config.conf["audiothemes"].get("state_sounds_suppress_role", False)
+
             # --- State-based sound ------------------------------------------
             if theme and current_states:
-                for state in current_states:
-                    state_snd = state + STATE_OFFSET
-                    with theme._lock:
-                        has_state_snd = state_snd in theme.sounds
-                    if has_state_snd:
-                        self.handler.play(obj_info, state_snd)
+                if suppress_role:
+                    # Old behavior: first matching state sound breaks, role sound skipped
+                    for state in current_states:
+                        state_snd = state + STATE_OFFSET
+                        with theme._lock:
+                            has_state_snd = state_snd in theme.sounds
+                        if has_state_snd:
+                            self.handler.play(obj_info, state_snd)
+                            break
+                else:
+                    # New behavior: play ALL matching state sounds, then role sound
+                    for state in current_states:
+                        state_snd = state + STATE_OFFSET
+                        with theme._lock:
+                            has_state_snd = state_snd in theme.sounds
+                        if has_state_snd:
+                            self.handler.play(obj_info, state_snd)
 
-            # --- Role-based sound (always played, regardless of state sounds) ---
+            # --- Role-based sound (always played unless suppress_role + a state played) ---
             order = self.getOrder(obj_info)
             snd = obj_info.get("snd")
             if snd is None:
@@ -962,6 +997,32 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception as e:
             log.debugWarning(f"playObject failed: {e}")
             return
+
+    def _unspoken_play_role(self, role_val, states, heading_level=None):
+        """Play a sound for a role encountered during speech output."""
+        try:
+            from .handler import STATE_OFFSET
+            from . import utils
+            # Route heading level 7-9 to SpecialProps heading7/8/9
+            if heading_level is not None and heading_level >= 7:
+                h_key = {
+                    7: SpecialProps.heading7,
+                    8: SpecialProps.heading8,
+                    9: SpecialProps.heading9,
+                }.get(heading_level)
+                if h_key is not None:
+                    role_val = h_key.value
+            foreground_app = utils.getCurrentContext()[0]
+            obj_info = {
+                "role": role_val,
+                "states": frozenset(states) if isinstance(states, (list, set)) else frozenset(),
+                "foreground_app": foreground_app,
+                "snd": None,
+                "force_3d": False,
+            }
+            utils.threadPool.add_task(self.playObject, obj_info)
+        except Exception as e:
+            log.debugWarning(f"_unspoken_play_role failed: {e}")
 
     def getOrder(self, obj_info, parrole=None, chrole=None):
         """Determine first/last item in a list or tree from pre-extracted dict."""

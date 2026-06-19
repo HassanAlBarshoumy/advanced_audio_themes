@@ -112,6 +112,9 @@ audiothemes_config_defaults = {
     "firstlast_fallback": "string(default='role')",
     "first_fallback_role_name": "string(default='listitem')",
     "last_fallback_role_name": "string(default='listitem')",
+    "general_fallback": "string(default='role')",
+    "general_fallback_role_name": "string(default='listitem')",
+    "state_sounds_suppress_role": "boolean(default=False)",
 }
 
 
@@ -140,6 +143,9 @@ class SpecialProps(IntEnum):
     last = 2502
     notify = 2503
     loaded = 2504
+    heading7 = 2505
+    heading8 = 2506
+    heading9 = 2507
 
 
 theme_roles = copy.copy(controlTypes.roleLabels)
@@ -155,6 +161,12 @@ theme_roles.update(
         SpecialProps.notify: _("New Notification Sound"),
         # Translators: The label of the sound which will be played when a web page is loaded.
         SpecialProps.loaded: _("Web Page Loaded"),
+        # Translators: The label of the sound for heading level 7.
+        SpecialProps.heading7: _("Heading Level 7"),
+        # Translators: The label of the sound for heading level 8.
+        SpecialProps.heading8: _("Heading Level 8"),
+        # Translators: The label of the sound for heading level 9.
+        SpecialProps.heading9: _("Heading Level 9"),
     }
 )
 
@@ -680,7 +692,18 @@ class AudioThemesHandler:
                 if sound_obj is None and theme.sounds:
                     sound_obj = next(iter(theme.sounds.values()))
             if sound_obj is None and theme.sounds:
-                sound_obj = next(iter(theme.sounds.values()))
+                fb = config.conf["audiothemes"].get("general_fallback", "role")
+                if fb == "role":
+                    snd_role = obj_info.get("role", 0) if isinstance(obj_info, dict) else 0
+                    if snd_role:
+                        sound_obj = theme.sounds.get(snd_role)
+                if sound_obj is None and fb in ("role", "first_available"):
+                    sound_obj = next(iter(theme.sounds.values()))
+                elif fb == "custom_role":
+                    name = config.conf["audiothemes"].get("general_fallback_role_name", "listitem")
+                    target = role_name_to_int.get(name)
+                    if target is not None:
+                        sound_obj = theme.sounds.get(target)
                     
         if sound_obj is None:
             return

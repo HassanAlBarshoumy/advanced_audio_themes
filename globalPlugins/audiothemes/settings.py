@@ -280,6 +280,28 @@ class AudioThemesSettingsPanel(SettingsPanel):
         themeSizer.Add(self.lastRoleLabel, 0, wx.LEFT | wx.RIGHT, 10)
         themeSizer.Add(self.lastRoleChoice, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
         self.Bind(wx.EVT_CHOICE, self._on_fl_fallback_changed, self.firstlastFallbackChoice)
+
+        # General fallback controls
+        # Translators: label for a combobox to choose fallback behavior when no sound is found for any role
+        gfLabel = wx.StaticText(themePanel, -1, _("When no sound is found for a role or state:"))
+        self.generalFallbackChoice = wx.Choice(themePanel, -1, choices=[
+            _("Play the object's role sound"),
+            _("Don't play any sound"),
+            _("Play the first available sound"),
+            _("Use custom role sound"),
+        ], name=_("General fallback"))
+        themeSizer.Add(gfLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
+        themeSizer.Add(self.generalFallbackChoice, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+        self.generalRoleLabel = wx.StaticText(themePanel, -1, _("Fallback sound:"))
+        self.generalRoleChoice = wx.Choice(themePanel, -1, choices=self.fl_choices, name=_("General fallback role"))
+        themeSizer.Add(self.generalRoleLabel, 0, wx.LEFT | wx.RIGHT, 10)
+        themeSizer.Add(self.generalRoleChoice, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+        self.Bind(wx.EVT_CHOICE, self._on_general_fallback_changed, self.generalFallbackChoice)
+
+        # State sounds toggle
+        # Translators: checkbox for whether state sounds suppress the role sound
+        self.stateSoundsSuppressCheckbox = wx.CheckBox(themePanel, -1, _("State sounds suppress the role sound"))
+        themeSizer.Add(self.stateSoundsSuppressCheckbox, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
         
         themeSizer.Fit(themePanel)
         
@@ -1174,6 +1196,21 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.lastRoleLabel.Show(show_custom)
         self.lastRoleChoice.Show(show_custom)
 
+        # General fallback
+        gf_map = {"role": 0, "silence": 1, "first_available": 2, "custom_role": 3}
+        gf_val = conf.get("general_fallback", "role")
+        gf_idx = gf_map.get(gf_val, 0)
+        self.generalFallbackChoice.SetSelection(gf_idx)
+        g_name = conf.get("general_fallback_role_name", "listitem")
+        g_idx = self.fl_names.index(g_name) if g_name in self.fl_names else 0
+        self.generalRoleChoice.SetSelection(g_idx)
+        show_gf_custom = gf_idx == 3
+        self.generalRoleLabel.Show(show_gf_custom)
+        self.generalRoleChoice.Show(show_gf_custom)
+
+        # State sounds toggle
+        self.stateSoundsSuppressCheckbox.SetValue(conf.get("state_sounds_suppress_role", False))
+
         # Speech Order
         fmt = conf.get("announceFormat", "0")
         for i, (f, n) in enumerate(self.ANNOUNCE_FORMATS):
@@ -1345,6 +1382,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.lastRoleChoice.Show(show)
         self.themePanel.GetSizer().Layout()
 
+    def _on_general_fallback_changed(self, event):
+        show = self.generalFallbackChoice.GetSelection() == 3
+        self.generalRoleLabel.Show(show)
+        self.generalRoleChoice.Show(show)
+        self.themePanel.GetSizer().Layout()
+
     def _maintain_state(self):
         self.audio_themes = sorted(AudioThemesHandler.get_installed_themes())
         self.installedThemesChoice.Clear()
@@ -1475,6 +1518,17 @@ class AudioThemesSettingsPanel(SettingsPanel):
             conf["first_fallback_role_name"] = self.fl_names[self.firstRoleChoice.GetSelection()]
         if self.lastRoleChoice.GetSelection() != wx.NOT_FOUND:
             conf["last_fallback_role_name"] = self.fl_names[self.lastRoleChoice.GetSelection()]
+
+        # General fallback
+        gf_map = {0: "role", 1: "silence", 2: "first_available", 3: "custom_role"}
+        sel = self.generalFallbackChoice.GetSelection()
+        if sel != wx.NOT_FOUND:
+            conf["general_fallback"] = gf_map.get(sel, "role")
+        if self.generalRoleChoice.GetSelection() != wx.NOT_FOUND:
+            conf["general_fallback_role_name"] = self.fl_names[self.generalRoleChoice.GetSelection()]
+
+        # State sounds toggle
+        conf["state_sounds_suppress_role"] = self.stateSoundsSuppressCheckbox.GetValue()
 
         # Speech Order
         if self.announceFormatChoice.GetSelection() != wx.NOT_FOUND:
