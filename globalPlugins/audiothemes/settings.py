@@ -150,6 +150,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.quickJumpPage = wx.Panel(self.notebook)
         self.notebook.AddPage(self.quickJumpPage, _("QuickSearch & Bookmarks"))
 
+        # Tab 8: First/Last item detection
+        self.firstLastPage = wx.Panel(self.notebook)
+        self.setupFirstLastPage(self.firstLastPage)
+        self.notebook.AddPage(self.firstLastPage, _("First/Last Item"))
+
         settingsSizer.Add(self.notebook, 1, wx.EXPAND | wx.ALL, 5)
 
         self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._onLazyLoadTab)
@@ -1064,6 +1069,58 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         page.SetSizer(sizer)
 
+    # ── First/Last Item tab ──────────────────────────────────────────────
+
+    def setupFirstLastPage(self, page):
+        """Tab: First/Last Item universal detection settings."""
+        sizer = wx.BoxSizer(wx.VERTICAL)
+
+        # Global toggle
+        self.flEnableCheckbox = wx.CheckBox(page, -1, _("Enable first/last item detection"))
+        sizer.Add(self.flEnableCheckbox, 0, wx.ALL, 10)
+
+        # Detection scope
+        scopeBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Detection scope"))
+        self.flScopeAll = wx.RadioButton(page, -1, _("Apply to all roles"), style=wx.RB_GROUP)
+        self.flScopeSelected = wx.RadioButton(page, -1, _("Apply to selected roles only"))
+        self.flSelectRolesBtn = wx.Button(page, -1, _("Select roles..."))
+        self.flSelectRolesBtn.Enable(False)
+        scopeBox.Add(self.flScopeAll, 0, wx.ALL, 5)
+        scopeBox.Add(self.flScopeSelected, 0, wx.ALL, 5)
+        scopeBox.Add(self.flSelectRolesBtn, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10)
+        self.Bind(wx.EVT_RADIOBUTTON, self._on_fl_scope_changed, self.flScopeAll)
+        self.Bind(wx.EVT_RADIOBUTTON, self._on_fl_scope_changed, self.flScopeSelected)
+        self.Bind(wx.EVT_BUTTON, self._on_fl_select_roles, self.flSelectRolesBtn)
+        sizer.Add(scopeBox, 0, wx.EXPAND | wx.ALL, 10)
+
+        # Solo items behavior
+        soloBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Solo items"))
+        soloHelp = wx.StaticText(page, -1, _(
+            "Solo items are items that have no siblings of the same type."
+        ))
+        soloBox.Add(soloHelp, 0, wx.ALL, 5)
+        soloLabel = wx.StaticText(page, -1, _("Behavior:"))
+        self.flSoloChoice = wx.Choice(page, -1, choices=[
+            _("Detect as first item"),
+            _("Detect as last item"),
+            _("Don't detect solo items"),
+        ], name=_("Solo item behavior"))
+        soloBox.Add(soloLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
+        soloBox.Add(self.flSoloChoice, 0, wx.EXPAND | wx.ALL, 5)
+        sizer.Add(soloBox, 0, wx.EXPAND | wx.ALL, 10)
+
+        # Note about fallback
+        noteLabel = wx.StaticText(page, -1, _(
+            "Note: Fallback behavior when no first/last sound exists can be\n"
+            "configured in the General tab under \"When no sound for first/last item\"."
+        ))
+        sizer.Add(noteLabel, 0, wx.ALL, 10)
+
+        sizer.AddStretchSpacer()
+        page.SetSizer(sizer)
+
+        page.SetSizer(sizer)
+
     def onSelectRoles(self, event):
         dlg = RoleSelectionDialog(self)
         if dlg.ShowModal() == wx.ID_OK:
@@ -1210,6 +1267,23 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         # State sounds toggle
         self.stateSoundsSuppressCheckbox.SetValue(conf.get("state_sounds_suppress_role", False))
+
+        # First/Last Item tab
+        self.flEnableCheckbox.SetValue(_b(conf.get("universal_fl_enabled", True)))
+        fl_roles_raw = conf.get("fl_enabled_roles", "all")
+        if fl_roles_raw == "all":
+            self.flScopeAll.SetValue(True)
+            self.flSelectRolesBtn.Enable(False)
+        else:
+            self.flScopeSelected.SetValue(True)
+            self.flSelectRolesBtn.Enable(True)
+            try:
+                self._fl_enabled_roles_list = json.loads(fl_roles_raw)
+            except Exception:
+                self._fl_enabled_roles_list = []
+        solo_map = {"first": 0, "last": 1, "none": 2}
+        solo_val = conf.get("fl_solo_behavior", "first")
+        self.flSoloChoice.SetSelection(solo_map.get(solo_val, 0))
 
         # Speech Order
         fmt = conf.get("announceFormat", "0")
@@ -1388,6 +1462,57 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.generalRoleChoice.Show(show)
         self.themePanel.GetSizer().Layout()
 
+    # ── First/Last tab event handlers ────────────────────────────────────
+
+    def _on_fl_scope_changed(self, event):
+        self.flSelectRolesBtn.Enable(self.flScopeSelected.GetValue())
+
+    def _on_fl_select_roles(self, event):
+        """Show dialog to pick which roles get first/last detection."""
+        current = getattr(self, '_fl_enabled_roles_list', [])
+        dlg = wx.Dialog(self, title=_("Select roles for first/last detection"))
+        mainSizer = wx.BoxSizer(wx.VERTICAL)
+        label = wx.StaticText(dlg, -1, _("Select the roles that should have first/last item detection:"))
+        mainSizer.Add(label, 0, wx.ALL | wx.EXPAND, 10)
+        lst = wx.ListView(dlg, style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_NO_HEADER, name=_("Roles"))
+        lst.EnableCheckBoxes(True)
+        lst.InsertColumn(0, _("Role"), width=360)
+        mainSizer.Add(lst, 1, wx.ALL | wx.EXPAND, 10)
+        # Populate – include all SpecialProps and controlTypes roles
+        items = []  # (int_val, name, label)
+        for r_int, r_label in theme_roles.items():
+            r_name = role_int_to_name.get(r_int)
+            if r_name:
+                items.append((r_int, r_name, r_label))
+        items.sort(key=lambda x: x[2].lower())
+        for i, (r_int, r_name, r_label) in enumerate(items):
+            lst.InsertItem(i, r_label)
+            if r_name in current:
+                lst.CheckItem(i, True)
+        btnSizer = wx.BoxSizer(wx.HORIZONTAL)
+        selectAllBtn = wx.Button(dlg, -1, _("Select All"))
+        deselectAllBtn = wx.Button(dlg, -1, _("Deselect All"))
+        selectAllBtn.Bind(wx.EVT_BUTTON, lambda e: _toggle_all(True))
+        deselectAllBtn.Bind(wx.EVT_BUTTON, lambda e: _toggle_all(False))
+        btnSizer.Add(selectAllBtn, 0, wx.RIGHT, 5)
+        btnSizer.Add(deselectAllBtn, 0)
+        mainSizer.Add(btnSizer, 0, wx.ALL | wx.ALIGN_CENTER, 10)
+        def _toggle_all(state):
+            for j in range(lst.GetItemCount()):
+                lst.CheckItem(j, state)
+        stdBtns = dlg.CreateButtonSizer(wx.OK | wx.CANCEL)
+        mainSizer.Add(stdBtns, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
+        dlg.SetSizer(mainSizer)
+        dlg.SetMinSize((400, 500))
+        dlg.Fit()
+        if dlg.ShowModal() == wx.ID_OK:
+            self._fl_enabled_roles_list = []
+            for j in range(lst.GetItemCount()):
+                if lst.IsItemChecked(j):
+                    r_name = items[j][1]
+                    self._fl_enabled_roles_list.append(r_name)
+        dlg.Destroy()
+
     def _maintain_state(self):
         self.audio_themes = sorted(AudioThemesHandler.get_installed_themes())
         self.installedThemesChoice.Clear()
@@ -1529,6 +1654,17 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         # State sounds toggle
         conf["state_sounds_suppress_role"] = self.stateSoundsSuppressCheckbox.GetValue()
+
+        # First/Last Item tab
+        conf["universal_fl_enabled"] = self.flEnableCheckbox.GetValue()
+        if self.flScopeAll.GetValue():
+            conf["fl_enabled_roles"] = "all"
+        else:
+            enabled_list = getattr(self, '_fl_enabled_roles_list', [])
+            conf["fl_enabled_roles"] = json.dumps(enabled_list)
+        solo_map = {0: "first", 1: "last", 2: "none"}
+        sel = self.flSoloChoice.GetSelection()
+        conf["fl_solo_behavior"] = solo_map.get(sel, "first")
 
         # Speech Order
         if self.announceFormatChoice.GetSelection() != wx.NOT_FOUND:

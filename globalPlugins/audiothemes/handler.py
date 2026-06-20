@@ -115,6 +115,9 @@ audiothemes_config_defaults = {
     "general_fallback": "string(default='role')",
     "general_fallback_role_name": "string(default='listitem')",
     "state_sounds_suppress_role": "boolean(default=False)",
+    "universal_fl_enabled": "boolean(default=True)",
+    "fl_enabled_roles": "string(default='all')",
+    "fl_solo_behavior": "string(default='first')",
 }
 
 

@@ -38,7 +38,7 @@ import textInfos
 import logHandler
 log = logHandler.log
 
-from .handler import AudioThemesHandler, SpecialProps, showPendingConflicts
+from .handler import AudioThemesHandler, SpecialProps, role_int_to_name, showPendingConflicts
 from .settings import AudioThemesSettingsPanel
 from .studio import AudioThemesStudioStartupDialog
 from .update_checker import check_for_updates_auto
@@ -130,21 +130,19 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception:
             info["windowClassName"] = ""
         # --- getOrder data (parent / previous / next roles) ---
-        # These are expensive COM traversals; only do them if audio is enabled and it's a list item.
+        # Now collected for ALL roles to support universal first/last detection.
         if _cfg.conf["audiothemes"]["enable_audio_themes"]:
             try:
-                role = info.get("role", 0)
-                if role in (controlTypes.Role.LISTITEM, controlTypes.Role.TREEVIEWITEM):
-                    info["parent_role"] = obj.parent.role if obj.parent else None
-                    info["previous_role"] = obj.previous.role if obj.previous else None
-                    info["next_role"] = obj.next.role if obj.next else None
-                else:
-                    info["parent_role"] = None
-                    info["previous_role"] = None
-                    info["next_role"] = None
+                info["parent_role"] = obj.parent.role if obj.parent else None
             except Exception:
                 info["parent_role"] = None
+            try:
+                info["previous_role"] = obj.previous.role if obj.previous else None
+            except Exception:
                 info["previous_role"] = None
+            try:
+                info["next_role"] = obj.next.role if obj.next else None
+            except Exception:
                 info["next_role"] = None
         else:
             info["parent_role"] = None
@@ -1025,28 +1023,81 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             log.debugWarning(f"_unspoken_play_role failed: {e}")
 
     def getOrder(self, obj_info, parrole=None, chrole=None):
-        """Determine first/last item in a list or tree from pre-extracted dict."""
+        """Determine first/last item in any container from pre-extracted dict.
+
+        Supports universal first/last detection for ALL roles, configurable
+        via ``universal_fl_enabled``, ``fl_enabled_roles``, and
+        ``fl_solo_behavior`` in the Audio Themes config.
+        """
         role = obj_info.get("role")
-        if parrole is None:
-            if role == controlTypes.Role.TREEVIEWITEM:
-                parrole = controlTypes.Role.TREEVIEW.value
-            else:
-                parrole = controlTypes.Role.LIST.value
+        if not role:
+            return None
+
+        # Legacy mode: only LISTITEM / TREEVIEWITEM
+        if not config.conf["audiothemes"].get("universal_fl_enabled", True):
+            if parrole is None:
+                if role == controlTypes.Role.TREEVIEWITEM:
+                    parrole = controlTypes.Role.TREEVIEW.value
+                else:
+                    parrole = controlTypes.Role.LIST.value
+            if chrole is None:
+                if role == controlTypes.Role.TREEVIEWITEM:
+                    chrole = controlTypes.Role.TREEVIEWITEM.value
+                else:
+                    chrole = controlTypes.Role.LISTITEM.value
+            if role != chrole:
+                return None
+            parent_role = obj_info.get("parent_role")
+            if parent_role is not None and parent_role != parrole:
+                return None
+            prev_role = obj_info.get("previous_role")
+            if prev_role is None or prev_role != chrole:
+                return SpecialProps.first
+            next_role = obj_info.get("next_role")
+            if next_role is None or next_role != chrole:
+                return SpecialProps.last
+            return None
+
+        # --- Universal mode ------------------------------------------------
+        # Check role filter – which roles are enabled for FL detection?
+        fl_roles_raw = config.conf["audiothemes"].get("fl_enabled_roles", "all")
+        if fl_roles_raw != "all":
+            try:
+                import json
+                enabled = json.loads(fl_roles_raw)
+                r_name = role_int_to_name.get(role)
+                if r_name and r_name not in enabled:
+                    return None
+            except Exception:
+                pass
+
+        # Determine the child role to match against siblings.
         if chrole is None:
-            if role == controlTypes.Role.TREEVIEWITEM:
-                chrole = controlTypes.Role.TREEVIEWITEM.value
-            else:
-                chrole = controlTypes.Role.LISTITEM.value
+            chrole = role
         if role != chrole:
             return None
-        parent_role = obj_info.get("parent_role")
-        if parent_role is not None and parent_role != parrole:
-            return None
+
         prev_role = obj_info.get("previous_role")
-        if prev_role is None or prev_role != chrole:
-            return SpecialProps.first
         next_role = obj_info.get("next_role")
-        if next_role is None or next_role != chrole:
+
+        has_same_prev = prev_role is not None and prev_role == chrole
+        has_same_next = next_role is not None and next_role == chrole
+
+        is_first = prev_role is None or not has_same_prev
+        is_last = next_role is None or not has_same_next
+
+        # Solo item (no siblings of the same type)
+        if is_first and is_last and not has_same_prev and not has_same_next:
+            solo = config.conf["audiothemes"].get("fl_solo_behavior", "first")
+            if solo == "first":
+                return SpecialProps.first
+            elif solo == "last":
+                return SpecialProps.last
+            return None  # "none" – skip solo items
+
+        if is_first:
+            return SpecialProps.first
+        if is_last:
             return SpecialProps.last
         return None
 
