@@ -1119,8 +1119,6 @@ class AudioThemesSettingsPanel(SettingsPanel):
         sizer.AddStretchSpacer()
         page.SetSizer(sizer)
 
-        page.SetSizer(sizer)
-
     def onSelectRoles(self, event):
         dlg = RoleSelectionDialog(self)
         if dlg.ShowModal() == wx.ID_OK:
@@ -1489,6 +1487,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
             lst.InsertItem(i, r_label)
             if r_name in current:
                 lst.CheckItem(i, True)
+        def _toggle_all(state):
+            for j in range(lst.GetItemCount()):
+                lst.CheckItem(j, state)
         btnSizer = wx.BoxSizer(wx.HORIZONTAL)
         selectAllBtn = wx.Button(dlg, -1, _("Select All"))
         deselectAllBtn = wx.Button(dlg, -1, _("Deselect All"))
@@ -1497,9 +1498,6 @@ class AudioThemesSettingsPanel(SettingsPanel):
         btnSizer.Add(selectAllBtn, 0, wx.RIGHT, 5)
         btnSizer.Add(deselectAllBtn, 0)
         mainSizer.Add(btnSizer, 0, wx.ALL | wx.ALIGN_CENTER, 10)
-        def _toggle_all(state):
-            for j in range(lst.GetItemCount()):
-                lst.CheckItem(j, state)
         stdBtns = dlg.CreateButtonSizer(wx.OK | wx.CANCEL)
         mainSizer.Add(stdBtns, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
         dlg.SetSizer(mainSizer)

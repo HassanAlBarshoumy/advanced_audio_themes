@@ -1071,23 +1071,17 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             except Exception:
                 pass
 
-        # Determine the child role to match against siblings.
-        if chrole is None:
-            chrole = role
-        if role != chrole:
-            return None
-
         prev_role = obj_info.get("previous_role")
         next_role = obj_info.get("next_role")
 
-        has_same_prev = prev_role is not None and prev_role == chrole
-        has_same_next = next_role is not None and next_role == chrole
+        # Solo: truly no siblings at all
+        has_any_adjacent = prev_role is not None or next_role is not None
 
-        is_first = prev_role is None or not has_same_prev
-        is_last = next_role is None or not has_same_next
+        # is_first = actual first child, is_last = actual last child
+        is_first = prev_role is None
+        is_last = next_role is None
 
-        # Solo item (no siblings of the same type)
-        if is_first and is_last and not has_same_prev and not has_same_next:
+        if is_first and is_last and not has_any_adjacent:
             solo = config.conf["audiothemes"].get("fl_solo_behavior", "first")
             if solo == "first":
                 return SpecialProps.first
