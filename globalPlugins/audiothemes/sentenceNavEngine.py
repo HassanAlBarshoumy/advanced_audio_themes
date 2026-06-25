@@ -104,6 +104,7 @@ def initSentenceNavConfiguration():
         "fullWidthPhraseBreakers": "string( default='\\u3002\\uff01\\uff1f\\uff0c\\uff1b\\uff1a\\uff08\\uff09')",
         "applicationsBlacklist": "string( default='audacity,excel')",
         "enableInWord": "boolean( default=False)",
+        "breakAtElementBoundaries": "boolean( default=True)",
     }
     config.conf.spec["sentencenav"] = confspec
 
@@ -190,6 +191,38 @@ def preprocessNewLines(s):
 # ──────────────────────────────────────────────
 #  Context — paragraph caching for sentence parsing
 # ──────────────────────────────────────────────
+
+def _getElementBoundaries(textInfo):
+    """Return positions in textInfo.text that separate VB child elements.
+
+    Uses two methods for reliability:
+    1. Scans the original text for \\n (inserted by VB between sibling nodes).
+    2. Falls back to _getTextInfos() for inline boundaries without \\n.
+    Positions are in RAW text (preprocessNewLines not applied).
+    """
+    if not getSNConfig("breakAtElementBoundaries"):
+        return []
+    text = textInfo.text
+    # Normalize line endings so positions match preprocessNewLines output
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    # Method 1: \\n positions (most reliable for VB)
+    newlinePositions = [i for i, ch in enumerate(normalized) if ch == '\n']
+    boundaries = [p for p in newlinePositions if 0 < p < len(text)]
+    # Method 2: inline element boundaries (no \\n, e.g. <b>, <a> within a line)
+    if hasattr(textInfo, "_getTextInfos"):
+        try:
+            subInfos = list(textInfo._getTextInfos())
+            if len(subInfos) > 1:
+                pos = 0
+                for i, sub in enumerate(subInfos):
+                    pos += len(sub.text)
+                    if i < len(subInfos) - 1 and pos > 0:
+                        # Avoid duplicating a \\n-based boundary already found
+                        if pos not in boundaries:
+                            boundaries.append(pos)
+        except Exception:
+            pass
+    return sorted(set(boundaries))
 
 class Context:
     def __init__(self, textInfo, caretIndex, caretInfo=None):
@@ -410,6 +443,31 @@ class SentenceNavMixin:
         for i in range(1, n):
             parStartIndices.append(parStartIndices[i - 1] + len(texts[i - 1]) + len(joinString))
         boundaries = SentenceNavMixin.splitParagraphIntoSentences(s, regex=regex)
+        if getSNConfig("breakAtElementBoundaries"):
+            # Paragraph transitions are sentence boundaries (each VB element is a unit)
+            for i in range(1, n):
+                p = parStartIndices[i]
+                if 0 < p < len(s):
+                    boundaries.append(p)
+            # Element boundaries (within each paragraph: \n separators, inline transitions)
+            for i, ti in enumerate(tis):
+                extra = _getElementBoundaries(ti)
+                if extra:
+                    offset = parStartIndices[i]
+                    for b in extra:
+                        bAbs = offset + b
+                        if 0 < bAbs < len(s):
+                            boundaries.append(bAbs)
+            boundaries = sorted(set(boundaries))
+            # Slide past whitespace (same treatment as regex boundaries)
+            def slideForward(i):
+                if i == 0:
+                    return i
+                while i < len(s) and s[i].isspace():
+                    i += 1
+                return i
+            boundaries = [slideForward(b) for b in boundaries]
+            boundaries = sorted(set(boundaries))
         j = bisect.bisect_right(boundaries, index)
         i = j - 1
         if len(boundaries) == 1:
@@ -631,7 +689,7 @@ class SentenceNavMixin:
         return False
 
     # --- Core move ---
-    _sn_virtualCaret = None  # (paraTextHash, caretIndex) - bypass VB caret drift
+    _sn_virtualCaret = None  # (paragraphText, caretOffset) - bypass VB caret drift
 
     def _sn_move(self, gesture, regex, increment, errorMsg):
         focus = api.getFocusObject()
@@ -663,8 +721,11 @@ class SentenceNavMixin:
         caretIndex, paragraphInfo = getCaretIndexWithinParagraph(caretInfo)
         paraText = preprocessNewLines(paragraphInfo.text)
         # Use virtual caret to bypass VB caret drift on treeInterceptors
-        if self._sn_virtualCaret is not None and self._sn_virtualCaret[0] == paraText:
-            caretIndex = self._sn_virtualCaret[1]
+        # Invalidate after single use; will be re-stored after successful move
+        if self._sn_virtualCaret is not None:
+            storedText, storedOffset = self._sn_virtualCaret
+            if storedText == paraText:
+                caretIndex = storedOffset
         context = Context(paragraphInfo, caretIndex, caretInfo)
         reconstructMode = getSNConfig("reconstructMode")
         sentenceStr, ti, sn_startOffset = self.moveExtended(context, increment, regex=regex, errorMsg=errorMsg, reconstructMode=reconstructMode)
@@ -673,12 +734,28 @@ class SentenceNavMixin:
             return
         if increment != 0:
             if sn_startOffset is not None:
-                self._sn_virtualCaret = (paraText, sn_startOffset)
+                # Store the actual paragraph text containing the target sentence
+                # to ensure paragraphText and offset always belong together
+                try:
+                    caretCopy = ti.copy()
+                    caretCopy.collapse()
+                    caretCopy.expand(textInfos.UNIT_PARAGRAPH)
+                    actualParaText = preprocessNewLines(caretCopy.text)
+                    self._sn_virtualCaret = (actualParaText, sn_startOffset)
+                except Exception:
+                    self._sn_virtualCaret = (paraText, sn_startOffset)
             newCaret = ti.copy()
             newCaret.collapse()
             newCaret.updateCaret()
-            if hasattr(focus, "_setCaret"):
-                focus._setCaret(newCaret)
+            # Verify caret wasn't drifted by VirtualBuffer; retry via _setCaret if needed
+            try:
+                verifyCaret = focus.makeTextInfo(textInfos.POSITION_CARET)
+                verifyCaret.collapse()
+                if newCaret.compareEndPoints(verifyCaret, "startToStart") != 0:
+                    if hasattr(focus, "_setCaret"):
+                        focus._setCaret(newCaret)
+            except Exception:
+                pass
             review.handleCaretMove(newCaret)
             braille.handler.handleCaretMove(focus)
             vision.handler.handleCaretMove(focus)

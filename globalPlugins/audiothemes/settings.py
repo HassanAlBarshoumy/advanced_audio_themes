@@ -555,12 +555,76 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.trimThresholdSlider.Bind(wx.EVT_SLIDER, self._onTrimThresholdChanged)
 
         # Noise Gate
-        self.noiseGateCheckbox = wx.CheckBox(page, -1, _("Noise Gate (Remove background noise below threshold)"))
-        engineSizer.Add(self.noiseGateCheckbox, 0, wx.ALL, 5)
+        noiseBox = wx.StaticBox(page, -1, _("Noise Gate"))
+        noiseSizer = wx.StaticBoxSizer(noiseBox, wx.VERTICAL)
+
+        self.noiseGateCheckbox = wx.CheckBox(page, -1, _("Enable Noise Gate (remove quiet background noise)"))
+        noiseSizer.Add(self.noiseGateCheckbox, 0, wx.ALL, 5)
+
+        ngThreshSizer = wx.BoxSizer(wx.HORIZONTAL)
+        ngThreshLabel = wx.StaticText(page, -1, _("Threshold:"))
+        self.noiseThresholdSlider = wx.Slider(page, -1, minValue=1, maxValue=100, name=_("Noise gate threshold"))
+        self.noiseThresholdValueLabel = wx.StaticText(page, -1, "0.02")
+        ngThreshSizer.Add(ngThreshLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        ngThreshSizer.Add(self.noiseThresholdSlider, 1, wx.EXPAND | wx.ALL, 5)
+        ngThreshSizer.Add(self.noiseThresholdValueLabel, 0, wx.ALIGN_CENTER_VERTICAL, 5)
+        noiseSizer.Add(ngThreshSizer, 0, wx.EXPAND)
+
+        ngAttackSizer = wx.BoxSizer(wx.HORIZONTAL)
+        ngAttackLabel = wx.StaticText(page, -1, _("Attack (ms):"))
+        self.noiseAttackSlider = wx.Slider(page, -1, minValue=1, maxValue=100, name=_("Noise gate attack"))
+        self.noiseAttackValueLabel = wx.StaticText(page, -1, "5")
+        ngAttackSizer.Add(ngAttackLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        ngAttackSizer.Add(self.noiseAttackSlider, 1, wx.EXPAND | wx.ALL, 5)
+        ngAttackSizer.Add(self.noiseAttackValueLabel, 0, wx.ALIGN_CENTER_VERTICAL, 5)
+        noiseSizer.Add(ngAttackSizer, 0, wx.EXPAND)
+
+        ngReleaseSizer = wx.BoxSizer(wx.HORIZONTAL)
+        ngReleaseLabel = wx.StaticText(page, -1, _("Release (ms):"))
+        self.noiseReleaseSlider = wx.Slider(page, -1, minValue=1, maxValue=500, name=_("Noise gate release"))
+        self.noiseReleaseValueLabel = wx.StaticText(page, -1, "50")
+        ngReleaseSizer.Add(ngReleaseLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        ngReleaseSizer.Add(self.noiseReleaseSlider, 1, wx.EXPAND | wx.ALL, 5)
+        ngReleaseSizer.Add(self.noiseReleaseValueLabel, 0, wx.ALIGN_CENTER_VERTICAL, 5)
+        noiseSizer.Add(ngReleaseSizer, 0, wx.EXPAND)
+
+        self.noiseGateCheckbox.Bind(wx.EVT_CHECKBOX, self._on_noise_gate_changed)
+        self.noiseThresholdSlider.Bind(wx.EVT_SLIDER, self._on_noise_threshold_changed)
+        self.noiseAttackSlider.Bind(wx.EVT_SLIDER, self._on_noise_attack_changed)
+        self.noiseReleaseSlider.Bind(wx.EVT_SLIDER, self._on_noise_release_changed)
+
+        engineSizer.Add(noiseSizer, 0, wx.EXPAND | wx.ALL, 5)
 
         # Bass Boost
-        self.bassBoostCheckbox = wx.CheckBox(page, -1, _("Bass Boost (Enhance low frequencies)"))
-        engineSizer.Add(self.bassBoostCheckbox, 0, wx.ALL, 5)
+        bassBox = wx.StaticBox(page, -1, _("Bass Boost"))
+        bassSizer = wx.StaticBoxSizer(bassBox, wx.VERTICAL)
+
+        self.bassBoostCheckbox = wx.CheckBox(page, -1, _("Enable Bass Boost (enhance low frequencies)"))
+        bassSizer.Add(self.bassBoostCheckbox, 0, wx.ALL, 5)
+
+        bassGainSizer = wx.BoxSizer(wx.HORIZONTAL)
+        bassGainLabel = wx.StaticText(page, -1, _("Gain (dB):"))
+        self.bassGainSlider = wx.Slider(page, -1, minValue=0, maxValue=12, name=_("Bass boost gain"))
+        self.bassGainValueLabel = wx.StaticText(page, -1, "3 dB")
+        bassGainSizer.Add(bassGainLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        bassGainSizer.Add(self.bassGainSlider, 1, wx.EXPAND | wx.ALL, 5)
+        bassGainSizer.Add(self.bassGainValueLabel, 0, wx.ALIGN_CENTER_VERTICAL, 5)
+        bassSizer.Add(bassGainSizer, 0, wx.EXPAND)
+
+        bassCutSizer = wx.BoxSizer(wx.HORIZONTAL)
+        bassCutLabel = wx.StaticText(page, -1, _("Cutoff (Hz):"))
+        self.bassCutoffSlider = wx.Slider(page, -1, minValue=50, maxValue=500, name=_("Bass boost cutoff"))
+        self.bassCutoffValueLabel = wx.StaticText(page, -1, "200 Hz")
+        bassCutSizer.Add(bassCutLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        bassCutSizer.Add(self.bassCutoffSlider, 1, wx.EXPAND | wx.ALL, 5)
+        bassCutSizer.Add(self.bassCutoffValueLabel, 0, wx.ALIGN_CENTER_VERTICAL, 5)
+        bassSizer.Add(bassCutSizer, 0, wx.EXPAND)
+
+        self.bassBoostCheckbox.Bind(wx.EVT_CHECKBOX, self._on_bass_boost_changed)
+        self.bassGainSlider.Bind(wx.EVT_SLIDER, self._on_bass_gain_changed)
+        self.bassCutoffSlider.Bind(wx.EVT_SLIDER, self._on_bass_cutoff_changed)
+
+        engineSizer.Add(bassSizer, 0, wx.EXPAND | wx.ALL, 5)
 
         # Output Mode
         modeSizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -569,6 +633,32 @@ class AudioThemesSettingsPanel(SettingsPanel):
         modeSizer.Add(modeLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
         modeSizer.Add(self.outputModeChoice, 1, wx.EXPAND | wx.ALL, 0)
         engineSizer.Add(modeSizer, 0, wx.EXPAND | wx.ALL, 5)
+
+        # Progress Bar Spatial Audio
+        progressBox = wx.StaticBox(page, -1, _("Progress Bar Spatial Audio"))
+        progressSizer = wx.StaticBoxSizer(progressBox, wx.VERTICAL)
+
+        panModeSizer = wx.BoxSizer(wx.HORIZONTAL)
+        panModeLabel = wx.StaticText(page, -1, _("Pan Mode:"))
+        self.progressPanModeChoice = wx.Choice(page, -1, choices=[_("Progress-based (left to right)"), _("Screen position (bar location on screen)")], name=_("Progress Pan Mode"))
+        panModeSizer.Add(panModeLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        panModeSizer.Add(self.progressPanModeChoice, 1, wx.EXPAND | wx.ALL, 0)
+        progressSizer.Add(panModeSizer, 0, wx.EXPAND | wx.ALL, 5)
+
+        rangeSizer = wx.BoxSizer(wx.HORIZONTAL)
+        rangeLabel = wx.StaticText(page, -1, _("Pan Range:"))
+        self.progressPanRangeSlider = wx.Slider(page, -1, minValue=45, maxValue=180, name=_("Progress pan range"))
+        self.progressPanRangeValueLabel = wx.StaticText(page, -1, "180\xb0")
+        rangeSizer.Add(rangeLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        rangeSizer.Add(self.progressPanRangeSlider, 1, wx.EXPAND | wx.ALL, 5)
+        rangeSizer.Add(self.progressPanRangeValueLabel, 0, wx.ALIGN_CENTER_VERTICAL, 5)
+        progressSizer.Add(rangeSizer, 0, wx.EXPAND)
+        self.progressPanRangeSlider.Bind(wx.EVT_SLIDER, self._onProgressRangeChanged)
+
+        self.progressPitchShiftCheckbox = wx.CheckBox(page, -1, _("Pitch shift with progress (higher pitch = more progress)"))
+        progressSizer.Add(self.progressPitchShiftCheckbox, 0, wx.ALL, 5)
+
+        engineSizer.Add(progressSizer, 0, wx.EXPAND | wx.ALL, 5)
 
         page.SetSizer(engineSizer)
 
@@ -668,6 +758,51 @@ class AudioThemesSettingsPanel(SettingsPanel):
         else:
             self.trimThresholdValueLabel.SetLabel(f"{threshold:.3f}")
         self.trimThresholdSlider.Enable(self.trimSilenceCheckbox.GetValue())
+
+    def _onProgressRangeChanged(self, event):
+        val = self.progressPanRangeSlider.GetValue()
+        self.progressPanRangeValueLabel.SetLabel(_("%d\xb0") % val)
+
+    # ── Noise Gate event handlers ──────────────────────────────────────
+
+    def _noise_threshold_to_slider(self, value):
+        return max(1, min(100, int(float(value) * 1000)))
+
+    def _slider_to_noise_threshold(self, value):
+        return max(0.001, min(0.1, value / 1000.0))
+
+    def _on_noise_gate_changed(self, event):
+        enabled = self.noiseGateCheckbox.GetValue()
+        self.noiseThresholdSlider.Enable(enabled)
+        self.noiseAttackSlider.Enable(enabled)
+        self.noiseReleaseSlider.Enable(enabled)
+
+    def _on_noise_threshold_changed(self, event):
+        val = self._slider_to_noise_threshold(self.noiseThresholdSlider.GetValue())
+        self.noiseThresholdValueLabel.SetLabel("%.3f" % val)
+
+    def _on_noise_attack_changed(self, event):
+        val = self.noiseAttackSlider.GetValue()
+        self.noiseAttackValueLabel.SetLabel("%d" % val)
+
+    def _on_noise_release_changed(self, event):
+        val = self.noiseReleaseSlider.GetValue()
+        self.noiseReleaseValueLabel.SetLabel("%d" % val)
+
+    # ── Bass Boost event handlers ──────────────────────────────────────
+
+    def _on_bass_boost_changed(self, event):
+        enabled = self.bassBoostCheckbox.GetValue()
+        self.bassGainSlider.Enable(enabled)
+        self.bassCutoffSlider.Enable(enabled)
+
+    def _on_bass_gain_changed(self, event):
+        val = self.bassGainSlider.GetValue()
+        self.bassGainValueLabel.SetLabel(_("%d dB") % val)
+
+    def _on_bass_cutoff_changed(self, event):
+        val = self.bassCutoffSlider.GetValue()
+        self.bassCutoffValueLabel.SetLabel(_("%d Hz") % val)
 
     def setupSpeechOrderPage(self, page):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -925,6 +1060,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # Break on Wiki References
         self.breakOnWikiReferencesCheckbox = wx.CheckBox(page, -1, _("Skip Wikipedia references in sentence endings"))
         sentBox.Add(self.breakOnWikiReferencesCheckbox, 0, wx.ALL, 5)
+
+        # Break at element boundaries (links, etc.)
+        self.breakAtElementBoundariesCheckbox = wx.CheckBox(page, -1, _("Break sentences at element boundaries (links, separators, etc.)"))
+        sentBox.Add(self.breakAtElementBoundariesCheckbox, 0, wx.ALL, 5)
 
         # Reconstruct mode
         self.reconstructOptions = ["always", "sameIndent", "never"]
@@ -1210,14 +1349,40 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.trimThresholdSlider.Enable(self.trimSilenceCheckbox.GetValue())
         self.trimThresholdValueLabel.Enable(self.trimSilenceCheckbox.GetValue())
         self.noiseGateCheckbox.SetValue(_b(unspoken_conf.get("NoiseGate", False)))
+        ng_threshold = float(unspoken_conf.get("NoiseGateThreshold", 0.02))
+        self.noiseThresholdSlider.SetValue(self._noise_threshold_to_slider(ng_threshold))
+        self._on_noise_threshold_changed(None)
+        ng_attack = int(unspoken_conf.get("NoiseGateAttack", 5))
+        self.noiseAttackSlider.SetValue(ng_attack)
+        self._on_noise_attack_changed(None)
+        ng_release = int(unspoken_conf.get("NoiseGateRelease", 50))
+        self.noiseReleaseSlider.SetValue(ng_release)
+        self._on_noise_release_changed(None)
+        self._on_noise_gate_changed(None)
+
         self.bassBoostCheckbox.SetValue(_b(unspoken_conf.get("BassBoost", False)))
+        bb_gain = int(unspoken_conf.get("BassBoostGain", 3))
+        self.bassGainSlider.SetValue(bb_gain)
+        self._on_bass_gain_changed(None)
+        bb_cutoff = int(unspoken_conf.get("BassBoostCutoff", 200))
+        self.bassCutoffSlider.SetValue(bb_cutoff)
+        self._on_bass_cutoff_changed(None)
+        self._on_bass_boost_changed(None)
         
         mode = conf.get("output_mode", "stereo")
         if mode == "mono":
             self.outputModeChoice.SetSelection(1)
         else:
             self.outputModeChoice.SetSelection(0)
-        
+
+        # Progress bar spatial audio
+        pan_mode = conf.get("progress_pan_mode", "progress")
+        self.progressPanModeChoice.SetSelection(0 if pan_mode == "progress" else 1)
+        pan_range = _i(conf.get("progress_pan_range", 180))
+        self.progressPanRangeSlider.SetValue(pan_range)
+        self._onProgressRangeChanged(None)
+        self.progressPitchShiftCheckbox.SetValue(_b(conf.get("progress_pitch_shift", True)))
+
         self.typingSoundsCheckbox.SetValue(_b(conf.get("typing_sounds", False)))
         self.typingSoundsEditOnlyCheckbox.SetValue(_b(conf.get("typing_sounds_edit_only", True)))
         self.typingSoundsSpatialCheckbox.SetValue(_b(conf.get("typing_sounds_spatial", True)))
@@ -1334,6 +1499,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.speakFormattedCheckbox.SetValue(_b(snConf["speakFormatted"]))
         self.enableInWordCheckbox.SetValue(_b(snConf.get("enableInWord", False)))
         self.breakOnWikiReferencesCheckbox.SetValue(_b(snConf.get("breakOnWikiReferences", True)))
+        self.breakAtElementBoundariesCheckbox.SetValue(_b(snConf.get("breakAtElementBoundaries", True)))
         
         self.textCrackleVolumeSlider.SetValue(_i(snConf.get("textCrackleVolume", 25)))
         self.noNextTextChimeSlider.SetValue(_i(snConf.get("noNextTextChimeVolume", 50)))
@@ -1464,6 +1630,17 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
     def _on_fl_scope_changed(self, event):
         self.flSelectRolesBtn.Enable(self.flScopeSelected.GetValue())
+        if self.flScopeSelected.GetValue() and not hasattr(self, '_fl_enabled_roles_list'):
+            import json
+            conf = config.conf.get("audiothemes", {})
+            raw = conf.get("fl_enabled_roles", "all")
+            if raw == "all":
+                self._fl_enabled_roles_list = []
+            else:
+                try:
+                    self._fl_enabled_roles_list = json.loads(raw)
+                except Exception:
+                    self._fl_enabled_roles_list = []
 
     def _on_fl_select_roles(self, event):
         """Show dialog to pick which roles get first/last detection."""
@@ -1623,7 +1800,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
             conf["output_mode"] = "mono"
         else:
             conf["output_mode"] = "stereo"
-        
+
+        # Progress bar spatial audio
+        conf["progress_pan_mode"] = "screen" if self.progressPanModeChoice.GetSelection() == 1 else "progress"
+        conf["progress_pan_range"] = self.progressPanRangeSlider.GetValue()
+        conf["progress_pitch_shift"] = self.progressPitchShiftCheckbox.GetValue()
+
         conf["typing_sounds"] = self.typingSoundsCheckbox.GetValue()
         conf["typing_sounds_edit_only"] = self.typingSoundsEditOnlyCheckbox.GetValue()
         conf["typing_sounds_spatial"] = self.typingSoundsSpatialCheckbox.GetValue()
@@ -1690,7 +1872,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
         slider_val = self.trimThresholdSlider.GetValue()
         unspoken_conf["TrimSilenceThreshold"] = self._slider_to_threshold(slider_val)
         unspoken_conf["NoiseGate"] = self.noiseGateCheckbox.GetValue()
+        unspoken_conf["NoiseGateThreshold"] = self._slider_to_noise_threshold(self.noiseThresholdSlider.GetValue())
+        unspoken_conf["NoiseGateAttack"] = self.noiseAttackSlider.GetValue()
+        unspoken_conf["NoiseGateRelease"] = self.noiseReleaseSlider.GetValue()
         unspoken_conf["BassBoost"] = self.bassBoostCheckbox.GetValue()
+        unspoken_conf["BassBoostGain"] = self.bassGainSlider.GetValue()
+        unspoken_conf["BassBoostCutoff"] = self.bassCutoffSlider.GetValue()
         unspoken_conf["Reverb"] = self.enableReverbCheckbox.IsChecked()
         unspoken_conf["RoomSize"] = self.roomSizeSlider.GetValue()
         unspoken_conf["Damping"] = self.dampingSlider.GetValue()
@@ -1709,6 +1896,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         snConf["speakFormatted"] = self.speakFormattedCheckbox.GetValue()
         snConf["enableInWord"] = self.enableInWordCheckbox.GetValue()
         snConf["breakOnWikiReferences"] = self.breakOnWikiReferencesCheckbox.GetValue()
+        snConf["breakAtElementBoundaries"] = self.breakAtElementBoundariesCheckbox.GetValue()
         
         snConf["textCrackleVolume"] = self.textCrackleVolumeSlider.GetValue()
         snConf["noNextTextChimeVolume"] = self.noNextTextChimeSlider.GetValue()

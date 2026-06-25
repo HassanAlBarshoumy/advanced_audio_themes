@@ -720,13 +720,30 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                             else:
                                 percent = val_float / 100.0
                             percent = max(0.0, min(1.0, percent))
-                            # Calculate custom X angle from -45 to 45 degrees based on progress
-                            angle_x = -45.0 + (percent * 90.0)
-                            
-                            # Play progress bar earcon if exists
+
+                            pan_mode = config.conf["audiothemes"].get("progress_pan_mode", "progress")
+                            pan_range = config.conf["audiothemes"].get("progress_pan_range", 180)
+                            pitch_shift = config.conf["audiothemes"].get("progress_pitch_shift", True)
+
                             obj_info = self._snapshot_obj(obj)
+
+                            if pan_mode == "screen":
+                                loc = obj_info.get("location")
+                                desktop = obj_info.get("desktop_location")
+                                if loc and desktop and desktop[2] > 0:
+                                    bar_left = loc[0]
+                                    bar_width = loc[2]
+                                    sound_x = bar_left + percent * bar_width
+                                    angle_x = ((sound_x - desktop[2] / 2.0) / desktop[2]) * 180.0
+                                    angle_x = max(-90.0, min(90.0, angle_x))
+                                else:
+                                    angle_x = -(pan_range / 2.0) + (percent * pan_range)
+                            else:
+                                angle_x = -(pan_range / 2.0) + (percent * pan_range)
+
                             obj_info['progress_angle'] = angle_x
                             obj_info['progress_percent'] = percent
+                            obj_info['progress_pitch_shift'] = pitch_shift
                             utils.threadPool.add_task(self.playObject, obj_info)
                         except Exception as e:
                             log.debug(f"AudioThemes event_valueChange progress: {e}")

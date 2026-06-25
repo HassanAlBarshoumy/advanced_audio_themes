@@ -212,6 +212,13 @@ class UnspokenPlayer:
 			"SmoothPanning": "boolean(default=True)",
 			"TrimSilence": "boolean(default=True)",
 			"TrimSilenceThreshold": "float(default=0.01)",
+			"NoiseGate": "boolean(default=False)",
+			"NoiseGateThreshold": "float(default=0.02)",
+			"NoiseGateAttack": "integer(default=5, min=0, max=100)",
+			"NoiseGateRelease": "integer(default=50, min=0, max=500)",
+			"BassBoost": "boolean(default=False)",
+			"BassBoostGain": "integer(default=3, min=0, max=12)",
+			"BassBoostCutoff": "integer(default=200, min=50, max=500)",
 		}
 		log.debug("Initializing Steam Audio")
 		self.steam_audio = steam_audio.get_steam_audio()
@@ -494,11 +501,21 @@ class UnspokenPlayer:
 
 		if config.conf["unspoken"].get("NoiseGate", False):
 			from . import audio_filters
-			float_samples = array('f', audio_filters.apply_noise_gate(float_samples, sample_rate=sample_rate))
+			threshold = float(config.conf["unspoken"].get("NoiseGateThreshold", 0.02))
+			attack_ms = int(config.conf["unspoken"].get("NoiseGateAttack", 5))
+			release_ms = int(config.conf["unspoken"].get("NoiseGateRelease", 50))
+			float_samples = array('f', audio_filters.apply_noise_gate(
+				float_samples, threshold=threshold,
+				attack_ms=attack_ms, release_ms=release_ms,
+				sample_rate=sample_rate))
 
 		if config.conf["unspoken"].get("BassBoost", False):
 			from . import audio_filters
-			float_samples = array('f', audio_filters.apply_bass_boost(float_samples, sample_rate=sample_rate))
+			gain_db = float(config.conf["unspoken"].get("BassBoostGain", 3))
+			cutoff_hz = float(config.conf["unspoken"].get("BassBoostCutoff", 200))
+			float_samples = array('f', audio_filters.apply_bass_boost(
+				float_samples, gain_db=gain_db,
+				cutoff_hz=cutoff_hz, sample_rate=sample_rate))
 
 		remainder = len(float_samples) % 1024
 		if remainder != 0:
@@ -620,8 +637,7 @@ class UnspokenPlayer:
 			if "progress_angle" in obj_info:
 				angle_x = obj_info["progress_angle"]
 				angle_y = 0.0
-			
-			if config.conf["unspoken"].get("SmoothPanning", True) and hasattr(self, '_last_angle_x'):
+			elif config.conf["unspoken"].get("SmoothPanning", True) and hasattr(self, '_last_angle_x'):
 				dx = abs(angle_x - self._last_angle_x)
 				dy = abs(angle_y - self._last_angle_y)
 				if max(dx, dy) < 30.0:
@@ -650,8 +666,10 @@ class UnspokenPlayer:
 		# Pitch shifting based on progress (up to 2x pitch/speed at 100%)
 		pitch_factor = 1.0
 		if "progress_percent" in obj_info:
-			percent = clamp(obj_info["progress_percent"], 0.0, 1.0)
-			pitch_factor = 1.0 + percent
+			enable_pitch = obj_info.get("progress_pitch_shift", True)
+			if enable_pitch:
+				percent = clamp(obj_info["progress_percent"], 0.0, 1.0)
+				pitch_factor = 1.0 + percent
 
 		# Cache reverb setting
 		reverb_on = config.conf["unspoken"]["Reverb"]
