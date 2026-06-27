@@ -2744,3 +2744,99 @@ msgstr "Palabra"
 
 msgid "text blocks"
 msgstr "Bloques de texto"
+msgid "AC Power Connected"
+msgstr ""
+
+msgid "AC Power Disconnected"
+msgstr ""
+
+msgid "AC power connected/disconnected"
+msgstr ""
+
+msgid "Battery check interval (seconds):"
+msgstr ""
+
+msgid "Battery Critical"
+msgstr ""
+
+msgid "Battery Fully Charged"
+msgstr ""
+
+msgid "Battery Low"
+msgstr ""
+
+msgid "Battery level changes (low, critical, full)"
+msgstr ""
+
+msgid "Battery Thresholds"
+msgstr ""
+
+msgid "Check Intervals"
+msgstr ""
+
+msgid "Critical battery threshold (%):"
+msgstr ""
+
+msgid "Custom Sound Files"
+msgstr ""
+
+msgid "Enable system status sounds"
+msgstr ""
+
+msgid "Events"
+msgstr ""
+
+msgid "Low battery threshold (%):"
+msgstr ""
+
+msgid "Monitor all USB devices (keyboard, mouse, storage, etc.)"
+msgstr ""
+
+msgid "Network check interval (seconds):"
+msgstr ""
+
+msgid "Network Connected"
+msgstr ""
+
+msgid "Network connect/disconnect"
+msgstr ""
+
+msgid "Network Disconnected"
+msgstr ""
+
+msgid "Storage Volume Mounted"
+msgstr ""
+
+msgid "Storage volume mount/unmount"
+msgstr ""
+
+msgid "Storage Volume Unmounted"
+msgstr ""
+
+msgid "System Sleep"
+msgstr ""
+
+msgid "System Status"
+msgstr ""
+
+msgid "System status sounds volume:"
+msgstr ""
+
+msgid "System Wake"
+msgstr ""
+
+msgid "System wake/sleep"
+msgstr ""
+
+msgid "USB Device Plugged"
+msgstr ""
+
+msgid "USB device plug/unplug"
+msgstr ""
+
+msgid "USB Device Unplugged"
+msgstr ""
+
+msgid "USB Monitoring"
+msgstr ""
+
