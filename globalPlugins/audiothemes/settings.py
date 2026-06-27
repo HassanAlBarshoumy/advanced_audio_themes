@@ -1385,7 +1385,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             try: return int(v)
             except (ValueError, TypeError): return d
 
-        conf = config.conf.get("audiothemes", {})
+        conf = config.conf["audiothemes"]
         self.enableThemesCheckbox.SetValue(_b(conf.get("enable_audio_themes", True)))
         self.play3dCheckbox.SetValue(_b(conf.get("audio3d", True)))
         self.speakRoleCheckbox.SetValue(_b(conf.get("speak_roles", True)))
@@ -1751,15 +1751,15 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.flSelectRolesBtn.Enable(self.flScopeSelected.GetValue())
         if self.flScopeSelected.GetValue() and not hasattr(self, '_fl_enabled_roles_list'):
             import json
-            conf = config.conf.get("audiothemes", {})
+            conf = config.conf["audiothemes"]
             raw = conf.get("fl_enabled_roles", "all")
             if raw == "all":
-                self._fl_enabled_roles_list = []
+                self._fl_enabled_roles_list = ["listitem", "treeviewitem", "menuitem", "tab"]
             else:
                 try:
                     self._fl_enabled_roles_list = json.loads(raw)
                 except Exception:
-                    self._fl_enabled_roles_list = []
+                    self._fl_enabled_roles_list = ["listitem", "treeviewitem", "menuitem", "tab"]
 
     def _on_fl_select_roles(self, event):
         """Show dialog to pick which roles get first/last detection."""
@@ -1963,6 +1963,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
             conf["fl_enabled_roles"] = "all"
         else:
             enabled_list = getattr(self, '_fl_enabled_roles_list', [])
+            if not enabled_list:
+                enabled_list = ["listitem", "treeviewitem", "menuitem", "tab"]
             conf["fl_enabled_roles"] = json.dumps(enabled_list)
         solo_map = {0: "first", 1: "last", 2: "none"}
         sel = self.flSoloChoice.GetSelection()

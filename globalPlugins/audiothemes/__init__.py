@@ -1110,7 +1110,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
         # --- Universal mode ------------------------------------------------
         # Check role filter – which roles are enabled for FL detection?
-        fl_roles_raw = config.conf["audiothemes"].get("fl_enabled_roles", "all")
+        fl_roles_raw = config.conf["audiothemes"].get("fl_enabled_roles")
+        if fl_roles_raw is None:
+            fl_roles_raw = "all"
         if fl_roles_raw != "all":
             try:
                 import json

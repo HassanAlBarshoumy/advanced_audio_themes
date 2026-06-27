@@ -135,7 +135,13 @@ audiothemes_config_defaults = {
     "sys_network_check_interval": "integer(default=15, min=5, max=300)",
     "sys_battery_check_interval": "integer(default=30, min=5, max=300)",
     "sys_all_usb": "boolean(default=True)",
+    "config_version": "integer(default=1)",
 }
+
+# Current config schema version.  Increment when making backward-incompatible
+# changes (e.g. renaming or removing a key, changing a default that existing
+# users should not inherit without migration).
+CONFIG_VERSION = 1
 
 
 def _get_blacklisted_roles():
@@ -662,7 +668,19 @@ class AudioThemesHandler:
             theme.is_active = True
             return theme
 
+    def _migrate_config(self):
+        try:
+            saved = config.conf["audiothemes"].get("config_version", 0)
+        except Exception:
+            saved = 0
+        if saved >= CONFIG_VERSION:
+            return
+        if saved < 1:
+            pass  # Placeholder for future migrations.
+        config.conf["audiothemes"]["config_version"] = CONFIG_VERSION
+
     def configure(self, *args, **kwargs):
+        self._migrate_config()
         with self._config_lock:
             user_config = config.conf["audiothemes"]
             if self.active_theme is not None:
