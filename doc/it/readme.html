@@ -1,233 +1,254 @@
-<html><head><meta charset='utf-8'></head><body><h1>Temi audio NG e punteggiatura fonetica</h1>
-<p>Questo componente aggiuntivo fornisce un'esperienza audio coinvolgente per gli utenti di lettori di schermo NVDA riproducendo suoni per vari eventi dell'interfaccia utente. Consente la creazione, l'installazione e la personalizzazione di temi audio, migliorando il feedback uditivo dall'interfaccia utente.</p>
+<html><head><meta charset='utf-8'></head>
+<body>
+<h1>Audio Themes NG &amp; Punteggiatura Fonetica</h1>
+<p>Questo componente aggiuntivo offre un'esperienza audio immersiva per gli utenti dello screen reader NVDA riproducendo suoni per vari eventi dell'interfaccia utente. Consente la creazione, l'installazione e la personalizzazione di temi audio, migliorando il feedback uditivo dell'interfaccia utente.</p>
 <h2>Caratteristiche</h2>
 <ul>
-<li><strong>Effetti audio:</strong> riproduce suoni per eventi dell'interfaccia utente come la concentrazione sui controlli, la navigazione negli elenchi e altro ancora.</li>
-<li><strong>Audio 3D:</strong> utilizza Steam Audio per fornire audio posizionale 3D, dando un'idea della posizione dei controlli sullo schermo.</li>
-<li><strong>DSP audio avanzato:</strong> Elaborazione audio in tempo reale tra cui potenziamento dei bassi, noise gate, rifinitura del silenzio, normalizzazione intelligente del volume e inviluppi uniformi.</li>
-<li><strong>Audio Ducking:</strong> abbassa automaticamente il volume del tema quando NVDA parla per garantire la chiarezza del parlato.</li>
-<li><strong>Riverbero:</strong> aggiunge effetti di riverbero all'audio per un'esperienza più coinvolgente.</li>
-<li><strong>Temi personalizzabili:</strong> consente agli utenti di creare, installare e passare da un tema audio all'altro.</li>
-<li><strong>Temi audio Studio V2:</strong> Uno strumento integrato per creare nuovi temi audio o modificare quelli esistenti direttamente dal microfono o tramite trascinamento.</li>
+<li><strong>Effetti audio:</strong> Riproduce suoni per eventi dell'interfaccia utente, come la focalizzazione sui controlli, la navigazione negli elenchi e altro ancora.</li>
+<li><strong>Audio 3D:</strong> Utilizza Steam Audio per fornire audio posizionale 3D, dando un'idea della posizione dei controlli sullo schermo.</li>
+<li><strong>DSP audio avanzato:</strong> Elaborazione audio in tempo reale che include potenziamento dei bassi (Bass Boost), noise gate, ritaglio del silenzio (Silence Trimming), normalizzazione intelligente del volume ed inviluppi fluidi (Smooth Envelopes).</li>
+<li><strong>Attenuazione audio (Ducking):</strong> Abbassa automaticamente il volume del tema quando NVDA parla per garantire la chiarezza vocale.</li>
+<li><strong>Riverbero:</strong> Aggiunge effetti di riverbero all'audio per un'esperienza più immersiva.</li>
+<li><strong>Temi personalizzabili:</strong> Consente agli utenti di creare, installare e passare da un tema audio all'altro.</li>
+<li><strong>Audio Themes Studio V2:</strong> Uno strumento integrato per creare nuovi temi audio o modificare quelli esistenti direttamente dal microfono o tramite trascinamento (drag &amp; drop).</li>
 <li><strong>Formati audio estesi:</strong> Supporto FFmpeg integrato per MP3, FLAC, OGG, M4A e altro.</li>
-<li><strong>Suoni di digitazione avanzati:</strong> Simula la digitazione della tastiera fisica con posizionamento spaziale dell'audio, regolazioni dinamiche del volume della velocità e mappatura intelligente dei tasti speciali (Invio, Backspace, Spazio, Maiusc, Ctrl, Alt).</li>
-<li><strong>Digitazione sensibile al contesto:</strong> opzione per limitare la riproduzione dei suoni di digitazione solo all'interno dei campi di testo modificabili.</li>
-<li><strong>Barre di avanzamento intelligenti:</strong> Cambio dinamico del tono per le barre di avanzamento (tono più alto = percentuale più alta).</li>
-<li><strong>Rilevamento primo/ultimo elemento:</strong> riproduce un suono specifico quando si raggiunge il limite di un elenco o di un menu.</li>
-<li><strong>Segnalatore audio/sonar:</strong> rilascia un segnale audio spaziale in qualsiasi posizione sullo schermo e naviga per ascoltare i segnali sonar in tempo reale che ti guidano rispetto al segnale.</li>
-<li><strong>Navigazione avanzata:</strong> motori SentenceNav e BrowserNav integrati per una navigazione fluida di testo e web senza tasti freccia in conflitto.</li>
-<li><strong>Livello di navigazione:</strong> Premi NVDA+Win+N per accedere a una modalità di navigazione veloce in cui i tasti freccia si spostano per frasi, paragrafi o altri elementi senza tenere premuti modificatori.</li>
-<li><strong>Negozio di temi cloud:</strong> scarica, visualizza in anteprima e installa i temi creati dalla community direttamente da Audio Themes Studio.</li>
-<li><strong>Profili specifici dell'app:</strong> passa automaticamente a un tema audio specifico e digita un pacchetto di suoni in base all'applicazione attiva.</li>
+<li><strong>Suoni di digitazione avanzati:</strong> Simula la digitazione su una tastiera fisica con posizionamento audio spaziale, regolazione dinamica del volume in base alla velocità (velocity) e mappatura intelligente dei tasti per tasti speciali (Invio, Backspace, Spazio, Maiusc, Ctrl, Alt).</li>
+<li><strong>Digitazione contestuale:</strong> Opzione per limitare la riproduzione dei suoni di digitazione solo all'interno dei campi di testo modificabili.</li>
+<li><strong>Barre di avanzamento intelligenti:</strong> Variazione dinamica dell'intonazione (pitch shifting) per le barre di avanzamento (tonalità più alta = percentuale più alta).</li>
+<li><strong>Rilevamento del primo/ultimo elemento:</strong> Riproduce uno specifico suono di "urto" (bump) quando si raggiunge il limite di un elenco o di un menu.</li>
+<li><strong>Segnale/Sonar audio:</strong> Rilascia un segnale audio spaziale in qualsiasi punto dello schermo e naviga intorno per ascoltare echi sonar in tempo reale che ti guidano rispetto al segnale.</li>
+<li><strong>Navigazione avanzata:</strong> Motori SentenceNav e BrowserNav integrati per una navigazione fluida nel testo e nel web senza conflitti con i tasti freccia.</li>
+<li><strong>Livello di navigazione:</strong> Premi NVDA+Win+N per accedere a una modalità di navigazione rapida in cui i tasti freccia si muovono per frasi, paragrafi o altri elementi senza tenere premuti i modificatori.</li>
+<li><strong>Store dei temi nel cloud:</strong> Scarica, ascolta in anteprima e installa i temi creati dalla comunità direttamente dall'interno di Audio Themes Studio.</li>
+<li>
+<p><strong>Profili specifici dell'app:</strong> Passa automaticamente a un tema audio e a un pacchetto di suoni di digitazione specifici in base all'applicazione attiva.</p>
+</li>
+<li>
+<p><strong>Suoni di Stato del Sistema (System Status Sounds):</strong> Riproduce segnali audio per eventi a livello di sistema come variazioni di alimentazione CA, stato della batteria, connessione di dispositivi USB e connettività di rete.</p>
+</li>
 </ul>
-<h2>Sviluppo e crediti</h2>
-<p>Lo sviluppo e il consolidamento di questo componente aggiuntivo sono iniziati all'inizio di maggio (precisamente il 3 maggio 2026) esclusivamente da <strong>Hassan AlBarshoumy</strong>.</p>
-<p>Tutti i refactoring del codice, i consolidamenti strutturali e le integrazioni della GUI (inclusi Audio Themes Studio V2 e le finestre di dialogo Impostazioni unificate) sono stati eseguiti per garantire la massima stabilità e compatibilità con NVDA 2026.1+.</p>
-<p><strong>Sviluppatore e consolidatore principale:</strong>
-*Hassan AlBarshoumy</p>
-<p><strong>Crediti e riconoscimenti:</strong>
-Questo componente aggiuntivo ha tratto grandi benefici dalla fusione e dallo sviluppo di precedenti progetti open source nella comunità NVDA. Un ringraziamento speciale agli sviluppatori originali:
+<h2>Sviluppo e Riconoscimenti</h2>
+<p>Lo sviluppo e il consolidamento di questo componente aggiuntivo sono iniziati all'inizio di maggio (precisamente il 3 maggio 2026) esclusivamente da parte di <strong>Hassan AlBarshoumy</strong>.</p>
+<p>Tutto il refactoring del codice, i consolidamenti strutturali e le integrazioni della GUI (incluso Audio Themes Studio V2 e le finestre di dialogo delle impostazioni unificate) sono stati eseguiti per garantire la massima stabilità e compatibilità con NVDA 2026.1+.</p>
+<p><strong>Sviluppatore principale e consolidatore:</strong>
+* Hassan AlBarshoumy</p>
+<p><strong>Crediti e Ringraziamenti:</strong>
+Questo componente aggiuntivo ha beneficiato notevolmente della fusione e dello sviluppo di precedenti progetti open source nella comunità NVDA. Un ringraziamento speciale agli sviluppatori originali:
 * <strong>Ahmed Sami:</strong> Sviluppatore originale del componente aggiuntivo navSounds (Navigation Sound Effects) e per i suoi contributi.
 * <strong>Musharraf Omer:</strong> Sviluppatore originale del componente aggiuntivo Audio Themes 3D.
-* <strong>Tony Malykh:</strong> Sviluppatore originale dei componenti aggiuntivi Earcons e Speech Rules, BrowserNav, SentenceNav e TextNav.
+* <strong>Tony Malykh:</strong> Sviluppatore originale dei componenti aggiuntivi Earcons and Speech Rules, BrowserNav, SentenceNav e TextNav.
 * <strong>Austin Hicks e Bryan Smart:</strong> Sviluppatori originali del componente aggiuntivo Unspoken.</p>
 <p><strong>Contatti e aggiornamenti:</strong> <a href="https://t.me/HassanAlBarshoumy">https://t.me/HassanAlBarshoumy</a></p>
 <h2>Installazione</h2>
 <ol>
 <li>Scarica l'ultima versione del componente aggiuntivo dal canale ufficiale di Hassan.</li>
-<li>Aprire il file <code>.nvda-addon</code> scaricato.</li>
+<li>Apri il file <code>.nvda-addon</code> scaricato.</li>
 <li>NVDA ti chiederà di confermare l'installazione. Scegli "Sì".</li>
-<li>Riavviare NVDA per completare l'installazione.</li>
+<li>Riavvia NVDA per completare l'installazione.</li>
 </ol>
-<h2>Come usare</h2>
-<h3>Abilitare/Disabilitare i temi audio</h3>
+<h2>Come si usa</h2>
+<h3>Abilitazione/Disabilitazione dei temi audio</h3>
 <p>Puoi abilitare o disabilitare la funzionalità dei temi audio nelle impostazioni di NVDA:</p>
 <ol>
-<li>Aprire il menu NVDA (NVDA+N).</li>
+<li>Apri il menu NVDA (NVDA+N).</li>
 <li>Vai su "Preferenze" -&gt; "Impostazioni".</li>
 <li>Nella finestra di dialogo delle impostazioni, seleziona la categoria "Temi audio".</li>
 <li>Seleziona o deseleziona la casella di controllo "Abilita temi audio".</li>
 </ol>
 <h3>Selezione e gestione dei temi</h3>
 <ul>
-<li><strong>Informazioni su un tema:</strong> fai clic sul pulsante "Informazioni" per visualizzare le informazioni sul tema selezionato.</li>
+<li><strong>Informazioni su un tema:</strong> Fai clic sul pulsante "Informazioni" per visualizzare le informazioni sul tema selezionato.</li>
 </ul>
-<h3>Panoramica delle schede Impostazioni</h3>
-<p>Il pannello delle impostazioni Temi audio avanzati contiene diverse schede per personalizzare ogni aspetto dell'esperienza audio. Di seguito è riportato un approfondimento su tutte le opzioni disponibili:</p>
+<h3>Panoramica delle schede delle impostazioni</h3>
+<p>Il pannello delle impostazioni Temi audio avanzati contiene diverse schede per personalizzare ogni aspetto dell'esperienza audio. Di seguito un approfondimento su ogni opzione disponibile:</p>
 <h4>1. Scheda Generale</h4>
 <ul>
-<li><strong>Abilita temi audio:</strong> Interruttore principale per attivare o disattivare il motore dei temi audio.</li>
-<li><strong>Seleziona tema:</strong> menu a discesa per scegliere il tema audio attivo dai temi installati.</li>
-<li><strong>Informazioni/Rimuovi/Aggiungi nuovo:</strong> Gestisci i tuoi temi. Puoi installare nuovi temi da file ".atp" o ".zip".</li>
-<li><strong>Negozio temi:</strong> apre lo store integrato per scaricare temi creati dalla community.</li>
-<li><strong>Studio tema:</strong> apre lo studio per modificare o remixare il tema attualmente selezionato.</li>
-<li><strong>Anteprima:</strong> riproduce una sequenza di suoni campione dal tema attivo.</li>
-<li><strong>Riproduci suoni in modalità 3D:</strong> Abilita l'elaborazione audio spaziale.</li>
-<li><strong>Pronuncia ruoli:</strong> Scegli se NVDA pronuncia i ruoli di controllo (come "pulsante", "link").</li>
-<li><strong>Pronuncia i ruoli durante il dire tutto:</strong> attiva/disattiva il ruolo durante la lettura continua. È possibile utilizzare il pulsante "Seleziona ruoli..." per specificare esattamente quali ruoli parlare.</li>
-<li><strong>Utilizza il volume del sintetizzatore vocale:</strong> collega il volume del tema al volume della voce di NVDA. Disabilitalo per utilizzare il dispositivo di scorrimento manuale.</li>
-<li><strong>Audio Ducking:</strong> abbassa il volume dell'audio di sottofondo quando NVDA parla. Puoi scegliere quali categorie di suoni attenuare e impostare la percentuale del volume attenuato.</li>
-<li><strong>Comportamenti di riserva:</strong> definisci cosa succede quando manca un suono per un ruolo specifico o un primo/ultimo elemento (ad esempio, riproduci il silenzio, riproduci un suono personalizzato o riproduci il primo suono disponibile).</li>
-<li><strong>I suoni di stato sopprimono il suono del ruolo:</strong> Se un elemento ha un suono di stato (ad esempio, una casella selezionata), impedirà la riproduzione del suono del ruolo per evitare confusione audio.</li>
-<li><strong>Lista nera delle applicazioni:</strong> un elenco separato da virgole di file eseguibili delle applicazioni in cui i temi audio devono essere completamente disabilitati. Puoi anche personalizzare quali categorie di suoni specifiche vengono soppresse in queste app.</li>
-<li><strong>Suoni di digitazione:</strong> attiva i suoni della macchina da scrivere o della tastiera meccanica. Le opzioni includono la digitazione spaziale (simulazione delle posizioni fisiche della tastiera), mappatura spaziale intelligente, limitazione dei suoni alle caselle di modifica, selezione di pacchetti di suoni e regolazione del volume.</li>
-<li><strong>Gestione della configurazione:</strong> controlla gli aggiornamenti, includi versioni beta ed esporta/importa l'intera configurazione (inclusi temi, regole e suoni) in un singolo file <code>.atcfg</code>.</li>
+<li><strong>Abilita temi audio:</strong> Interruttore principale per accendere o spegnere il motore dei temi audio.</li>
+<li><strong>Seleziona tema:</strong> Menu a discesa per scegliere il tema audio attivo tra quelli installati.</li>
+<li><strong>Informazioni / Rimuovi / Aggiungi nuovo:</strong> Gestisci i tuoi temi. Puoi installare nuovi temi da file <code>.atp</code> o <code>.zip</code>.</li>
+<li><strong>Store dei temi:</strong> Apre lo store integrato per scaricare i temi creati dalla community.</li>
+<li><strong>Theme Studio:</strong> Apre lo studio per modificare o remixare il tema attualmente selezionato.</li>
+<li><strong>Anteprima:</strong> Riproduce una sequenza di suoni campione del tema attivo.</li>
+<li><strong>Riproduci i suoni in modalità 3D:</strong> Abilita l'elaborazione dell'audio spaziale.</li>
+<li><strong>Annuncia i ruoli:</strong> Scegli se NVDA deve pronunciare i ruoli dei controlli (come "pulsante", "link").</li>
+<li><strong>Annuncia i ruoli durante leggi tutto:</strong> Abilita o disabilita la pronuncia dei ruoli durante la lettura continua. Puoi usare il pulsante "Seleziona ruoli..." per specificare esattamente quali ruoli pronunciare.</li>
+<li><strong>Usa il volume del sintetizzatore vocale:</strong> Collega il volume del tema al volume della voce di NVDA. Disabilitalo per usare il cursore manuale.</li>
+<li><strong>Attenuazione audio (Ducking):</strong> Abbassa il volume dell'audio di sottofondo quando NVDA parla. Puoi scegliere quali categorie di suoni attenuare e impostare la percentuale del volume attenuato.</li>
+<li><strong>Comportamenti di fallback:</strong> Definisce cosa succede quando manca un suono per un ruolo specifico o per un primo/ultimo elemento (ad esempio, riproduci silenzio, riproduci un suono personalizzato o riproduci il primo suono disponibile).</li>
+<li><strong>I suoni di stato sopprimono il suono del ruolo:</strong> Se un elemento ha un suono di stato (ad es. casella di controllo attivata), impedirà la riproduzione del suono del ruolo per evitare confusione audio.</li>
+<li><strong>Lista nera (Blacklist) applicazioni:</strong> Un elenco separato da virgole di eseguibili di applicazioni in cui i temi audio devono essere completamente disabilitati. Puoi anche personalizzare quali categorie specifiche di suoni vengono soppresse in queste app.</li>
+<li><strong>Suoni di digitazione:</strong> Abilita i suoni della macchina da scrivere o della tastiera meccanica. Le opzioni includono la digitazione spaziale (simulazione delle posizioni fisiche sulla tastiera), la mappatura spaziale intelligente, la restrizione dei suoni alle caselle di modifica, la selezione di pacchetti di suoni e la regolazione del volume.</li>
+<li><strong>Gestione della configurazione:</strong> Cerca aggiornamenti, includi le versioni beta ed esporta/importa l'intera configurazione (inclusi temi, regole e suoni) in un singolo file <code>.atcfg</code>.</li>
 </ul>
-<h4>2. Scheda Motore audio</h4>
+<h4>2. Scheda Motore Audio</h4>
 <ul>
-<li><strong>Normalizzazione intelligente del volume:</strong> regola dinamicamente i suoni forti e deboli a un livello costante.</li>
-<li><strong>Inviluppo uniforme:</strong> Applica micro dissolvenze in entrata e in uscita per evitare scoppiettii o clic dell'audio.</li>
-<li><strong>Panoramica 3D fluida:</strong> crea un effetto di planata quando gli oggetti si muovono sullo schermo invece di saltare istantaneamente.</li>
-<li><strong>Caching RAM:</strong> carica i suoni in memoria per una riproduzione a latenza zero.</li>
-<li><strong>Taglia silenzio:</strong> rimuove automaticamente gli spazi silenziosi all'inizio e alla fine dei file audio in base a una soglia personalizzabile.</li>
-<li><strong>Noise Gate:</strong> elimina il sibilo di sottofondo di basso livello da temi audio registrati male. Include i cursori Soglia, Attacco e Rilascio.</li>
-<li><strong>Potenziamento dei bassi:</strong> migliora le basse frequenze per dare più forza ai suoni. Include i cursori Gain e Cutoff.</li>
-<li><strong>Modalità uscita audio:</strong> Passa dall'audio 3D spaziale completo (stereo) a quello centrato (mono).</li>
-<li><strong>Audio spaziale della barra di avanzamento:</strong> scegli se le barre di avanzamento si spostano da sinistra a destra in base alla percentuale di avanzamento o in base alla posizione fisica sullo schermo. Include anche un interruttore per spostare il tono più in alto man mano che il progresso aumenta.</li>
+<li><strong>Normalizzazione intelligente del volume:</strong> Regola dinamicamente i suoni deboli e forti a un livello costante.</li>
+<li><strong>Inviluppo fluido:</strong> Applica micro dissolvenze in apertura e in chiusura per evitare crepitii o clic audio.</li>
+<li><strong>Panning 3D fluido:</strong> Crea un effetto di scivolamento quando gli oggetti si spostano sullo schermo invece di saltare istantaneamente.</li>
+<li><strong>Caching in RAM:</strong> Carica i suoni in memoria per una riproduzione a latenza zero.</li>
+<li><strong>Ritaglia silenzio:</strong> Rimuove automaticamente gli spazi silenziosi all'inizio e alla fine dei file audio in base a una soglia personalizzabile.</li>
+<li><strong>Noise Gate:</strong> Elimina il sibilo di sottofondo di basso livello dai temi audio registrati male. Include i cursori per Soglia, Attacco e Rilascio.</li>
+<li><strong>Potenziamento dei bassi (Bass Boost):</strong> Migliora le basse frequenze per dare più corpo ai suoni. Include cursori per Guadagno e Frequenza di taglio.</li>
+<li><strong>Modalità di uscita audio:</strong> Passa dall'audio spaziale 3D completo (Stereo) a quello centrato (Mono).</li>
+<li><strong>Audio spaziale della barra di avanzamento:</strong> Scegli se le barre di avanzamento eseguono il panning da sinistra a destra in base alla loro percentuale di avanzamento o in base alla loro posizione fisica sullo schermo. Include anche un interruttore per alzare la tonalità all'aumentare dell'avanzamento.</li>
 </ul>
 <h4>3. Scheda Riverbero</h4>
-<p>Simula l'acustica ambientale per far sembrare che i suoni vengano riprodotti in una stanza fisica.
-- <strong>Abilita riverbero:</strong> interruttore principale per gli effetti ambientali.
-- <strong>Dimensione stanza:</strong> regola la dimensione percepita della stanza virtuale.
-- <strong>Smorzamento:</strong> controlla la velocità con cui le frequenze alte vengono assorbite (simulando pareti morbide o dure).
-- <strong>Livello Wet / Livello Dry:</strong> Bilancia la quantità di riverbero elaborato rispetto al suono pulito originale.
-- <strong>Larghezza:</strong> Regola la diffusione stereo della coda del riverbero.</p>
-<h4>4. Scheda Formati audio</h4>
+<p>Simula l'acustica ambientale per far sembrare i suoni riprodotti in una stanza fisica.
+- <strong>Abilita riverbero:</strong> Interruttore principale per gli effetti ambientali.
+- <strong>Dimensioni della stanza:</strong> Regola la dimensione percepita della stanza virtuale.
+- <strong>Smorzamento (Damping):</strong> Controlla la rapidità con cui le alte frequenze vengono assorbite (simulando pareti morbide rispetto a quelle dure).
+- <strong>Livello bagnato / Livello asciutto (Wet/Dry):</strong> Bilancia la quantità di riverbero elaborato rispetto al suono pulito originale.
+- <strong>Ampiezza (Width):</strong> Regola la diffusione stereo della coda del riverbero.</p>
+<h4>4. Scheda Formati Audio</h4>
 <ul>
-<li><strong>Usa FFmpeg:</strong> abilita il supporto per formati audio compressi come MP3, FLAC, M4A e OGG.</li>
-<li><strong>Stato FFmpeg:</strong> Mostra se FFmpeg è installato. In caso contrario, viene fornito un pulsante per scaricarlo ed estrarlo automaticamente (~ 12 MB).</li>
+<li><strong>Usa FFmpeg:</strong> Abilita il supporto per formati audio compressi come MP3, FLAC, M4A e OGG.</li>
+<li><strong>Stato FFmpeg:</strong> Mostra se FFmpeg è installato. In caso contrario, viene fornito un pulsante per scaricarlo ed estrarlo automaticamente (~12 MB).</li>
 </ul>
-<h4>5. Scheda Earcons e regole vocali</h4>
+<h4>5. Scheda Earcons &amp; Regole di Pronuncia</h4>
 <p>Un potente motore di regole per la pronuncia fonetica e i suoni di stato personalizzati.
-- <strong>Elenco regole:</strong> Visualizza tutte le regole attive filtrate per categoria (Ruolo, Stato, Testo, Personaggio, ecc.).
-- <strong>Editor di regole:</strong> Quando aggiungi o modifichi una regola, puoi definire:
-  - <strong>Valore modello/frenesia:</strong> il modello, il ruolo o lo stato regex da abbinare.
-  - <strong>Tipo di azione:</strong> scegli di riprodurre un'onda incorporata, un file wav personalizzato, un segnale acustico, regolare la prosodia (altezza/velocità), sostituire il testo o non fare nulla.
-  - <strong>Azione vocale:</strong> Decidi se NVDA deve mantenere il testo originale, modificare il testo parlato o essere completamente silenziato quando la regola corrisponde.
-  - <strong>Regolazioni audio:</strong> Dispositivo di scorrimento del volume, offset di inizio/fine ritaglio (in millisecondi), tono/durata dei segnali acustici.
-  - <strong>Filtri:</strong> limita la regola ad applicazioni, titoli di finestre o URL di siti Web specifici (supportato da Regex).
-- <strong>Operazioni batch:</strong> esporta/importa dizionari di regole, abilita/disabilita tutte le regole o testa le regole direttamente dall'interfaccia.</p>
+- <strong>Elenco delle regole:</strong> Mostra tutte le regole attive filtrate per categoria (Ruolo, Stato, Testo, Carattere, ecc.).
+- <strong>Editor delle regole:</strong> Quando aggiungi o modifichi una regola, puoi definire:
+  - <strong>Modello / Valore:</strong> Il modello Regex, il ruolo o lo stato da far corrispondere.
+  - <strong>Tipo di azione:</strong> Scegli di riprodurre un wave integrato, un file wav personalizzato, un segnale acustico, regolare la prosodia (tono/velocità), sostituire il testo o non fare nulla.
+  - <strong>Azione vocale:</strong> Decidi se NVDA deve mantenere il testo originale, modificare il testo pronunciato o essere completamente silenziato quando la regola corrisponde.
+  - <strong>Regolazioni audio:</strong> Cursore del volume, offset di ritaglio iniziale/finale (in millisecondi), tonalità/durata per i segnali acustici.
+  - <strong>Filtri:</strong> Limita la regola ad applicazioni specifiche, titoli di finestre o URL di siti Web (è supportata l'espressione regolare Regex).
+- <strong>Operazioni batch:</strong> Esporta/importa dizionari di regole, abilita/disabilita tutte le regole o testa le regole direttamente dall'interfaccia.</p>
 <h4>6. Scheda Varie</h4>
 <p>Configurazione avanzata per i moduli di navigazione.
-- <strong>Navigazione tra frasi (Alt+Frecce):</strong> regola i volumi del segnale acustico per i limiti dei paragrafi, attiva/disattiva gli annunci di formattazione, configura il salto dei riferimenti di Wikipedia, regola la ricostruzione delle frasi tra i paragrafi e definisce caratteri di punteggiatura personalizzati per interrompere frasi/frasi.
-- <strong>Navigazione del testo (Alt+Maiusc+Frecce):</strong> regola il volume del crackle e configura i comportamenti del segnale acustico di fine testo.
-- <strong>Navigazione avanzata del browser (BrowserNav):</strong> regola il volume del crepitio e dei segnali acustici durante la navigazione QuickSearch e salta il volume del segnale acustico disordinato.
-- <strong>Livello di navigazione (NVDA+Windows+N):</strong> configura i timeout di uscita automatica, i suoni delle azioni dei livelli, i tasti pass-through e attiva o disattiva modalità di navigazione specifiche.</p>
-<h4>7. Scheda Ordine vocale</h4>
+- <strong>Navigazione per frasi (Alt+Frecce):</strong> Regola il volume dei segnali acustici per i confini dei paragrafi, attiva gli annunci di formattazione, configura l'omissione dei riferimenti di Wikipedia, regola la ricostruzione della frase tra i paragrafi e definisci caratteri di punteggiatura personalizzati per la suddivisione di frasi/proposizioni.
+- <strong>Navigazione del testo (Alt+Maiusc+Frecce):</strong> Regola il volume del crepitio e configura i comportamenti del segnale acustico di fine testo.
+- <strong>Navigazione web avanzata (BrowserNav):</strong> Regola il volume del crepitio e dei segnali acustici durante la navigazione QuickSearch, e imposta il volume del segnale per saltare il disordine (Skip Clutter).
+- <strong>Livello di navigazione (NVDA+Win+N):</strong> Configura i timeout di uscita automatica, i suoni delle azioni del livello, i tasti pass-through (ignora tasto) e attiva o disattiva modalità di navigazione specifiche.</p>
+<h4>7. Scheda Ordine di Lettura</h4>
 <ul>
-<li><strong>Formato annuncio globale:</strong> Modifica il modo in cui NVDA legge gli elementi a livello globale (ad esempio, Predefinito: Nome -&gt; Ruolo -&gt; Stato o Stato -&gt; Ruolo -&gt; Nome).</li>
-<li><strong>Personalizzazione per ruolo:</strong> utilizza la casella di ricerca per trovare ruoli specifici (come casella di controllo o collegamento) e assegnare un formato di annuncio univoco solo per loro.</li>
+<li><strong>Formato di annuncio globale:</strong> Cambia il modo in cui NVDA legge gli elementi a livello globale (es. Predefinito: Nome -&gt; Ruolo -&gt; Stato, o Stato -&gt; Ruolo -&gt; Nome).</li>
+<li><strong>Personalizzazione per ruolo:</strong> Usa la casella di ricerca per trovare ruoli specifici (come Casella di controllo o Link) e assegna loro un formato di annuncio univoco.</li>
 </ul>
-<h4>8. Scheda Profili app</h4>
+<h4>8. Scheda Profili App</h4>
 <ul>
 <li>Cambia automaticamente le esperienze audio in base all'applicazione attiva.</li>
-<li><strong>Aggiungi profilo:</strong> inserisci un eseguibile dell'applicazione (ad esempio, <code>chrome.exe</code> o <code>devenv.exe</code>) e assegna un tema audio specifico e/o un pacchetto di suoni di digitazione che si attiverà immediatamente quando passi a quell'app.</li>
+<li><strong>Aggiungi profilo:</strong> Inserisci l'eseguibile di un'applicazione (es. <code>chrome.exe</code>) e assegna uno specifico Tema Audio e/o un Pacchetto Suoni di Digitazione che si attiverà istantaneamente quando passi a quell'app.</li>
 </ul>
-<h4>9. Scheda Ricerca rapida e segnalibri</h4>
+<h4>9. Scheda Ricerca Rapida e Segnalibri</h4>
 <ul>
-<li>Gestisci le regole di navigazione specifiche del dominio per la navigazione web.</li>
-<li>Assegna sequenze di tasti (come J o K) per passare rapidamente a elementi specifici (QuickJump), saltare automaticamente menu disordinati (SkipClutter) o eseguire script Python personalizzati (segnalibri di script) su siti Web specifici.</li>
+<li>Gestisci regole di navigazione specifiche per dominio per la navigazione web.</li>
+<li>Assegna tasti (come J o K) per passare rapidamente a elementi specifici (QuickJump), saltare automaticamente i menu disordinati (SkipClutter) o eseguire script Python personalizzati su siti Web specifici.</li>
 </ul>
-<h4>10. Scheda Primo/Ultimo elemento</h4>
+<h4>10. Scheda Primo/Ultimo Elemento</h4>
 <ul>
-<li><strong>Abilita il rilevamento del primo/ultimo elemento:</strong> riproduce un suono unico quando raggiungi la parte superiore o inferiore di un elenco, menu o visualizzazione struttura.</li>
-<li><strong>Ambito di rilevamento:</strong> applicalo universalmente a tutti i ruoli o selettivamente a ruoli specifici (utilizzando il pulsante Seleziona ruoli).</li>
-<li><strong>Comportamento degli elementi singoli:</strong> decidi se gli elementi che sono l'unico elemento in un elenco devono essere trattati come il primo elemento, l'ultimo elemento o ignorati completamente.</li>
+<li><strong>Abilita il rilevamento del primo/ultimo elemento:</strong> Riproduce un suono di "urto" (bump) unico quando raggiungi l'inizio o la fine di un elenco, di un menu o di una visualizzazione ad albero.</li>
+<li><strong>Ambito di rilevamento:</strong> Applica questo universalmente a tutti i ruoli o selettivamente a ruoli specifici (utilizzando il pulsante "Seleziona ruoli").</li>
+<li><strong>Comportamento per gli elementi singoli:</strong> Decidi se gli elementi che sono gli unici presenti in un elenco devono essere trattati come il primo, l'ultimo o essere ignorati completamente.</li>
 </ul>
-<h3>Utilizzo di Temi audio Studio V2</h3>
-<p>Lo Studio Temi Audio ti consente di creare e modificare temi audio. Per aprire lo studio:</p>
+<h3>Utilizzo di Audio Themes Studio V2</h3>
+<p>Audio Themes Studio consente di creare e modificare temi audio. Per aprire lo studio:</p>
 <ol>
-<li>Aprire il menu NVDA (NVDA+N).</li>
-<li>Seleziona "Studio temi audio".</li>
+<li>Apri il menu NVDA (NVDA+N).</li>
+<li>Seleziona "Audio Themes Studio".</li>
 </ol>
-<p>Nello studio potrai:</p>
+<p>Nello studio puoi:</p>
 <ul>
-<li><strong>Crea un nuovo tema audio:</strong> ti guiderà attraverso il processo di creazione di un nuovo tema da zero.</li>
-<li><strong>Personalizza un tema audio esistente:</strong> seleziona questa opzione per modificare i suoni di un tema installato.</li>
-<li><strong>Registra dal microfono:</strong> ora puoi registrare in modo nativo la tua voce o qualsiasi suono direttamente dal microfono per assegnarlo a un evento dell'interfaccia utente!</li>
-<li><strong>Trascina e rilascia:</strong> puoi trascinare e rilasciare i file audio direttamente nella finestra di Studio per assegnarli rapidamente.</li>
-<li><strong>Negozio di temi cloud:</strong> sfoglia, visualizza in anteprima e scarica i temi creati dalla community direttamente all'interno di Studio, senza bisogno di browser esterni.</li>
+<li><strong>Creare un nuovo tema audio:</strong> Questo ti guiderà attraverso il processo di creazione di un nuovo tema da zero.</li>
+<li><strong>Personalizzare un tema audio esistente:</strong> Seleziona questa opzione per modificare i suoni di un tema installato.</li>
+<li><strong>Registrare dal microfono:</strong> Ora puoi registrare nativamente la tua voce o qualsiasi suono direttamente dal tuo microfono per assegnarlo a un evento dell'interfaccia utente!</li>
+<li><strong>Trascina e rilascia (Drag &amp; Drop):</strong> Puoi trascinare e rilasciare file audio direttamente nella finestra di Studio per assegnarli rapidamente.</li>
+<li><strong>Store dei temi nel cloud:</strong> Sfoglia, ascolta in anteprima e scarica i temi creati dalla community direttamente da Studio, senza bisogno di browser esterni.</li>
 </ul>
-<h3>Esportazione del tema</h3>
-<p>Dopo aver creato o modificato un tema, puoi esportarlo come file ".atp" per condividerlo con altri. Puoi trovare l'opzione di esportazione nella schermata di modifica.</p>
-<h2>Regole avanzate e punteggiatura fonetica</h2>
-<p>Earcons e Regole vocali consentono a NVDA di riprodurre gli earcons e altri effetti vocali, come i cambiamenti di prosodia.</p>
+<h3>Esportazione del tuo Tema</h3>
+<p>Dopo aver creato o modificato un tema, puoi esportarlo come file <code>.atp</code> per condividerlo con altri. Troverai l'opzione di esportazione nella schermata di modifica.</p>
+<h2>Regole avanzate e Punteggiatura fonetica</h2>
+<p>Le regole per Earcons e Speech consentono a NVDA di riprodurre earcons (icone acustiche) e altri effetti vocali, come i cambiamenti di prosodia.</p>
 <h3>Utilizzo</h3>
 <ol>
-<li>Assicurati che il componente aggiuntivo sia abilitato. Premi NVDA+Alt+P per attivarlo.</li>
+<li>Assicurati che il componente aggiuntivo sia abilitato. Premi NVDA+Alt+P per attivarlo/disattivarlo.</li>
 <li>Le regole possono essere configurate tramite una finestra di dialogo nel menu delle preferenze di NVDA.</li>
-<li>Per impostazione predefinita avrai una serie di regole audio predefinite.</li>
-<li>Le regole vengono salvate in un file chiamato "earconsAndSpeechRules.json" nella directory di configurazione utente di NVDA.</li>
+<li>Per impostazione predefinita, avrai un set di regole audio predefinite.</li>
+<li>Le regole vengono salvate in un file denominato <code>earconsAndSpeechRules.json</code> nella directory di configurazione utente di NVDA.</li>
 </ol>
-<h3>Verbosità statale</h3>
-<p>Il componente aggiuntivo include una funzionalità che consente di disattivare e nascondere la voce o i suoni per gli stati che potrebbero causare fastidio costante (ad esempio, gli stati "espanso" o "non selezionato").
+<h3>Verbosità dello stato (State Verbosity)</h3>
+<p>Il componente aggiuntivo include una funzione che ti consente di silenziare e nascondere il parlato o i suoni per gli stati che potrebbero causare fastidio costante (ad esempio, gli stati "espanso" o "non selezionato").
 Per utilizzare questa funzione:
-1. Vai alle impostazioni delle Regole vocali e modifica lo stato che desideri disattivare.
-2. Seleziona l'opzione etichettata <strong>"Elimina stato clutter"</strong>.
-3. Ora puoi utilizzare la scorciatoia rapida per attivare/disattivare il livello di verbosità ogni volta che vuoi.
-* È possibile attivare/disattivare questa opzione tramite la scorciatoia del livello <strong>(NVDA+Shift+A poi s)</strong> o tramite la scorciatoia diretta <strong>(NVDA+Alt+[)</strong>.
-* Quando riduci la verbosità, qualsiasi stato per il quale hai abilitato questa opzione verrà disattivato. Quando si aumenta nuovamente la verbosità, il componente aggiuntivo tornerà a leggere normalmente tutti gli stati.</p>
-<h2>Funzionalità avanzate e segreti</h2>
-<p>In questo componente aggiuntivo sono integrate una serie di funzionalità altamente avanzate che potrebbero non essere ovvie a prima vista:</p>
-<h3>1. Livello di navigazione</h3>
+1. Vai alle impostazioni delle Regole vocali e modifica lo stato che desideri silenziare.
+2. Seleziona l'opzione denominata <strong>"Sopprimi disordine di stato" (Suppress state clutter)</strong>.
+3. Ora puoi usare la scorciatoia rapida per cambiare il livello di verbosità ogni volta che lo desideri.
+* Puoi attivare/disattivare questa opzione tramite la scorciatoia del livello <strong>(NVDA+Maiusc+A poi s)</strong> o tramite la scorciatoia diretta <strong>(NVDA+Alt+[)</strong>.
+* Quando riduci la verbosità, qualsiasi stato per cui hai abilitato questa opzione verrà silenziato. Quando aumenti di nuovo la verbosità, il componente aggiuntivo tornerà a leggere normalmente tutti gli stati.</p>
+<h2>Funzionalità avanzate e Segreti</h2>
+<p>In questo componente aggiuntivo sono integrate una serie di funzionalità altamente avanzate che potrebbero non essere evidenti a prima vista:</p>
+<h3>1. Livello di Navigazione</h3>
 <ul>
 <li><strong>Scorciatoia:</strong> <code>NVDA+Win+N</code></li>
-<li><strong>Descrizione:</strong> Una volta entrato in questo livello, non è più necessario tenere premuto "Alt", "Maiusc" o qualsiasi tasto modificatore per navigare. Puoi usare solo i tasti freccia!</li>
-<li><strong>Come usare:</strong></li>
-<li>Utilizza le frecce sinistra/destra per scorrere <strong>27 diverse modalità di navigazione</strong> (carattere, parola, riga, frase, paragrafo, intestazione, collegamento, pulsante, campo di modifica, tabella, ecc.).</li>
-<li>Utilizzare le frecce su/giù per passare all'elemento precedente/successivo in base alla modalità corrente.</li>
-<li>Premi "C" per copiare l'elemento corrente negli appunti.</li>
-<li>Premi "S" per scrivere l'elemento corrente.</li>
-<li>Premi "R" per leggere tutto a partire dall'elemento corrente.</li>
-<li>Premi "Escape" per uscire dal livello.</li>
+<li><strong>Descrizione:</strong> Una volta entrato in questo livello (layer), non hai più bisogno di tenere premuto <code>Alt</code>, <code>Maiusc</code> o qualsiasi tasto modificatore per navigare. Puoi usare solo i tasti freccia!</li>
+<li><strong>Come si usa:</strong></li>
+<li>Usa le Frecce Sinistra/Destra per scorrere tra <strong>27 diverse modalità di navigazione</strong> (Carattere, Parola, Riga, Frase, Paragrafo, Intestazione, Link, Pulsante, Campo di modifica, Tabella, ecc.).</li>
+<li>Usa le Frecce Su/Giù per saltare all'elemento precedente/successivo in base alla modalità corrente.</li>
+<li>Premi <code>C</code> per copiare l'elemento corrente negli appunti.</li>
+<li>Premi <code>S</code> per sillabare l'elemento corrente.</li>
+<li>Premi <code>R</code> per leggere tutto partendo dall'elemento corrente.</li>
+<li>Premi <code>Esc</code> per uscire dal livello.</li>
 </ul>
-<h3>2. Sonar audio</h3>
+<h3>2. Sonar Audio</h3>
 <ul>
-<li><strong>Scorciatoia:</strong> <code>NVDA+Alt+R</code> (o <code>NVDA+Shift+A</code> quindi <code>r</code>)</li>
-<li><strong>Descrizione:</strong> Una funzionalità incredibile che sposta l'intera finestra attiva, raccoglie tutti i controlli al suo interno (pulsanti, elenchi, testi) e riproduce rapidamente i suoni associati da sinistra a destra nello spazio 3D. Questo ti dà una "immagine" sonora del layout della finestra e di quanto è popolata!</li>
+<li><strong>Scorciatoia:</strong> <code>NVDA+Alt+R</code> (o <code>NVDA+Maiusc+A</code> poi <code>r</code>)</li>
+<li><strong>Descrizione:</strong> Una funzione incredibile che analizza l'intera finestra attiva, raccoglie tutti i controlli al suo interno (pulsanti, elenchi, testi) e riproduce rapidamente i loro suoni associati da sinistra a destra nello spazio 3D. Questo ti dà una "immagine" sonora del layout della finestra e di quanto è popolata!</li>
 </ul>
-<h3>3. Segnale audio</h3>
+<h3>3. Segnale Audio (Beacon)</h3>
 <ul>
-<li><strong>Scorciatoia:</strong> <code>NVDA+Shift+B</code> (o <code>NVDA+Shift+A</code> quindi <code>a</code>)</li>
-<li><strong>Descrizione:</strong> Puoi "rilasciare" un segnale audio nella posizione corrente dell'oggetto del navigatore. Ciò è utile per contrassegnare un oggetto e tracciarlo contestualmente durante una scansione del sonar audio.</li>
+<li><strong>Scorciatoia:</strong> <code>NVDA+Maiusc+B</code> (o <code>NVDA+Maiusc+A</code> poi <code>a</code>)</li>
+<li><strong>Descrizione:</strong> Puoi "rilasciare" un segnale audio (beacon) nella posizione corrente dell'oggetto navigatore. Questo è utile per marcare un oggetto e seguirlo contestualmente durante un'analisi del Sonar Audio.</li>
 </ul>
-<h3>4. Livello di comando dei temi audio</h3>
+<h3>4. Livello di Comando Temi Audio</h3>
 <ul>
 <li><strong>Scorciatoia:</strong> <code>NVDA+Maiusc+A</code></li>
-<li><strong>Descrizione:</strong> Invece di memorizzare decine di scorciatoie, entra in questo livello e premi un solo tasto per eseguire un comando:</li>
-<li>"t": attiva/disattiva i temi audio.</li>
-<li><code>p</code>: attiva/disattiva Earcons e regole vocali.</li>
-<li>"n" e "b": tema successivo/precedente.</li>
-<li>"Freccia su" e "Freccia giù": aumenta/diminuisce il volume del tema.</li>
-<li><code>s</code>: attiva/disattiva la verbosità dello stato.</li>
-<li><code>o</code>: cicla rapidamente l'ordine del discorso (ad esempio Nome quindi Ruolo o Ruolo quindi Nome).</li>
-<li>"c" : pronuncia il livello di rotta corrente.</li>
-<li><code>y</code>: scorre i temi.</li>
-<li>"i": scorre i suoni di digitazione.</li>
-<li>"u": attiva/disattiva i suoni di digitazione.</li>
-<li><code>h</code>: Aiuto.</li>
+<li><strong>Descrizione:</strong> Invece di memorizzare dozzine di scorciatoie, entra in questo livello e premi un solo tasto per eseguire un comando:</li>
+<li><code>t</code> : Attiva/disattiva i temi audio.</li>
+<li><code>p</code> : Attiva/disattiva regole vocali e Earcons.</li>
+<li><code>n</code> e <code>b</code> : Tema successivo/precedente.</li>
+<li><code>Freccia Su</code> e <code>Freccia Giù</code> : Aumenta/diminuisci il volume del tema.</li>
+<li><code>s</code> : Attiva/disattiva verbosità di stato.</li>
+<li><code>o</code> : Scorri rapidamente l'ordine di pronuncia (es. Nome poi Ruolo, o Ruolo poi Nome).</li>
+<li><code>c</code> : Pronuncia il livello di intestazione corrente.</li>
+<li><code>y</code> : Scorri i temi.</li>
+<li><code>i</code> : Scorri i suoni di digitazione.</li>
+<li><code>u</code> : Attiva/disattiva i suoni di digitazione.</li>
+<li><code>h</code> : Aiuto.</li>
 </ul>
-<h3>5. Reporting di oggetti 3D</h3>
+<h3>5. Segnalazione Oggetti 3D</h3>
 <ul>
 <li><strong>Scorciatoia:</strong> <code>NVDA+Tab</code></li>
-<li><strong>Descrizione:</strong> Riporta l'oggetto corrente sotto il cursore, ma mappa perfettamente le sue coordinate audio spaziali 3D in modo da poter sentire la sua esatta posizione fisica sullo schermo rispetto al centro.</li>
+<li><strong>Descrizione:</strong> Riporta l'oggetto corrente sotto il cursore, ma mappa perfettamente le sue coordinate audio spaziali 3D in modo che tu possa sentire la sua esatta posizione fisica sullo schermo rispetto al centro.</li>
 </ul>
-<h3>6. Integrazione della barra delle applicazioni</h3>
+<h3>6. Integrazione nel vassoio di sistema (System Tray)</h3>
 <ul>
-<li><strong>Descrizione:</strong> Il componente aggiuntivo inserisce opzioni di accesso rapido direttamente nel menu della barra delle applicazioni di NVDA. Puoi fare clic con il pulsante destro del mouse sull'icona NVDA accanto all'orologio sulla barra delle applicazioni per accedere immediatamente a "Studio temi audio" o attivare/disattivare i temi senza dover aprire la finestra di dialogo completa delle preferenze.</li>
+<li><strong>Descrizione:</strong> Il componente aggiuntivo inietta opzioni di accesso rapido direttamente nel menu della barra delle applicazioni di NVDA (System Tray). Puoi fare clic con il pulsante destro del mouse sull'icona di NVDA accanto all'orologio sulla barra delle applicazioni per accedere istantaneamente ad "Audio Themes Studio" o per attivare/disattivare i temi senza dover aprire la finestra di dialogo completa delle preferenze.</li>
+</ul>
+<h3>7. Suoni di Stato del Sistema (System Status Sounds)</h3>
+<ul>
+<li><strong>Descrizione:</strong> Riproduce segnali audio per eventi a livello di sistema come connessione/disconnessione di dispositivi USB, variazioni di alimentazione CA, stato della batteria, connettività di rete e sospensione/riattivazione del sistema. Tutti gli eventi sono monitorati tramite notifiche native di Windows (nessun polling).</li>
+<li><strong>Eventi:</strong></li>
+<li><strong>Alimentazione CA collegata/scollegata:</strong> Riproduce un suono quando colleghi o scolleghi il cavo di alimentazione del portatile.</li>
+<li><strong>Batteria scarica/critica/carica:</strong> Riproduce avvisi basati su soglie quando il livello della batteria scende sotto percentuali configurabili o quando è completamente carica.</li>
+<li><strong>Dispositivo USB collegato/scollegato:</strong> Rileva qualsiasi connessione o rimozione di un dispositivo USB (tastiere, mouse, chiavette USB, ecc.).</li>
+<li><strong>Montaggio/Smontaggio volume di archiviazione:</strong> Rileva l'assegnazione di lettere di unità per chiavette USB, dischi rigidi esterni e schede SD.</li>
+<li><strong>Rete connessa/disconnessa:</strong> Controlla lo stato della connettività a intervalli configurabili e riproduce un suono ai cambiamenti di stato.</li>
+<li><strong>Riattivazione/sospensione del sistema:</strong> Riproduce suoni quando il computer si riprende dalla modalità di sospensione o vi entra.</li>
+<li><strong>Suoni personalizzati:</strong> Posiziona i file <code>.wav</code> nella cartella del tuo tema con questi nomi:
+  <code>sys_ac_plug.wav</code>, <code>sys_ac_unplug.wav</code>, <code>sys_battery_low.wav</code>, <code>sys_battery_critical.wav</code>, <code>sys_battery_full.wav</code>, <code>sys_usb_plug.wav</code>, <code>sys_usb_unplug.wav</code>, <code>sys_volume_plug.wav</code>, <code>sys_volume_unplug.wav</code>, <code>sys_network_connect.wav</code>, <code>sys_network_disconnect.wav</code>, <code>sys_wake.wav</code>, <code>sys_sleep.wav</code></li>
+<li><strong>Configurazione:</strong> Apri Impostazioni NVDA -&gt; Temi Audio Avanzati -&gt; scheda "Stato del Sistema" per abilitare/disabilitare i singoli eventi, regolare il volume e impostare le soglie della batteria.</li>
 </ul>
 <h2>Scorciatoie da tastiera</h2>
 <table>
 <thead>
 <tr>
-<th>Chiave</th>
+<th>Tasto</th>
 <th>Azione</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>NVDA+Alt+N</strong></td>
-<td>Attiva/disattiva i temi audio. Premi due volte velocemente per attivare/disattivare i suoni di digitazione.</td>
+<td>Attiva/disattiva i temi audio. Premi due volte in rapida successione per attivare/disattivare i suoni di digitazione.</td>
 </tr>
 <tr>
 <td><strong>NVDA+Alt+T</strong></td>
@@ -243,31 +264,31 @@ Per utilizzare questa funzione:
 </tr>
 <tr>
 <td><strong>NVDA+Alt+R</strong></td>
-<td>Sonar audio: sposta la finestra attiva per creare una mappa audio dei suoi elementi.</td>
+<td>Sonar audio: analizza la finestra attiva per creare una mappa audio dei suoi elementi.</td>
 </tr>
 <tr>
-<td><strong>NVDA+MAIUSC+B</strong></td>
-<td>Rilascia/rimuovi un segnalatore audio sull'oggetto del navigatore corrente.</td>
+<td><strong>NVDA+Maiusc+B</strong></td>
+<td>Rilascia/rimuove un segnale audio in corrispondenza dell'oggetto navigatore corrente.</td>
 </tr>
 <tr>
 <td><strong>NVDA+Maiusc+A</strong></td>
-<td>Accedi al livello di comando dei temi audio (premi questo, quindi: h per aiuto, t per attivare/disattivare, p per le regole, n/b per il tema successivo/precedente, frecce su/giù per il volume, y/i/u per scorrere/attivare temi/digitazione, a/r per beacon/sonar, s per verbosità, c per intestazione, o per ordine).</td>
+<td>Accedi al livello dei comandi dei temi audio (premi questo, poi: h per aiuto, t per alternare, p per regole, n/b per tema successivo/precedente, frecce su/giù per il volume, y/i/u per scorrere/alternare temi/digitazione, a/r per segnale/sonar, s per verbosità, c per intestazione, o per ordine di lettura).</td>
 </tr>
 <tr>
 <td><strong>NVDA+Alt+P</strong></td>
-<td>Attiva/disattiva il componente aggiuntivo Earcons e Regole vocali sonore.</td>
+<td>Attiva/disattiva il componente aggiuntivo earcons e regole vocali.</td>
 </tr>
 <tr>
 <td><strong>NVDA+Alt+[</strong></td>
-<td>Attiva/disattiva la modalità di reporting conciso dello stato (Verbosità dello stato).</td>
+<td>Attiva o disattiva la modalità concisa di segnalazione dello stato (verbosità dello stato).</td>
 </tr>
 <tr>
 <td><strong>NVDA+H</strong></td>
-<td>Pronuncia il livello di rotta corrente.</td>
+<td>Pronuncia il livello di intestazione corrente.</td>
 </tr>
 <tr>
 <td><strong>NVDA+Tab</strong></td>
-<td>Segnala l'oggetto sotto il cursore con le coordinate audio 3D complete.</td>
+<td>Riporta l'oggetto sotto il cursore con coordinate audio 3D complete.</td>
 </tr>
 <tr>
 <td><strong>NVDA+Alt+S</strong></td>
@@ -275,30 +296,66 @@ Per utilizzare questa funzione:
 </tr>
 <tr>
 <td><strong>Alt+Frecce</strong></td>
-<td>Navigazione avanzata delle frasi.</td>
+<td>Navigazione avanzata per frasi.</td>
 </tr>
 <tr>
-<td><strong>Alt+Windows+Frecce</strong></td>
-<td>Navigazione avanzata delle frasi.</td>
+<td><strong>Alt+Win+Frecce</strong></td>
+<td>Navigazione avanzata per proposizioni.</td>
 </tr>
 <tr>
 <td><strong>Alt+Maiusc+Frecce</strong></td>
-<td>Navigazione avanzata dei paragrafi.</td>
+<td>Navigazione avanzata per paragrafi.</td>
 </tr>
 <tr>
 <td><strong>NVDA+Alt+Frecce</strong></td>
-<td>Navigazione Web avanzata (BrowserNav).</td>
+<td>Navigazione web avanzata (BrowserNav).</td>
 </tr>
 <tr>
 <td><strong>NVDA+Win+N</strong></td>
-<td>Attiva/disattiva il livello di navigazione (navigazione veloce senza modificatori).</td>
+<td>Attiva il livello di navigazione (navigazione veloce senza modificatori).</td>
 </tr>
 </tbody>
 </table>
+<h2>Compatibility &amp; Requirements</h2>
+<ul>
+<li><strong>NVDA Version:</strong> Requires NVDA 2024.1.0 or later.</li>
+<li><strong>Last Tested NVDA Version:</strong> 2026.1.0</li>
+<li><strong>Operating System:</strong> Windows 10 or Windows 11.</li>
+</ul>
+<h2>Source Code &amp; Repository</h2>
+<p>You can view the source code, report issues, or contribute to the project on GitHub:
+<a href="https://github.com/HassanAlBarshoumy/advanced_audio_themes">Advanced Audio Themes Repository</a></p>
+<h2>Change Log</h2>
+<h3>Version 9.32</h3>
+<ul>
+<li><strong>System Status Sounds:</strong> Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.</li>
+<li><strong>Audio DSP Enhancements:</strong> Completely rewrote the Bass Boost (Low-shelf filter) and Noise Gate algorithms to support correct attack/release times and improved sound quality. Added a full UI in the settings panel to control these DSP effects.</li>
+<li><strong>3D Spatial Audio Fixes:</strong> Resolved an issue causing lag in 3D audio playback for progress bars.</li>
+</ul>
+<h3>Version 9.30 - 9.31</h3>
+<ul>
+<li><strong>Universal First/Last Item Detection:</strong> Added support for first/last item detection for <em>all</em> NVDA roles, instead of just lists and menus.</li>
+<li><strong>Advanced Detection Modes:</strong> Introduced 3 detection modes (smart, strict, any_sibling) with multi-hop traversal to guarantee accurate detection of the first and last elements even in complex web layouts.</li>
+</ul>
+<h3>Version 9.27 - 9.28</h3>
+<ul>
+<li><strong>Role vs State Sounds Priority:</strong> Fixed an issue where state sounds (like "checked") were wrongly suppressing role sounds (like "checkbox").</li>
+<li><strong>Fallback Behaviors:</strong> Added custom fallback settings for first/last item sounds, allowing users to select custom sounds or bypass missing roles.</li>
+<li><strong>Heading Support:</strong> Added support for Heading levels 7, 8, and 9.</li>
+</ul>
+<h3>Version 9.23 - 9.26</h3>
+<ul>
+<li><strong>Sentence Navigation Fixes:</strong> Fixed a bug causing NVDA to endlessly repeat sentences when reading Arabic text in VirtualBuffers.</li>
+<li><strong>NVDA 2026.2 Compatibility:</strong> Migrated to the new <code>NVDAHelper.localLib.generateBeep</code> API to resolve deprecation warnings and ensure stability on future NVDA versions.</li>
+<li><strong>Auto-Update Fix:</strong> Resolved a critical freeze in NVDA during the auto-update download process.</li>
+</ul>
 <h2>Traduttori</h2>
 <ul>
 <li><strong>Spagnolo:</strong> Hassan AlBarshoumy, Luis Carlos González Morales</li>
+<li><strong>Italiano:</strong> [Il tuo nome]</li>
 </ul>
 <h2>Supporto</h2>
-<p>Per eventuali problemi, richieste o segnalazioni di bug, fare riferimento al punto di contatto ufficiale:
-<strong><a href="https://t.me/HassanAlBarshoumy">Telegramma di Hassan AlBarshoumy</a></strong></p></body></html>
+<p>Per qualsiasi problema, richiesta o segnalazione di bug, fai riferimento al punto di contatto ufficiale:
+<strong><a href="https://t.me/HassanAlBarshoumy">Telegram di Hassan AlBarshoumy</a></strong></p>
+</body>
+</html>

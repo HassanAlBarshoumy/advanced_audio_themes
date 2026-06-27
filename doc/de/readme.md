@@ -22,6 +22,8 @@ Dieses Add-on bietet ein immersives Audio-Erlebnis für Nutzer des NVDA-Screenre
 - **Cloud Theme Store:** Laden Sie von der Community erstellte Themes direkt aus dem Audio Themes Studio herunter, hören Sie sie vor und installieren Sie sie.
 - **App-spezifische Profile:** Wechselt automatisch zu einem bestimmten Audio-Theme und Tippgeräusch-Paket basierend auf der aktiven Anwendung.
 
+- **Systemstatus-Sounds:** Spielt Audiohinweise für Ereignisse auf Systemebene ab, z. B. Änderungen der Stromversorgung, Akkustatus, USB-Geräteverbindung und Netzwerkkonnektivität.
+
 ## Entwicklung & Credits
 
 Die Entwicklung und Konsolidierung dieses Add-ons begann Anfang Mai (genauer gesagt am 3. Mai 2026) exklusiv durch **Hassan AlBarshoumy**.
@@ -225,6 +227,19 @@ In dieses Add-on ist eine Reihe hochgradig erweiterter Funktionen integriert, di
 ### 6. System-Tray-Integration
 - **Beschreibung:** Das Add-on fügt Schnellzugriffsoptionen direkt in das NVDA-System-Tray-Menü ein. Sie können mit der rechten Maustaste auf das NVDA-Symbol neben der Uhr in Ihrer Taskleiste klicken, um sofort auf das "Audio Themes Studio" zuzugreifen oder die Themes ein- und auszuschalten, ohne den vollständigen Einstellungsdialog öffnen zu müssen.
 
+### 7. Systemstatus-Sounds
+- **Beschreibung:** Spielt Audiohinweise für Ereignisse auf Systemebene ab, z. B. USB-Geräte anschließen/entfernen, Änderungen der Stromversorgung, Akkustatus, Netzwerkkonnektivität und Systemruhezustand/-aufwachen. Alle Ereignisse werden durch native Windows-Benachrichtigungen überwacht (kein Polling).
+- **Ereignisse:**
+  - **Netzstrom angeschlossen/getrennt:** Spielt einen Ton ab, wenn Sie das Stromkabel Ihres Laptops anschließen oder abziehen.
+  - **Akku niedrig/kritisch/voll:** Spielt schwellenwertbasierte Warnungen ab, wenn der Akkustand unter konfigurierbare Prozentsätze fällt oder wenn er vollständig aufgeladen ist.
+  - **USB-Gerät angeschlossen/getrennt:** Erkennt jede Verbindung oder Entfernung eines USB-Geräts (Tastaturen, Mäuse, Flash-Laufwerke usw.).
+  - **Speichervolumen bereitgestellt/ausgeworfen:** Erkennt die Zuweisung von Laufwerksbuchstaben für Flash-Laufwerke, externe Festplatten und SD-Karten.
+  - **Netzwerk verbunden/getrennt:** Überprüft den Verbindungsstatus in konfigurierbaren Intervallen und spielt bei Statusänderungen einen Ton ab.
+  - **System aufwachen/Ruhezustand:** Spielt Töne ab, wenn der Computer aus dem Ruhezustand zurückkehrt oder in diesen wechselt.
+- **Benutzerdefinierte Sounds:** Platzieren Sie `.wav`-Dateien mit diesen Namen in Ihrem Theme-Ordner:
+  `sys_ac_plug.wav`, `sys_ac_unplug.wav`, `sys_battery_low.wav`, `sys_battery_critical.wav`, `sys_battery_full.wav`, `sys_usb_plug.wav`, `sys_usb_unplug.wav`, `sys_volume_plug.wav`, `sys_volume_unplug.wav`, `sys_network_connect.wav`, `sys_network_disconnect.wav`, `sys_wake.wav`, `sys_sleep.wav`
+- **Konfiguration:** Öffnen Sie NVDA-Einstellungen -> Erweiterte Audio-Themes -> Registerkarte "Systemstatus", um einzelne Ereignisse zu aktivieren/deaktivieren, die Lautstärke anzupassen und Akkuschwellenwerte festzulegen.
+
 ## Tastenkombinationen
 
 | Taste | Aktion |
@@ -246,6 +261,36 @@ In dieses Add-on ist eine Reihe hochgradig erweiterter Funktionen integriert, di
 | **Alt+Umschalt+Pfeiltasten** | Erweiterte Absatznavigation. |
 | **NVDA+Alt+Pfeiltasten** | Erweiterte Webnavigation (BrowserNav). |
 | **NVDA+Win+N** | Navigationsebene umschalten (schnelle Navigation ohne Modifikatoren). |
+
+## Compatibility & Requirements
+- **NVDA Version:** Requires NVDA 2024.1.0 or later.
+- **Last Tested NVDA Version:** 2026.1.0
+- **Operating System:** Windows 10 or Windows 11.
+
+## Source Code & Repository
+You can view the source code, report issues, or contribute to the project on GitHub:
+[Advanced Audio Themes Repository](https://github.com/HassanAlBarshoumy/advanced_audio_themes)
+
+## Change Log
+
+### Version 9.32
+- **System Status Sounds:** Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
+- **Audio DSP Enhancements:** Completely rewrote the Bass Boost (Low-shelf filter) and Noise Gate algorithms to support correct attack/release times and improved sound quality. Added a full UI in the settings panel to control these DSP effects.
+- **3D Spatial Audio Fixes:** Resolved an issue causing lag in 3D audio playback for progress bars.
+
+### Version 9.30 - 9.31
+- **Universal First/Last Item Detection:** Added support for first/last item detection for *all* NVDA roles, instead of just lists and menus.
+- **Advanced Detection Modes:** Introduced 3 detection modes (smart, strict, any_sibling) with multi-hop traversal to guarantee accurate detection of the first and last elements even in complex web layouts.
+
+### Version 9.27 - 9.28
+- **Role vs State Sounds Priority:** Fixed an issue where state sounds (like "checked") were wrongly suppressing role sounds (like "checkbox").
+- **Fallback Behaviors:** Added custom fallback settings for first/last item sounds, allowing users to select custom sounds or bypass missing roles.
+- **Heading Support:** Added support for Heading levels 7, 8, and 9.
+
+### Version 9.23 - 9.26
+- **Sentence Navigation Fixes:** Fixed a bug causing NVDA to endlessly repeat sentences when reading Arabic text in VirtualBuffers.
+- **NVDA 2026.2 Compatibility:** Migrated to the new `NVDAHelper.localLib.generateBeep` API to resolve deprecation warnings and ensure stability on future NVDA versions.
+- **Auto-Update Fix:** Resolved a critical freeze in NVDA during the auto-update download process.
 
 ## Übersetzer
 

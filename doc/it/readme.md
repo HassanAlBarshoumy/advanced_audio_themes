@@ -22,6 +22,8 @@ Questo componente aggiuntivo offre un'esperienza audio immersiva per gli utenti 
 - **Store dei temi nel cloud:** Scarica, ascolta in anteprima e installa i temi creati dalla comunità direttamente dall'interno di Audio Themes Studio.
 - **Profili specifici dell'app:** Passa automaticamente a un tema audio e a un pacchetto di suoni di digitazione specifici in base all'applicazione attiva.
 
+- **Suoni di Stato del Sistema (System Status Sounds):** Riproduce segnali audio per eventi a livello di sistema come variazioni di alimentazione CA, stato della batteria, connessione di dispositivi USB e connettività di rete.
+
 ## Sviluppo e Riconoscimenti
 
 Lo sviluppo e il consolidamento di questo componente aggiuntivo sono iniziati all'inizio di maggio (precisamente il 3 maggio 2026) esclusivamente da parte di **Hassan AlBarshoumy**.
@@ -225,6 +227,19 @@ In questo componente aggiuntivo sono integrate una serie di funzionalità altame
 ### 6. Integrazione nel vassoio di sistema (System Tray)
 - **Descrizione:** Il componente aggiuntivo inietta opzioni di accesso rapido direttamente nel menu della barra delle applicazioni di NVDA (System Tray). Puoi fare clic con il pulsante destro del mouse sull'icona di NVDA accanto all'orologio sulla barra delle applicazioni per accedere istantaneamente ad "Audio Themes Studio" o per attivare/disattivare i temi senza dover aprire la finestra di dialogo completa delle preferenze.
 
+### 7. Suoni di Stato del Sistema (System Status Sounds)
+- **Descrizione:** Riproduce segnali audio per eventi a livello di sistema come connessione/disconnessione di dispositivi USB, variazioni di alimentazione CA, stato della batteria, connettività di rete e sospensione/riattivazione del sistema. Tutti gli eventi sono monitorati tramite notifiche native di Windows (nessun polling).
+- **Eventi:**
+  - **Alimentazione CA collegata/scollegata:** Riproduce un suono quando colleghi o scolleghi il cavo di alimentazione del portatile.
+  - **Batteria scarica/critica/carica:** Riproduce avvisi basati su soglie quando il livello della batteria scende sotto percentuali configurabili o quando è completamente carica.
+  - **Dispositivo USB collegato/scollegato:** Rileva qualsiasi connessione o rimozione di un dispositivo USB (tastiere, mouse, chiavette USB, ecc.).
+  - **Montaggio/Smontaggio volume di archiviazione:** Rileva l'assegnazione di lettere di unità per chiavette USB, dischi rigidi esterni e schede SD.
+  - **Rete connessa/disconnessa:** Controlla lo stato della connettività a intervalli configurabili e riproduce un suono ai cambiamenti di stato.
+  - **Riattivazione/sospensione del sistema:** Riproduce suoni quando il computer si riprende dalla modalità di sospensione o vi entra.
+- **Suoni personalizzati:** Posiziona i file `.wav` nella cartella del tuo tema con questi nomi:
+  `sys_ac_plug.wav`, `sys_ac_unplug.wav`, `sys_battery_low.wav`, `sys_battery_critical.wav`, `sys_battery_full.wav`, `sys_usb_plug.wav`, `sys_usb_unplug.wav`, `sys_volume_plug.wav`, `sys_volume_unplug.wav`, `sys_network_connect.wav`, `sys_network_disconnect.wav`, `sys_wake.wav`, `sys_sleep.wav`
+- **Configurazione:** Apri Impostazioni NVDA -> Temi Audio Avanzati -> scheda "Stato del Sistema" per abilitare/disabilitare i singoli eventi, regolare il volume e impostare le soglie della batteria.
+
 ## Scorciatoie da tastiera
 
 | Tasto | Azione |
@@ -246,6 +261,36 @@ In questo componente aggiuntivo sono integrate una serie di funzionalità altame
 | **Alt+Maiusc+Frecce** | Navigazione avanzata per paragrafi. |
 | **NVDA+Alt+Frecce** | Navigazione web avanzata (BrowserNav). |
 | **NVDA+Win+N** | Attiva il livello di navigazione (navigazione veloce senza modificatori). |
+
+## Compatibility & Requirements
+- **NVDA Version:** Requires NVDA 2024.1.0 or later.
+- **Last Tested NVDA Version:** 2026.1.0
+- **Operating System:** Windows 10 or Windows 11.
+
+## Source Code & Repository
+You can view the source code, report issues, or contribute to the project on GitHub:
+[Advanced Audio Themes Repository](https://github.com/HassanAlBarshoumy/advanced_audio_themes)
+
+## Change Log
+
+### Version 9.32
+- **System Status Sounds:** Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
+- **Audio DSP Enhancements:** Completely rewrote the Bass Boost (Low-shelf filter) and Noise Gate algorithms to support correct attack/release times and improved sound quality. Added a full UI in the settings panel to control these DSP effects.
+- **3D Spatial Audio Fixes:** Resolved an issue causing lag in 3D audio playback for progress bars.
+
+### Version 9.30 - 9.31
+- **Universal First/Last Item Detection:** Added support for first/last item detection for *all* NVDA roles, instead of just lists and menus.
+- **Advanced Detection Modes:** Introduced 3 detection modes (smart, strict, any_sibling) with multi-hop traversal to guarantee accurate detection of the first and last elements even in complex web layouts.
+
+### Version 9.27 - 9.28
+- **Role vs State Sounds Priority:** Fixed an issue where state sounds (like "checked") were wrongly suppressing role sounds (like "checkbox").
+- **Fallback Behaviors:** Added custom fallback settings for first/last item sounds, allowing users to select custom sounds or bypass missing roles.
+- **Heading Support:** Added support for Heading levels 7, 8, and 9.
+
+### Version 9.23 - 9.26
+- **Sentence Navigation Fixes:** Fixed a bug causing NVDA to endlessly repeat sentences when reading Arabic text in VirtualBuffers.
+- **NVDA 2026.2 Compatibility:** Migrated to the new `NVDAHelper.localLib.generateBeep` API to resolve deprecation warnings and ensure stability on future NVDA versions.
+- **Auto-Update Fix:** Resolved a critical freeze in NVDA during the auto-update download process.
 
 ## Traduttori
 

@@ -22,6 +22,8 @@
 - **Облачный магазин тем (Cloud Theme Store):** Скачивайте, прослушивайте и устанавливайте темы, созданные сообществом, прямо из Студии Аудио Тем.
 - **Профили приложений:** Автоматически переключайтесь на определенную аудио тему и пакет звуков набора текста в зависимости от активного приложения.
 
+- **Звуки состояния системы (System Status Sounds):** Воспроизводит звуковые сигналы для событий системного уровня, таких как изменения питания от сети переменного тока, состояние батареи, подключение USB-устройств и подключение к сети.
+
 ## Разработка и благодарности
 
 Разработка и объединение этого дополнения начались в начале мая (а именно 3 мая 2026 года) исключительно усилиями **Hassan AlBarshoumy**.
@@ -225,6 +227,19 @@
 ### 6. Интеграция в системный трей (System Tray)
 - **Описание:** Дополнение внедряет параметры быстрого доступа прямо в меню системного трея NVDA. Вы можете щелкнуть правой кнопкой мыши значок NVDA рядом с часами на панели задач, чтобы мгновенно получить доступ к "Audio Themes Studio" или включить/выключить темы без необходимости открывать диалоговое окно полных настроек.
 
+### 7. Звуки состояния системы (System Status Sounds)
+- **Описание:** Воспроизводит звуковые сигналы для событий системного уровня, таких как подключение/отключение USB-устройств, изменения питания от сети переменного тока, состояние батареи, подключение к сети и переход в спящий режим/выход из него. Все события отслеживаются через нативные уведомления Windows (без опроса).
+- **События:**
+  - **Питание подключено/отключено:** Воспроизводит звук при подключении или отключении кабеля питания ноутбука.
+  - **Батарея разряжена/критически разряжена/полностью заряжена:** Воспроизводит оповещения на основе пороговых значений, когда уровень заряда батареи падает ниже настраиваемых процентов или когда она полностью заряжена.
+  - **Устройство USB подключено/отключено:** Обнаруживает любое подключение или извлечение USB-устройства (клавиатуры, мыши, флэш-накопители и т. д.).
+  - **Монтирование/размонтирование тома хранилища:** Обнаруживает назначение буквы диска для флэш-накопителей, внешних жестких дисков и SD-карт.
+  - **Сеть подключена/отключена:** Проверяет состояние подключения через настраиваемые интервалы и воспроизводит звук при изменении состояния.
+  - **Пробуждение/Сон системы:** Воспроизводит звуки, когда компьютер выходит из спящего режима или переходит в него.
+- **Пользовательские звуки:** Поместите файлы `.wav` в папку вашей темы со следующими именами:
+  `sys_ac_plug.wav`, `sys_ac_unplug.wav`, `sys_battery_low.wav`, `sys_battery_critical.wav`, `sys_battery_full.wav`, `sys_usb_plug.wav`, `sys_usb_unplug.wav`, `sys_volume_plug.wav`, `sys_volume_unplug.wav`, `sys_network_connect.wav`, `sys_network_disconnect.wav`, `sys_wake.wav`, `sys_sleep.wav`
+- **Конфигурация:** Откройте «Настройки NVDA» -> «Расширенные звуковые темы» -> вкладка «Состояние системы», чтобы включить/отключить отдельные события, отрегулировать громкость и установить пороговые значения батареи.
+
 ## Горячие клавиши (Клавиатурные сокращения)
 
 | Клавиша | Действие |
@@ -246,6 +261,36 @@
 | **Alt+Shift+Стрелки** | Расширенная навигация по абзацам. |
 | **NVDA+Alt+Стрелки** | Расширенная веб-навигация (BrowserNav). |
 | **NVDA+Win+N** | Включить/выключить Слой навигации (быстрарая навигация без модификаторов). |
+
+## Compatibility & Requirements
+- **NVDA Version:** Requires NVDA 2024.1.0 or later.
+- **Last Tested NVDA Version:** 2026.1.0
+- **Operating System:** Windows 10 or Windows 11.
+
+## Source Code & Repository
+You can view the source code, report issues, or contribute to the project on GitHub:
+[Advanced Audio Themes Repository](https://github.com/HassanAlBarshoumy/advanced_audio_themes)
+
+## Change Log
+
+### Version 9.32
+- **System Status Sounds:** Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
+- **Audio DSP Enhancements:** Completely rewrote the Bass Boost (Low-shelf filter) and Noise Gate algorithms to support correct attack/release times and improved sound quality. Added a full UI in the settings panel to control these DSP effects.
+- **3D Spatial Audio Fixes:** Resolved an issue causing lag in 3D audio playback for progress bars.
+
+### Version 9.30 - 9.31
+- **Universal First/Last Item Detection:** Added support for first/last item detection for *all* NVDA roles, instead of just lists and menus.
+- **Advanced Detection Modes:** Introduced 3 detection modes (smart, strict, any_sibling) with multi-hop traversal to guarantee accurate detection of the first and last elements even in complex web layouts.
+
+### Version 9.27 - 9.28
+- **Role vs State Sounds Priority:** Fixed an issue where state sounds (like "checked") were wrongly suppressing role sounds (like "checkbox").
+- **Fallback Behaviors:** Added custom fallback settings for first/last item sounds, allowing users to select custom sounds or bypass missing roles.
+- **Heading Support:** Added support for Heading levels 7, 8, and 9.
+
+### Version 9.23 - 9.26
+- **Sentence Navigation Fixes:** Fixed a bug causing NVDA to endlessly repeat sentences when reading Arabic text in VirtualBuffers.
+- **NVDA 2026.2 Compatibility:** Migrated to the new `NVDAHelper.localLib.generateBeep` API to resolve deprecation warnings and ensure stability on future NVDA versions.
+- **Auto-Update Fix:** Resolved a critical freeze in NVDA during the auto-update download process.
 
 ## Переводчики
 

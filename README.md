@@ -1,44 +1,68 @@
-# Audio Themes NG & Phonetic Punctuation
+# Advanced Audio Themes
 
-An NVDA add-on that provides an immersive audio experience through customizable sound themes, 3D positional audio, earcon rules, and advanced navigation tools.
+This add-on provides an immersive audio experience for NVDA screen reader users by playing sounds for various UI events. It allows for the creation, installation, and customization of audio themes, enhancing the auditory feedback from the user interface.
 
 ## Features
 
-- **Audio Themes:** Plays spatial sounds for UI events — focus changes, navigation, menus, and more.
-- **3D Audio:** Steam Audio engine for positional audio that maps UI element locations.
+- **Audio effects:** Plays sounds for UI events such as focusing on controls, navigating lists, and more.
+- **3D Audio:** Utilizes Steam Audio to provide 3D positional audio, giving a sense of where controls are on the screen.
 - **Advanced Audio DSP:** Real-time audio processing including Bass Boost, Noise Gate, Silence Trimming, Smart Volume Normalization, and Smooth Envelopes.
 - **Audio Ducking:** Automatically lowers theme volume when NVDA speaks to ensure speech clarity.
-- **Reverb:** Realistic room simulation and acoustic effects.
-- **Audio Themes Studio V2:** Built-in theme editor with microphone recording and drag-and-drop.
-- **Advanced Typing Sounds:** Physical keyboard simulation with spatial positioning, dynamic velocity, and per-key mapping.
+- **Reverb:** Adds reverb effects to the audio for a more immersive experience.
+- **Customizable Themes:** Allows users to create, install, and switch between different audio themes.
+- **Audio Themes Studio V2:** A built-in tool to create new audio themes or edit existing ones directly from the microphone or via drag & drop.
+- **Extended Audio Formats:** Built-in FFmpeg support for MP3, FLAC, OGG, M4A, and more.
+- **Advanced Typing Sounds:** Simulates physical keyboard typing with spatial audio positioning, dynamic velocity volume adjustments, and smart key mapping for special keys (Enter, Backspace, Space, Shift, Ctrl, Alt).
 - **Context-Aware Typing:** Option to restrict typing sounds to play only within editable text fields.
 - **Smart Progress Bars:** Dynamic pitch shifting for progress bars (higher pitch = higher percentage).
 - **First/Last Item Detection:** Plays a specific bump sound when reaching the boundary of a list or menu.
 - **Audio Beacon / Sonar:** Drop a spatial audio beacon at any location on the screen and navigate around to hear real-time sonar pings guiding you relative to the beacon.
-- **Extended Audio Formats:** Built-in FFmpeg support for MP3, FLAC, OGG, M4A, and more.
-- **Earcons & Speech Rules:** Custom audio cues and prosody changes for words, characters, roles, states, and formatting.
-- **Phonetic Punctuation:** Hear punctuation marks as distinct sounds instead of spoken names.
-- **Sentence Navigation (SentenceNav):** Alt+Arrow keys for phrase/ sentence navigation.
-- **Browser Navigation (BrowserNav):** NVDA+Alt+Arrow keys for advanced web navigation.
-- **Navigation Layer:** Press NVDA+Win+N to enter a fast navigation mode where arrow keys move by elements without holding modifiers.
+- **Advanced Navigation:** Integrated SentenceNav and BrowserNav engines for seamless text and web navigation without conflicting arrow keys.
+- **Navigation Layer:** Press NVDA+Win+N to enter a fast navigation mode where arrow keys move by sentences, paragraphs, or other elements without holding modifiers.
 - **Cloud Theme Store:** Download, preview, and install community-created themes directly from within the Audio Themes Studio.
 - **App-Specific Profiles:** Automatically switch to a specific audio theme and typing sound pack based on the active application.
 
+- **System Status Sounds:** Plays audio cues for system-level events such as AC power changes, battery status, USB device connection, and network connectivity.
+
+## Development & Credits
+
+The development and consolidation of this add-on began in early May (specifically May 3, 2026) exclusively by **Hassan AlBarshoumy**.
+
+All code refactoring, structural consolidations, and GUI integrations (including the Audio Themes Studio V2 and unified Settings dialogs) were performed to ensure maximum stability and compatibility with NVDA 2026.1+.
+
+**Main Developer and Consolidator:**
+* Hassan AlBarshoumy
+
+**Credits & Acknowledgments:**
+This add-on heavily benefited from the merging and development of previous open-source projects in the NVDA community. Special thanks to the original developers:
+* **Ahmed Sami:** Original developer of the navSounds (Navigation Sound Effects) add-on and for his contributions.
+* **Musharraf Omer:** Original developer of the Audio Themes 3D add-on.
+* **Tony Malykh:** Original developer of the Earcons and Speech Rules, BrowserNav, SentenceNav, and TextNav add-ons.
+* **Austin Hicks & Bryan Smart:** Original developers of the Unspoken add-on.
+
+**Contact & Updates:** [https://t.me/HassanAlBarshoumy](https://t.me/HassanAlBarshoumy)
+
 ## Installation
 
-1. Download the latest `.nvda-addon` release from the [Releases](https://github.com/HassanAlBarshoumy/advanced_audio_themes/releases) page.
-2. Open the file — NVDA will prompt for confirmation.
-3. Restart NVDA.
+1. Download the latest release of the add-on from Hassan's official channel.
+2. Open the downloaded `.nvda-addon` file.
+3. NVDA will ask you to confirm the installation. Choose "Yes".
+4. Restart NVDA to complete the installation.
 
-## Getting Started
+## How to Use
 
-### Enabling / Disabling Audio Themes
+### Enabling/Disabling Audio Themes
 
-NVDA menu → Preferences → Settings → Audio Themes. Toggle "Enable audio themes".
+You can enable or disable the audio themes feature in NVDA's settings:
 
-### Switching Themes
+1. Open the NVDA menu (NVDA+N).
+2. Go to "Preferences" -> "Settings".
+3. In the settings dialog, select the "Audio Themes" category.
+4. Check or uncheck the "Enable audio themes" checkbox.
 
-NVDA menu → Preferences → Settings → Audio Themes, or press NVDA+Alt+T to cycle.
+### Selecting and Managing Themes
+
+- **About a theme:** Click the "About" button to see information about the selected theme.
 
 ### Settings Tabs Overview
 
@@ -118,9 +142,36 @@ Advanced configuration for navigation modules.
 #### 10. First/Last Item Tab
 - **Enable first/last item detection:** Plays a unique bump sound when you reach the top or bottom of a list, menu, or treeview.
 - **Detection scope:** Apply this universally to all roles, or selectively to specific roles (using the Select Roles button).
-### Opening the Studio
+- **Solo items behavior:** Decide if items that are the only element in a list should be treated as the first item, the last item, or ignored completely.
 
-NVDA menu → Audio Themes Studio (or NVDA+Shift+A then 's').
+### Using the Audio Themes Studio V2
+
+The Audio Themes Studio allows you to create and edit audio themes. To open the studio:
+
+1. Open the NVDA menu (NVDA+N).
+2. Select "Audio Themes Studio".
+
+In the studio, you can:
+
+- **Create a new audio theme:** This will guide you through the process of creating a new theme from scratch.
+- **Customize an existing audio theme:** Select this option to modify the sounds of an installed theme.
+- **Record from Microphone:** You can now natively record your voice or any sound directly from your microphone to be assigned to a UI event!
+- **Drag & Drop:** You can drag and drop audio files directly into the Studio window to assign them rapidly.
+- **Cloud Theme Store:** Browse, preview, and download community-created themes directly within the Studio, without needing external browsers.
+
+### Exporting Your Theme
+
+After creating or editing a theme, you can export it as an `.atp` file to share it with others. You can find the export option in the editing screen.
+
+## Advanced Rules & Phonetic Punctuation
+
+Earcons and Speech Rules allow NVDA to play earcons as well as other speech effects, such as prosody changes.
+
+### Usage
+1. Make sure the add-on is enabled. Press NVDA+Alt+P to toggle it.
+2. Rules can be configured via a dialog box in NVDA preferences menu.
+3. By default you will have a set of predefined audio rules.
+4. The rules are saved in a file called `earconsAndSpeechRules.json` in your NVDA user configuration directory.
 
 ### State Verbosity
 The add-on includes a feature that allows you to mute and hide the speech or sounds for states that might cause constant annoyance (e.g., the "expanded" or "not selected" states).
@@ -176,49 +227,81 @@ A set of highly advanced features are integrated into this add-on which might no
 ### 6. System Tray Integration
 - **Description:** The add-on injects quick-access options directly into NVDA's System Tray menu. You can right-click the NVDA icon next to the clock on your taskbar to instantly access the "Audio Themes Studio" or toggle the themes on/off without needing to open the full preferences dialog.
 
+### 7. System Status Sounds
+- **Description:** Plays audio cues for system-level events such as USB device plug/unplug, AC power changes, battery status, network connectivity, and system sleep/wake. All events are monitored through Windows native notifications (no polling).
+- **Events:**
+  - **AC Power Connected/Disconnected:** Plays a sound when you plug or unplug your laptop power cord.
+  - **Battery Low/Critical/Full:** Plays threshold-based alerts when battery level drops below configurable percentages, or when fully charged.
+  - **USB Device Plug/Unplug:** Detects any USB device connection or removal (keyboards, mice, flash drives, etc.).
+  - **Storage Volume Mount/Unmount:** Detects drive letter assignment for flash drives, external hard drives, and SD cards.
+  - **Network Connect/Disconnect:** Checks connectivity status at configurable intervals and plays sound on state changes.
+  - **System Wake/Sleep:** Plays sounds when the computer resumes from or enters sleep mode.
+- **Custom Sounds:** Place `.wav` files in your theme folder with these names:
+  `sys_ac_plug.wav`, `sys_ac_unplug.wav`, `sys_battery_low.wav`, `sys_battery_critical.wav`, `sys_battery_full.wav`, `sys_usb_plug.wav`, `sys_usb_unplug.wav`, `sys_volume_plug.wav`, `sys_volume_unplug.wav`, `sys_network_connect.wav`, `sys_network_disconnect.wav`, `sys_wake.wav`, `sys_sleep.wav`
+- **Configuration:** Open NVDA Settings -> Advanced Audio Themes -> "System Status" tab to enable/disable individual events, adjust volume, and set battery thresholds.
+
 ## Keyboard Shortcuts
 
 | Key | Action |
 | --- | ------ |
-| NVDA+Alt+N | Toggle Audio Themes (press twice for Typing Sounds) |
-| NVDA+Alt+T | Cycle audio themes |
-| NVDA+Alt+Y | Cycle typing sound packs |
-| NVDA+Alt+K | Toggle typing sounds |
-| NVDA+Alt+R | Audio Sonar: sweep active window for an audio map |
-| NVDA+Shift+B | Drop / remove audio beacon |
-| NVDA+Shift+A | Audio Themes command layer (h=help, t=toggle, p=rules, n/b=next/prev theme, arrows=volume, y/i/u=cycle/toggle, a/r=beacon/sonar, s=verbosity, c=heading, o=order) |
-| NVDA+Alt+P | Toggle earcons and speech rules |
-| NVDA+Alt+[ | Toggle concise state reporting |
-| NVDA+H | Speak current heading level |
-| NVDA+Tab | Report object with 3D coordinates |
-| NVDA+Alt+S | Speak current sentence (SentenceNav) |
-| Alt+Arrows | Sentence navigation |
-| Alt+Windows+Arrows | Phrase navigation |
-| Alt+Shift+Arrows | Paragraph navigation |
-| NVDA+Alt+Arrows | Web browser navigation |
-| NVDA+Win+N | Toggle Navigation Layer (fast navigation without modifiers) |
+| **NVDA+Alt+N** | Toggle Audio Themes on/off. Press twice quickly to toggle Typing Sounds. |
+| **NVDA+Alt+T** | Cycle through available Audio Themes. |
+| **NVDA+Alt+Y** | Cycle through available Typing Sound packs. |
+| **NVDA+Alt+K** | Toggle Typing Sounds on/off. |
+| **NVDA+Alt+R** | Audio Sonar: Sweeps the active window to create an audio map of its elements. |
+| **NVDA+Shift+B** | Drop/Remove an Audio Beacon at the current navigator object. |
+| **NVDA+Shift+A** | Enter Audio Themes Command Layer (press this, then: h for help, t to toggle, p for rules, n/b for next/prev theme, up/down arrows for volume, y/i/u to cycle/toggle themes/typing, a/r for beacon/sonar, s for verbosity, c for heading, o for order). |
+| **NVDA+Alt+P** | Toggle earcons and sound speech rules add-on. |
+| **NVDA+Alt+[** | Toggle concise state reporting mode (State Verbosity). |
+| **NVDA+H** | Speak current heading level. |
+| **NVDA+Tab** | Report the object under the cursor with full 3D audio coordinates. |
+| **NVDA+Alt+S** | Speak current sentence (SentenceNav). |
+| **Alt+Arrows** | Advanced Sentence Navigation. |
+| **Alt+Windows+Arrows** | Advanced Phrase Navigation. |
+| **Alt+Shift+Arrows** | Advanced Paragraph Navigation. |
+| **NVDA+Alt+Arrows** | Advanced Web Navigation (BrowserNav). |
+| **NVDA+Win+N** | Toggle Navigation Layer (fast navigation without modifiers). |
 
-## Credits
+## Compatibility & Requirements
+- **NVDA Version:** Requires NVDA 2024.1.0 or later.
+- **Last Tested NVDA Version:** 2026.1.0
+- **Operating System:** Windows 10 or Windows 11.
 
-The development and consolidation of this add-on began in early May (specifically May 3, 2026) exclusively by **Hassan AlBarshoumy**.
+## Source Code & Repository
+You can view the source code, report issues, or contribute to the project on GitHub:
+[Advanced Audio Themes Repository](https://github.com/HassanAlBarshoumy/advanced_audio_themes)
 
-All code refactoring, structural consolidations, and GUI integrations (including the Audio Themes Studio V2 and unified Settings dialogs) were performed to ensure maximum stability and compatibility with NVDA 2026.1+.
+## Change Log
 
-**Main Developer and Consolidator:**
-* Hassan AlBarshoumy
+### Version 9.32
+- **System Status Sounds:** Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
+- **Audio DSP Enhancements:** Completely rewrote the Bass Boost (Low-shelf filter) and Noise Gate algorithms to support correct attack/release times and improved sound quality. Added a full UI in the settings panel to control these DSP effects.
+- **3D Spatial Audio Fixes:** Resolved an issue causing lag in 3D audio playback for progress bars.
 
-**Acknowledgments:**
-This add-on heavily benefited from the merging and development of previous open-source projects in the NVDA community. Special thanks to the original developers:
-* **Ahmed Sami:** Original developer of the navSounds (Navigation Sound Effects) add-on and for his contributions.
-* **Musharraf Omer:** Original developer of the Audio Themes 3D add-on.
-* **Tony Malykh:** Original developer of the Earcons and Speech Rules, BrowserNav, SentenceNav, and TextNav add-ons.
-* **Austin Hicks & Bryan Smart:** Original developers of the Unspoken add-on.
+### Version 9.30 - 9.31
+- **Universal First/Last Item Detection:** Added support for first/last item detection for *all* NVDA roles, instead of just lists and menus.
+- **Advanced Detection Modes:** Introduced 3 detection modes (smart, strict, any_sibling) with multi-hop traversal to guarantee accurate detection of the first and last elements even in complex web layouts.
 
-## Links
+### Version 9.27 - 9.28
+- **Role vs State Sounds Priority:** Fixed an issue where state sounds (like "checked") were wrongly suppressing role sounds (like "checkbox").
+- **Fallback Behaviors:** Added custom fallback settings for first/last item sounds, allowing users to select custom sounds or bypass missing roles.
+- **Heading Support:** Added support for Heading levels 7, 8, and 9.
 
-- **Telegram:** [t.me/HassanAlBarshoumy](https://t.me/HassanAlBarshoumy)
-- **GitHub:** [github.com/HassanAlBarshoumy/advanced_audio_themes](https://github.com/HassanAlBarshoumy/advanced_audio_themes)
+### Version 9.23 - 9.26
+- **Sentence Navigation Fixes:** Fixed a bug causing NVDA to endlessly repeat sentences when reading Arabic text in VirtualBuffers.
+- **NVDA 2026.2 Compatibility:** Migrated to the new `NVDAHelper.localLib.generateBeep` API to resolve deprecation warnings and ensure stability on future NVDA versions.
+- **Auto-Update Fix:** Resolved a critical freeze in NVDA during the auto-update download process.
 
-## License
+## Translators
 
-Refer to the add-on's license file for details.
+- **Arabic:** Hassan AlBarshoumy
+- **Spanish:** Hassan AlBarshoumy, Luis Carlos González Morales
+- **German:** Hassan AlBarshoumy, [Your Name]
+- **Italian:** [Your Name]
+- **Russian:** [Your Name]
+- **Chinese:** [Your Name]
+
+## Support
+
+For any issues, requests, or bug reports, please refer to the official contact point:
+**[Hassan AlBarshoumy's Telegram](https://t.me/HassanAlBarshoumy)**

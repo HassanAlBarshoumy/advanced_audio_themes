@@ -1,4 +1,4 @@
-# Audio Themes NG & Phonetic Punctuation
+# Advanced Audio Themes
 
 This add-on provides an immersive audio experience for NVDA screen reader users by playing sounds for various UI events. It allows for the creation, installation, and customization of audio themes, enhancing the auditory feedback from the user interface.
 
@@ -21,6 +21,8 @@ This add-on provides an immersive audio experience for NVDA screen reader users 
 - **Navigation Layer:** Press NVDA+Win+N to enter a fast navigation mode where arrow keys move by sentences, paragraphs, or other elements without holding modifiers.
 - **Cloud Theme Store:** Download, preview, and install community-created themes directly from within the Audio Themes Studio.
 - **App-Specific Profiles:** Automatically switch to a specific audio theme and typing sound pack based on the active application.
+
+- **System Status Sounds:** Plays audio cues for system-level events such as AC power changes, battery status, USB device connection, and network connectivity.
 
 ## Development & Credits
 
@@ -260,9 +262,44 @@ A set of highly advanced features are integrated into this add-on which might no
 | **NVDA+Alt+Arrows** | Advanced Web Navigation (BrowserNav). |
 | **NVDA+Win+N** | Toggle Navigation Layer (fast navigation without modifiers). |
 
+## Compatibility & Requirements
+- **NVDA Version:** Requires NVDA 2024.1.0 or later.
+- **Last Tested NVDA Version:** 2026.1.0
+- **Operating System:** Windows 10 or Windows 11.
+
+## Source Code & Repository
+You can view the source code, report issues, or contribute to the project on GitHub:
+[Advanced Audio Themes Repository](https://github.com/HassanAlBarshoumy/advanced_audio_themes)
+
+## Change Log
+
+### Version 9.32
+- **System Status Sounds:** Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
+- **Audio DSP Enhancements:** Completely rewrote the Bass Boost (Low-shelf filter) and Noise Gate algorithms to support correct attack/release times and improved sound quality. Added a full UI in the settings panel to control these DSP effects.
+- **3D Spatial Audio Fixes:** Resolved an issue causing lag in 3D audio playback for progress bars.
+
+### Version 9.30 - 9.31
+- **Universal First/Last Item Detection:** Added support for first/last item detection for *all* NVDA roles, instead of just lists and menus.
+- **Advanced Detection Modes:** Introduced 3 detection modes (smart, strict, any_sibling) with multi-hop traversal to guarantee accurate detection of the first and last elements even in complex web layouts.
+
+### Version 9.27 - 9.28
+- **Role vs State Sounds Priority:** Fixed an issue where state sounds (like "checked") were wrongly suppressing role sounds (like "checkbox").
+- **Fallback Behaviors:** Added custom fallback settings for first/last item sounds, allowing users to select custom sounds or bypass missing roles.
+- **Heading Support:** Added support for Heading levels 7, 8, and 9.
+
+### Version 9.23 - 9.26
+- **Sentence Navigation Fixes:** Fixed a bug causing NVDA to endlessly repeat sentences when reading Arabic text in VirtualBuffers.
+- **NVDA 2026.2 Compatibility:** Migrated to the new `NVDAHelper.localLib.generateBeep` API to resolve deprecation warnings and ensure stability on future NVDA versions.
+- **Auto-Update Fix:** Resolved a critical freeze in NVDA during the auto-update download process.
+
 ## Translators
 
+- **Arabic:** Hassan AlBarshoumy
 - **Spanish:** Hassan AlBarshoumy, Luis Carlos González Morales
+- **German:** Hassan AlBarshoumy, [Your Name]
+- **Italian:** [Your Name]
+- **Russian:** [Your Name]
+- **Chinese:** [Your Name]
 
 ## Support
 

@@ -1,136 +1,328 @@
-<html><head><meta charset='utf-8'></head><body><h1>高级音频主题和语音标点符号 (Audio Themes NG &amp; Phonetic Punctuation)</h1>
-<p>此附加组件通过为各种UI事件播放声音，为NVDA屏幕阅读器用户提供身临其境的音频体验。</p>
-<h2>主要功能</h2>
+<html><head><meta charset='utf-8'></head>
+<body>
+<h1>Audio Themes NG &amp; 语音标点 (Phonetic Punctuation)</h1>
+<p>此附加组件通过为各种用户界面事件播放声音，为 NVDA 屏幕阅读器用户提供沉浸式的音频体验。它允许创建、安装和自定义音频主题，从而增强来自用户界面的听觉反馈。</p>
+<h2>功能特性</h2>
 <ul>
-<li><strong>音频效果:</strong> 为UI事件播放声音。</li>
-<li><strong>3D音频:</strong> 使用Steam Audio提供3D定位音频。</li>
-<li><strong>高级音频DSP:</strong> 低音增强，噪声门，静音修剪，智能音量标准化和包络线。</li>
-<li><strong>音频闪避:</strong> 当NVDA说话时自动降低主题音量。</li>
-<li><strong>混响:</strong> 为音频添加混响效果。</li>
-<li><strong>音频主题工作室V2:</strong> 直接从麦克风或通过拖放创建或编辑音频主题。</li>
-<li><strong>高级音频格式:</strong> FFmpeg支持MP3, FLAC, OGG, M4A等。</li>
-<li><strong>高级打字声音:</strong> 具有空间音频定位和特殊按键映射的物理键盘模拟。</li>
-<li><strong>音频信标/声纳:</strong> 在屏幕上放置空间音频信标并进行实时声纳探测。</li>
-<li><strong>高级导航:</strong> SentenceNav和BrowserNav引擎，无冲突的箭头键。导航层（Navigation Layer）。</li>
-<li><strong>云主题商店:</strong> 直接从工作室下载社区主题。</li>
-<li><strong>应用程序配置文件:</strong> 自动为每个应用程序切换音频主题。</li>
+<li><strong>音频特效 (Audio effects)：</strong> 为聚焦控件、浏览列表等 UI 事件播放声音。</li>
+<li><strong>3D 音频 (3D Audio)：</strong> 利用 Steam Audio 提供 3D 定位音频，让您感知控件在屏幕上的具体位置。</li>
+<li><strong>高级音频 DSP (Advanced Audio DSP)：</strong> 实时音频处理，包括低音增强 (Bass Boost)、噪声门 (Noise Gate)、静音修剪 (Silence Trimming)、智能音量标准化 (Smart Volume Normalization) 和平滑包络 (Smooth Envelopes)。</li>
+<li><strong>音频闪避 (Audio Ducking)：</strong> 当 NVDA 说话时，自动降低主题音量以确保语音清晰度。</li>
+<li><strong>混响 (Reverb)：</strong> 为音频添加混响效果，带来更加身临其境的体验。</li>
+<li><strong>可定制的主题 (Customizable Themes)：</strong> 允许用户创建、安装并在不同的音频主题之间切换。</li>
+<li><strong>音频主题工作室 V2 (Audio Themes Studio V2)：</strong> 一个内置工具，可以直接通过麦克风或拖拽的方式来创建新的音频主题或编辑现有主题。</li>
+<li><strong>扩展的音频格式 (Extended Audio Formats)：</strong> 内置 FFmpeg 支持，可播放 MP3, FLAC, OGG, M4A 等格式。</li>
+<li><strong>高级打字音效 (Advanced Typing Sounds)：</strong> 通过空间音频定位、动态力度音量调整以及对特殊键（Enter, Backspace, Space, Shift, Ctrl, Alt）的智能键位映射，模拟真实的物理键盘打字体验。</li>
+<li><strong>上下文感知打字 (Context-Aware Typing)：</strong> 可以选择仅在可编辑的文本字段中播放打字声音。</li>
+<li><strong>智能进度条 (Smart Progress Bars)：</strong> 进度条动态变调（音调越高 = 进度百分比越高）。</li>
+<li><strong>首尾项目检测 (First/Last Item Detection)：</strong> 当到达列表或菜单的边界时，播放特定的碰撞 (bump) 声音。</li>
+<li><strong>音频信标 / 声纳 (Audio Beacon / Sonar)：</strong> 在屏幕上的任意位置放置一个空间音频信标，四处导航时可以听到实时的声纳脉冲声，引导您找到信标的相对位置。</li>
+<li><strong>高级导航 (Advanced Navigation)：</strong> 集成 SentenceNav（句子导航）和 BrowserNav（浏览器导航）引擎，实现无缝的文本和网页导航，且与方向键无冲突。</li>
+<li><strong>导航层 (Navigation Layer)：</strong> 按下 NVDA+Win+N 进入快速导航模式，此时可以直接使用方向键按句子、段落或其他元素进行导航，无需按住修饰键。</li>
+<li><strong>云主题商店 (Cloud Theme Store)：</strong> 直接在音频主题工作室中下载、试听并安装社区创建的音频主题。</li>
+<li>
+<p><strong>应用程序专属配置文件 (App-Specific Profiles)：</strong> 根据当前活动的应用程序，自动切换到特定的音频主题和打字音效包。</p>
+</li>
+<li>
+<p><strong>系统状态声音 (System Status Sounds)：</strong> 针对系统级事件（如交流电源更改、电池状态、USB 设备连接和网络连接）播放音频提示。</p>
+</li>
 </ul>
-<h2>开发和鸣谢</h2>
-<p>此附加组件的开发和整合始于2026年5月初，由 <strong>Hassan AlBarshoumy</strong> 独家开发。</p>
-<p><strong>主要开发人员和整合者:</strong>
+<h2>开发与致谢</h2>
+<p>此附加组件的开发和整合始于5月初（具体为 2026 年 5 月 3 日），由 <strong>Hassan AlBarshoumy</strong> 独家完成。</p>
+<p>执行了所有的代码重构、结构整合以及图形界面集成（包括 Audio Themes Studio V2 和统一的设置对话框），以确保与 NVDA 2026.1+ 版本的最大稳定性和兼容性。</p>
+<p><strong>主要开发者和整合者：</strong>
 * Hassan AlBarshoumy</p>
-<p><strong>鸣谢:</strong>
-* Ahmed Sami
-* Musharraf Omer
-* Tony Malykh
-* Austin Hicks &amp; Bryan Smart</p>
-<p><strong>联系方式:</strong> <a href="https://t.me/HassanAlBarshoumy">https://t.me/HassanAlBarshoumy</a></p>
-<h2>安装和使用</h2>
-<p>在NVDA设置中，选择"高级音频主题" (Advanced Audio Themes) 并勾选"启用音频主题" (Enable audio themes)。</p>
-<h3>设置选项卡概述</h3>
+<p><strong>致谢名单：</strong>
+此附加组件在很大程度上得益于 NVDA 社区中早期开源项目的合并与发展。特别感谢以下原始开发者：
+* <strong>Ahmed Sami:</strong> navSounds (导航音效) 附加组件的原始开发者，感谢他的贡献。
+* <strong>Musharraf Omer:</strong> Audio Themes 3D 附加组件的原始开发者。
+* <strong>Tony Malykh:</strong> Earcons and Speech Rules, BrowserNav, SentenceNav 和 TextNav 附加组件的原始开发者。
+* <strong>Austin Hicks &amp; Bryan Smart:</strong> Unspoken 附加组件的原始开发者。</p>
+<p><strong>联系方式与更新：</strong> <a href="https://t.me/HassanAlBarshoumy">https://t.me/HassanAlBarshoumy</a></p>
+<h2>安装方法</h2>
+<ol>
+<li>从 Hassan 的官方频道下载该附加组件的最新版本。</li>
+<li>打开下载的 <code>.nvda-addon</code> 文件。</li>
+<li>NVDA 会要求您确认安装，请选择“是 (Yes)”。</li>
+<li>重启 NVDA 以完成安装。</li>
+</ol>
+<h2>使用指南</h2>
+<h3>启用/禁用音频主题</h3>
+<p>您可以在 NVDA 的设置中启用或禁用音频主题功能：</p>
+<ol>
+<li>打开 NVDA 菜单 (NVDA+N)。</li>
+<li>进入“选项” -&gt; “设置”。</li>
+<li>在设置对话框中，选择“音频主题” (Audio Themes) 类别。</li>
+<li>勾选或取消勾选“启用音频主题”复选框。</li>
+</ol>
+<h3>选择和管理主题</h3>
 <ul>
-<li><strong>常规 (General):</strong> 选择主题，应用商店，3D模式，打字声音。</li>
-<li><strong>音频引擎 (Audio Engine):</strong> 正常化，静音修剪，噪声门，低音。</li>
-<li><strong>混响 (Reverb):</strong> 模拟房间声学。</li>
-<li><strong>音频格式:</strong> FFmpeg状态。</li>
-<li><strong>语音标点符号规则:</strong> 强大的语音和状态声音规则引擎。</li>
-<li><strong>杂项 (Miscellaneous):</strong> SentenceNav，BrowserNav设置。</li>
-<li><strong>语音顺序 (Speech Order):</strong> 更改NVDA读取元素的顺序。</li>
-<li><strong>应用配置文件 (App Profiles):</strong> 特定于应用程序的主题。</li>
-<li><strong>快速搜索和书签 (QuickSearch &amp; Bookmarks):</strong> 网页导航。</li>
-<li><strong>第一个/最后一个元素:</strong> 列表边界声音。</li>
+<li><strong>关于主题：</strong> 点击“关于 (About)”按钮可查看所选主题的信息。</li>
 </ul>
-<h3>状态冗长 (State Verbosity)</h3>
-<p>您可以隐藏烦人的状态（例如，"已展开"）：在语音规则设置中选中 <strong>"抑制状态混乱"</strong> (Suppress state clutter)，然后使用 <strong>NVDA+Shift+A，然后s</strong> 或 <strong>NVDA+Alt+[</strong> 来切换。</p>
-<h2>高级功能和秘密 (Advanced Features &amp; Secrets)</h2>
+<h3>设置选项卡概览</h3>
+<p>“高级音频主题” (Advanced Audio Themes) 设置面板包含多个选项卡，可自定义音频体验的各个方面。以下是每个可用选项的深入介绍：</p>
+<h4>1. 常规选项卡 (General)</h4>
+<ul>
+<li><strong>启用音频主题：</strong> 开启或关闭音频主题引擎的总开关。</li>
+<li><strong>选择主题：</strong> 下拉菜单，用于从已安装的主题中选择活动的音频主题。</li>
+<li><strong>关于 / 移除 / 新增：</strong> 管理您的主题。您可以从 <code>.atp</code> 或 <code>.zip</code> 文件安装新主题。</li>
+<li><strong>主题商店 (Theme Store)：</strong> 打开内置商店以下载社区创建的主题。</li>
+<li><strong>主题工作室 (Theme Studio)：</strong> 打开工作室来编辑或混音当前选定的主题。</li>
+<li><strong>预览 (Preview)：</strong> 播放一段当前主题的示例声音序列。</li>
+<li><strong>在 3D 模式下播放声音：</strong> 启用空间音频处理。</li>
+<li><strong>朗读角色 (Speak roles)：</strong> 切换 NVDA 是否读出控件角色（例如“按钮”、“链接”）。</li>
+<li><strong>在连续朗读时读出角色：</strong> 切换连续朗读时的角色朗读。您可以使用“选择角色...”按钮来精确指定要朗读哪些角色。</li>
+<li><strong>使用语音合成器音量：</strong> 将主题音量与 NVDA 语音音量绑定。禁用此选项可使用手动滑块调节。</li>
+<li><strong>音频闪避 (Audio Ducking)：</strong> 在 NVDA 说话时降低背景音频的音量。您可以选择要闪避哪些类别的声音，并设置闪避的音量百分比。</li>
+<li><strong>后备行为 (Fallback behaviors)：</strong> 定义当缺少特定角色或首尾元素的声音时会发生什么（例如，播放静音、播放自定义声音或播放第一个可用声音）。</li>
+<li><strong>状态声音抑制角色声音：</strong> 如果某个元素具有状态声音（例如，复选框已选中），则将阻止播放其角色声音，以避免声音重叠嘈杂。</li>
+<li><strong>应用程序黑名单 (Blacklist)：</strong> 一个以逗号分隔的应用程序可执行文件列表，在这些应用程序中将完全禁用音频主题。您还可以自定义在这些应用程序中抑制哪些特定声音类别。</li>
+<li><strong>打字音效 (Typing Sounds)：</strong> 启用打字机或机械键盘的声音。选项包括：空间打字音效、智能空间映射、将声音限制在编辑框内播放、选择声音包以及调整音量。</li>
+<li><strong>配置管理：</strong> 检查更新、包含测试版发布，并将您的整个配置（包括主题、规则和声音）导出/导入到一个单一的 <code>.atcfg</code> 文件中。</li>
+</ul>
+<h4>2. 音频引擎选项卡 (Audio Engine)</h4>
+<ul>
+<li><strong>智能音量标准化 (Smart Volume Normalization)：</strong> 动态调整微弱和响亮的声音，使之保持在一致的水平。</li>
+<li><strong>平滑包络 (Smooth Envelope)：</strong> 应用微小的淡入和淡出，以防止音频出现爆音或咔哒声。</li>
+<li><strong>平滑 3D 声像 (Smooth 3D Panning)：</strong> 当物体在屏幕上移动时产生平滑滑动的效果，而不是瞬间跳跃。</li>
+<li><strong>RAM 缓存 (RAM Caching)：</strong> 将声音加载到内存中，实现零延迟播放。</li>
+<li><strong>静音修剪 (Trim Silence)：</strong> 根据可自定义的阈值，自动去除音频文件开头和结尾的静音片段。</li>
+<li><strong>噪声门 (Noise Gate)：</strong> 消除录制质量较差的主题中低级别的背景嘶嘶声。包括阈值 (Threshold)、起音 (Attack) 和释放 (Release) 滑块。</li>
+<li><strong>低音增强 (Bass Boost)：</strong> 增强低频，让声音更具冲击力。包括增益 (Gain) 和截止频率 (Cutoff) 滑块。</li>
+<li><strong>音频输出模式：</strong> 在全 3D 空间（立体声）和居中（单声道）音频之间切换。</li>
+<li><strong>进度条空间音频：</strong> 选择进度条是从左到右平移（基于其进度百分比），还是基于其在屏幕上的物理位置。还包含一个开关：随着进度的增加，提高音调。</li>
+</ul>
+<h4>3. 混响选项卡 (Reverb)</h4>
+<p>模拟环境声学，让声音听起来像是在物理房间中播放一样。
+- <strong>启用混响：</strong> 环境效果的总开关。
+- <strong>房间大小 (Room Size)：</strong> 调整感知到的虚拟房间的大小。
+- <strong>阻尼 (Damping)：</strong> 控制高频被吸收的速度（模拟柔软墙壁与坚硬墙壁的区别）。
+- <strong>湿声/干声电平 (Wet / Dry Level)：</strong> 平衡处理后的混响音量与原始纯净声音的音量。
+- <strong>宽度 (Width)：</strong> 调整混响尾音的立体声扩展宽度。</p>
+<h4>4. 音频格式选项卡 (Audio Formats)</h4>
+<ul>
+<li><strong>使用 FFmpeg：</strong> 启用对压缩音频格式（如 MP3, FLAC, M4A, OGG）的支持。</li>
+<li><strong>FFmpeg 状态：</strong> 显示是否已安装 FFmpeg。如果没有，提供了一个按钮来自动下载和提取它（约 12MB）。</li>
+</ul>
+<h4>5. 提示音与语音规则选项卡 (Earcons &amp; Speech Rules)</h4>
+<p>一个强大的规则引擎，用于实现语音重读 (prosody) 和自定义的状态声音。
+- <strong>规则列表：</strong> 显示所有活动规则，并可按类别（角色、状态、文本、字符等）过滤。
+- <strong>规则编辑器：</strong> 在添加或编辑规则时，您可以定义：
+  - <strong>匹配模式/值：</strong> 要匹配的正则表达式、角色或状态。
+  - <strong>动作类型：</strong> 选择播放内置音频、自定义 WAV 文件、发出蜂鸣声、调整语音重读（音调/语速）、替换文本或不执行任何操作。
+  - <strong>语音动作：</strong> 当规则匹配时，决定 NVDA 是应保留原始文本、编辑朗读文本还是完全静音。
+  - <strong>音频微调：</strong> 音量滑块、开始/结束修剪偏移量（以毫秒为单位）、蜂鸣声的音调/持续时间。
+  - <strong>过滤器：</strong> 将规则限制为特定的应用程序、窗口标题或网站 URL（支持正则表达式）。
+- <strong>批量操作：</strong> 导出/导入规则字典、启用/禁用所有规则，或直接从界面测试规则。</p>
+<h4>6. 杂项选项卡 (Miscellaneous)</h4>
+<p>导航模块的高级配置。
+- <strong>句子导航 (Alt+方向键)：</strong> 调整段落边界提示音的音量、切换格式化宣告、配置跳过维基百科引用标记、调整跨段落的句子重构，以及定义用于断句的自定义标点符号。
+- <strong>文本导航 (Alt+Shift+方向键)：</strong> 调整纸张摩擦 (crackle) 音量并配置文本结束提示音行为。
+- <strong>高级浏览器导航 (BrowserNav)：</strong> 调整快速搜索导航期间的摩擦声和蜂鸣声音量，以及“跳过杂乱元素 (Skip Clutter)” 提示音的音量。
+- <strong>导航层 (NVDA+Win+N)：</strong> 配置自动退出超时、导航层动作音效、直通键 (pass-through keys)，以及开启或关闭特定的导航模式。</p>
+<h4>7. 朗读顺序选项卡 (Speech Order)</h4>
+<ul>
+<li><strong>全局宣告格式：</strong> 更改 NVDA 在全局范围内朗读元素的方式（例如，默认：名称 -&gt; 角色 -&gt; 状态，或者 状态 -&gt; 角色 -&gt; 名称）。</li>
+<li><strong>按角色定制：</strong> 使用搜索框查找特定角色（如复选框或链接），并仅为它们分配独特的朗读格式。</li>
+</ul>
+<h4>8. 应用程序配置文件选项卡 (App Profiles)</h4>
+<ul>
+<li>根据活动应用程序自动切换音频体验。</li>
+<li><strong>添加配置文件：</strong> 输入应用程序的可执行文件名（例如 <code>chrome.exe</code>），并分配特定的音频主题和/或打字音效包，当您切换到该应用程序时，将立即激活它们。</li>
+</ul>
+<h4>9. 快速搜索与书签选项卡 (QuickSearch &amp; Bookmarks)</h4>
+<ul>
+<li>管理针对特定域名的网页浏览导航规则。</li>
+<li>分配按键（如 J 或 K）以快速跳转到特定元素 (QuickJump)、自动跳过杂乱的菜单 (SkipClutter)，或在特定网站上执行自定义 Python 脚本。</li>
+</ul>
+<h4>10. 首尾项目选项卡 (First/Last Item)</h4>
+<ul>
+<li><strong>启用首尾项目检测：</strong> 当您到达列表、菜单或树状视图的顶部或底部时，播放独特的碰撞声。</li>
+<li><strong>检测范围：</strong> 普遍应用于所有角色，或选择性地应用于特定角色（使用“选择角色”按钮）。</li>
+<li><strong>单一项目行为：</strong> 决定列表中只有一个元素时，应将其视为第一项、最后一项，还是完全忽略。</li>
+</ul>
+<h3>使用音频主题工作室 V2 (Audio Themes Studio V2)</h3>
+<p>音频主题工作室允许您创建和编辑音频主题。要打开工作室：</p>
+<ol>
+<li>打开 NVDA 菜单 (NVDA+N)。</li>
+<li>选择“音频主题工作室” (Audio Themes Studio)。</li>
+</ol>
+<p>在工作室中，您可以：</p>
+<ul>
+<li><strong>创建一个新的音频主题：</strong> 这将引导您完成从零开始创建新主题的过程。</li>
+<li><strong>自定义现有的音频主题：</strong> 选择此选项可修改已安装主题的声音。</li>
+<li><strong>从麦克风录制：</strong> 现在您可以直接通过麦克风原生录制您的声音或任何声响，并将其分配给 UI 事件！</li>
+<li><strong>拖放操作：</strong> 您可以将音频文件直接拖放至工作室窗口中，以快速分配它们。</li>
+<li><strong>云主题商店：</strong> 无需外部浏览器，即可在工作室中直接浏览、试听并下载社区创建的主题。</li>
+</ul>
+<h3>导出您的主题</h3>
+<p>创建或编辑主题后，您可以将其导出为 <code>.atp</code> 文件，以便与他人分享。您可以在编辑界面中找到导出选项。</p>
+<h2>高级规则与语音标点</h2>
+<p>提示音与语音规则允许 NVDA 播放提示音 (earcons) 以及其他的语音效果，例如语调变化 (prosody)。</p>
+<h3>用法</h3>
+<ol>
+<li>确保已启用此附加组件。按 NVDA+Alt+P 可切换其开关。</li>
+<li>可以通过 NVDA 选项菜单中的对话框来配置规则。</li>
+<li>默认情况下，您会获得一组预定义的音频规则。</li>
+<li>规则保存在您 NVDA 用户配置目录下一个名为 <code>earconsAndSpeechRules.json</code> 的文件中。</li>
+</ol>
+<h3>状态冗长度 (State Verbosity)</h3>
+<p>此附加组件包含一项功能，允许您静音和隐藏那些可能会引起持续烦恼的状态的语音或声音（例如，“已展开”或“未选中”状态）。
+要使用此功能：
+1. 转到“语音规则”设置，编辑您想要静音的状态。
+2. 勾选标记为 <strong>“抑制状态杂音 (Suppress state clutter)”</strong> 的选项。
+3. 现在您可以随时使用快捷键来切换冗长度级别。
+* 您可以通过导航层快捷键 <strong>(NVDA+Shift+A 然后按 s)</strong>，或者直接使用快捷键 <strong>(NVDA+Alt+[)</strong> 来切换此选项。
+* 当您降低冗长度时，任何开启了此选项的状态都将被静音。当您将冗长度恢复时，附加组件将恢复正常朗读所有状态。</p>
+<h2>高级功能与秘密彩蛋</h2>
+<p>此附加组件集成了一系列非常高级的功能，这些功能乍一看可能并不明显：</p>
 <h3>1. 导航层 (Navigation Layer)</h3>
-<p><strong>NVDA+Win+N</strong>: 仅使用方向键浏览27种不同的导航模式，无需按住修饰键！</p>
+<ul>
+<li><strong>快捷键：</strong> <code>NVDA+Win+N</code></li>
+<li><strong>描述：</strong> 进入此层后，您无需再按住 <code>Alt</code>、<code>Shift</code> 或任何修饰键即可进行导航。您只需使用方向键！</li>
+<li><strong>如何使用：</strong></li>
+<li>使用 左右方向键 循环切换 <strong>27 种不同的导航模式</strong>（字符、单词、行、句子、段落、标题、链接、按钮、编辑字段、表格等）。</li>
+<li>使用 上下方向键 根据当前模式跳转到上一个/下一个项目。</li>
+<li>按 <code>C</code> 将当前项目复制到剪贴板。</li>
+<li>按 <code>S</code> 拼读当前项目。</li>
+<li>按 <code>R</code> 从当前项目开始连续朗读。</li>
+<li>按 <code>Escape</code> 退出导航层。</li>
+</ul>
 <h3>2. 音频声纳 (Audio Sonar)</h3>
-<p><strong>NVDA+Alt+R</strong>: 扫描窗口中的所有元素并在3D空间中从左到右播放它们的声音！</p>
+<ul>
+<li><strong>快捷键：</strong> <code>NVDA+Alt+R</code> (或 <code>NVDA+Shift+A</code> 然后按 <code>r</code>)</li>
+<li><strong>描述：</strong> 这是一个令人难以置信的功能，它会扫过整个活动窗口，收集其中的所有控件（按钮、列表、文本），并在 3D 空间中从左到右快速播放它们相关的声音。这为您呈现了一幅关于窗口布局及元素丰富程度的“声音地图”！</li>
+</ul>
 <h3>3. 音频信标 (Audio Beacon)</h3>
-<p><strong>NVDA+Shift+B</strong>: 在当前对象上"放置"一个音频信标。</p>
+<ul>
+<li><strong>快捷键：</strong> <code>NVDA+Shift+B</code> (或 <code>NVDA+Shift+A</code> 然后按 <code>a</code>)</li>
+<li><strong>描述：</strong> 您可以在当前导航对象的位置“放置”一个音频信标。在进行音频声纳扫描时，这可用于标记对象并根据上下文进行跟踪。</li>
+</ul>
 <h3>4. 音频主题命令层</h3>
-<p><strong>NVDA+Shift+A</strong>: 单键命令 (t-主题, p-规则, n/b-主题切换, s-状态详细, o-语音顺序)。</p>
-<h3>5. 3D对象报告</h3>
-<p><strong>NVDA+Tab</strong>: 报告当前对象并映射其3D空间音频坐标。</p>
+<ul>
+<li><strong>快捷键：</strong> <code>NVDA+Shift+A</code></li>
+<li><strong>描述：</strong> 无需记住几十个快捷键，只需进入此层并按单键即可执行命令：</li>
+<li><code>t</code> : 开启/关闭音频主题。</li>
+<li><code>p</code> : 切换提示音与语音规则。</li>
+<li><code>n</code> 和 <code>b</code> : 下一个/上一个主题。</li>
+<li><code>向上方向键</code> 和 <code>向下方向键</code> : 增大/减小主题音量。</li>
+<li><code>s</code> : 切换状态冗长度。</li>
+<li><code>o</code> : 快速循环切换朗读顺序（如：先名称后角色，或先角色后名称）。</li>
+<li><code>c</code> : 朗读当前标题级别。</li>
+<li><code>y</code> : 循环切换主题。</li>
+<li><code>i</code> : 循环切换打字音效。</li>
+<li><code>u</code> : 开启/关闭打字音效。</li>
+<li><code>h</code> : 获取帮助。</li>
+</ul>
+<h3>5. 3D 对象报告</h3>
+<ul>
+<li><strong>快捷键：</strong> <code>NVDA+Tab</code></li>
+<li><strong>描述：</strong> 报告当前光标下的对象，同时完美映射其 3D 空间音频坐标，让您能听到它在屏幕上相对于中心的准确物理位置。</li>
+</ul>
 <h3>6. 系统托盘集成</h3>
-<p>右键单击任务栏上的NVDA图标以快速访问工作室或切换主题。</p>
+<ul>
+<li><strong>描述：</strong> 此附加组件将快速访问选项直接注入 NVDA 的系统托盘菜单中。您可以右键单击任务栏时钟旁的 NVDA 图标，以立即访问“音频主题工作室”或快速开关主题，而无需打开完整的首选项对话框。</li>
+</ul>
+<h3>7. 系统状态声音 (System Status Sounds)</h3>
+<ul>
+<li><strong>说明：</strong> 针对系统级事件（如 USB 设备的插入/拔出、交流电源的更改、电池状态、网络连接以及系统睡眠/唤醒）播放音频提示。所有事件均通过 Windows 原生通知进行监控（无需轮询）。</li>
+<li><strong>事件：</strong></li>
+<li><strong>交流电源连接/断开：</strong> 在插入或拔出笔记本电脑电源线时播放声音。</li>
+<li><strong>电池电量低/极低/已充满：</strong> 当电池电量低于可配置的百分比或充满电时，播放基于阈值的警报。</li>
+<li><strong>USB 设备插入/拔出：</strong> 检测任何 USB 设备的连接或移除（键盘、鼠标、闪存驱动器等）。</li>
+<li><strong>存储卷装载/卸载：</strong> 检测闪存驱动器、外部硬盘和 SD 卡的驱动器号分配。</li>
+<li><strong>网络连接/断开：</strong> 按可配置的时间间隔检查连接状态，并在状态更改时播放声音。</li>
+<li><strong>系统唤醒/睡眠：</strong> 在计算机从睡眠模式恢复或进入睡眠模式时播放声音。</li>
+<li><strong>自定义声音：</strong> 将具有以下名称的 <code>.wav</code> 文件放入您的主题文件夹中：
+  <code>sys_ac_plug.wav</code>, <code>sys_ac_unplug.wav</code>, <code>sys_battery_low.wav</code>, <code>sys_battery_critical.wav</code>, <code>sys_battery_full.wav</code>, <code>sys_usb_plug.wav</code>, <code>sys_usb_unplug.wav</code>, <code>sys_volume_plug.wav</code>, <code>sys_volume_unplug.wav</code>, <code>sys_network_connect.wav</code>, <code>sys_network_disconnect.wav</code>, <code>sys_wake.wav</code>, <code>sys_sleep.wav</code></li>
+<li><strong>配置：</strong> 打开 NVDA 设置 -&gt; 高级音频主题 -&gt; “系统状态”选项卡，以启用/禁用单个事件、调整音量以及设置电池阈值。</li>
+</ul>
 <h2>键盘快捷键</h2>
 <table>
 <thead>
 <tr>
 <th>快捷键</th>
-<th>操作</th>
+<th>动作</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>NVDA+Alt+N</strong></td>
-<td>切换音频主题。</td>
+<td>开启/关闭音频主题。快速按两次可切换打字音效。</td>
 </tr>
 <tr>
 <td><strong>NVDA+Alt+T</strong></td>
-<td>循环切换主题。</td>
+<td>循环切换可用的音频主题。</td>
 </tr>
 <tr>
 <td><strong>NVDA+Alt+Y</strong></td>
-<td>循环切换打字声音。</td>
+<td>循环切换可用的打字音效包。</td>
 </tr>
 <tr>
 <td><strong>NVDA+Alt+K</strong></td>
-<td>切换打字声音。</td>
+<td>开启/关闭打字音效。</td>
 </tr>
 <tr>
 <td><strong>NVDA+Alt+R</strong></td>
-<td>音频声纳。</td>
+<td>音频声纳：扫描活动窗口以创建其元素的音频地图。</td>
 </tr>
 <tr>
 <td><strong>NVDA+Shift+B</strong></td>
-<td>音频信标。</td>
+<td>在当前导航对象处放置/移除音频信标。</td>
 </tr>
 <tr>
 <td><strong>NVDA+Shift+A</strong></td>
-<td>命令层。</td>
+<td>进入音频主题命令层（按下后，按：h 帮助，t 开关主题，p 规则，n/b 下一个/上一个主题，上下箭头调音量，y/i/u 循环/开关主题与打字，a/r 信标/声纳，s 冗长度，c 标题，o 朗读顺序）。</td>
 </tr>
 <tr>
 <td><strong>NVDA+Alt+P</strong></td>
-<td>切换语音规则。</td>
+<td>切换提示音与语音规则功能。</td>
 </tr>
 <tr>
 <td><strong>NVDA+Alt+[</strong></td>
-<td>切换状态冗长。</td>
+<td>切换简洁状态报告模式（状态冗长度）。</td>
 </tr>
 <tr>
 <td><strong>NVDA+H</strong></td>
-<td>当前标题级别。</td>
+<td>朗读当前标题级别。</td>
 </tr>
 <tr>
 <td><strong>NVDA+Tab</strong></td>
-<td>3D对象报告。</td>
+<td>报告光标下的对象及完整的 3D 音频坐标。</td>
 </tr>
 <tr>
 <td><strong>NVDA+Alt+S</strong></td>
-<td>朗读当前句子。</td>
+<td>朗读当前句子 (SentenceNav)。</td>
 </tr>
 <tr>
 <td><strong>Alt+方向键</strong></td>
-<td>句子导航。</td>
+<td>高级句子导航。</td>
 </tr>
 <tr>
-<td><strong>Alt+Windows+方向键</strong></td>
-<td>短语导航。</td>
+<td><strong>Alt+Win+方向键</strong></td>
+<td>高级短语导航。</td>
 </tr>
 <tr>
 <td><strong>Alt+Shift+方向键</strong></td>
-<td>段落导航。</td>
+<td>高级段落导航。</td>
 </tr>
 <tr>
 <td><strong>NVDA+Alt+方向键</strong></td>
-<td>高级网页导航。</td>
+<td>高级网页导航 (BrowserNav)。</td>
 </tr>
 <tr>
 <td><strong>NVDA+Win+N</strong></td>
-<td>导航层。</td>
+<td>切换导航层（无需按修饰键的快速导航）。</td>
 </tr>
 </tbody>
-</table></body></html>
+</table>
+<h2>翻译人员</h2>
+<ul>
+<li><strong>西班牙语：</strong> Hassan AlBarshoumy, Luis Carlos González Morales</li>
+<li><strong>简体中文：</strong> [您的名字]</li>
+</ul>
+<h2>技术支持</h2>
+<p>如果遇到任何问题、有任何请求或要报告错误，请联系官方支持通道：
+<strong><a href="https://t.me/HassanAlBarshoumy">Hassan AlBarshoumy 的 Telegram</a></strong></p>
+</body>
+</html>
