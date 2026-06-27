@@ -144,10 +144,43 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 info["next_role"] = obj.next.role if obj.next else None
             except Exception:
                 info["next_role"] = None
+            # Multi-hop traversal for same-role sibling detection
+            fl_mode = _cfg.conf["audiothemes"].get("fl_detection_mode", "smart")
+            if fl_mode in ("strict", "smart"):
+                _role = info.get("role")
+                # Walk back up to 3 levels to find a same-role sibling
+                try:
+                    p = obj.previous
+                    _depth = 0
+                    while p is not None and _depth < 3:
+                        if p.role == _role:
+                            break
+                        p = p.previous
+                        _depth += 1
+                    info["prev_same_role"] = p.role if (p is not None and _depth < 3) else None
+                except Exception:
+                    info["prev_same_role"] = None
+                # Walk forward up to 3 levels to find a same-role sibling
+                try:
+                    n = obj.next
+                    _depth = 0
+                    while n is not None and _depth < 3:
+                        if n.role == _role:
+                            break
+                        n = n.next
+                        _depth += 1
+                    info["next_same_role"] = n.role if (n is not None and _depth < 3) else None
+                except Exception:
+                    info["next_same_role"] = None
+            else:
+                info["prev_same_role"] = None
+                info["next_same_role"] = None
         else:
             info["parent_role"] = None
             info["previous_role"] = None
             info["next_role"] = None
+            info["prev_same_role"] = None
+            info["next_same_role"] = None
         # Carry forward a custom snd override (e.g. SpecialProps.notify).
         info["snd"] = extra_snd
         # Desktop dimensions for 3D audio (avoids COM call on worker thread).
@@ -1090,14 +1123,37 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
         prev_role = obj_info.get("previous_role")
         next_role = obj_info.get("next_role")
+        prev_same_role = obj_info.get("prev_same_role")
+        next_same_role = obj_info.get("next_same_role")
+        fl_mode = config.conf["audiothemes"].get("fl_detection_mode", "smart")
 
-        # Solo: truly no siblings at all
+        # Determine is_first / is_last based on detection mode
+        if fl_mode == "strict":
+            # Only same-role siblings count (ignores separators, headings, etc.)
+            is_first = prev_same_role is None
+            is_last = next_same_role is None
+        elif fl_mode == "any_sibling":
+            # Any adjacent item counts (current v9.31 behavior)
+            is_first = prev_role is None
+            is_last = next_role is None
+        else:
+            # "smart" (default) – same-role check with any-sibling fallback
+            if prev_same_role is not None:
+                is_first = False
+            elif prev_role is None:
+                is_first = True
+            else:
+                # prev exists but different role, no same-role found → first
+                is_first = True
+            if next_same_role is not None:
+                is_last = False
+            elif next_role is None:
+                is_last = True
+            else:
+                is_last = True
+
+        # Solo items: no siblings at all (regardless of mode)
         has_any_adjacent = prev_role is not None or next_role is not None
-
-        # is_first = actual first child, is_last = actual last child
-        is_first = prev_role is None
-        is_last = next_role is None
-
         if is_first and is_last and not has_any_adjacent:
             solo = config.conf["audiothemes"].get("fl_solo_behavior", "first")
             if solo == "first":

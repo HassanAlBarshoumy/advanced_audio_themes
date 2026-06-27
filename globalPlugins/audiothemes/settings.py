@@ -1223,6 +1223,20 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.flEnableCheckbox = wx.CheckBox(page, -1, _("Enable first/last item detection"))
         sizer.Add(self.flEnableCheckbox, 0, wx.ALL, 10)
 
+        # Detection Mode
+        modeBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Detection mode"))
+        modeHelp = wx.StaticText(page, -1, _(
+            "Controls how first/last items are identified."
+        ))
+        modeBox.Add(modeHelp, 0, wx.ALL, 5)
+        self.flModeChoice = wx.Choice(page, -1, choices=[
+            _("Smart (Recommended) – ignore separators, fall back to any adjacent item"),
+            _("Strict – same role only"),
+            _("Any adjacent item – standard"),
+        ], name=_("Detection mode"))
+        modeBox.Add(self.flModeChoice, 0, wx.EXPAND | wx.ALL, 5)
+        sizer.Add(modeBox, 0, wx.EXPAND | wx.ALL, 10)
+
         # Detection scope
         scopeBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Detection scope"))
         self.flScopeAll = wx.RadioButton(page, -1, _("Apply to all roles"), style=wx.RB_GROUP)
@@ -1520,6 +1534,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         # First/Last Item tab
         self.flEnableCheckbox.SetValue(_b(conf.get("universal_fl_enabled", True)))
+        fl_mode_map = {"smart": 0, "strict": 1, "any_sibling": 2}
+        fl_mode_val = conf.get("fl_detection_mode", "smart")
+        self.flModeChoice.SetSelection(fl_mode_map.get(fl_mode_val, 0))
         fl_roles_raw = conf.get("fl_enabled_roles", "all")
         if fl_roles_raw == "all":
             self.flScopeAll.SetValue(True)
@@ -1939,6 +1956,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         # First/Last Item tab
         conf["universal_fl_enabled"] = self.flEnableCheckbox.GetValue()
+        fl_mode_map = {0: "smart", 1: "strict", 2: "any_sibling"}
+        sel = self.flModeChoice.GetSelection()
+        conf["fl_detection_mode"] = fl_mode_map.get(sel, "smart")
         if self.flScopeAll.GetValue():
             conf["fl_enabled_roles"] = "all"
         else:

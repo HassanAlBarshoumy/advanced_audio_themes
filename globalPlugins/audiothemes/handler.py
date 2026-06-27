@@ -118,6 +118,7 @@ audiothemes_config_defaults = {
     "universal_fl_enabled": "boolean(default=True)",
     "fl_enabled_roles": "string(default='[\"listitem\",\"treeviewitem\",\"menuitem\",\"tab\"]')",
     "fl_solo_behavior": "string(default='first')",
+    "fl_detection_mode": "string(default='smart')",
     "progress_pan_mode": "string(default='progress')",
     "progress_pan_range": "integer(default=180, min=45, max=180)",
     "progress_pitch_shift": "boolean(default=True)",

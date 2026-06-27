@@ -376,7 +376,8 @@ msgid "Beeping volume (Beeping)"
 msgstr "Signaltonlautstärke (Beeping)"
 
 msgid "Blacklist applications for sentence navigation (comma separated):"
-msgstr "Anwendungen auf der Blacklist für die Satznavigation (durch Komma getrennt):"
+msgstr ""
+"Anwendungen auf der Blacklist für die Satznavigation (durch Komma getrennt):"
 
 msgid "Blank announcement"
 msgstr "Leere Ankündigung"
@@ -403,7 +404,9 @@ msgid "Bookmark entry error"
 msgstr "Lesezeichen-Eintragsfehler"
 
 msgid "Bookmark points to non-focusable NVDA object, cannot click it."
-msgstr "Das Lesezeichen verweist auf ein NVDA-Objekt ohne Fokus, Klick nicht möglich."
+msgstr ""
+"Das Lesezeichen verweist auf ein NVDA-Objekt ohne Fokus, Klick nicht "
+"möglich."
 
 msgid "Bookmark store communication error"
 msgstr "Fehler bei der Store-Kommunikation"
@@ -462,7 +465,8 @@ msgid "Cancel"
 msgstr "Abbrechen"
 
 msgid "Cannot combine tilde with digits for numeric script!"
-msgstr "Tilde kann für numerisches Skript nicht mit Ziffern kombiniert werden!"
+msgstr ""
+"Tilde kann für numerisches Skript nicht mit Ziffern kombiniert werden!"
 
 msgid ""
 "Cannot copy text out of edit box. Please make sure edit box is not empty and"
@@ -558,7 +562,8 @@ msgid "Create new website for domain %s"
 msgstr "Erstelle neue Website für Domain %s"
 
 msgid "Create new website with custom URL matching options"
-msgstr "Erstelle neue Website mit benutzerdefinierten URL-Übereinstimmungsoptionen"
+msgstr ""
+"Erstelle neue Website mit benutzerdefinierten URL-Übereinstimmungsoptionen"
 
 msgid "Creating New Theme - {name}"
 msgstr "Erstelle neues Theme - {name}"
@@ -585,7 +590,8 @@ msgid "Customize &Existing Audio Theme"
 msgstr "Passe &vorhandenes Audio-Theme an"
 
 msgid "Customize an installed audio theme with your prefered  sounds."
-msgstr "Passen Sie ein installiertes Audio-Theme mit Ihren bevorzugten Sounds an."
+msgstr ""
+"Passen Sie ein installiertes Audio-Theme mit Ihren bevorzugten Sounds an."
 
 msgid "Customize announcement format per role:"
 msgstr "Ansageformat pro Rolle anpassen:"
@@ -648,7 +654,8 @@ msgid "Disable Audio Themes in these applications (comma separated):"
 msgstr "Audio-Themes in diesen Anwendungen deaktivieren (kommagetrennt):"
 
 msgid "Disable PhoneticPuntuation in applications (comma-separated list)"
-msgstr "PhoneticPunctuation in Anwendungen deaktivieren (kommagetrennte Liste)"
+msgstr ""
+"PhoneticPunctuation in Anwendungen deaktivieren (kommagetrennte Liste)"
 
 msgid "Disable audio themes"
 msgstr "Audio-Themes deaktivieren"
@@ -720,7 +727,8 @@ msgid "Edit &bookmarks"
 msgstr "Lesezeichen b&earbeiten"
 
 msgid "Edit &script in new window; press Control+Enter when Done."
-msgstr "&Skript in neuem Fenster bearbeiten; Strg+Eingabe drücken, wenn fertig."
+msgstr ""
+"&Skript in neuem Fenster bearbeiten; Strg+Eingabe drücken, wenn fertig."
 
 msgid "Edit audio rule"
 msgstr "Audioregel bearbeiten"
@@ -822,7 +830,9 @@ msgid "Error during installation."
 msgstr "Fehler bei der Installation."
 
 msgid "Error during switch to window stage, focused element role is %d"
-msgstr "Fehler beim Wechsel zur Fenster-Phase, die Rolle des fokussierten Elements ist %d"
+msgstr ""
+"Fehler beim Wechsel zur Fenster-Phase, die Rolle des fokussierten Elements "
+"ist %d"
 
 msgid ""
 "Error exporting configuration:\n"
@@ -886,10 +896,13 @@ msgid "Failed to compile regular expression: %s"
 msgstr "Kompilieren des regulären Ausdrucks fehlgeschlagen: %s"
 
 msgid "Failed to connect to store. Check your internet connection."
-msgstr "Verbindung zum Store fehlgeschlagen. Überprüfen Sie Ihre Internetverbindung."
+msgstr ""
+"Verbindung zum Store fehlgeschlagen. Überprüfen Sie Ihre Internetverbindung."
 
 msgid "Failed to open settings. Please open through NVDA Preferences."
-msgstr "Einstellungen konnten nicht geöffnet werden. Bitte über NVDA-Einstellungen öffnen."
+msgstr ""
+"Einstellungen konnten nicht geöffnet werden. Bitte über NVDA-Einstellungen "
+"öffnen."
 
 msgid ""
 "Failed to read clipboard data. Please make sure clipboard is not empty - "
@@ -975,7 +988,9 @@ msgid "I&mport Configuration..."
 msgstr "Konfiguration i&mportieren..."
 
 msgid "Ignore all focus events - good for websites that misuse focus events"
-msgstr "Alle Fokusereignisse ignorieren (gut für Websites, die Fokusereignisse missbrauchen)"
+msgstr ""
+"Alle Fokusereignisse ignorieren (gut für Websites, die Fokusereignisse "
+"missbrauchen)"
 
 msgid "Import Audio Themes Configuration"
 msgstr "Audio-Theme-Konfiguration importieren"
@@ -1001,7 +1016,9 @@ msgid ""
 msgstr ""
 
 msgid "Invalid keystroke %s: cannot overload essential  NVDA keystrokes!"
-msgstr "Ungültiger Tastenbefehl %s: Grundlegende NVDA-Tastenkombinationen dürfen nicht überschrieben werden!"
+msgstr ""
+"Ungültiger Tastenbefehl %s: Grundlegende NVDA-Tastenkombinationen dürfen "
+"nicht überschrieben werden!"
 
 msgid "Invalid level for numeric script: '{level}'"
 msgstr "Ungültige Ebene für numerisches Skript: '{level}'"
@@ -1037,7 +1054,9 @@ msgid "Keep default NVDA focus behavior"
 msgstr "Standard-NVDA-Fokusverhalten beibehalten"
 
 msgid "Keep existing website definition, but overwrite all &bookmarks"
-msgstr "Bestehende Website-Definition beibehalten, aber alle &Lesezeichen überschreiben"
+msgstr ""
+"Bestehende Website-Definition beibehalten, aber alle &Lesezeichen "
+"überschreiben"
 
 msgid "Keep original text"
 msgstr "Originaltext beibehalten"
@@ -1362,7 +1381,8 @@ msgid "Play chime when bookmark disappears from the page"
 msgstr "Klang abspielen, wenn das Lesezeichen von der Seite verschwindet"
 
 msgid "Play chime when text matched by bookmark changes"
-msgstr "Klang abspielen, wenn sich der vom Lesezeichen übereinstimmende Text ändert"
+msgstr ""
+"Klang abspielen, wenn sich der vom Lesezeichen übereinstimmende Text ändert"
 
 msgid "Play sounds in 3D mode"
 msgstr "Sounds im 3D-Modus abspielen"
@@ -1450,7 +1470,8 @@ msgid "QuickJump3"
 msgstr "QuickJump 3"
 
 msgid "QuickNav item not found: tried to search for '{text}' {direction}."
-msgstr "QuickNav-Element nicht gefunden: Suche nach '{text}' {direction} versucht."
+msgstr ""
+"QuickNav-Element nicht gefunden: Suche nach '{text}' {direction} versucht."
 
 msgid "QuickSearch & Bookmarks"
 msgstr "Schnellsuche & Lesezeichen (QuickSearch & Bookmarks)"
@@ -1464,7 +1485,8 @@ msgid "Re&move rule"
 msgstr "Regel &entfernen"
 
 msgid "React to focus event, but prevent entering focus mode"
-msgstr "Auf Fokus-Ereignis reagieren, aber Wechsel in den Fokusmodus verhindern"
+msgstr ""
+"Auf Fokus-Ereignis reagieren, aber Wechsel in den Fokusmodus verhindern"
 
 msgid "Read an error message instead of playing a chime"
 msgstr "Statt eines Klangs eine Fehlermeldung vorlesen"
@@ -1482,7 +1504,9 @@ msgid "Regex search"
 msgstr "Regex-Suche"
 
 msgid "Regexp text not found: tried to search for '{text}' {direction}."
-msgstr "Regulärer Ausdruck (Text) nicht gefunden: Suche nach '{text}' {direction} versucht."
+msgstr ""
+"Regulärer Ausdruck (Text) nicht gefunden: Suche nach '{text}' {direction} "
+"versucht."
 
 msgid ""
 "Regular expression pattern matches empty string. This is not allowed. Please"
@@ -1493,7 +1517,8 @@ msgid "Remove Audio Theme"
 msgstr "Audio-Theme entfernen"
 
 msgid "Report the object under the cursor with full 3D audio coordinates."
-msgstr "Meldet das Objekt unter dem Cursor mit vollständigen 3D-Audiokoordinaten."
+msgstr ""
+"Meldet das Objekt unter dem Cursor mit vollständigen 3D-Audiokoordinaten."
 
 msgid "Reverb"
 msgstr "Hall (Reverb)"
@@ -1690,7 +1715,8 @@ msgid "Speak live regions"
 msgstr "Spreche Live-Regionen"
 
 msgid "Speak message when no more text units found"
-msgstr "Sprich eine Nachricht, wenn keine weiteren Texteinheiten gefunden wurden"
+msgstr ""
+"Sprich eine Nachricht, wenn keine weiteren Texteinheiten gefunden wurden"
 
 msgid "Speak only changed words (diff)"
 msgstr "Spreche nur geänderte Wörter (diff)"
@@ -1758,7 +1784,9 @@ msgid "Suppress aria label announcements for landmarks and regions"
 msgstr "Aria-Beschriftungsansagen für Landmarken und Regionen unterdrücken"
 
 msgid "Suppress aria name announcements for editables and combo boxes"
-msgstr "Aria-Namensansagen für bearbeitbare Felder und Kombinationsfelder unterdrücken"
+msgstr ""
+"Aria-Namensansagen für bearbeitbare Felder und Kombinationsfelder "
+"unterdrücken"
 
 msgid "Suppress aria role text announcements"
 msgstr "Aria-Rollen-Textansagen unterdrücken"
@@ -1859,7 +1887,8 @@ msgid "Timed out during switch to window stage"
 msgstr "Zeitüberschreitung während des Wechsels zum Fenster"
 
 msgid "Timeout while trying to focus current edit box."
-msgstr "Zeitüberschreitung beim Versuch, das aktuelle Eingabefeld zu fokussieren."
+msgstr ""
+"Zeitüberschreitung beim Versuch, das aktuelle Eingabefeld zu fokussieren."
 
 msgid "Toggle"
 msgstr "Umschalten"
@@ -2041,7 +2070,8 @@ msgid ""
 msgstr ""
 
 msgid "You must specify blank domain for this match option."
-msgstr "Sie müssen für diese Übereinstimmungsoption eine leere Domain angeben."
+msgstr ""
+"Sie müssen für diese Übereinstimmungsoption eine leere Domain angeben."
 
 msgid "You must specify non-empty string as domain"
 msgstr "Sie müssen eine nicht-leere Zeichenfolge als Domain angeben"
@@ -2111,7 +2141,6 @@ msgid ""
 "تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).\n"
 msgstr ""
 
-
 msgid "Contact on Telegram"
 msgstr "Kontakt auf Telegram"
 
@@ -2144,10 +2173,14 @@ msgid "Check for &Updates..."
 msgstr "Nach &Updates suchen..."
 
 msgid "Could not check for updates. Please check your internet connection."
-msgstr "Suche nach Updates fehlgeschlagen. Bitte überprüfen Sie Ihre Internetverbindung."
+msgstr ""
+"Suche nach Updates fehlgeschlagen. Bitte überprüfen Sie Ihre "
+"Internetverbindung."
 
 msgid "Download complete. The add-on installation dialog will now open."
-msgstr "Download abgeschlossen. Der Dialog zur Add-on-Installation wird nun geöffnet."
+msgstr ""
+"Download abgeschlossen. Der Dialog zur Add-on-Installation wird nun "
+"geöffnet."
 
 msgid "Failed to download the update: {error}"
 msgstr "Update konnte nicht heruntergeladen werden: {error}"
@@ -2185,7 +2218,6 @@ msgstr "Update-Überprüfung"
 msgid "You are already running the latest version ({version})."
 msgstr "Sie verwenden bereits die neueste Version ({version})."
 
-
 msgid "First/Last Item"
 msgstr "Erstes/Letztes Element"
 
@@ -2217,14 +2249,20 @@ msgid "Detect as last item"
 msgstr "Als letztes Element erkennen"
 
 msgid "Select the roles that should have first/last item detection:"
-msgstr "Wählen Sie die Rollen aus, für die das erste/letzte Element erkannt werden soll:"
+msgstr ""
+"Wählen Sie die Rollen aus, für die das erste/letzte Element erkannt werden "
+"soll:"
 
 msgid "Solo item behavior"
 msgstr "Verhalten bei einzelnem Element"
 
-msgid "Note: Fallback behavior when no first/last sound exists can be configured in the General tab under \"When no sound for first/last item\"."
-msgstr "Hinweis: Das Ersatzverhalten, wenn kein Ton für das erste/letzte Element vorhanden ist, kann im Reiter \"Allgemein\" unter \"Wenn kein Ton für erstes/letztes Element\" konfiguriert werden."
-
+msgid ""
+"Note: Fallback behavior when no first/last sound exists can be configured in"
+" the General tab under \"When no sound for first/last item\"."
+msgstr ""
+"Hinweis: Das Ersatzverhalten, wenn kein Ton für das erste/letzte Element "
+"vorhanden ist, kann im Reiter \"Allgemein\" unter \"Wenn kein Ton für "
+"erstes/letztes Element\" konfiguriert werden."
 
 msgid "Detection scope"
 msgstr "Erkennungsbereich"
@@ -2242,7 +2280,8 @@ msgid "Solo items"
 msgstr "Einzelne Elemente"
 
 msgid "Solo items are items that have no siblings of the same type."
-msgstr "Einzelne Elemente haben keine benachbarten Elemente des gleichen Typs."
+msgstr ""
+"Einzelne Elemente haben keine benachbarten Elemente des gleichen Typs."
 
 msgid "Behavior:"
 msgstr "Verhalten:"
@@ -2252,13 +2291,6 @@ msgstr "Einzelne Elemente nicht erkennen"
 
 msgid "Select roles for first/last detection"
 msgstr "Rollen für Erkennung des ersten/letzten Elements auswählen"
-
-msgid ""
-"\n"
-"Do you want to import them?"
-msgstr ""
-"\n"
-"Möchten Sie diese importieren?"
 
 msgid "%d Hz"
 msgstr "%d Hz"
@@ -2420,7 +2452,9 @@ msgid "Enable Noise Gate (remove quiet background noise)"
 msgstr "Noise Gate aktivieren (leises Hintergrundrauschen entfernen)"
 
 msgid "Enters the navigation layer to move by various text and web units."
-msgstr "Öffnet die Navigationsebene, um sich nach verschiedenen Text- und Webeinheiten zu bewegen."
+msgstr ""
+"Öffnet die Navigationsebene, um sich nach verschiedenen Text- und "
+"Webeinheiten zu bewegen."
 
 msgid "Exceptional abbreviations"
 msgstr "Ausnahme-Abkürzungen"
@@ -2454,13 +2488,6 @@ msgstr "Ersatzton:"
 
 msgid "Form fields"
 msgstr "Formularfelder"
-
-msgid ""
-"Found {count} matching file(s):\n"
-""
-msgstr ""
-"{count} passende Datei(en) gefunden:\n"
-""
 
 msgid "Frames"
 msgstr "Rahmen"
@@ -2568,7 +2595,8 @@ msgid "Objects"
 msgstr "Objekte"
 
 msgid "Open the Audio Theme Studio to create and edit themes"
-msgstr "Öffnen Sie das Audio Theme Studio, um Themes zu erstellen und zu bearbeiten"
+msgstr ""
+"Öffnen Sie das Audio Theme Studio, um Themes zu erstellen und zu bearbeiten"
 
 msgid "Opus audio files"
 msgstr "Opus-Audiodateien"
@@ -2598,7 +2626,8 @@ msgid "Phrase breakers"
 msgstr "Phrasen-Umbruchzeichen"
 
 msgid "Pitch shift with progress (higher pitch = more progress)"
-msgstr "Tonhöhenverschiebung mit Fortschritt (höhere Tonhöhe = mehr Fortschritt)"
+msgstr ""
+"Tonhöhenverschiebung mit Fortschritt (höhere Tonhöhe = mehr Fortschritt)"
 
 msgid "Play sounds for layer actions"
 msgstr "Töne für Ebenenaktionen abspielen"
@@ -2658,10 +2687,16 @@ msgid "Select theme"
 msgstr "Theme auswählen"
 
 msgid "Select which sound categories should be ducked when NVDA speaks:"
-msgstr "Wählen Sie aus, welche Klangkategorien abgedämpft werden sollen, wenn NVDA spricht:"
+msgstr ""
+"Wählen Sie aus, welche Klangkategorien abgedämpft werden sollen, wenn NVDA "
+"spricht:"
 
-msgid "Select which sound categories to suppress when the foreground app is in the disabled list:"
-msgstr "Wählen Sie, welche Klangkategorien unterdrückt werden sollen, wenn die aktive Anwendung in der deaktivierten Liste steht:"
+msgid ""
+"Select which sound categories to suppress when the foreground app is in the "
+"disabled list:"
+msgstr ""
+"Wählen Sie, welche Klangkategorien unterdrückt werden sollen, wenn die "
+"aktive Anwendung in der deaktivierten Liste steht:"
 
 msgid "Sentence"
 msgstr "Satz"
@@ -2693,11 +2728,18 @@ msgstr "Tabellen"
 msgid "TextNav sounds (Alt+Shift+Up/Down)"
 msgstr "TextNav-Sounds (Alt+Umschalt+Auf/Ab)"
 
-msgid "The following add-ons are now included in Advanced Audio Themes. Select the ones you want to remove to prevent conflicts:"
-msgstr "Die folgenden Add-ons sind jetzt in Advanced Audio Themes enthalten. Wählen Sie diejenigen aus, die Sie entfernen möchten, um Konflikte zu vermeiden:"
+msgid ""
+"The following add-ons are now included in Advanced Audio Themes. Select the "
+"ones you want to remove to prevent conflicts:"
+msgstr ""
+"Die folgenden Add-ons sind jetzt in Advanced Audio Themes enthalten. Wählen "
+"Sie diejenigen aus, die Sie entfernen möchten, um Konflikte zu vermeiden:"
 
-msgid "The selected conflicting add-ons will be removed after you restart NVDA."
-msgstr "Die ausgewählten konfliktbehafteten Add-ons werden nach einem Neustart von NVDA entfernt."
+msgid ""
+"The selected conflicting add-ons will be removed after you restart NVDA."
+msgstr ""
+"Die ausgewählten konfliktbehafteten Add-ons werden nach einem Neustart von "
+"NVDA entfernt."
 
 msgid "Theme sounds (roles, states, focus)"
 msgstr "Theme-Sounds (Rollen, Status, Fokus)"
@@ -2736,7 +2778,8 @@ msgid "Update Error"
 msgstr "Update-Fehler"
 
 msgid "Use FFmpeg for additional audio formats (MP3, FLAC, M4A, etc.)"
-msgstr "Verwenden Sie FFmpeg für zusätzliche Audioformate (MP3, FLAC, M4A etc.)"
+msgstr ""
+"Verwenden Sie FFmpeg für zusätzliche Audioformate (MP3, FLAC, M4A etc.)"
 
 msgid "Use custom role sound"
 msgstr "Benutzerdefinierten Rollenton verwenden"
@@ -2766,12 +2809,9 @@ msgstr ""
 "\n"
 "Möchten Sie diese importieren?"
 
-msgid ""
-"Found {count} matching file(s):\n"
-""
-msgstr ""
-"{count} passende Datei(en) gefunden:\n"
-""
+msgid "Found {count} matching file(s):\n"
+msgstr "{count} passende Datei(en) gefunden:\n"
+
 msgid "AC Power Connected"
 msgstr ""
 
@@ -2868,3 +2908,18 @@ msgstr ""
 msgid "USB Monitoring"
 msgstr ""
 
+msgid "Detection mode"
+msgstr ""
+
+msgid "Controls how first/last items are identified."
+msgstr ""
+
+msgid ""
+"Smart (Recommended) – ignore separators, fall back to any adjacent item"
+msgstr ""
+
+msgid "Strict – same role only"
+msgstr ""
+
+msgid "Any adjacent item – standard"
+msgstr ""

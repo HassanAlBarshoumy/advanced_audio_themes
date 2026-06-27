@@ -411,8 +411,9 @@ msgid "Bookmark entry error"
 msgstr "خطأ في إدخال الإشارة المرجعية"
 
 msgid "Bookmark points to non-focusable NVDA object, cannot click it."
-msgstr "المرجعية تشير إلى كائن لا يدعم التركيز، لا يمكن النقر عليه."
-"الإشارة المرجعية تشير إلى كائن NVDA غير قابل للتركيز، ولا يمكن النقر عليه."
+msgstr ""
+"المرجعية تشير إلى كائن لا يدعم التركيز، لا يمكن النقر عليه.الإشارة المرجعية "
+"تشير إلى كائن NVDA غير قابل للتركيز، ولا يمكن النقر عليه."
 
 msgid "Bookmark store communication error"
 msgstr "خطأ في الاتصال بمتجر الإشارة المرجعية"
@@ -553,8 +554,9 @@ msgid "Copied to clipboard: {}"
 msgstr "تم النسخ إلى الحافظة: {}"
 
 msgid "Copy the last text from semi-accessible edit box to clipboard."
-msgstr "نسخ النص الأخير من مربع التحرير شبه القابل للوصول إلى الحافظة."
-"انسخ النص الأخير من مربع التحرير شبه الذي يمكن الوصول إليه إلى الحافظة."
+msgstr ""
+"نسخ النص الأخير من مربع التحرير شبه القابل للوصول إلى الحافظة.انسخ النص "
+"الأخير من مربع التحرير شبه الذي يمكن الوصول إليه إلى الحافظة."
 
 msgid "Could not copy file {src} to directory {dst}."
 msgstr "تعذر نسخ الملف {src} إلى الدليل {dst}."
@@ -746,8 +748,10 @@ msgid "Edit &bookmarks"
 msgstr "تحرير &الإشارات المرجعية"
 
 msgid "Edit &script in new window; press Control+Enter when Done."
-msgstr "تحرير البرنامج النصي (Script) في نافذة جديدة؛ اضغط Control+Enter عند الانتهاء."
-"تحرير & البرنامج النصي في نافذة جديدة؛ اضغط على Control+Enter عند الانتهاء."
+msgstr ""
+"تحرير البرنامج النصي (Script) في نافذة جديدة؛ اضغط Control+Enter عند "
+"الانتهاء.تحرير & البرنامج النصي في نافذة جديدة؛ اضغط على Control+Enter عند "
+"الانتهاء."
 
 msgid "Edit audio rule"
 msgstr "تعديل قاعدة صوتية"
@@ -854,9 +858,9 @@ msgid "Error during installation."
 msgstr "خطأ أثناء تثبيت الثيم."
 
 msgid "Error during switch to window stage, focused element role is %d"
-msgstr "خطأ أثناء مرحلة التبديل إلى النافذة، دور العنصر المحدد هو %d"
-"حدث خطأ أثناء التبديل إلى مرحلة النافذة، دور العنصر الذي تم التركيز عليه هو "
-"%d"
+msgstr ""
+"خطأ أثناء مرحلة التبديل إلى النافذة، دور العنصر المحدد هو %dحدث خطأ أثناء "
+"التبديل إلى مرحلة النافذة، دور العنصر الذي تم التركيز عليه هو %d"
 
 msgid ""
 "Error exporting configuration:\n"
@@ -1032,9 +1036,10 @@ msgid "I&mport Configuration..."
 msgstr "ا&ستيراد الإعدادات..."
 
 msgid "Ignore all focus events - good for websites that misuse focus events"
-msgstr "تجاهل جميع أحداث التركيز - مفيد لمواقع الويب التي تسيء استخدام أحداث التركيز"
-"تجاهل جميع أحداث التركيز - وهو أمر جيد لمواقع الويب التي تسيء استخدام أحداث "
-"التركيز"
+msgstr ""
+"تجاهل جميع أحداث التركيز - مفيد لمواقع الويب التي تسيء استخدام أحداث "
+"التركيزتجاهل جميع أحداث التركيز - وهو أمر جيد لمواقع الويب التي تسيء استخدام"
+" أحداث التركيز"
 
 msgid "Import Audio Themes Configuration"
 msgstr "استيراد إعدادات السمات الصوتية"
@@ -1062,8 +1067,9 @@ msgstr ""
 "لإشارات QuickJump!"
 
 msgid "Invalid keystroke %s: cannot overload essential  NVDA keystrokes!"
-msgstr "اختصار غير صالح %s: لا يمكن تجاوز اختصارات NVDA الأساسية!"
-"ضغطة مفتاح غير صالحة %s: لا يمكن تحميل ضغطات مفاتيح NVDA الأساسية بشكل زائد!"
+msgstr ""
+"اختصار غير صالح %s: لا يمكن تجاوز اختصارات NVDA الأساسية!ضغطة مفتاح غير "
+"صالحة %s: لا يمكن تحميل ضغطات مفاتيح NVDA الأساسية بشكل زائد!"
 
 msgid "Invalid level for numeric script: '{level}'"
 msgstr "مستوى غير صالح للبرنامج النصي الرقمي: '{level}'"
@@ -1588,8 +1594,10 @@ msgid "Regex search"
 msgstr "بحث ريجكس"
 
 msgid "Regexp text not found: tried to search for '{text}' {direction}."
-msgstr "لم يتم العثور على نص التعبير النمطي: تمت محاولة البحث عن '{text}' {direction}."
-"لم يتم العثور على نص التعبير العادي: حاولت البحث عن '{text}' {direction}."
+msgstr ""
+"لم يتم العثور على نص التعبير النمطي: تمت محاولة البحث عن '{text}' "
+"{direction}.لم يتم العثور على نص التعبير العادي: حاولت البحث عن '{text}' "
+"{direction}."
 
 msgid ""
 "Regular expression pattern matches empty string. This is not allowed. Please"
@@ -1664,8 +1672,9 @@ msgid "Scrolling backward. This may load more elements on the page."
 msgstr "التمرير للخلف. قد يؤدي هذا إلى تحميل المزيد من العناصر على الصفحة."
 
 msgid "Scrolling forward. This may load more elements on the page."
-msgstr "التمرير للأمام. قد يؤدي هذا إلى تحميل المزيد من العناصر في الصفحة."
-"التمرير إلى الأمام. قد يؤدي هذا إلى تحميل المزيد من العناصر على الصفحة."
+msgstr ""
+"التمرير للأمام. قد يؤدي هذا إلى تحميل المزيد من العناصر في الصفحة.التمرير "
+"إلى الأمام. قد يؤدي هذا إلى تحميل المزيد من العناصر على الصفحة."
 
 msgid "Search for a role:"
 msgstr "البحث عن دور:"
@@ -1874,8 +1883,9 @@ msgid "Suppress aria label announcements for landmarks and regions"
 msgstr "منع إعلانات تصنيفات النغمات للمعالم والمناطق"
 
 msgid "Suppress aria name announcements for editables and combo boxes"
-msgstr "كتم إعلانات أسماء Aria لحقول التحرير ومربعات التحرير والسرد"
-"منع إعلانات أسماء النغمات للعناصر القابلة للتحرير ومربعات التحرير والسرد"
+msgstr ""
+"كتم إعلانات أسماء Aria لحقول التحرير ومربعات التحرير والسردمنع إعلانات أسماء"
+" النغمات للعناصر القابلة للتحرير ومربعات التحرير والسرد"
 
 msgid "Suppress aria role text announcements"
 msgstr "قمع الإعلانات النصية لدور الأغنية"
@@ -2377,7 +2387,6 @@ msgstr "لا تظهر هذه النافذة مرة أخرى"
 msgid "Skip"
 msgstr "تخطي"
 
-
 msgid "First/Last Item"
 msgstr "العنصر الأول/الأخير"
 
@@ -2414,9 +2423,12 @@ msgstr "حدد الأدوار التي يجب أن يتوفر فيها اكتش�
 msgid "Solo item behavior"
 msgstr "سلوك العنصر المنفرد (الوحيد)"
 
-msgid "Note: Fallback behavior when no first/last sound exists can be configured in the General tab under \"When no sound for first/last item\"."
-msgstr "ملاحظة: يمكن تكوين السلوك البديل عند عدم وجود صوت للعنصر الأول/الأخير في تبويبة \"عام\" تحت خيار \"عند عدم وجود صوت للعنصر الأول/الأخير\"."
-
+msgid ""
+"Note: Fallback behavior when no first/last sound exists can be configured in"
+" the General tab under \"When no sound for first/last item\"."
+msgstr ""
+"ملاحظة: يمكن تكوين السلوك البديل عند عدم وجود صوت للعنصر الأول/الأخير في "
+"تبويبة \"عام\" تحت خيار \"عند عدم وجود صوت للعنصر الأول/الأخير\"."
 
 msgid "Detection scope"
 msgstr "نطاق الاكتشاف"
@@ -2444,10 +2456,6 @@ msgstr "عدم اكتشاف العناصر المنفردة"
 
 msgid "Select roles for first/last detection"
 msgstr "تحديد الأدوار لاكتشاف العنصر الأول/الأخير"
-
-
-
-
 
 msgid ""
 "\n"
@@ -2651,12 +2659,8 @@ msgstr "الصوت البديل:"
 msgid "Form fields"
 msgstr "حقول النماذج"
 
-msgid ""
-"Found {count} matching file(s):\n"
-""
-msgstr ""
-"تم العثور على {count} ملف(ملفات) مطابقة:\n"
-""
+msgid "Found {count} matching file(s):\n"
+msgstr "تم العثور على {count} ملف(ملفات) مطابقة:\n"
 
 msgid "Frames"
 msgstr "الإطارات"
@@ -2856,8 +2860,11 @@ msgstr "تحديد ثيم"
 msgid "Select which sound categories should be ducked when NVDA speaks:"
 msgstr "حدد فئات الصوت التي يجب خفض صوتها عندما يتحدث NVDA:"
 
-msgid "Select which sound categories to suppress when the foreground app is in the disabled list:"
-msgstr "حدد فئات الصوت التي يجب كتمها عندما يكون التطبيق الأمامي في القائمة المعطلة:"
+msgid ""
+"Select which sound categories to suppress when the foreground app is in the "
+"disabled list:"
+msgstr ""
+"حدد فئات الصوت التي يجب كتمها عندما يكون التطبيق الأمامي في القائمة المعطلة:"
 
 msgid "Sentence"
 msgstr "جملة"
@@ -2889,10 +2896,15 @@ msgstr "الجداول"
 msgid "TextNav sounds (Alt+Shift+Up/Down)"
 msgstr "أصوات TextNav (Alt+Shift+Up/Down)"
 
-msgid "The following add-ons are now included in Advanced Audio Themes. Select the ones you want to remove to prevent conflicts:"
-msgstr "الإضافات التالية مضمنة الآن في Advanced Audio Themes. حدد ما تريد إزالته لمنع التعارض:"
+msgid ""
+"The following add-ons are now included in Advanced Audio Themes. Select the "
+"ones you want to remove to prevent conflicts:"
+msgstr ""
+"الإضافات التالية مضمنة الآن في Advanced Audio Themes. حدد ما تريد إزالته "
+"لمنع التعارض:"
 
-msgid "The selected conflicting add-ons will be removed after you restart NVDA."
+msgid ""
+"The selected conflicting add-ons will be removed after you restart NVDA."
 msgstr "ستتم إزالة الإضافات المتعارضة المحددة بعد إعادة تشغيل NVDA."
 
 msgid "Theme sounds (roles, states, focus)"
@@ -3050,3 +3062,19 @@ msgstr "مراقبة USB"
 
 msgid "text blocks"
 msgstr "كتل النص"
+
+msgid "Detection mode"
+msgstr "وضع الكشف"
+
+msgid "Controls how first/last items are identified."
+msgstr "يتحكم في كيفية تحديد العنصر الأول والأخير."
+
+msgid ""
+"Smart (Recommended) – ignore separators, fall back to any adjacent item"
+msgstr "ذكي (موصى به) – تجاهل الفواصل، الرجوع إلى أي عنصر مجاور"
+
+msgid "Strict – same role only"
+msgstr "صارم – نفس الدور فقط"
+
+msgid "Any adjacent item – standard"
+msgstr "أي عنصر مجاور – قياسي"

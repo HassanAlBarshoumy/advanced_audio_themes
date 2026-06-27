@@ -376,7 +376,8 @@ msgid "Beeping volume (Beeping)"
 msgstr "Volume del segnale acustico (Beeping)"
 
 msgid "Blacklist applications for sentence navigation (comma separated):"
-msgstr "Applicazioni ignorate per la navigazione delle frasi (separate da virgola):"
+msgstr ""
+"Applicazioni ignorate per la navigazione delle frasi (separate da virgola):"
 
 msgid "Blank announcement"
 msgstr "Annuncio vuoto"
@@ -403,7 +404,9 @@ msgid "Bookmark entry error"
 msgstr "Errore voce segnalibro"
 
 msgid "Bookmark points to non-focusable NVDA object, cannot click it."
-msgstr "Il segnalibro punta a un oggetto NVDA non focalizzabile, impossibile cliccarlo."
+msgstr ""
+"Il segnalibro punta a un oggetto NVDA non focalizzabile, impossibile "
+"cliccarlo."
 
 msgid "Bookmark store communication error"
 msgstr "Errore di comunicazione col negozio di segnalibri"
@@ -445,7 +448,8 @@ msgid "BrowserNav navigates by "
 msgstr "BrowserNav naviga per "
 
 msgid "BrowserNav temporary action configured only for this website."
-msgstr "L'azione temporanea di BrowserNav è configurata solo per questo sito web."
+msgstr ""
+"L'azione temporanea di BrowserNav è configurata solo per questo sito web."
 
 msgid ""
 "BrowserNav warning: Two or more sites matching this URL are configured to "
@@ -528,7 +532,9 @@ msgid "Copied to clipboard: {}"
 msgstr "Copiato negli appunti: {}"
 
 msgid "Copy the last text from semi-accessible edit box to clipboard."
-msgstr "Copia negli appunti l'ultimo testo dalla casella di modifica semi-accessibile."
+msgstr ""
+"Copia negli appunti l'ultimo testo dalla casella di modifica semi-"
+"accessibile."
 
 msgid "Could not copy file {src} to directory {dst}."
 msgstr "Impossibile copiare il file {src} nella directory {dst}."
@@ -648,7 +654,9 @@ msgid "Disable Audio Themes in these applications (comma separated):"
 msgstr "Disabilita Temi Audio in queste applicazioni (separate da virgola):"
 
 msgid "Disable PhoneticPuntuation in applications (comma-separated list)"
-msgstr "Disabilita PhoneticPunctuation nelle applicazioni (elenco separato da virgola)"
+msgstr ""
+"Disabilita PhoneticPunctuation nelle applicazioni (elenco separato da "
+"virgola)"
 
 msgid "Disable audio themes"
 msgstr "Disabilita temi audio"
@@ -822,7 +830,9 @@ msgid "Error during installation."
 msgstr "Errore durante l'installazione."
 
 msgid "Error during switch to window stage, focused element role is %d"
-msgstr "Errore durante il passaggio alla fase della finestra, il ruolo dell'elemento a fuoco è %d"
+msgstr ""
+"Errore durante il passaggio alla fase della finestra, il ruolo dell'elemento"
+" a fuoco è %d"
 
 msgid ""
 "Error exporting configuration:\n"
@@ -886,7 +896,8 @@ msgid "Failed to compile regular expression: %s"
 msgstr "Impossibile compilare l'espressione regolare: %s"
 
 msgid "Failed to connect to store. Check your internet connection."
-msgstr "Impossibile connettersi al negozio. Controlla la tua connessione internet."
+msgstr ""
+"Impossibile connettersi al negozio. Controlla la tua connessione internet."
 
 msgid "Failed to open settings. Please open through NVDA Preferences."
 msgstr "Impossibile aprire le impostazioni. Apri tramite Preferenze NVDA."
@@ -1001,7 +1012,9 @@ msgid ""
 msgstr ""
 
 msgid "Invalid keystroke %s: cannot overload essential  NVDA keystrokes!"
-msgstr "Tasto di scelta rapida non valido %s: non è possibile sovraccaricare le scorciatoie essenziali di NVDA!"
+msgstr ""
+"Tasto di scelta rapida non valido %s: non è possibile sovraccaricare le "
+"scorciatoie essenziali di NVDA!"
 
 msgid "Invalid level for numeric script: '{level}'"
 msgstr "Livello non valido per script numerico: '{level}'"
@@ -1037,7 +1050,8 @@ msgid "Keep default NVDA focus behavior"
 msgstr "Mantieni comportamento focus NVDA predefinito"
 
 msgid "Keep existing website definition, but overwrite all &bookmarks"
-msgstr "Mantieni definizione sito esistente, ma sovrascrivi tutti i &segnalibri"
+msgstr ""
+"Mantieni definizione sito esistente, ma sovrascrivi tutti i &segnalibri"
 
 msgid "Keep original text"
 msgstr "Mantieni testo originale"
@@ -1371,7 +1385,8 @@ msgid "Play typing sounds only in edit boxes"
 msgstr "Riproduci i suoni di digitazione solo nelle caselle di testo"
 
 msgid "Please create a new site configuration in site submenu."
-msgstr "Si prega di creare una nuova configurazione del sito nel sottomenu del sito."
+msgstr ""
+"Si prega di creare una nuova configurazione del sito nel sottomenu del sito."
 
 msgid "Please enter a single character as pattern."
 msgstr "Si prega di inserire un singolo carattere come modello."
@@ -1450,7 +1465,8 @@ msgid "QuickJump3"
 msgstr "Salto Rapido 3"
 
 msgid "QuickNav item not found: tried to search for '{text}' {direction}."
-msgstr "Elemento QuickNav non trovato: tentata ricerca di '{text}' {direction}."
+msgstr ""
+"Elemento QuickNav non trovato: tentata ricerca di '{text}' {direction}."
 
 msgid "QuickSearch & Bookmarks"
 msgstr "Ricerca Rapida & Segnalibri (QuickSearch & Bookmarks)"
@@ -1464,7 +1480,8 @@ msgid "Re&move rule"
 msgstr "Ri&muovi regola"
 
 msgid "React to focus event, but prevent entering focus mode"
-msgstr "Reagisci all'evento di focus, ma previeni l'ingresso nella modalità focus"
+msgstr ""
+"Reagisci all'evento di focus, ma previeni l'ingresso nella modalità focus"
 
 msgid "Read an error message instead of playing a chime"
 msgstr "Leggi un messaggio di errore invece di riprodurre un suono"
@@ -1482,7 +1499,9 @@ msgid "Regex search"
 msgstr "Ricerca tramite espressione regolare"
 
 msgid "Regexp text not found: tried to search for '{text}' {direction}."
-msgstr "Testo dell'espressione regolare non trovato: tentata ricerca di '{text}' {direction}."
+msgstr ""
+"Testo dell'espressione regolare non trovato: tentata ricerca di '{text}' "
+"{direction}."
 
 msgid ""
 "Regular expression pattern matches empty string. This is not allowed. Please"
@@ -1553,10 +1572,13 @@ msgid "Scroll to all possible elements forward"
 msgstr "Scorri verso tutti i possibili elementi in avanti"
 
 msgid "Scrolling backward. This may load more elements on the page."
-msgstr "Scorrimento all'indietro. Questo potrebbe caricare più elementi nella pagina."
+msgstr ""
+"Scorrimento all'indietro. Questo potrebbe caricare più elementi nella "
+"pagina."
 
 msgid "Scrolling forward. This may load more elements on the page."
-msgstr "Scorrimento in avanti. Questo potrebbe caricare più elementi nella pagina."
+msgstr ""
+"Scorrimento in avanti. Questo potrebbe caricare più elementi nella pagina."
 
 msgid "Search for a role:"
 msgstr "Cerca un ruolo:"
@@ -1617,7 +1639,8 @@ msgid "Skip Wikipedia references in sentence endings"
 msgstr "Salta i riferimenti di Wikipedia alla fine delle frasi"
 
 msgid "Skip clutter off for line navigation"
-msgstr "Salto del disordine (skip clutter) disattivato per la navigazione per righe"
+msgstr ""
+"Salto del disordine (skip clutter) disattivato per la navigazione per righe"
 
 msgid "Skip clutter off for paragraph navigation"
 msgstr "Salto del disordine disattivato per la navigazione per paragrafi"
@@ -1755,10 +1778,13 @@ msgid "Success"
 msgstr "Successo"
 
 msgid "Suppress aria label announcements for landmarks and regions"
-msgstr "Sopprimi gli annunci etichetta aria per punti di riferimento (landmarks) e regioni"
+msgstr ""
+"Sopprimi gli annunci etichetta aria per punti di riferimento (landmarks) e "
+"regioni"
 
 msgid "Suppress aria name announcements for editables and combo boxes"
-msgstr "Sopprimi gli annunci nome aria per campi modificabili e caselle combinate"
+msgstr ""
+"Sopprimi gli annunci nome aria per campi modificabili e caselle combinate"
 
 msgid "Suppress aria role text announcements"
 msgstr "Sopprimi gli annunci testo ruolo aria"
@@ -1853,13 +1879,15 @@ msgid "Timed out during single-character control+C stage"
 msgstr "Scaduto il tempo durante la fase controllo+C singolo carattere"
 
 msgid "Timed out during switch to browser window stage"
-msgstr "Scaduto il tempo durante la fase di passaggio alla finestra del browser"
+msgstr ""
+"Scaduto il tempo durante la fase di passaggio alla finestra del browser"
 
 msgid "Timed out during switch to window stage"
 msgstr "Scaduto il tempo durante la fase di passaggio alla finestra"
 
 msgid "Timeout while trying to focus current edit box."
-msgstr "Tempo scaduto cercando di mettere a fuoco la casella di modifica corrente."
+msgstr ""
+"Tempo scaduto cercando di mettere a fuoco la casella di modifica corrente."
 
 msgid "Toggle"
 msgstr "Attiva/Disattiva (Toggle)"
@@ -1883,7 +1911,8 @@ msgid "Toggle skip clutter for line navigation"
 msgstr "Attiva/Disattiva il salto del disordine per la navigazione per righe"
 
 msgid "Toggle skip clutter for paragraph navigation"
-msgstr "Attiva/Disattiva il salto del disordine per la navigazione per paragrafi"
+msgstr ""
+"Attiva/Disattiva il salto del disordine per la navigazione per paragrafi"
 
 msgid "Toggle state verbosity"
 msgstr "Attiva/Disattiva dettaglio di stato"
@@ -2041,7 +2070,8 @@ msgid ""
 msgstr ""
 
 msgid "You must specify blank domain for this match option."
-msgstr "Devi specificare un dominio vuoto per questa opzione di corrispondenza."
+msgstr ""
+"Devi specificare un dominio vuoto per questa opzione di corrispondenza."
 
 msgid "You must specify non-empty string as domain"
 msgstr "Devi specificare una stringa non vuota come dominio"
@@ -2111,7 +2141,6 @@ msgid ""
 "تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).\n"
 msgstr ""
 
-
 msgid "Contact on Telegram"
 msgstr "Contatta su Telegram"
 
@@ -2144,10 +2173,14 @@ msgid "Check for &Updates..."
 msgstr "Controlla A&ggiornamenti..."
 
 msgid "Could not check for updates. Please check your internet connection."
-msgstr "Impossibile controllare gli aggiornamenti. Verifica la tua connessione internet."
+msgstr ""
+"Impossibile controllare gli aggiornamenti. Verifica la tua connessione "
+"internet."
 
 msgid "Download complete. The add-on installation dialog will now open."
-msgstr "Download completato. Si aprirà ora la finestra di installazione del componente aggiuntivo."
+msgstr ""
+"Download completato. Si aprirà ora la finestra di installazione del "
+"componente aggiuntivo."
 
 msgid "Failed to download the update: {error}"
 msgstr "Impossibile scaricare l'aggiornamento: {error}"
@@ -2185,7 +2218,6 @@ msgstr "Controllo Aggiornamenti"
 msgid "You are already running the latest version ({version})."
 msgstr "Stai già eseguendo l'ultima versione ({version})."
 
-
 msgid "First/Last Item"
 msgstr "Primo/Ultimo elemento"
 
@@ -2217,14 +2249,20 @@ msgid "Detect as last item"
 msgstr "Rileva come ultimo elemento"
 
 msgid "Select the roles that should have first/last item detection:"
-msgstr "Seleziona i ruoli che dovrebbero avere il rilevamento del primo/ultimo elemento:"
+msgstr ""
+"Seleziona i ruoli che dovrebbero avere il rilevamento del primo/ultimo "
+"elemento:"
 
 msgid "Solo item behavior"
 msgstr "Comportamento elemento singolo"
 
-msgid "Note: Fallback behavior when no first/last sound exists can be configured in the General tab under \"When no sound for first/last item\"."
-msgstr "Nota: Il comportamento alternativo quando non esiste un suono per il primo/ultimo elemento può essere configurato nella scheda \"Generale\" in \"Quando non c'è suono per il primo/ultimo elemento\"."
-
+msgid ""
+"Note: Fallback behavior when no first/last sound exists can be configured in"
+" the General tab under \"When no sound for first/last item\"."
+msgstr ""
+"Nota: Il comportamento alternativo quando non esiste un suono per il "
+"primo/ultimo elemento può essere configurato nella scheda \"Generale\" in "
+"\"Quando non c'è suono per il primo/ultimo elemento\"."
 
 msgid "Detection scope"
 msgstr "Ambito di rilevamento"
@@ -2242,7 +2280,9 @@ msgid "Solo items"
 msgstr "Elementi singoli"
 
 msgid "Solo items are items that have no siblings of the same type."
-msgstr "Gli elementi singoli sono quelli che non hanno elementi adiacenti dello stesso tipo."
+msgstr ""
+"Gli elementi singoli sono quelli che non hanno elementi adiacenti dello "
+"stesso tipo."
 
 msgid "Behavior:"
 msgstr "Comportamento:"
@@ -2252,13 +2292,6 @@ msgstr "Non rilevare elementi singoli"
 
 msgid "Select roles for first/last detection"
 msgstr "Seleziona i ruoli per il rilevamento del primo/ultimo elemento"
-
-msgid ""
-"\n"
-"Do you want to import them?"
-msgstr ""
-"\n"
-"Vuoi importarli?"
 
 msgid "%d Hz"
 msgstr "%d Hz"
@@ -2420,7 +2453,9 @@ msgid "Enable Noise Gate (remove quiet background noise)"
 msgstr "Abilita noise gate (rimuove il rumore di fondo silenzioso)"
 
 msgid "Enters the navigation layer to move by various text and web units."
-msgstr "Entra nel livello di navigazione per spostarsi per varie unità di testo e web."
+msgstr ""
+"Entra nel livello di navigazione per spostarsi per varie unità di testo e "
+"web."
 
 msgid "Exceptional abbreviations"
 msgstr "Abbreviazioni eccezionali"
@@ -2454,13 +2489,6 @@ msgstr "Suono alternativo:"
 
 msgid "Form fields"
 msgstr "Campi modulo"
-
-msgid ""
-"Found {count} matching file(s):\n"
-""
-msgstr ""
-"Trovati {count} file corrispondenti:\n"
-""
 
 msgid "Frames"
 msgstr "Frame"
@@ -2598,7 +2626,9 @@ msgid "Phrase breakers"
 msgstr "Separatori di frasi"
 
 msgid "Pitch shift with progress (higher pitch = more progress)"
-msgstr "Cambiamento di tonalità con il progresso (tono più alto = maggiore progresso)"
+msgstr ""
+"Cambiamento di tonalità con il progresso (tono più alto = maggiore "
+"progresso)"
 
 msgid "Play sounds for layer actions"
 msgstr "Riproduci suoni per azioni di livello"
@@ -2658,10 +2688,16 @@ msgid "Select theme"
 msgstr "Seleziona tema"
 
 msgid "Select which sound categories should be ducked when NVDA speaks:"
-msgstr "Seleziona quali categorie di suono dovrebbero essere attenuate quando NVDA parla:"
+msgstr ""
+"Seleziona quali categorie di suono dovrebbero essere attenuate quando NVDA "
+"parla:"
 
-msgid "Select which sound categories to suppress when the foreground app is in the disabled list:"
-msgstr "Seleziona quali categorie di suono sopprimere quando l'app in primo piano è nell'elenco disabilitato:"
+msgid ""
+"Select which sound categories to suppress when the foreground app is in the "
+"disabled list:"
+msgstr ""
+"Seleziona quali categorie di suono sopprimere quando l'app in primo piano è "
+"nell'elenco disabilitato:"
 
 msgid "Sentence"
 msgstr "Frase"
@@ -2693,11 +2729,18 @@ msgstr "Tabelle"
 msgid "TextNav sounds (Alt+Shift+Up/Down)"
 msgstr "Suoni TextNav (Alt+Maiusc+Su/Giù)"
 
-msgid "The following add-ons are now included in Advanced Audio Themes. Select the ones you want to remove to prevent conflicts:"
-msgstr "I seguenti componenti aggiuntivi sono ora inclusi in Advanced Audio Themes. Seleziona quelli che desideri rimuovere per prevenire conflitti:"
+msgid ""
+"The following add-ons are now included in Advanced Audio Themes. Select the "
+"ones you want to remove to prevent conflicts:"
+msgstr ""
+"I seguenti componenti aggiuntivi sono ora inclusi in Advanced Audio Themes. "
+"Seleziona quelli che desideri rimuovere per prevenire conflitti:"
 
-msgid "The selected conflicting add-ons will be removed after you restart NVDA."
-msgstr "I componenti aggiuntivi in conflitto selezionati verranno rimossi dopo il riavvio di NVDA."
+msgid ""
+"The selected conflicting add-ons will be removed after you restart NVDA."
+msgstr ""
+"I componenti aggiuntivi in conflitto selezionati verranno rimossi dopo il "
+"riavvio di NVDA."
 
 msgid "Theme sounds (roles, states, focus)"
 msgstr "Suoni tema (ruoli, stati, focus)"
@@ -2766,12 +2809,9 @@ msgstr ""
 "\n"
 "Vuoi importarli?"
 
-msgid ""
-"Found {count} matching file(s):\n"
-""
-msgstr ""
-"Trovati {count} file corrispondenti:\n"
-""
+msgid "Found {count} matching file(s):\n"
+msgstr "Trovati {count} file corrispondenti:\n"
+
 msgid "AC Power Connected"
 msgstr ""
 
@@ -2868,3 +2908,18 @@ msgstr ""
 msgid "USB Monitoring"
 msgstr ""
 
+msgid "Detection mode"
+msgstr ""
+
+msgid "Controls how first/last items are identified."
+msgstr ""
+
+msgid ""
+"Smart (Recommended) – ignore separators, fall back to any adjacent item"
+msgstr ""
+
+msgid "Strict – same role only"
+msgstr ""
+
+msgid "Any adjacent item – standard"
+msgstr ""

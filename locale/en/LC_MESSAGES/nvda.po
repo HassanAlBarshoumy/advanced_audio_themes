@@ -2111,7 +2111,6 @@ msgid ""
 "تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).\n"
 msgstr ""
 
-
 msgid "Contact on Telegram"
 msgstr "Contact on Telegram"
 
@@ -2185,7 +2184,6 @@ msgstr "Update Check"
 msgid "You are already running the latest version ({version})."
 msgstr "You are already running the latest version ({version})."
 
-
 msgid "First/Last Item"
 msgstr ""
 
@@ -2222,9 +2220,10 @@ msgstr ""
 msgid "Solo item behavior"
 msgstr ""
 
-msgid "Note: Fallback behavior when no first/last sound exists can be configured in the General tab under \"When no sound for first/last item\"."
+msgid ""
+"Note: Fallback behavior when no first/last sound exists can be configured in"
+" the General tab under \"When no sound for first/last item\"."
 msgstr ""
-
 
 msgid "Detection scope"
 msgstr ""
@@ -2347,4 +2346,20 @@ msgid "USB Device Unplugged"
 msgstr ""
 
 msgid "USB Monitoring"
+msgstr ""
+
+msgid "Detection mode"
+msgstr ""
+
+msgid "Controls how first/last items are identified."
+msgstr ""
+
+msgid ""
+"Smart (Recommended) – ignore separators, fall back to any adjacent item"
+msgstr ""
+
+msgid "Strict – same role only"
+msgstr ""
+
+msgid "Any adjacent item – standard"
 msgstr ""

@@ -1951,8 +1951,8 @@ msgid "This site is a duplicate of another existing site %s"
 msgstr "此网站是另一个现有网站 %s 的副本"
 
 msgid "This value is already used in another rule."
-msgstr "此值已在另一个规则中使用。"
-"错误\n"
+msgstr ""
+"此值已在另一个规则中使用。错误\n"
 " ：该值已被其他规则使用。"
 
 msgid "This website doesn't have a name. Cannot import it."
@@ -2346,7 +2346,6 @@ msgstr "关于打字音效包"
 msgid "Unknown"
 msgstr "未知"
 
-
 msgid "First/Last Item"
 msgstr "第一项/最后一项"
 
@@ -2383,9 +2382,10 @@ msgstr "选择需要第一项/最后一项检测的角色："
 msgid "Solo item behavior"
 msgstr "孤立项的行为"
 
-msgid "Note: Fallback behavior when no first/last sound exists can be configured in the General tab under \"When no sound for first/last item\"."
+msgid ""
+"Note: Fallback behavior when no first/last sound exists can be configured in"
+" the General tab under \"When no sound for first/last item\"."
 msgstr "注意：当没有第一项/最后一项声音时，可以在“常规”选项卡中的“当第一项/最后一项没有声音时”下配置后备行为。"
-
 
 msgid "Detection scope"
 msgstr "检测范围"
@@ -2413,13 +2413,6 @@ msgstr "不检测孤立项"
 
 msgid "Select roles for first/last detection"
 msgstr "选择用于第一项/最后一项检测的角色"
-
-msgid ""
-"\n"
-"Do you want to import them?"
-msgstr ""
-"\n"
-"您想要导入它们吗？"
 
 msgid "%d Hz"
 msgstr "%d Hz"
@@ -2615,13 +2608,6 @@ msgstr "后备声音："
 
 msgid "Form fields"
 msgstr "表单区域"
-
-msgid ""
-"Found {count} matching file(s):\n"
-""
-msgstr ""
-"找到 {count} 个匹配的文件：\n"
-""
 
 msgid "Frames"
 msgstr "框架"
@@ -2821,7 +2807,9 @@ msgstr "选择主题"
 msgid "Select which sound categories should be ducked when NVDA speaks:"
 msgstr "选择在 NVDA 说话时应闪避哪些声音类别："
 
-msgid "Select which sound categories to suppress when the foreground app is in the disabled list:"
+msgid ""
+"Select which sound categories to suppress when the foreground app is in the "
+"disabled list:"
 msgstr "选择当前台应用程序在禁用列表中时要抑制的声音类别："
 
 msgid "Sentence"
@@ -2854,10 +2842,13 @@ msgstr "表格"
 msgid "TextNav sounds (Alt+Shift+Up/Down)"
 msgstr "TextNav 声音 (Alt+Shift+Up/Down)"
 
-msgid "The following add-ons are now included in Advanced Audio Themes. Select the ones you want to remove to prevent conflicts:"
+msgid ""
+"The following add-ons are now included in Advanced Audio Themes. Select the "
+"ones you want to remove to prevent conflicts:"
 msgstr "以下附加组件现已包含在 Advanced Audio Themes 中。选择您想要删除的组件以防止冲突："
 
-msgid "The selected conflicting add-ons will be removed after you restart NVDA."
+msgid ""
+"The selected conflicting add-ons will be removed after you restart NVDA."
 msgstr "重启 NVDA 后，所选的冲突附加组件将被删除。"
 
 msgid "Theme sounds (roles, states, focus)"
@@ -2927,12 +2918,9 @@ msgstr ""
 "\n"
 "您想要导入它们吗？"
 
-msgid ""
-"Found {count} matching file(s):\n"
-""
-msgstr ""
-"找到 {count} 个匹配的文件：\n"
-""
+msgid "Found {count} matching file(s):\n"
+msgstr "找到 {count} 个匹配的文件：\n"
+
 msgid "AC Power Connected"
 msgstr ""
 
@@ -3029,3 +3017,18 @@ msgstr ""
 msgid "USB Monitoring"
 msgstr ""
 
+msgid "Detection mode"
+msgstr ""
+
+msgid "Controls how first/last items are identified."
+msgstr ""
+
+msgid ""
+"Smart (Recommended) – ignore separators, fall back to any adjacent item"
+msgstr ""
+
+msgid "Strict – same role only"
+msgstr ""
+
+msgid "Any adjacent item – standard"
+msgstr ""
