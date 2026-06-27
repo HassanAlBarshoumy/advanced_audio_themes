@@ -2184,3 +2184,167 @@ msgstr "Update Check"
 
 msgid "You are already running the latest version ({version})."
 msgstr "You are already running the latest version ({version})."
+
+
+msgid "First/Last Item"
+msgstr ""
+
+msgid "When no sound for first/last item:"
+msgstr ""
+
+msgid "First/Last item fallback"
+msgstr ""
+
+msgid "First item sound:"
+msgstr ""
+
+msgid "First item fallback role"
+msgstr ""
+
+msgid "Last item sound:"
+msgstr ""
+
+msgid "Last item fallback role"
+msgstr ""
+
+msgid "Enable first/last item detection"
+msgstr ""
+
+msgid "Detect as first item"
+msgstr ""
+
+msgid "Detect as last item"
+msgstr ""
+
+msgid "Select the roles that should have first/last item detection:"
+msgstr ""
+
+msgid "Solo item behavior"
+msgstr ""
+
+msgid "Note: Fallback behavior when no first/last sound exists can be configured in the General tab under \"When no sound for first/last item\"."
+msgstr ""
+
+
+msgid "Detection scope"
+msgstr ""
+
+msgid "Apply to all roles"
+msgstr ""
+
+msgid "Apply to selected roles only"
+msgstr ""
+
+msgid "Select roles..."
+msgstr ""
+
+msgid "Solo items"
+msgstr ""
+
+msgid "Solo items are items that have no siblings of the same type."
+msgstr ""
+
+msgid "Behavior:"
+msgstr ""
+
+msgid "Don't detect solo items"
+msgstr ""
+
+msgid "Select roles for first/last detection"
+msgstr ""
+
+msgid "AC Power Connected"
+msgstr ""
+
+msgid "AC Power Disconnected"
+msgstr ""
+
+msgid "AC power connected/disconnected"
+msgstr ""
+
+msgid "Battery check interval (seconds):"
+msgstr ""
+
+msgid "Battery Critical"
+msgstr ""
+
+msgid "Battery Fully Charged"
+msgstr ""
+
+msgid "Battery Low"
+msgstr ""
+
+msgid "Battery level changes (low, critical, full)"
+msgstr ""
+
+msgid "Battery Thresholds"
+msgstr ""
+
+msgid "Check Intervals"
+msgstr ""
+
+msgid "Critical battery threshold (%):"
+msgstr ""
+
+msgid "Custom Sound Files"
+msgstr ""
+
+msgid "Enable system status sounds"
+msgstr ""
+
+msgid "Events"
+msgstr ""
+
+msgid "Low battery threshold (%):"
+msgstr ""
+
+msgid "Monitor all USB devices (keyboard, mouse, storage, etc.)"
+msgstr ""
+
+msgid "Network check interval (seconds):"
+msgstr ""
+
+msgid "Network Connected"
+msgstr ""
+
+msgid "Network connect/disconnect"
+msgstr ""
+
+msgid "Network Disconnected"
+msgstr ""
+
+msgid "Storage Volume Mounted"
+msgstr ""
+
+msgid "Storage volume mount/unmount"
+msgstr ""
+
+msgid "Storage Volume Unmounted"
+msgstr ""
+
+msgid "System Sleep"
+msgstr ""
+
+msgid "System Status"
+msgstr ""
+
+msgid "System status sounds volume:"
+msgstr ""
+
+msgid "System Wake"
+msgstr ""
+
+msgid "System wake/sleep"
+msgstr ""
+
+msgid "USB Device Plugged"
+msgstr ""
+
+msgid "USB device plug/unplug"
+msgstr ""
+
+msgid "USB Device Unplugged"
+msgstr ""
+
+msgid "USB Monitoring"
+msgstr ""

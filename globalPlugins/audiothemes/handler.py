@@ -121,6 +121,19 @@ audiothemes_config_defaults = {
     "progress_pan_mode": "string(default='progress')",
     "progress_pan_range": "integer(default=180, min=45, max=180)",
     "progress_pitch_shift": "boolean(default=True)",
+    "sys_status_enabled": "boolean(default=True)",
+    "sys_status_volume": "integer(default=20)",
+    "sys_ac_enabled": "boolean(default=True)",
+    "sys_battery_enabled": "boolean(default=True)",
+    "sys_battery_low_threshold": "integer(default=20, min=0, max=100)",
+    "sys_battery_critical_threshold": "integer(default=10, min=0, max=100)",
+    "sys_usb_enabled": "boolean(default=True)",
+    "sys_volume_enabled": "boolean(default=True)",
+    "sys_network_enabled": "boolean(default=True)",
+    "sys_wake_enabled": "boolean(default=True)",
+    "sys_network_check_interval": "integer(default=15, min=5, max=300)",
+    "sys_battery_check_interval": "integer(default=30, min=5, max=300)",
+    "sys_all_usb": "boolean(default=True)",
 }
 
 
@@ -153,6 +166,21 @@ class SpecialProps(IntEnum):
     heading8 = 2506
     heading9 = 2507
 
+    # System Status Sounds (2510+)
+    sys_ac_plug = 2510
+    sys_ac_unplug = 2511
+    sys_battery_low = 2512
+    sys_battery_critical = 2513
+    sys_battery_full = 2514
+    sys_usb_plug = 2515
+    sys_usb_unplug = 2516
+    sys_volume_plug = 2517
+    sys_volume_unplug = 2518
+    sys_network_connect = 2519
+    sys_network_disconnect = 2520
+    sys_wake = 2521
+    sys_sleep = 2522
+
 
 theme_roles = copy.copy(controlTypes.roleLabels)
 theme_roles.update(
@@ -173,6 +201,32 @@ theme_roles.update(
         SpecialProps.heading8: _("Heading Level 8"),
         # Translators: The label of the sound for heading level 9.
         SpecialProps.heading9: _("Heading Level 9"),
+        # Translators: The label of the sound played when AC power is connected.
+        SpecialProps.sys_ac_plug: _("AC Power Connected"),
+        # Translators: The label of the sound played when AC power is disconnected.
+        SpecialProps.sys_ac_unplug: _("AC Power Disconnected"),
+        # Translators: The label of the sound played when battery level is low.
+        SpecialProps.sys_battery_low: _("Battery Low"),
+        # Translators: The label of the sound played when battery level is critical.
+        SpecialProps.sys_battery_critical: _("Battery Critical"),
+        # Translators: The label of the sound played when battery is fully charged.
+        SpecialProps.sys_battery_full: _("Battery Fully Charged"),
+        # Translators: The label of the sound played when a USB device is plugged in.
+        SpecialProps.sys_usb_plug: _("USB Device Plugged"),
+        # Translators: The label of the sound played when a USB device is unplugged.
+        SpecialProps.sys_usb_unplug: _("USB Device Unplugged"),
+        # Translators: The label of the sound played when a storage volume is mounted.
+        SpecialProps.sys_volume_plug: _("Storage Volume Mounted"),
+        # Translators: The label of the sound played when a storage volume is unmounted.
+        SpecialProps.sys_volume_unplug: _("Storage Volume Unmounted"),
+        # Translators: The label of the sound played when network connectivity is established.
+        SpecialProps.sys_network_connect: _("Network Connected"),
+        # Translators: The label of the sound played when network connectivity is lost.
+        SpecialProps.sys_network_disconnect: _("Network Disconnected"),
+        # Translators: The label of the sound played when the system wakes from sleep.
+        SpecialProps.sys_wake: _("System Wake"),
+        # Translators: The label of the sound played when the system is going to sleep.
+        SpecialProps.sys_sleep: _("System Sleep"),
     }
 )
 
@@ -483,6 +537,9 @@ class AudioThemesHandler:
             action.register(self.configure)
         self._NVDA_getPropertiesSpeech = speech.speech.getPropertiesSpeech
         speech.speech.getPropertiesSpeech = self._hook_getSpeechTextForProperties
+        # System status monitor
+        self._system_monitor = None
+        self._start_system_status_monitoring()
 
     def _hook_getSpeechTextForProperties(
         self, reason=NVDAObjects.controlTypes.OutputReason.QUERY, *args, **kwargs
@@ -570,6 +627,9 @@ class AudioThemesHandler:
     def close(self):
         if self.active_theme is not None:
             self.active_theme.deactivate()
+        if self._system_monitor is not None:
+            self._system_monitor.stop()
+            self._system_monitor = None
         speech.speech.getPropertiesSpeech = self._NVDA_getPropertiesSpeech
         speech.getPropertiesSpeech = self._NVDA_getPropertiesSpeech
 
@@ -647,6 +707,54 @@ class AudioThemesHandler:
                 if p:
                     self.disabled_apps.append(p)
 
+    def _start_system_status_monitoring(self):
+        try:
+            from .systemStatus import SystemStatusMonitor
+            self._system_monitor = SystemStatusMonitor(self._play_system_sound)
+            self._system_monitor.start()
+        except Exception as e:
+            log.debugWarning(f"Failed to start system status monitor: {e}")
+
+    def _play_system_sound(self, sound_key):
+        if not config.conf["audiothemes"]["sys_status_enabled"]:
+            return
+        if not self.enabled or self.active_theme is None:
+            return
+        user_config = config.conf["audiothemes"]
+        if sound_key == SpecialProps.sys_ac_plug or sound_key == SpecialProps.sys_ac_unplug:
+            if not user_config["sys_ac_enabled"]:
+                return
+        elif sound_key in (SpecialProps.sys_battery_low, SpecialProps.sys_battery_critical, SpecialProps.sys_battery_full):
+            if not user_config["sys_battery_enabled"]:
+                return
+        elif sound_key in (SpecialProps.sys_usb_plug, SpecialProps.sys_usb_unplug):
+            if not user_config["sys_usb_enabled"]:
+                return
+        elif sound_key in (SpecialProps.sys_volume_plug, SpecialProps.sys_volume_unplug):
+            if not user_config["sys_volume_enabled"]:
+                return
+        elif sound_key in (SpecialProps.sys_network_connect, SpecialProps.sys_network_disconnect):
+            if not user_config["sys_network_enabled"]:
+                return
+        elif sound_key in (SpecialProps.sys_wake, SpecialProps.sys_sleep):
+            if not user_config["sys_wake_enabled"]:
+                return
+        foreground_app = getattr(self, '_current_app_name', None)
+        if foreground_app:
+            app_l = foreground_app.lower()
+            if any(p in app_l for p in self.disabled_apps):
+                from .utils import is_sound_suppressed
+                if is_sound_suppressed("theme_sounds"):
+                    return
+        theme = self.get_theme_for_app(foreground_app)
+        if not theme:
+            return
+        with theme._lock:
+            sound_obj = theme.sounds.get(sound_key)
+            if sound_obj is None:
+                return
+        self.player.play({"name": str(sound_key.value), "role": 0, "system_sound": True, "volume_override": user_config["sys_status_volume"] / 100.0}, sound_obj)
+
     def play(self, obj_info, sound):
         """
         Play a themed sound.  obj_info is a plain dict (no COM object).
@@ -676,6 +784,9 @@ class AudioThemesHandler:
 
         with theme._lock:
             sound_obj = theme.sounds.get(sound)
+            # System sounds must not fall back to any other sound
+            if sound_obj is None and isinstance(obj_info, dict) and obj_info.get("system_sound"):
+                return
             if sound_obj is None and isinstance(obj_info, dict):
                 role = obj_info.get("role", 0)
                 if role and sound in (SpecialProps.first, SpecialProps.last):

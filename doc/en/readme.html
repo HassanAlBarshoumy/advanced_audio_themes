@@ -40,19 +40,37 @@ a:focus, a:hover {outline: solid}
 <ul>
 <li><strong>Audio effects:</strong> Plays sounds for UI events such as focusing on controls, navigating lists, and more.</li>
 <li><strong>3D Audio:</strong> Utilizes Steam Audio to provide 3D positional audio, giving a sense of where controls are on the screen.</li>
+<li><strong>Advanced Audio DSP:</strong> Real-time audio processing including Bass Boost, Noise Gate, Silence Trimming, Smart Volume Normalization, and Smooth Envelopes.</li>
+<li><strong>Audio Ducking:</strong> Automatically lowers theme volume when NVDA speaks to ensure speech clarity.</li>
 <li><strong>Reverb:</strong> Adds reverb effects to the audio for a more immersive experience.</li>
 <li><strong>Customizable Themes:</strong> Allows users to create, install, and switch between different audio themes.</li>
 <li><strong>Audio Themes Studio V2:</strong> A built-in tool to create new audio themes or edit existing ones directly from the microphone or via drag &amp; drop.</li>
 <li><strong>Advanced Typing Sounds:</strong> Simulates physical keyboard typing with spatial audio positioning, dynamic velocity volume adjustments, and smart key mapping for special keys (Enter, Backspace, Space, Shift, Ctrl, Alt).</li>
+<li><strong>Extended Audio Formats:</strong> Built-in FFmpeg support for MP3, FLAC, OGG, M4A, and more.</li>
+<li><strong>Context-Aware Typing:</strong> Option to restrict typing sounds to play only within editable text fields.</li>
+<li><strong>Smart Progress Bars:</strong> Dynamic pitch shifting for progress bars (higher pitch = higher percentage).</li>
+<li><strong>First/Last Item Detection:</strong> Plays a specific bump sound when reaching the boundary of a list or menu.</li>
 <li><strong>Audio Beacon / Sonar:</strong> Drop a spatial audio beacon at any location on the screen and navigate around to hear real-time sonar pings guiding you relative to the beacon.</li>
 <li><strong>Advanced Navigation:</strong> Integrated SentenceNav and BrowserNav engines for seamless text and web navigation without conflicting arrow keys.</li>
+<li><strong>Cloud Theme Store:</strong> Download, preview, and install community-created themes directly from within the Audio Themes Studio.</li>
+<li><strong>App-Specific Profiles:</strong> Automatically switch to a specific audio theme and typing sound pack based on the active application.</li>
+<li><strong>Navigation Layer:</strong> Press NVDA+Win+N to enter a fast navigation mode where arrow keys move by sentences, paragraphs, or other elements without holding modifiers.</li>
 </ul>
 <h2 id="development-credits">Development &amp; Credits</h2>
-<p>This add-on was exclusively developed, consolidated, and translated by <strong>Hassan AlBarshoumy</strong>.</p>
+<p>The development and consolidation of this add-on began in early May (specifically May 3, 2026) exclusively by <strong>Hassan AlBarshoumy</strong>.</p>
 <p>All code refactoring, structural consolidations, and GUI integrations (including the Audio Themes Studio V2 and unified Settings dialogs) were performed to ensure maximum stability and compatibility with NVDA 2026.1+. </p>
+<p><strong>Main Developer and Consolidator:</strong></p>
 <ul>
-<li><strong>Developer:</strong> Hassan AlBarshoumy</li>
+<li>Hassan AlBarshoumy</li>
 <li><strong>Contact &amp; Updates:</strong> <a href="https://t.me/HassanAlBarshoumy">https://t.me/HassanAlBarshoumy</a></li>
+</ul>
+<p><strong>Credits &amp; Acknowledgments:</strong></p>
+<p>This add-on heavily benefited from the merging and development of previous open-source projects in the NVDA community. Special thanks to the original developers:</p>
+<ul>
+<li><strong>Ahmed Sami:</strong> Original developer of the navSounds (Navigation Sound Effects) add-on and for his contributions.</li>
+<li><strong>Musharraf Omer:</strong> Original developer of the Audio Themes 3D add-on.</li>
+<li><strong>Tony Malykh:</strong> Original developer of the Earcons and Speech Rules, BrowserNav, SentenceNav, and TextNav add-ons.</li>
+<li><strong>Austin Hicks &amp; Bryan Smart:</strong> Original developers of the Unspoken add-on.</li>
 </ul>
 <h2 id="installation">Installation</h2>
 <ol>
@@ -74,9 +92,110 @@ a:focus, a:hover {outline: solid}
 <p>In the &ldquo;Audio Themes&rdquo; settings panel, you can:</p>
 <ul>
 <li><strong>Select a theme:</strong> Choose from the list of installed audio themes.</li>
-<li><strong>Add a new theme:</strong> Click the &ldquo;Add New&hellip;&rdquo; button to install a theme from an <code>.atp</code> file.</li>
-<li><strong>Remove a theme:</strong> Select a theme and click the &ldquo;Remove&rdquo; button.</li>
-<li><strong>About a theme:</strong> Click the &ldquo;About&rdquo; button to see information about the selected theme.</li>
+<li><strong>Add a new theme:</strong> Click the "Add New..." button to install a theme from an <code>.atp</code> file.</li>
+<li><strong>Remove a theme:</strong> Select a theme and click the "Remove" button.</li>
+<li><strong>About a theme:</strong> Click the "About" button to see information about the selected theme.</li>
+</ul>
+<h3 id="settings-tabs-overview">Settings Tabs Overview</h3>
+<p>The Advanced Audio Themes settings panel contains several tabs to customize every aspect of the audio experience. Below is a deep dive into every available option:</p>
+
+<h4>1. General Tab</h4>
+<ul>
+<li><strong>Enable audio themes:</strong> Master toggle to turn the audio themes engine on or off.</li>
+<li><strong>Select theme:</strong> Dropdown to choose the active audio theme from installed themes.</li>
+<li><strong>About / Remove / Add New:</strong> Manage your themes. You can install new themes from <code>.atp</code> or <code>.zip</code> files.</li>
+<li><strong>Theme Store:</strong> Opens the built-in store to download community-created themes.</li>
+<li><strong>Theme Studio:</strong> Opens the studio to edit or remix the currently selected theme.</li>
+<li><strong>Preview:</strong> Plays a sequence of sample sounds from the active theme.</li>
+<li><strong>Play sounds in 3D mode:</strong> Enables spatial audio processing.</li>
+<li><strong>Speak roles:</strong> Toggle whether NVDA speaks control roles (like "button", "link").</li>
+<li><strong>Speak roles during say all:</strong> Toggle role speaking during continuous reading. You can use the "Select Roles..." button to specify exactly which roles to speak.</li>
+<li><strong>Use speech synthesizer volume:</strong> Links the theme volume to NVDA's voice volume. Disable this to use the manual slider.</li>
+<li><strong>Audio Ducking:</strong> Lowers the volume of background audio when NVDA speaks. You can choose which categories of sound to duck and set the ducked volume percentage.</li>
+<li><strong>Fallback behaviors:</strong> Define what happens when a sound is missing for a specific role or a first/last item (e.g., play silence, play a custom sound, or play the first available sound).</li>
+<li><strong>State sounds suppress the role sound:</strong> If an element has a state sound (e.g., checked box), it will prevent the role sound from playing to avoid audio clutter.</li>
+<li><strong>Application Blacklist:</strong> A comma-separated list of application executables where audio themes should be completely disabled. You can also customize which specific sound categories are suppressed in these apps.</li>
+<li><strong>Typing Sounds:</strong> Enable typewriter or mechanical keyboard sounds. Options include spatial typing (simulating physical keyboard positions), smart spatial mapping, restricting sounds to edit boxes, selecting sound packs, and adjusting volume.</li>
+<li><strong>Configuration Management:</strong> Check for updates, include beta releases, and Export/Import your entire configuration (including themes, rules, and sounds) to a single <code>.atcfg</code> file.</li>
+</ul>
+
+<h4>2. Audio Engine Tab</h4>
+<ul>
+<li><strong>Smart Volume Normalization:</strong> Dynamically adjusts quiet and loud sounds to a consistent level.</li>
+<li><strong>Smooth Envelope:</strong> Applies micro fade-ins and fade-outs to prevent audio popping or clicking.</li>
+<li><strong>Smooth 3D Panning:</strong> Creates a glide effect when objects move across the screen rather than jumping instantly.</li>
+<li><strong>RAM Caching:</strong> Loads sounds into memory for zero-latency playback.</li>
+<li><strong>Trim Silence:</strong> Automatically removes silent gaps at the beginning and end of audio files based on a customizable threshold.</li>
+<li><strong>Noise Gate:</strong> Eliminates low-level background hiss from poorly recorded audio themes. Includes Threshold, Attack, and Release sliders.</li>
+<li><strong>Bass Boost:</strong> Enhances low frequencies to give sounds more punch. Includes Gain and Cutoff frequency sliders.</li>
+<li><strong>Audio Output Mode:</strong> Switch between full 3D Spatial (Stereo) and Centered (Mono) audio.</li>
+<li><strong>Progress Bar Spatial Audio:</strong> Choose whether progress bars pan from left to right based on their progress percentage, or based on their physical location on the screen. Also includes a toggle to shift the pitch higher as the progress increases.</li>
+</ul>
+
+<h4>3. Reverb Tab</h4>
+<p>Simulates environmental acoustics to make sounds feel like they are played in a physical room.</p>
+<ul>
+<li><strong>Enable Reverb:</strong> Master toggle for environmental effects.</li>
+<li><strong>Room Size:</strong> Adjusts the perceived size of the virtual room.</li>
+<li><strong>Damping:</strong> Controls how quickly high frequencies are absorbed (simulating soft vs. hard walls).</li>
+<li><strong>Wet Level / Dry Level:</strong> Balances the amount of processed reverb vs the original clean sound.</li>
+<li><strong>Width:</strong> Adjusts the stereo spread of the reverb tail.</li>
+</ul>
+
+<h4>4. Audio Formats Tab</h4>
+<ul>
+<li><strong>Use FFmpeg:</strong> Enables support for compressed audio formats like MP3, FLAC, M4A, and OGG.</li>
+<li><strong>FFmpeg Status:</strong> Shows if FFmpeg is installed. If not, a button is provided to automatically download and extract it (~12MB).</li>
+</ul>
+
+<h4>5. Earcons &amp; Speech Rules Tab</h4>
+<p>A powerful rules engine for phonetic pronunciation and custom state sounds.</p>
+<ul>
+<li><strong>Rules List:</strong> Displays all active rules filtered by category (Role, State, Text, Character, etc.).</li>
+<li><strong>Rule Editor:</strong> When adding or editing a rule, you can define:
+<ul>
+<li><strong>Pattern / Frenzy Value:</strong> The regex pattern, role, or state to match.</li>
+<li><strong>Action Type:</strong> Choose to play a built-in wave, a custom wav file, a beep, adjust prosody (pitch/rate), replace text, or do nothing.</li>
+<li><strong>Speech Action:</strong> Decide whether NVDA should keep the original text, edit the spoken text, or be completely silenced when the rule matches.</li>
+<li><strong>Audio Adjustments:</strong> Volume slider, start/end trim offsets (in milliseconds), tone/duration for beeps.</li>
+<li><strong>Filters:</strong> Restrict the rule to specific applications, window titles, or website URLs (Regex supported).</li>
+</ul>
+</li>
+<li><strong>Batch Operations:</strong> Export/Import rule dictionaries, enable/disable all rules, or test rules directly from the interface.</li>
+</ul>
+
+<h4>6. Miscellaneous Tab</h4>
+<p>Advanced configuration for navigation modules.</p>
+<ul>
+<li><strong>Sentence Navigation (Alt+Arrows):</strong> Adjust chime volumes for paragraph boundaries, toggle formatting announcements, configure Wikipedia reference skipping, adjust sentence reconstruction across paragraphs, and define custom sentence/phrase breaking punctuation characters.</li>
+<li><strong>Text Navigation (Alt+Shift+Arrows):</strong> Adjust crackle volume and configure end-of-text chime behaviors.</li>
+<li><strong>Advanced Browser Navigation (BrowserNav):</strong> Adjust crackling and beeping volumes during QuickSearch navigation, and skip clutter chime volume.</li>
+<li><strong>Navigation Layer (NVDA+Windows+N):</strong> Configure auto-exit timeouts, layer action sounds, pass-through keys, and toggle specific navigation modes on or off.</li>
+</ul>
+
+<h4>7. Speech Order Tab</h4>
+<ul>
+<li><strong>Global announcement format:</strong> Change how NVDA reads elements globally (e.g., Default: Name -> Role -> State, or State -> Role -> Name).</li>
+<li><strong>Per-role customization:</strong> Use the search box to find specific roles (like Checkbox or Link) and assign a unique announcement format just for them.</li>
+</ul>
+
+<h4>8. App Profiles Tab</h4>
+<ul>
+<li>Automatically switch audio experiences based on the active application.</li>
+<li><strong>Add Profile:</strong> Enter an application executable (e.g., <code>chrome.exe</code> or <code>devenv.exe</code>) and assign a specific Audio Theme and/or Typing Sound Pack that will activate instantly when you switch to that app.</li>
+</ul>
+
+<h4>9. QuickSearch &amp; Bookmarks Tab</h4>
+<ul>
+<li>Manage domain-specific navigation rules for web browsing.</li>
+<li>Assign keystrokes (like J or K) to quickly jump to specific elements (QuickJump), automatically skip cluttered menus (SkipClutter), or execute custom Python scripts (Script bookmarks) on specific websites.</li>
+</ul>
+
+<h4>10. First/Last Item Tab</h4>
+<ul>
+<li><strong>Enable first/last item detection:</strong> Plays a unique bump sound when you reach the top or bottom of a list, menu, or treeview.</li>
+<li><strong>Detection scope:</strong> Apply this universally to all roles, or selectively to specific roles (using the Select Roles button).</li>
+<li><strong>Solo items behavior:</strong> Decide if items that are the only element in a list should be treated as the first item, the last item, or ignored completely.</li>
 </ul>
 <h3 id="using-the-audio-themes-studio-v2">Using the Audio Themes Studio V2</h3>
 <p>The Audio Themes Studio allows you to create and edit audio themes. To open the studio:</p>
@@ -90,6 +209,7 @@ a:focus, a:hover {outline: solid}
 <li><strong>Customize an existing audio theme:</strong> Select this option to modify the sounds of an installed theme.</li>
 <li><strong>Record from Microphone:</strong> You can now natively record your voice or any sound directly from your microphone to be assigned to a UI event!</li>
 <li><strong>Drag &amp; Drop:</strong> You can drag and drop audio files directly into the Studio window to assign them rapidly.</li>
+<li><strong>Cloud Theme Store:</strong> Browse, preview, and download community-created themes directly within the Studio, without needing external browsers.</li>
 </ul>
 <h3 id="exporting-your-theme">Exporting Your Theme</h3>
 <p>After creating or editing a theme, you can export it as an <code>.atp</code> file to share it with others. You can find the export option in the editing screen.</p>
@@ -102,24 +222,161 @@ a:focus, a:hover {outline: solid}
 <li>By default you will have a set of predefined audio rules.</li>
 <li>The rules are saved in a file called <code>earconsAndSpeechRules.json</code> in your NVDA user configuration directory.</li>
 </ol>
-<h3 id="keyboard-commands">Keyboard Commands</h3>
+<h3 id="state-verbosity">State Verbosity</h3>
+<p>The add-on includes a feature that allows you to mute and hide the speech or sounds for states that might cause constant annoyance (e.g., the "expanded" or "not selected" states).</p>
+<p>To utilize this feature:</p>
+<ol>
+<li>Go to the Speech Rules settings and edit the state you wish to mute.</li>
+<li>Check the option labeled <strong>"Suppress state clutter"</strong>.</li>
+<li>Now you can use the quick shortcut to toggle the verbosity level whenever you want.</li>
+</ol>
 <ul>
-<li><strong>NVDA+Alt+N:</strong> Toggle Audio Themes on/off. Press twice quickly to toggle Typing Sounds.</li>
-<li><strong>NVDA+Alt+T:</strong> Cycle through available Audio Themes.</li>
-<li><strong>NVDA+Alt+Y:</strong> Cycle through available Typing Sound packs.</li>
-<li><strong>NVDA+Alt+K:</strong> Toggle Typing Sounds on/off.</li>
-<li><strong>NVDA+Shift+B:</strong> Drop/Remove an Audio Beacon at the current navigator object.</li>
-<li><strong>NVDA+Shift+A:</strong> Enter Audio Themes Command Layer (press this, then a command key such as 'h' for help, 't' to toggle themes, 'p' to toggle rules, 's' to toggle state verbosity, 'c' to speak heading level, 'o' to rotate speech order).</li>
-<li><strong>NVDA+Alt+P:</strong> Toggle earcons and sound speech rules add-on.</li>
-<li><strong>NVDA+Alt+[ (left bracket):</strong> Toggle concise state reporting mode.</li>
-<li><strong>NVDA+H:</strong> Speak current heading level.</li>
-<li><strong>NVDA+Tab:</strong> Report the object under the cursor with full 3D audio coordinates.</li>
-<li><strong>Alt+Arrows:</strong> Advanced Sentence/Phrase Navigation.</li>
-<li><strong>NVDA+Alt+Arrows:</strong> Advanced Web Navigation (BrowserNav).</li>
+<li>You can toggle this option either via the layer shortcut <strong>(NVDA+Shift+A then s)</strong> or via the direct shortcut <strong>(NVDA+Alt+[)</strong>.</li>
+<li>When you reduce the verbosity, any state for which you have enabled this option will be muted. When you increase the verbosity back, the add-on will return to reading all states normally.</li>
 </ul>
+
+<h2 id="advanced-features">Advanced Features &amp; Secrets</h2>
+<p>A set of highly advanced features are integrated into this add-on which might not be obvious at first glance:</p>
+
+<h3>1. Navigation Layer</h3>
+<ul>
+<li><strong>Shortcut:</strong> <code>NVDA+Win+N</code></li>
+<li><strong>Description:</strong> Once you enter this layer, you no longer need to hold <code>Alt</code>, <code>Shift</code>, or any modifier key to navigate. You can use just the arrow keys!</li>
+<li><strong>How to use:</strong>
+<ul>
+<li>Use Left/Right Arrows to cycle through <strong>27 different navigation modes</strong> (Character, Word, Line, Sentence, Paragraph, Heading, Link, Button, Edit field, Table, etc.).</li>
+<li>Use Up/Down Arrows to jump to the previous/next item based on the current mode.</li>
+<li>Press <code>C</code> to copy the current item to the clipboard.</li>
+<li>Press <code>S</code> to spell the current item.</li>
+<li>Press <code>R</code> to Read All starting from the current item.</li>
+<li>Press <code>Escape</code> to exit the layer.</li>
+</ul></li>
+</ul>
+
+<h3>2. Audio Sonar</h3>
+<ul>
+<li><strong>Shortcut:</strong> <code>NVDA+Alt+R</code> (or <code>NVDA+Shift+A</code> then <code>r</code>)</li>
+<li><strong>Description:</strong> An incredible feature that sweeps the entire active window, collects all controls inside it (buttons, lists, texts), and rapidly plays their associated sounds from left to right in 3D space. This gives you a sonic "picture" of the window's layout and how populated it is!</li>
+</ul>
+
+<h3>3. Audio Beacon</h3>
+<ul>
+<li><strong>Shortcut:</strong> <code>NVDA+Shift+B</code> (or <code>NVDA+Shift+A</code> then <code>a</code>)</li>
+<li><strong>Description:</strong> You can "drop" an audio beacon at the current navigator object's location. This is useful to mark an object and track it contextually during an Audio Sonar sweep.</li>
+</ul>
+
+<h3>4. Audio Themes Command Layer</h3>
+<ul>
+<li><strong>Shortcut:</strong> <code>NVDA+Shift+A</code></li>
+<li><strong>Description:</strong> Instead of memorizing dozens of shortcuts, enter this layer and press a single key to execute a command:
+<ul>
+<li><code>t</code> : Toggle Audio Themes on/off.</li>
+<li><code>p</code> : Toggle Earcons &amp; Speech Rules.</li>
+<li><code>n</code> and <code>b</code> : Next/Previous Theme.</li>
+<li><code>Up Arrow</code> and <code>Down Arrow</code> : Increase/Decrease theme volume.</li>
+<li><code>s</code> : Toggle State Verbosity.</li>
+<li><code>o</code> : Rapidly cycle Speech Order (e.g. Name then Role, or Role then Name).</li>
+<li><code>c</code> : Speak current heading level.</li>
+<li><code>y</code> : Cycle through themes.</li>
+<li><code>i</code> : Cycle through typing sounds.</li>
+<li><code>u</code> : Toggle typing sounds.</li>
+<li><code>h</code> : Help.</li>
+</ul></li>
+</ul>
+
+<h3>5. 3D Object Reporting</h3>
+<ul>
+<li><strong>Shortcut:</strong> <code>NVDA+Tab</code></li>
+<li><strong>Description:</strong> Reports the current object under the cursor, but perfectly maps its 3D spatial audio coordinates so you can hear its exact physical location on your screen relative to the center.</li>
+</ul>
+
+<h3>6. System Tray Integration</h3>
+<ul>
+<li><strong>Description:</strong> The add-on injects quick-access options directly into NVDA's System Tray menu. You can right-click the NVDA icon next to the clock on your taskbar to instantly access the "Audio Themes Studio" or toggle the themes on/off without needing to open the full preferences dialog.</li>
+</ul>
+
+<h3 id="keyboard-commands">Keyboard Shortcuts</h3>
+<table border="1">
+<thead>
+<tr>
+<th>Key</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>NVDA+Alt+N</strong></td>
+<td>Toggle Audio Themes on/off. Press twice quickly to toggle Typing Sounds.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+T</strong></td>
+<td>Cycle through available Audio Themes.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+Y</strong></td>
+<td>Cycle through available Typing Sound packs.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+K</strong></td>
+<td>Toggle Typing Sounds on/off.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+R</strong></td>
+<td>Audio Sonar: Sweeps the active window to create an audio map of its elements.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Shift+B</strong></td>
+<td>Drop/Remove an Audio Beacon at the current navigator object.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Shift+A</strong></td>
+<td>Enter Audio Themes Command Layer (press this, then: h for help, t to toggle, p for rules, n/b for next/prev theme, up/down arrows for volume, y/i/u to cycle/toggle themes/typing, a/r for beacon/sonar, s for verbosity, c for heading, o for order).</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+P</strong></td>
+<td>Toggle earcons and sound speech rules add-on.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+[</strong></td>
+<td>Toggle concise state reporting mode (State Verbosity).</td>
+</tr>
+<tr>
+<td><strong>NVDA+H</strong></td>
+<td>Speak current heading level.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Tab</strong></td>
+<td>Report the object under the cursor with full 3D audio coordinates.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+S</strong></td>
+<td>Speak current sentence (SentenceNav).</td>
+</tr>
+<tr>
+<td><strong>Alt+Arrows</strong></td>
+<td>Advanced Sentence Navigation.</td>
+</tr>
+<tr>
+<td><strong>Alt+Windows+Arrows</strong></td>
+<td>Advanced Phrase Navigation.</td>
+</tr>
+<tr>
+<td><strong>Alt+Shift+Arrows</strong></td>
+<td>Advanced Paragraph Navigation.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+Arrows</strong></td>
+<td>Advanced Web Navigation (BrowserNav).</td>
+</tr>
+<tr>
+<td><strong>NVDA+Win+N</strong></td>
+<td>Toggle Navigation Layer (fast navigation without modifiers).</td>
+</tr>
+</tbody>
+</table>
 <h2 id="translators">Translators</h2>
 <ul>
-<li><strong>Spanish:</strong> Luis Carlos González Morales</li>
+<li><strong>Spanish:</strong> Hassan AlBarshoumy, Luis Carlos González Morales</li>
 </ul>
 <h2 id="support">Support</h2>
 <p>For any issues, requests, or bug reports, please refer to the official contact point:<br />

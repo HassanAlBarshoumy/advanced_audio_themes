@@ -2166,3 +2166,581 @@ msgstr "No volver a mostrar este diálogo"
 
 msgid "Skip"
 msgstr "Omitir"
+
+
+msgid "First/Last Item"
+msgstr "Primer/Último elemento"
+
+msgid "When no sound for first/last item:"
+msgstr "Cuando no hay sonido para el primer/último elemento:"
+
+msgid "First/Last item fallback"
+msgstr "Alternativa para primer/último elemento"
+
+msgid "First item sound:"
+msgstr "Sonido del primer elemento:"
+
+msgid "First item fallback role"
+msgstr "Rol alternativo del primer elemento"
+
+msgid "Last item sound:"
+msgstr "Sonido del último elemento:"
+
+msgid "Last item fallback role"
+msgstr "Rol alternativo del último elemento"
+
+msgid "Enable first/last item detection"
+msgstr "Habilitar detección de primer/último elemento"
+
+msgid "Detect as first item"
+msgstr "Detectar como primer elemento"
+
+msgid "Detect as last item"
+msgstr "Detectar como último elemento"
+
+msgid "Select the roles that should have first/last item detection:"
+msgstr "Seleccione los roles que deben tener detección de primer/último elemento:"
+
+msgid "Solo item behavior"
+msgstr "Comportamiento de elemento único"
+
+msgid "Note: Fallback behavior when no first/last sound exists can be configured in the General tab under \"When no sound for first/last item\"."
+msgstr "Nota: El comportamiento alternativo cuando no existe un sonido para el primer/último elemento se puede configurar en la pestaña \"General\" en \"Cuando no hay sonido para el primer/último elemento\"."
+
+
+msgid "Detection scope"
+msgstr "Alcance de detección"
+
+msgid "Apply to all roles"
+msgstr "Aplicar a todos los roles"
+
+msgid "Apply to selected roles only"
+msgstr "Aplicar solo a los roles seleccionados"
+
+msgid "Select roles..."
+msgstr "Seleccionar roles..."
+
+msgid "Solo items"
+msgstr "Elementos únicos"
+
+msgid "Solo items are items that have no siblings of the same type."
+msgstr "Los elementos únicos son aquellos que no tienen elementos adyacentes del mismo tipo."
+
+msgid "Behavior:"
+msgstr "Comportamiento:"
+
+msgid "Don't detect solo items"
+msgstr "No detectar elementos únicos"
+
+msgid "Select roles for first/last detection"
+msgstr "Seleccionar roles para detección de primer/último elemento"
+
+
+
+
+
+msgid ""
+"\n"
+"Do you want to import them?"
+msgstr ""
+"\n"
+"¿Quieres importarlos?"
+
+msgid "%d Hz"
+msgstr "%d Hz"
+
+msgid "%d dB"
+msgstr "%d dB"
+
+msgid "%d°"
+msgstr "%d°"
+
+msgid "&Cancel"
+msgstr "&Cancelar"
+
+msgid "&Download and Install FFmpeg"
+msgstr "&Descargar e instalar FFmpeg"
+
+msgid "0 (off)"
+msgstr "0 (desactivado)"
+
+msgid "AAC audio files"
+msgstr "Archivos de audio AAC"
+
+msgid "AAC/M4A audio files"
+msgstr "Archivos de audio AAC/M4A"
+
+msgid "AC3 audio files"
+msgstr "Archivos de audio AC3"
+
+msgid "Active Navigation Modes:"
+msgstr "Modos de navegación activos:"
+
+msgid "Add Audio Theme"
+msgstr "Añadir tema de audio"
+
+msgid "Announcement format"
+msgstr "Formato de anuncio"
+
+msgid "Application Profiles"
+msgstr "Perfiles de aplicaciones"
+
+msgid "Articles"
+msgstr "Artículos"
+
+msgid "Attack (ms):"
+msgstr "Ataque (ms):"
+
+msgid "Audio Ducking Categories"
+msgstr "Categorías de atenuación de audio"
+
+msgid "Audio Formats"
+msgstr "Formatos de audio"
+
+msgid "Audio Output Mode"
+msgstr "Modo de salida de audio"
+
+msgid "Auto-exit layer after 10 seconds of inactivity"
+msgstr "Salir de la capa automáticamente tras 10 segundos de inactividad"
+
+msgid "Bass Boost"
+msgstr "Aumento de graves"
+
+msgid "Bass boost cutoff"
+msgstr "Corte de aumento de graves"
+
+msgid "Bass boost gain"
+msgstr "Ganancia de aumento de graves"
+
+msgid "Beeping sound volume"
+msgstr "Volumen del sonido de pitido"
+
+msgid "Blacklist applications"
+msgstr "Aplicaciones en la lista negra"
+
+msgid "Break sentences at element boundaries (links, separators, etc.)"
+msgstr "Romper frases en los límites de los elementos (enlaces, separadores, etc.)"
+
+msgid "BrowserNav sounds (indentation, navigation)"
+msgstr "Sonidos de BrowserNav (sangría, navegación)"
+
+msgid "Buttons"
+msgstr "Botones"
+
+msgid "Capital letters"
+msgstr "Letras mayúsculas"
+
+msgid "Categories to Suppress in Disabled Apps"
+msgstr "Categorías a suprimir en aplicaciones deshabilitadas"
+
+msgid "Categories to suppress in disabled apps..."
+msgstr "Categorías a suprimir en aplicaciones deshabilitadas..."
+
+msgid "Check boxes"
+msgstr "Casillas de verificación"
+
+msgid "Check for updates &automatically"
+msgstr "Buscar actualizaciones &automáticamente"
+
+msgid "Checking for updates..."
+msgstr "Buscando actualizaciones..."
+
+msgid "Choose a folder containing audio files to import"
+msgstr "Elija una carpeta que contenga archivos de audio para importar"
+
+msgid "Choose a folder containing audio theme files"
+msgstr "Elija una carpeta que contenga archivos de temas de audio"
+
+msgid "Combo boxes"
+msgstr "Cuadros combinados"
+
+msgid "Conflicting add-ons"
+msgstr "Complementos en conflicto"
+
+msgid "Crackling sound volume"
+msgstr "Volumen del sonido de crujido"
+
+msgid "Cutoff (Hz):"
+msgstr "Corte (Hz):"
+
+msgid "Default (%s)"
+msgstr "Predeterminado (%s)"
+
+msgid "Disable in applications"
+msgstr "Deshabilitar en aplicaciones"
+
+msgid "Don't play any sound"
+msgstr "No reproducir ningún sonido"
+
+msgid "Don't show this dialog again"
+msgstr "No volver a mostrar este diálogo"
+
+msgid "Downloading Update"
+msgstr "Descargando actualización"
+
+msgid "Downloading preview... {}%"
+msgstr "Descargando vista previa... {}%"
+
+msgid "Downloading the latest version..."
+msgstr "Descargando la última versión..."
+
+msgid "Downloading..."
+msgstr "Descargando..."
+
+msgid "Downloading... {}%"
+msgstr "Descargando... {}%"
+
+msgid "Ducked Volume"
+msgstr "Volumen atenuado"
+
+msgid "Ducking categories..."
+msgstr "Categorías de atenuación..."
+
+msgid "Edit fields"
+msgstr "Campos de edición"
+
+msgid "Enable Bass Boost (enhance low frequencies)"
+msgstr "Habilitar aumento de graves (mejorar bajas frecuencias)"
+
+msgid "Enable Noise Gate (remove quiet background noise)"
+msgstr "Habilitar puerta de ruido (eliminar ruido de fondo silencioso)"
+
+msgid "Enters the navigation layer to move by various text and web units."
+msgstr "Entra en la capa de navegación para moverse por diversas unidades de texto y web."
+
+msgid "Exceptional abbreviations"
+msgstr "Abreviaturas excepcionales"
+
+msgid "Exited navigation layer"
+msgstr "Salió de la capa de navegación"
+
+msgid "FFmpeg download failed."
+msgstr "Fallo al descargar FFmpeg."
+
+msgid "FFmpeg status: checking..."
+msgstr "Estado de FFmpeg: comprobando..."
+
+msgid "FFmpeg: available at {path}"
+msgstr "FFmpeg: disponible en {path}"
+
+msgid "FFmpeg: not available"
+msgstr "FFmpeg: no disponible"
+
+msgid "FFmpeg: not installed"
+msgstr "FFmpeg: no instalado"
+
+msgid "FLAC audio files"
+msgstr "Archivos de audio FLAC"
+
+msgid "Failed to open the update file: {error}"
+msgstr "Error al abrir el archivo de actualización: {error}"
+
+msgid "Fallback sound:"
+msgstr "Sonido alternativo:"
+
+msgid "Form fields"
+msgstr "Campos de formulario"
+
+msgid ""
+"Found {count} matching file(s):\n"
+""
+msgstr ""
+"Se encontraron {count} archivo(s) coincidente(s):\n"
+""
+
+msgid "Frames"
+msgstr "Marcos"
+
+msgid "Full width phrase breakers"
+msgstr "Separadores de frases de ancho completo"
+
+msgid "Full width sentence breakers"
+msgstr "Separadores de frases de ancho completo"
+
+msgid "Gain (dB):"
+msgstr "Ganancia (dB):"
+
+msgid "General fallback"
+msgstr "Alternativa general"
+
+msgid "General fallback role"
+msgstr "Rol alternativo general"
+
+msgid "Heading Level 7"
+msgstr "Encabezado de nivel 7"
+
+msgid "Heading Level 8"
+msgstr "Encabezado de nivel 8"
+
+msgid "Heading Level 9"
+msgstr "Encabezado de nivel 9"
+
+msgid "Headings"
+msgstr "Encabezados"
+
+msgid "Images"
+msgstr "Imágenes"
+
+msgid "Import &Folder..."
+msgstr "Importar &carpeta..."
+
+msgid "Import &ZIP or .atp file..."
+msgstr "Importar archivo &ZIP o .atp..."
+
+msgid "Import &folder..."
+msgstr "Importar &carpeta..."
+
+msgid "Import Folder"
+msgstr "Importar carpeta"
+
+msgid "Include &pre-release (beta) versions"
+msgstr "Incluir versiones &prelanzamiento (beta)"
+
+msgid "Jupyter cell update in progress!"
+msgstr "¡Actualización de celda de Jupyter en curso!"
+
+msgid "Landmarks"
+msgstr "Regiones"
+
+msgid "Lines"
+msgstr "Líneas"
+
+msgid "Links"
+msgstr "Enlaces"
+
+msgid "List items"
+msgstr "Elementos de lista"
+
+msgid "Lists"
+msgstr "Listas"
+
+msgid "Lower case letters"
+msgstr "Letras minúsculas"
+
+msgid "MP2 audio files"
+msgstr "Archivos de audio MP2"
+
+msgid "MPEG audio files"
+msgstr "Archivos de audio MPEG"
+
+msgid "Navigation Layer (NVDA+Windows+N)"
+msgstr "Capa de navegación (NVDA+Windows+N)"
+
+msgid "No matching audio files found in the selected folder."
+msgstr "No se encontraron archivos de audio coincidentes en la carpeta seleccionada."
+
+msgid "No more sentences chime volume"
+msgstr "Volumen del timbre de \"No hay más frases\""
+
+msgid "No more text units chime volume"
+msgstr "Volumen del timbre de \"No hay más unidades de texto\""
+
+msgid "Noise Gate"
+msgstr "Puerta de ruido"
+
+msgid "Noise gate attack"
+msgstr "Ataque de la puerta de ruido"
+
+msgid "Noise gate release"
+msgstr "Liberación de la puerta de ruido"
+
+msgid "Noise gate threshold"
+msgstr "Umbral de la puerta de ruido"
+
+msgid "Not supported here"
+msgstr "No compatible aquí"
+
+msgid "Objects"
+msgstr "Objetos"
+
+msgid "Open the Audio Theme Studio to create and edit themes"
+msgstr "Abra el Audio Theme Studio para crear y editar temas"
+
+msgid "Opus audio files"
+msgstr "Archivos de audio Opus"
+
+msgid "Pan Mode:"
+msgstr "Modo de panoramización:"
+
+msgid "Pan Range:"
+msgstr "Rango de panoramización:"
+
+msgid "Paragraph"
+msgstr "Párrafo"
+
+msgid "Paragraph boundary chime volume"
+msgstr "Volumen del timbre de límite de párrafo"
+
+msgid "Paragraph crackle volume"
+msgstr "Volumen del crujido del párrafo"
+
+msgid "Pass-through unknown keys (Auto-exit on typing)"
+msgstr "Pasar teclas desconocidas (salida automática al escribir)"
+
+msgid "Phonetic punctuation earcons (Alt+P)"
+msgstr "Earcons fonéticos de puntuación (Alt+P)"
+
+msgid "Phrase breakers"
+msgstr "Separadores de frases"
+
+msgid "Pitch shift with progress (higher pitch = more progress)"
+msgstr "Cambio de tono con progreso (tono más alto = más progreso)"
+
+msgid "Play sounds for layer actions"
+msgstr "Reproducir sonidos para acciones de capa"
+
+msgid "Play the first available sound"
+msgstr "Reproducir el primer sonido disponible"
+
+msgid "Play the item's role sound"
+msgstr "Reproducir el sonido del rol del elemento"
+
+msgid "Play the object's role sound"
+msgstr "Reproducir el sonido del rol del objeto"
+
+msgid "Progress Bar Spatial Audio"
+msgstr "Audio espacial de la barra de progreso"
+
+msgid "Progress Pan Mode"
+msgstr "Modo de panoramización de progreso"
+
+msgid "Progress pan range"
+msgstr "Rango de panoramización de progreso"
+
+msgid "Progress-based (left to right)"
+msgstr "Basado en progreso (de izquierda a derecha)"
+
+msgid "Quotes"
+msgstr "Comillas"
+
+msgid "Radio buttons"
+msgstr "Botones de opción"
+
+msgid "Reconstruct sentences across paragraphs"
+msgstr "Reconstruir frases a través de párrafos"
+
+msgid "Release (ms):"
+msgstr "Liberación (ms):"
+
+msgid "Remove selected"
+msgstr "Eliminar seleccionados"
+
+msgid "Restart Required"
+msgstr "Reinicio requerido"
+
+msgid "Screen position (bar location on screen)"
+msgstr "Posición en pantalla (ubicación de la barra en la pantalla)"
+
+msgid "Search for a role"
+msgstr "Buscar un rol"
+
+msgid "Search:"
+msgstr "Buscar:"
+
+msgid "Searches"
+msgstr "Búsquedas"
+
+msgid "Select theme"
+msgstr "Seleccionar tema"
+
+msgid "Select which sound categories should be ducked when NVDA speaks:"
+msgstr "Seleccione qué categorías de sonido deben atenuarse cuando NVDA habla:"
+
+msgid "Select which sound categories to suppress when the foreground app is in the disabled list:"
+msgstr "Seleccione qué categorías de sonido suprimir cuando la aplicación en primer plano esté en la lista de deshabilitadas:"
+
+msgid "Sentence"
+msgstr "Frase"
+
+msgid "Sentence breakers"
+msgstr "Separadores de frases"
+
+msgid "SentenceNav sounds (Alt+Up/Down)"
+msgstr "Sonidos de SentenceNav (Alt+Arriba/Abajo)"
+
+msgid "Separators"
+msgstr "Separadores"
+
+msgid "Skip Clutter chime volume"
+msgstr "Volumen del timbre de Skip Clutter"
+
+msgid "Skippable punctuation"
+msgstr "Puntuación omitible"
+
+msgid "Sound For"
+msgstr "Sonido para"
+
+msgid "State sounds suppress the role sound"
+msgstr "Los sonidos de estado suprimen el sonido del rol"
+
+msgid "Tables"
+msgstr "Tablas"
+
+msgid "TextNav sounds (Alt+Shift+Up/Down)"
+msgstr "Sonidos de TextNav (Alt+Shift+Arriba/Abajo)"
+
+msgid "The following add-ons are now included in Advanced Audio Themes. Select the ones you want to remove to prevent conflicts:"
+msgstr "Los siguientes complementos ahora están incluidos en Advanced Audio Themes. Seleccione los que desea eliminar para evitar conflictos:"
+
+msgid "The selected conflicting add-ons will be removed after you restart NVDA."
+msgstr "Los complementos en conflicto seleccionados se eliminarán después de reiniciar NVDA."
+
+msgid "Theme sounds (roles, states, focus)"
+msgstr "Sonidos del tema (roles, estados, foco)"
+
+msgid "Threshold:"
+msgstr "Umbral:"
+
+msgid "Toggle audio themes on or off"
+msgstr "Activar o desactivar temas de audio"
+
+msgid "Trim silence threshold"
+msgstr "Umbral de recorte de silencio"
+
+msgid "Typing pack installation successful!"
+msgstr "¡Instalación del paquete de escritura exitosa!"
+
+msgid "Typing sound pack"
+msgstr "Paquete de sonido de escritura"
+
+msgid "Typing sound pack successfully installed."
+msgstr "Paquete de sonido de escritura instalado con éxito."
+
+msgid "Typing sounds"
+msgstr "Sonidos de escritura"
+
+msgid "Typing sounds volume"
+msgstr "Volumen de los sonidos de escritura"
+
+msgid "UI feedback beeps (layer, error, beacon)"
+msgstr "Pitidos de comentarios de UI (capa, error, baliza)"
+
+msgid "Unvisited links"
+msgstr "Enlaces no visitados"
+
+msgid "Update Error"
+msgstr "Error de actualización"
+
+msgid "Use FFmpeg for additional audio formats (MP3, FLAC, M4A, etc.)"
+msgstr "Usar FFmpeg para formatos de audio adicionales (MP3, FLAC, M4A, etc.)"
+
+msgid "Use custom role sound"
+msgstr "Usar sonido de rol personalizado"
+
+msgid "Use custom role sounds"
+msgstr "Usar sonidos de rol personalizados"
+
+msgid "Visited links"
+msgstr "Enlaces visitados"
+
+msgid "WMA audio files"
+msgstr "Archivos de audio WMA"
+
+msgid "When no sound is found for a role or state:"
+msgstr "Cuando no se encuentra ningún sonido para un rol o estado:"
+
+msgid "Word"
+msgstr "Palabra"
+
+msgid "text blocks"
+msgstr "Bloques de texto"

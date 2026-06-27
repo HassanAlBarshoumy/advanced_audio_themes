@@ -411,7 +411,7 @@ msgid "Bookmark entry error"
 msgstr "خطأ في إدخال الإشارة المرجعية"
 
 msgid "Bookmark points to non-focusable NVDA object, cannot click it."
-msgstr ""
+msgstr "المرجعية تشير إلى كائن لا يدعم التركيز، لا يمكن النقر عليه."
 "الإشارة المرجعية تشير إلى كائن NVDA غير قابل للتركيز، ولا يمكن النقر عليه."
 
 msgid "Bookmark store communication error"
@@ -553,7 +553,7 @@ msgid "Copied to clipboard: {}"
 msgstr "تم النسخ إلى الحافظة: {}"
 
 msgid "Copy the last text from semi-accessible edit box to clipboard."
-msgstr ""
+msgstr "نسخ النص الأخير من مربع التحرير شبه القابل للوصول إلى الحافظة."
 "انسخ النص الأخير من مربع التحرير شبه الذي يمكن الوصول إليه إلى الحافظة."
 
 msgid "Could not copy file {src} to directory {dst}."
@@ -746,7 +746,7 @@ msgid "Edit &bookmarks"
 msgstr "تحرير &الإشارات المرجعية"
 
 msgid "Edit &script in new window; press Control+Enter when Done."
-msgstr ""
+msgstr "تحرير البرنامج النصي (Script) في نافذة جديدة؛ اضغط Control+Enter عند الانتهاء."
 "تحرير & البرنامج النصي في نافذة جديدة؛ اضغط على Control+Enter عند الانتهاء."
 
 msgid "Edit audio rule"
@@ -854,7 +854,7 @@ msgid "Error during installation."
 msgstr "خطأ أثناء تثبيت الثيم."
 
 msgid "Error during switch to window stage, focused element role is %d"
-msgstr ""
+msgstr "خطأ أثناء مرحلة التبديل إلى النافذة، دور العنصر المحدد هو %d"
 "حدث خطأ أثناء التبديل إلى مرحلة النافذة، دور العنصر الذي تم التركيز عليه هو "
 "%d"
 
@@ -1032,7 +1032,7 @@ msgid "I&mport Configuration..."
 msgstr "ا&ستيراد الإعدادات..."
 
 msgid "Ignore all focus events - good for websites that misuse focus events"
-msgstr ""
+msgstr "تجاهل جميع أحداث التركيز - مفيد لمواقع الويب التي تسيء استخدام أحداث التركيز"
 "تجاهل جميع أحداث التركيز - وهو أمر جيد لمواقع الويب التي تسيء استخدام أحداث "
 "التركيز"
 
@@ -1062,7 +1062,7 @@ msgstr ""
 "لإشارات QuickJump!"
 
 msgid "Invalid keystroke %s: cannot overload essential  NVDA keystrokes!"
-msgstr ""
+msgstr "اختصار غير صالح %s: لا يمكن تجاوز اختصارات NVDA الأساسية!"
 "ضغطة مفتاح غير صالحة %s: لا يمكن تحميل ضغطات مفاتيح NVDA الأساسية بشكل زائد!"
 
 msgid "Invalid level for numeric script: '{level}'"
@@ -1588,7 +1588,7 @@ msgid "Regex search"
 msgstr "بحث ريجكس"
 
 msgid "Regexp text not found: tried to search for '{text}' {direction}."
-msgstr ""
+msgstr "لم يتم العثور على نص التعبير النمطي: تمت محاولة البحث عن '{text}' {direction}."
 "لم يتم العثور على نص التعبير العادي: حاولت البحث عن '{text}' {direction}."
 
 msgid ""
@@ -1664,7 +1664,7 @@ msgid "Scrolling backward. This may load more elements on the page."
 msgstr "التمرير للخلف. قد يؤدي هذا إلى تحميل المزيد من العناصر على الصفحة."
 
 msgid "Scrolling forward. This may load more elements on the page."
-msgstr ""
+msgstr "التمرير للأمام. قد يؤدي هذا إلى تحميل المزيد من العناصر في الصفحة."
 "التمرير إلى الأمام. قد يؤدي هذا إلى تحميل المزيد من العناصر على الصفحة."
 
 msgid "Search for a role:"
@@ -1874,7 +1874,7 @@ msgid "Suppress aria label announcements for landmarks and regions"
 msgstr "منع إعلانات تصنيفات النغمات للمعالم والمناطق"
 
 msgid "Suppress aria name announcements for editables and combo boxes"
-msgstr ""
+msgstr "كتم إعلانات أسماء Aria لحقول التحرير ومربعات التحرير والسرد"
 "منع إعلانات أسماء النغمات للعناصر القابلة للتحرير ومربعات التحرير والسرد"
 
 msgid "Suppress aria role text announcements"
@@ -2376,3 +2376,677 @@ msgstr "لا تظهر هذه النافذة مرة أخرى"
 
 msgid "Skip"
 msgstr "تخطي"
+
+
+msgid "First/Last Item"
+msgstr "العنصر الأول/الأخير"
+
+msgid "When no sound for first/last item:"
+msgstr "عند عدم وجود صوت للعنصر الأول/الأخير:"
+
+msgid "First/Last item fallback"
+msgstr "البديل للعنصر الأول/الأخير"
+
+msgid "First item sound:"
+msgstr "صوت العنصر الأول:"
+
+msgid "First item fallback role"
+msgstr "الدور البديل للعنصر الأول"
+
+msgid "Last item sound:"
+msgstr "صوت العنصر الأخير:"
+
+msgid "Last item fallback role"
+msgstr "الدور البديل للعنصر الأخير"
+
+msgid "Enable first/last item detection"
+msgstr "تفعيل اكتشاف العنصر الأول/الأخير"
+
+msgid "Detect as first item"
+msgstr "اكتشاف كعنصر أول"
+
+msgid "Detect as last item"
+msgstr "اكتشاف كعنصر أخير"
+
+msgid "Select the roles that should have first/last item detection:"
+msgstr "حدد الأدوار التي يجب أن يتوفر فيها اكتشاف العنصر الأول/الأخير:"
+
+msgid "Solo item behavior"
+msgstr "سلوك العنصر المنفرد (الوحيد)"
+
+msgid "Note: Fallback behavior when no first/last sound exists can be configured in the General tab under \"When no sound for first/last item\"."
+msgstr "ملاحظة: يمكن تكوين السلوك البديل عند عدم وجود صوت للعنصر الأول/الأخير في تبويبة \"عام\" تحت خيار \"عند عدم وجود صوت للعنصر الأول/الأخير\"."
+
+
+msgid "Detection scope"
+msgstr "نطاق الاكتشاف"
+
+msgid "Apply to all roles"
+msgstr "تطبيق على جميع الأدوار"
+
+msgid "Apply to selected roles only"
+msgstr "تطبيق على الأدوار المحددة فقط"
+
+msgid "Select roles..."
+msgstr "تحديد الأدوار..."
+
+msgid "Solo items"
+msgstr "العناصر المنفردة"
+
+msgid "Solo items are items that have no siblings of the same type."
+msgstr "العناصر المنفردة هي العناصر التي ليس لها عناصر مجاورة من نفس النوع."
+
+msgid "Behavior:"
+msgstr "السلوك:"
+
+msgid "Don't detect solo items"
+msgstr "عدم اكتشاف العناصر المنفردة"
+
+msgid "Select roles for first/last detection"
+msgstr "تحديد الأدوار لاكتشاف العنصر الأول/الأخير"
+
+
+
+
+
+msgid ""
+"\n"
+"Do you want to import them?"
+msgstr ""
+"\n"
+"هل ترغب في استيرادهم؟"
+
+msgid "%d Hz"
+msgstr "%d هرتز"
+
+msgid "%d dB"
+msgstr "%d ديسيبل"
+
+msgid "%d°"
+msgstr "%d°"
+
+msgid "&Cancel"
+msgstr "إل&غاء"
+
+msgid "&Download and Install FFmpeg"
+msgstr "&تنزيل وتثبيت FFmpeg"
+
+msgid "0 (off)"
+msgstr "0 (إيقاف)"
+
+msgid "AAC audio files"
+msgstr "ملفات صوت AAC"
+
+msgid "AAC/M4A audio files"
+msgstr "ملفات صوت AAC/M4A"
+
+msgid "AC3 audio files"
+msgstr "ملفات صوت AC3"
+
+msgid "Active Navigation Modes:"
+msgstr "أوضاع التصفح النشطة:"
+
+msgid "Add Audio Theme"
+msgstr "إضافة ثيم صوتي"
+
+msgid "Announcement format"
+msgstr "صيغة النطق"
+
+msgid "Application Profiles"
+msgstr "ملفات تعريف التطبيقات"
+
+msgid "Articles"
+msgstr "المقالات"
+
+msgid "Attack (ms):"
+msgstr "الهجوم (بالملي ثانية):"
+
+msgid "Audio Ducking Categories"
+msgstr "فئات خفض الصوت (Ducking)"
+
+msgid "Audio Formats"
+msgstr "صيغ الصوت"
+
+msgid "Audio Output Mode"
+msgstr "وضع إخراج الصوت"
+
+msgid "Auto-exit layer after 10 seconds of inactivity"
+msgstr "الخروج التلقائي من الطبقة بعد 10 ثوانٍ من عدم النشاط"
+
+msgid "Bass Boost"
+msgstr "تضخيم الجهير (Bass Boost)"
+
+msgid "Bass boost cutoff"
+msgstr "تردد قطع تضخيم الجهير"
+
+msgid "Bass boost gain"
+msgstr "مستوى تضخيم الجهير"
+
+msgid "Beeping sound volume"
+msgstr "مستوى صوت الرنين"
+
+msgid "Blacklist applications"
+msgstr "تطبيقات القائمة السوداء"
+
+msgid "Break sentences at element boundaries (links, separators, etc.)"
+msgstr "تقسيم الجمل عند حدود العناصر (الروابط، الفواصل، إلخ)"
+
+msgid "BrowserNav sounds (indentation, navigation)"
+msgstr "أصوات BrowserNav (المسافة البادئة، التصفح)"
+
+msgid "Buttons"
+msgstr "الأزرار"
+
+msgid "Capital letters"
+msgstr "الأحرف الكبيرة"
+
+msgid "Categories to Suppress in Disabled Apps"
+msgstr "الفئات المراد كتمها في التطبيقات المعطلة"
+
+msgid "Categories to suppress in disabled apps..."
+msgstr "الفئات المراد كتمها في التطبيقات المعطلة..."
+
+msgid "Check boxes"
+msgstr "مربعات التحديد"
+
+msgid "Check for updates &automatically"
+msgstr "التحقق من التحديثات تل&قائياً"
+
+msgid "Checking for updates..."
+msgstr "جاري التحقق من التحديثات..."
+
+msgid "Choose a folder containing audio files to import"
+msgstr "اختر مجلداً يحتوي على ملفات صوتية لاستيرادها"
+
+msgid "Choose a folder containing audio theme files"
+msgstr "اختر مجلداً يحتوي على ملفات ثيمات صوتية"
+
+msgid "Combo boxes"
+msgstr "مربعات التحرير والسرد (الخيارات المتعددة)"
+
+msgid "Conflicting add-ons"
+msgstr "الإضافات المتعارضة"
+
+msgid "Crackling sound volume"
+msgstr "مستوى صوت الطقطقة (الخشخشة)"
+
+msgid "Cutoff (Hz):"
+msgstr "تردد القطع (هرتز):"
+
+msgid "Default (%s)"
+msgstr "الافتراضي (%s)"
+
+msgid "Disable in applications"
+msgstr "تعطيل في التطبيقات"
+
+msgid "Don't play any sound"
+msgstr "عدم تشغيل أي صوت"
+
+msgid "Don't show this dialog again"
+msgstr "عدم إظهار هذا الحوار مرة أخرى"
+
+msgid "Downloading Update"
+msgstr "جاري تنزيل التحديث"
+
+msgid "Downloading preview... {}%"
+msgstr "جاري تنزيل المعاينة... {}%"
+
+msgid "Downloading the latest version..."
+msgstr "جاري تنزيل أحدث إصدار..."
+
+msgid "Downloading..."
+msgstr "جاري التنزيل..."
+
+msgid "Downloading... {}%"
+msgstr "جاري التنزيل... {}%"
+
+msgid "Ducked Volume"
+msgstr "مستوى الصوت المخفض"
+
+msgid "Ducking categories..."
+msgstr "فئات خفض الصوت..."
+
+msgid "Edit fields"
+msgstr "حقول التحرير"
+
+msgid "Enable Bass Boost (enhance low frequencies)"
+msgstr "تفعيل تضخيم الجهير (تحسين الترددات المنخفضة)"
+
+msgid "Enable Noise Gate (remove quiet background noise)"
+msgstr "تفعيل بوابة الضوضاء (لإزالة الضوضاء الخلفية الخافتة)"
+
+msgid "Enters the navigation layer to move by various text and web units."
+msgstr "الدخول إلى طبقة التصفح للتنقل عبر مختلف وحدات النص والويب."
+
+msgid "Exceptional abbreviations"
+msgstr "اختصارات استثنائية"
+
+msgid "Exited navigation layer"
+msgstr "تم الخروج من طبقة التصفح"
+
+msgid "FFmpeg download failed."
+msgstr "فشل تنزيل FFmpeg."
+
+msgid "FFmpeg status: checking..."
+msgstr "حالة FFmpeg: جاري التحقق..."
+
+msgid "FFmpeg: available at {path}"
+msgstr "FFmpeg: متاح في {path}"
+
+msgid "FFmpeg: not available"
+msgstr "FFmpeg: غير متاح"
+
+msgid "FFmpeg: not installed"
+msgstr "FFmpeg: غير مثبت"
+
+msgid "FLAC audio files"
+msgstr "ملفات صوت FLAC"
+
+msgid "Failed to open the update file: {error}"
+msgstr "فشل فتح ملف التحديث: {error}"
+
+msgid "Fallback sound:"
+msgstr "الصوت البديل:"
+
+msgid "Form fields"
+msgstr "حقول النماذج"
+
+msgid ""
+"Found {count} matching file(s):\n"
+""
+msgstr ""
+"تم العثور على {count} ملف(ملفات) مطابقة:\n"
+""
+
+msgid "Frames"
+msgstr "الإطارات"
+
+msgid "Full width phrase breakers"
+msgstr "فواصل العبارات كاملة العرض"
+
+msgid "Full width sentence breakers"
+msgstr "فواصل الجمل كاملة العرض"
+
+msgid "Gain (dB):"
+msgstr "مستوى الزيادة (ديسيبل):"
+
+msgid "General fallback"
+msgstr "البديل العام"
+
+msgid "General fallback role"
+msgstr "الدور البديل العام"
+
+msgid "Heading Level 7"
+msgstr "ترويسة من المستوى 7"
+
+msgid "Heading Level 8"
+msgstr "ترويسة من المستوى 8"
+
+msgid "Heading Level 9"
+msgstr "ترويسة من المستوى 9"
+
+msgid "Headings"
+msgstr "الترويسات"
+
+msgid "Images"
+msgstr "الصور"
+
+msgid "Import &Folder..."
+msgstr "استيراد م&جلد..."
+
+msgid "Import &ZIP or .atp file..."
+msgstr "استيراد ملف &ZIP أو .atp..."
+
+msgid "Import &folder..."
+msgstr "استيراد م&جلد..."
+
+msgid "Import Folder"
+msgstr "استيراد مجلد"
+
+msgid "Include &pre-release (beta) versions"
+msgstr "تضمين الإصدارات التجريبية (بيتا)"
+
+msgid "Jupyter cell update in progress!"
+msgstr "جاري تحديث خلية Jupyter!"
+
+msgid "Landmarks"
+msgstr "المعالم (Landmarks)"
+
+msgid "Lines"
+msgstr "الأسطر"
+
+msgid "Links"
+msgstr "الروابط"
+
+msgid "List items"
+msgstr "عناصر القائمة"
+
+msgid "Lists"
+msgstr "القوائم"
+
+msgid "Lower case letters"
+msgstr "الأحرف الصغيرة"
+
+msgid "MP2 audio files"
+msgstr "ملفات صوت MP2"
+
+msgid "MPEG audio files"
+msgstr "ملفات صوت MPEG"
+
+msgid "Navigation Layer (NVDA+Windows+N)"
+msgstr "طبقة التصفح (NVDA+Windows+N)"
+
+msgid "No matching audio files found in the selected folder."
+msgstr "لم يتم العثور على ملفات صوتية مطابقة في المجلد المحدد."
+
+msgid "No more sentences chime volume"
+msgstr "مستوى صوت رنين \"لا توجد جمل أخرى\""
+
+msgid "No more text units chime volume"
+msgstr "مستوى صوت رنين \"لا توجد وحدات نصية أخرى\""
+
+msgid "Noise Gate"
+msgstr "بوابة الضوضاء (Noise Gate)"
+
+msgid "Noise gate attack"
+msgstr "زمن هجوم بوابة الضوضاء"
+
+msgid "Noise gate release"
+msgstr "زمن تحرير بوابة الضوضاء"
+
+msgid "Noise gate threshold"
+msgstr "عتبة بوابة الضوضاء"
+
+msgid "Not supported here"
+msgstr "غير مدعوم هنا"
+
+msgid "Objects"
+msgstr "الكائنات"
+
+msgid "Open the Audio Theme Studio to create and edit themes"
+msgstr "افتح استوديو الثيمات الصوتية لإنشاء الثيمات وتعديلها"
+
+msgid "Opus audio files"
+msgstr "ملفات صوت Opus"
+
+msgid "Pan Mode:"
+msgstr "وضع التوزيع الصوتي (Pan):"
+
+msgid "Pan Range:"
+msgstr "نطاق التوزيع الصوتي:"
+
+msgid "Paragraph"
+msgstr "فقرة"
+
+msgid "Paragraph boundary chime volume"
+msgstr "مستوى صوت رنين حدود الفقرة"
+
+msgid "Paragraph crackle volume"
+msgstr "مستوى صوت طقطقة الفقرة"
+
+msgid "Pass-through unknown keys (Auto-exit on typing)"
+msgstr "تمرير المفاتيح غير المعروفة (الخروج التلقائي عند الكتابة)"
+
+msgid "Phonetic punctuation earcons (Alt+P)"
+msgstr "رموز صوتية لعلامات الترقيم (Alt+P)"
+
+msgid "Phrase breakers"
+msgstr "فواصل العبارات"
+
+msgid "Pitch shift with progress (higher pitch = more progress)"
+msgstr "تغيير حدة الصوت مع التقدم (حدة أعلى = تقدم أكبر)"
+
+msgid "Play sounds for layer actions"
+msgstr "تشغيل أصوات لإجراءات الطبقة"
+
+msgid "Play the first available sound"
+msgstr "تشغيل أول صوت متاح"
+
+msgid "Play the item's role sound"
+msgstr "تشغيل صوت دور العنصر"
+
+msgid "Play the object's role sound"
+msgstr "تشغيل صوت دور الكائن"
+
+msgid "Progress Bar Spatial Audio"
+msgstr "الصوت المكاني لشريط التقدم"
+
+msgid "Progress Pan Mode"
+msgstr "وضع التوزيع الصوتي للتقدم"
+
+msgid "Progress pan range"
+msgstr "نطاق التوزيع الصوتي للتقدم"
+
+msgid "Progress-based (left to right)"
+msgstr "مبني على التقدم (من اليسار لليمين)"
+
+msgid "Quotes"
+msgstr "علامات الاقتباس"
+
+msgid "Radio buttons"
+msgstr "أزرار الاختيار"
+
+msgid "Reconstruct sentences across paragraphs"
+msgstr "إعادة بناء الجمل عبر الفقرات"
+
+msgid "Release (ms):"
+msgstr "التحرير (بالملي ثانية):"
+
+msgid "Remove selected"
+msgstr "إزالة المحدد"
+
+msgid "Restart Required"
+msgstr "يجب إعادة التشغيل"
+
+msgid "Screen position (bar location on screen)"
+msgstr "موضع الشاشة (مكان الشريط على الشاشة)"
+
+msgid "Search for a role"
+msgstr "البحث عن دور"
+
+msgid "Search:"
+msgstr "بحث:"
+
+msgid "Searches"
+msgstr "عمليات البحث"
+
+msgid "Select theme"
+msgstr "تحديد ثيم"
+
+msgid "Select which sound categories should be ducked when NVDA speaks:"
+msgstr "حدد فئات الصوت التي يجب خفض صوتها عندما يتحدث NVDA:"
+
+msgid "Select which sound categories to suppress when the foreground app is in the disabled list:"
+msgstr "حدد فئات الصوت التي يجب كتمها عندما يكون التطبيق الأمامي في القائمة المعطلة:"
+
+msgid "Sentence"
+msgstr "جملة"
+
+msgid "Sentence breakers"
+msgstr "فواصل الجمل"
+
+msgid "SentenceNav sounds (Alt+Up/Down)"
+msgstr "أصوات SentenceNav (Alt+Up/Down)"
+
+msgid "Separators"
+msgstr "الفواصل"
+
+msgid "Skip Clutter chime volume"
+msgstr "مستوى رنين تجاوز الفوضى (Skip Clutter)"
+
+msgid "Skippable punctuation"
+msgstr "علامات الترقيم القابلة للتخطي"
+
+msgid "Sound For"
+msgstr "صوت لـ"
+
+msgid "State sounds suppress the role sound"
+msgstr "أصوات الحالة تكتم صوت الدور"
+
+msgid "Tables"
+msgstr "الجداول"
+
+msgid "TextNav sounds (Alt+Shift+Up/Down)"
+msgstr "أصوات TextNav (Alt+Shift+Up/Down)"
+
+msgid "The following add-ons are now included in Advanced Audio Themes. Select the ones you want to remove to prevent conflicts:"
+msgstr "الإضافات التالية مضمنة الآن في Advanced Audio Themes. حدد ما تريد إزالته لمنع التعارض:"
+
+msgid "The selected conflicting add-ons will be removed after you restart NVDA."
+msgstr "ستتم إزالة الإضافات المتعارضة المحددة بعد إعادة تشغيل NVDA."
+
+msgid "Theme sounds (roles, states, focus)"
+msgstr "أصوات الثيمات (الأدوار، الحالات، التركيز)"
+
+msgid "Threshold:"
+msgstr "العتبة:"
+
+msgid "Toggle audio themes on or off"
+msgstr "تبديل تشغيل/إيقاف الثيمات الصوتية"
+
+msgid "Trim silence threshold"
+msgstr "عتبة قص الصمت"
+
+msgid "Typing pack installation successful!"
+msgstr "تم تثبيت حزمة الكتابة بنجاح!"
+
+msgid "Typing sound pack"
+msgstr "حزمة صوت الكتابة"
+
+msgid "Typing sound pack successfully installed."
+msgstr "تم تثبيت حزمة صوت الكتابة بنجاح."
+
+msgid "Typing sounds"
+msgstr "أصوات الكتابة"
+
+msgid "Typing sounds volume"
+msgstr "مستوى أصوات الكتابة"
+
+msgid "UI feedback beeps (layer, error, beacon)"
+msgstr "أصوات واجهة المستخدم (الطبقات، الأخطاء، الإشارات)"
+
+msgid "Unvisited links"
+msgstr "روابط غير مزورة"
+
+msgid "Update Error"
+msgstr "خطأ في التحديث"
+
+msgid "Use FFmpeg for additional audio formats (MP3, FLAC, M4A, etc.)"
+msgstr "استخدم FFmpeg لدعم صيغ صوت إضافية (MP3، FLAC، M4A، إلخ)"
+
+msgid "Use custom role sound"
+msgstr "استخدام صوت دور مخصص"
+
+msgid "Use custom role sounds"
+msgstr "استخدام أصوات دور مخصصة"
+
+msgid "Visited links"
+msgstr "روابط تمت زيارتها"
+
+msgid "WMA audio files"
+msgstr "ملفات صوت WMA"
+
+msgid "When no sound is found for a role or state:"
+msgstr "عند عدم العثور على صوت لدور أو حالة:"
+
+msgid "Word"
+msgstr "كلمة"
+
+msgid "AC Power Connected"
+msgstr "تم توصيل التيار الكهربائي"
+
+msgid "AC Power Disconnected"
+msgstr "تم فصل التيار الكهربائي"
+
+msgid "AC power connected/disconnected"
+msgstr "توصيل/فصل التيار الكهربائي"
+
+msgid "Battery check interval (seconds):"
+msgstr "فترة التحقق من البطارية (ثواني):"
+
+msgid "Battery Critical"
+msgstr "البطارية في مستوى خطير"
+
+msgid "Battery Fully Charged"
+msgstr "البطارية مشحونة بالكامل"
+
+msgid "Battery Low"
+msgstr "البطارية منخفضة"
+
+msgid "Battery level changes (low, critical, full)"
+msgstr "تغيرات مستوى البطارية (منخفضة، خطيرة، كاملة)"
+
+msgid "Battery Thresholds"
+msgstr "عتبات البطارية"
+
+msgid "Check Intervals"
+msgstr "فترات التحقق"
+
+msgid "Critical battery threshold (%):"
+msgstr "عتبة البطارية الخطيرة (%):"
+
+msgid "Custom Sound Files"
+msgstr "ملفات الصوت المخصصة"
+
+msgid "Enable system status sounds"
+msgstr "تفعيل أصوات حالة النظام"
+
+msgid "Events"
+msgstr "الأحداث"
+
+msgid "Low battery threshold (%):"
+msgstr "عتبة البطارية المنخفضة (%):"
+
+msgid "Monitor all USB devices (keyboard, mouse, storage, etc.)"
+msgstr "مراقبة جميع أجهزة USB (لوحة مفاتيح، فأرة، تخزين، إلخ)"
+
+msgid "Network check interval (seconds):"
+msgstr "فترة التحقق من الشبكة (ثواني):"
+
+msgid "Network Connected"
+msgstr "تم الاتصال بالشبكة"
+
+msgid "Network connect/disconnect"
+msgstr "اتصال/قطع الشبكة"
+
+msgid "Network Disconnected"
+msgstr "تم قطع الاتصال بالشبكة"
+
+msgid "Storage Volume Mounted"
+msgstr "تم تركيب وسيط تخزين"
+
+msgid "Storage volume mount/unmount"
+msgstr "تركيب/إزالة وسائط التخزين"
+
+msgid "Storage Volume Unmounted"
+msgstr "تم إزالة وسيط تخزين"
+
+msgid "System Sleep"
+msgstr "دخول النظام في وضع السكون"
+
+msgid "System Status"
+msgstr "حالة النظام"
+
+msgid "System status sounds volume:"
+msgstr "مستوى أصوات حالة النظام:"
+
+msgid "System Wake"
+msgstr "استيقاظ النظام"
+
+msgid "System wake/sleep"
+msgstr "استيقاظ/سكون النظام"
+
+msgid "USB Device Plugged"
+msgstr "تم توصيل جهاز USB"
+
+msgid "USB device plug/unplug"
+msgstr "توصيل/فصل أجهزة USB"
+
+msgid "USB Device Unplugged"
+msgstr "تم فصل جهاز USB"
+
+msgid "USB Monitoring"
+msgstr "مراقبة USB"
+
+msgid "text blocks"
+msgstr "كتل النص"

@@ -155,6 +155,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.setupFirstLastPage(self.firstLastPage)
         self.notebook.AddPage(self.firstLastPage, _("First/Last Item"))
 
+        # Tab 9: System Status Sounds
+        self.sysStatusPage = wx.Panel(self.notebook)
+        self.setupSystemStatusPage(self.sysStatusPage)
+        self.notebook.AddPage(self.sysStatusPage, _("System Status"))
+
         settingsSizer.Add(self.notebook, 1, wx.EXPAND | wx.ALL, 5)
 
         self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._onLazyLoadTab)
@@ -1250,10 +1255,92 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         # Note about fallback
         noteLabel = wx.StaticText(page, -1, _(
-            "Note: Fallback behavior when no first/last sound exists can be\n"
-            "configured in the General tab under \"When no sound for first/last item\"."
+            "Note: Fallback behavior when no first/last sound exists can be configured in the General tab under \"When no sound for first/last item\"."
         ))
         sizer.Add(noteLabel, 0, wx.ALL, 10)
+
+        sizer.AddStretchSpacer()
+        page.SetSizer(sizer)
+
+    def setupSystemStatusPage(self, page):
+        sizer = wx.BoxSizer(wx.VERTICAL)
+
+        # Master enable
+        self.sysStatusEnableCheckbox = wx.CheckBox(page, -1, _("Enable system status sounds"))
+        sizer.Add(self.sysStatusEnableCheckbox, 0, wx.ALL, 10)
+
+        # Volume slider
+        volLabel = wx.StaticText(page, -1, _("System status sounds volume:"))
+        self.sysStatusVolumeSlider = wx.Slider(page, -1, minValue=0, maxValue=100, name=_("System status sounds volume"))
+        sizer.Add(volLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
+        sizer.Add(self.sysStatusVolumeSlider, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+
+        # USB monitoring mode
+        usbBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("USB Monitoring"))
+        self.sysAllUsbCheckbox = wx.CheckBox(page, -1, _("Monitor all USB devices (keyboard, mouse, storage, etc.)"))
+        usbBox.Add(self.sysAllUsbCheckbox, 0, wx.ALL, 5)
+        sizer.Add(usbBox, 0, wx.EXPAND | wx.ALL, 10)
+
+        # Per-event toggles
+        eventsBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Events"))
+
+        self.sysAcEnableCheckbox = wx.CheckBox(page, -1, _("AC power connected/disconnected"))
+        eventsBox.Add(self.sysAcEnableCheckbox, 0, wx.ALL, 5)
+        self.sysBatteryEnableCheckbox = wx.CheckBox(page, -1, _("Battery level changes (low, critical, full)"))
+        eventsBox.Add(self.sysBatteryEnableCheckbox, 0, wx.ALL, 5)
+        self.sysUsbEnableCheckbox = wx.CheckBox(page, -1, _("USB device plug/unplug"))
+        eventsBox.Add(self.sysUsbEnableCheckbox, 0, wx.ALL, 5)
+        self.sysVolumeEnableCheckbox = wx.CheckBox(page, -1, _("Storage volume mount/unmount"))
+        eventsBox.Add(self.sysVolumeEnableCheckbox, 0, wx.ALL, 5)
+        self.sysNetworkEnableCheckbox = wx.CheckBox(page, -1, _("Network connect/disconnect"))
+        eventsBox.Add(self.sysNetworkEnableCheckbox, 0, wx.ALL, 5)
+        self.sysWakeEnableCheckbox = wx.CheckBox(page, -1, _("System wake/sleep"))
+        eventsBox.Add(self.sysWakeEnableCheckbox, 0, wx.ALL, 5)
+
+        sizer.Add(eventsBox, 0, wx.EXPAND | wx.ALL, 10)
+
+        # Battery thresholds
+        thresholdBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Battery Thresholds"))
+
+        lowLabel = wx.StaticText(page, -1, _("Low battery threshold (%):"))
+        self.sysBatteryLowSpin = wx.SpinCtrl(page, -1, min=0, max=100, initial=20, name=_("Low battery threshold"))
+        thresholdBox.Add(lowLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
+        thresholdBox.Add(self.sysBatteryLowSpin, 0, wx.EXPAND | wx.ALL, 5)
+
+        critLabel = wx.StaticText(page, -1, _("Critical battery threshold (%):"))
+        self.sysBatteryCriticalSpin = wx.SpinCtrl(page, -1, min=0, max=100, initial=10, name=_("Critical battery threshold"))
+        thresholdBox.Add(critLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
+        thresholdBox.Add(self.sysBatteryCriticalSpin, 0, wx.EXPAND | wx.ALL, 5)
+
+        sizer.Add(thresholdBox, 0, wx.EXPAND | wx.ALL, 10)
+
+        # Check intervals
+        intervalBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Check Intervals"))
+
+        netLabel = wx.StaticText(page, -1, _("Network check interval (seconds):"))
+        self.sysNetworkIntervalSpin = wx.SpinCtrl(page, -1, min=5, max=300, initial=15, name=_("Network check interval"))
+        intervalBox.Add(netLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
+        intervalBox.Add(self.sysNetworkIntervalSpin, 0, wx.EXPAND | wx.ALL, 5)
+
+        batLabel = wx.StaticText(page, -1, _("Battery check interval (seconds):"))
+        self.sysBatteryIntervalSpin = wx.SpinCtrl(page, -1, min=5, max=300, initial=30, name=_("Battery check interval"))
+        intervalBox.Add(batLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
+        intervalBox.Add(self.sysBatteryIntervalSpin, 0, wx.EXPAND | wx.ALL, 5)
+
+        sizer.Add(intervalBox, 0, wx.EXPAND | wx.ALL, 10)
+
+        # Sound file naming note
+        noteBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Custom Sound Files"))
+        note = wx.StaticText(page, -1, _(
+            "Place .wav files in your theme folder with these names:\n"
+            "sys_ac_plug.wav, sys_ac_unplug.wav, sys_battery_low.wav,\n"
+            "sys_battery_critical.wav, sys_battery_full.wav, sys_usb_plug.wav,\n"
+            "sys_usb_unplug.wav, sys_volume_plug.wav, sys_volume_unplug.wav,\n"
+            "sys_network_connect.wav, sys_network_disconnect.wav,\n"
+            "sys_wake.wav, sys_sleep.wav"
+        ))
+        noteBox.Add(note, 0, wx.ALL, 10)
+        sizer.Add(noteBox, 0, wx.EXPAND | wx.ALL, 10)
 
         sizer.AddStretchSpacer()
         page.SetSizer(sizer)
@@ -1447,6 +1534,21 @@ class AudioThemesSettingsPanel(SettingsPanel):
         solo_map = {"first": 0, "last": 1, "none": 2}
         solo_val = conf.get("fl_solo_behavior", "first")
         self.flSoloChoice.SetSelection(solo_map.get(solo_val, 0))
+
+        # System Status tab
+        self.sysStatusEnableCheckbox.SetValue(_b(conf.get("sys_status_enabled", True)))
+        self.sysStatusVolumeSlider.SetValue(_i(conf.get("sys_status_volume", 20)))
+        self.sysAllUsbCheckbox.SetValue(_b(conf.get("sys_all_usb", True)))
+        self.sysAcEnableCheckbox.SetValue(_b(conf.get("sys_ac_enabled", True)))
+        self.sysBatteryEnableCheckbox.SetValue(_b(conf.get("sys_battery_enabled", True)))
+        self.sysUsbEnableCheckbox.SetValue(_b(conf.get("sys_usb_enabled", True)))
+        self.sysVolumeEnableCheckbox.SetValue(_b(conf.get("sys_volume_enabled", True)))
+        self.sysNetworkEnableCheckbox.SetValue(_b(conf.get("sys_network_enabled", True)))
+        self.sysWakeEnableCheckbox.SetValue(_b(conf.get("sys_wake_enabled", True)))
+        self.sysBatteryLowSpin.SetValue(_i(conf.get("sys_battery_low_threshold", 20)))
+        self.sysBatteryCriticalSpin.SetValue(_i(conf.get("sys_battery_critical_threshold", 10)))
+        self.sysNetworkIntervalSpin.SetValue(_i(conf.get("sys_network_check_interval", 15), 15))
+        self.sysBatteryIntervalSpin.SetValue(_i(conf.get("sys_battery_check_interval", 30), 30))
 
         # Speech Order
         fmt = conf.get("announceFormat", "0")
@@ -1845,6 +1947,21 @@ class AudioThemesSettingsPanel(SettingsPanel):
         solo_map = {0: "first", 1: "last", 2: "none"}
         sel = self.flSoloChoice.GetSelection()
         conf["fl_solo_behavior"] = solo_map.get(sel, "first")
+
+        # System Status tab
+        conf["sys_status_enabled"] = self.sysStatusEnableCheckbox.GetValue()
+        conf["sys_status_volume"] = self.sysStatusVolumeSlider.GetValue()
+        conf["sys_all_usb"] = self.sysAllUsbCheckbox.GetValue()
+        conf["sys_ac_enabled"] = self.sysAcEnableCheckbox.GetValue()
+        conf["sys_battery_enabled"] = self.sysBatteryEnableCheckbox.GetValue()
+        conf["sys_usb_enabled"] = self.sysUsbEnableCheckbox.GetValue()
+        conf["sys_volume_enabled"] = self.sysVolumeEnableCheckbox.GetValue()
+        conf["sys_network_enabled"] = self.sysNetworkEnableCheckbox.GetValue()
+        conf["sys_wake_enabled"] = self.sysWakeEnableCheckbox.GetValue()
+        conf["sys_battery_low_threshold"] = self.sysBatteryLowSpin.GetValue()
+        conf["sys_battery_critical_threshold"] = self.sysBatteryCriticalSpin.GetValue()
+        conf["sys_network_check_interval"] = self.sysNetworkIntervalSpin.GetValue()
+        conf["sys_battery_check_interval"] = self.sysBatteryIntervalSpin.GetValue()
 
         # Speech Order
         if self.announceFormatChoice.GetSelection() != wx.NOT_FOUND:

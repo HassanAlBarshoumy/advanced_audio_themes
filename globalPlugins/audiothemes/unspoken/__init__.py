@@ -530,7 +530,9 @@ class UnspokenPlayer:
 					sounds.pop(next(iter(sounds)))
 		return result
 
-	def _compute_volume(self):
+	def _compute_volume(self, volume_override=None):
+		if volume_override is not None:
+			return clamp(volume_override, 0.0, 1.5)
 		if not self.use_synth_volume:
 			base_vol = self.volume / 100.0
 		else:
@@ -564,7 +566,7 @@ class UnspokenPlayer:
 			return
 		if config.conf["unspoken"].get("noSounds", False):
 			return
-		if getattr(self, "use_in_say_all", False) and SayAllHandler.isRunning():
+		if not obj_info.get("system_sound") and getattr(self, "use_in_say_all", False) and SayAllHandler.isRunning():
 			return
 
 		if sound.get("is_ogg"):
@@ -595,6 +597,7 @@ class UnspokenPlayer:
 		# De-duplicate: skip if same name played < 50ms ago, unless it's a progress bar updating
 		obj_name = obj_info.get("name", "") if isinstance(obj_info, dict) else ""
 		is_progress = "progress_angle" in obj_info if isinstance(obj_info, dict) else False
+		is_system = obj_info.get("system_sound") if isinstance(obj_info, dict) else False
 		if not is_progress and self._last_played_object and (curtime - self._last_played_time < 0.05 and obj_name == self._last_played_object.get("name", "")):
 			return
 		self._last_played_object = obj_info
@@ -661,7 +664,8 @@ class UnspokenPlayer:
 		# Process audio with Steam Audio
 		sound_data = sound
 		# Adjust volume
-		volume = self._compute_volume()
+		volume_override = obj_info.get("volume_override") if isinstance(obj_info, dict) else None
+		volume = self._compute_volume(volume_override=volume_override)
 		
 		# Pitch shifting based on progress (up to 2x pitch/speed at 100%)
 		pitch_factor = 1.0
