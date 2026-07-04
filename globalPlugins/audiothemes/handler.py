@@ -1056,6 +1056,17 @@ class AudioThemesHandler:
                 pack.extractall(path=identified_path)
         info_file = os.path.join(identified_path, INFO_FILE_NAME)
         if not os.path.exists(info_file):
+            folder_name = os.path.basename(os.path.normpath(theme_pack))
+            if folder_name.lower().endswith(".zip"):
+                folder_name = folder_name[:-4]
+            safe_name = cls._sanitize_folder_name(folder_name)
+            target_path = os.path.join(THEMES_DIR, safe_name)
+            if os.path.isdir(target_path):
+                shutil.rmtree(target_path)
+            if safe_name != os.path.basename(identified_path):
+                os.rename(identified_path, target_path)
+            info = {"name": folder_name, "author": "Unknown", "summary": folder_name}
+            cls.write_info_file(os.path.join(target_path, INFO_FILE_NAME), info)
             return
         theme_info = cls.load_info_file(info_file)
         theme_name = theme_info.get("name", "").strip()
