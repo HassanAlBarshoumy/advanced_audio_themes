@@ -1,4 +1,4 @@
-# Audio Themes NG и Фонетическая пунктуация (Phonetic Punctuation)
+# Продвинутые Аудио Темы (Advanced Audio Themes)
 
 Это дополнение обеспечивает захватывающий звуковой опыт для пользователей программы чтения экрана NVDA, воспроизводя звуки для различных событий пользовательского интерфейса. Оно позволяет создавать, устанавливать и настраивать аудио темы, улучшая звуковую обратную связь от интерфейса.
 
@@ -274,7 +274,7 @@ You can view the source code, report issues, or contribute to the project on Git
 ## Change Log
 
 ### Version 9.32
-- **System Status Sounds:** Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
+- **Звуки состояния системы: Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
 - **Audio DSP Enhancements:** Completely rewrote the Bass Boost (Low-shelf filter) and Noise Gate algorithms to support correct attack/release times and improved sound quality. Added a full UI in the settings panel to control these DSP effects.
 - **3D Spatial Audio Fixes:** Resolved an issue causing lag in 3D audio playback for progress bars.
 
@@ -292,10 +292,29 @@ You can view the source code, report issues, or contribute to the project on Git
 - **NVDA 2026.2 Compatibility:** Migrated to the new `NVDAHelper.localLib.generateBeep` API to resolve deprecation warnings and ensure stability on future NVDA versions.
 - **Auto-Update Fix:** Resolved a critical freeze in NVDA during the auto-update download process.
 
-## Переводчики
+## Что нового
 
+### Версия 9.32
+- **Звуки состояния системы:** Новая система мониторинга батареи, USB, сети и питания.
+- **Улучшения DSP:** Полностью переписаны фильтры Bass Boost и Noise Gate.
+- **3D-звук:** Устранена задержка звука в индикаторах выполнения.
+
+### Версии 9.30 - 9.31
+- **Универсальное распознавание:** Обнаружение первого/последнего элемента для всех ролей.
+
+### Версии 9.27 - 9.28
+- **Резервные звуки:** Настройки звуков по умолчанию.
+- **Заголовки:** Поддержка заголовков уровней 7, 8 и 9.
+
+### Версии 9.23 - 9.26
+- **Исправления:** Исправлены проблемы с навигацией по предложениям и совместимость с NVDA 2026.2.
+
+## Переводчики
 - **Испанский:** Hassan AlBarshoumy, Luis Carlos González Morales
-- **Русский:** [Ваше Имя]
+- **Итальянский:** Christian Cantelmi, Ciro Cantelmi
+- **Русский:** Valentin Kupriyanov
+- **Китайский:** Cary-rowen, Jerry
+- **Немецкий:** René L
 
 ## Поддержка
 

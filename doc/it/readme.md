@@ -1,4 +1,4 @@
-# Audio Themes NG & Punteggiatura Fonetica
+# Temi Audio Avanzati (Advanced Audio Themes)
 
 Questo componente aggiuntivo offre un'esperienza audio immersiva per gli utenti dello screen reader NVDA riproducendo suoni per vari eventi dell'interfaccia utente. Consente la creazione, l'installazione e la personalizzazione di temi audio, migliorando il feedback uditivo dell'interfaccia utente.
 
@@ -274,7 +274,7 @@ You can view the source code, report issues, or contribute to the project on Git
 ## Change Log
 
 ### Version 9.32
-- **System Status Sounds:** Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
+- **Suoni di stato del sistema: Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
 - **Audio DSP Enhancements:** Completely rewrote the Bass Boost (Low-shelf filter) and Noise Gate algorithms to support correct attack/release times and improved sound quality. Added a full UI in the settings panel to control these DSP effects.
 - **3D Spatial Audio Fixes:** Resolved an issue causing lag in 3D audio playback for progress bars.
 
@@ -292,12 +292,27 @@ You can view the source code, report issues, or contribute to the project on Git
 - **NVDA 2026.2 Compatibility:** Migrated to the new `NVDAHelper.localLib.generateBeep` API to resolve deprecation warnings and ensure stability on future NVDA versions.
 - **Auto-Update Fix:** Resolved a critical freeze in NVDA during the auto-update download process.
 
+## Novità
+
+### Versione 9.32
+- **Suoni di stato del sistema:** Nuovo motore di monitoraggio per batteria, USB, rete e alimentazione.
+- **Miglioramenti DSP:** Filtri Bass Boost e Noise Gate riscritti.
+- **Audio 3D:** Risolti i ritardi nelle barre di avanzamento.
+
+### Versione 9.30 - 9.31
+- **Identificazione universale:** Rilevazione del primo/ultimo elemento per tutti i ruoli.
+
+### Versione 9.27 - 9.28
+- **Suoni di riserva:** Aggiunti suoni di riserva.
+- **Intestazioni:** Supporto per intestazioni di livello 7, 8 e 9.
+
+### Versione 9.23 - 9.26
+- **Correzioni:** Correzione di bug nella navigazione e compatibilità con NVDA 2026.2.
+
 ## Traduttori
-
 - **Spagnolo:** Hassan AlBarshoumy, Luis Carlos González Morales
-- **Italiano:** [Il tuo nome]
+- **Italiano:** Christian Cantelmi, Ciro Cantelmi
+- **Russo:** Valentin Kupriyanov
+- **Cinese:** Cary-rowen, Jerry
+- **Tedesco:** René L
 
-## Supporto
-
-Per qualsiasi problema, richiesta o segnalazione di bug, fai riferimento al punto di contatto ufficiale:
-**[Telegram di Hassan AlBarshoumy](https://t.me/HassanAlBarshoumy)**

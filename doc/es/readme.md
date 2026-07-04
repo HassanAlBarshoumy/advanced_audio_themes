@@ -1,4 +1,4 @@
-# Audio Themes NG & Puntuación Fonética
+# Temas de Audio Avanzados (Advanced Audio Themes)
 
 Este complemento proporciona una experiencia de audio inmersiva para los usuarios del lector de pantalla NVDA mediante la reproducción de sonidos para diversos eventos de la interfaz de usuario. Permite la creación, instalación y personalización de temas de audio, mejorando la retroalimentación auditiva de la interfaz.
 
@@ -274,7 +274,7 @@ You can view the source code, report issues, or contribute to the project on Git
 ## Change Log
 
 ### Version 9.32
-- **System Status Sounds:** Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
+- **Sonidos de estado del sistema: Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
 - **Audio DSP Enhancements:** Completely rewrote the Bass Boost (Low-shelf filter) and Noise Gate algorithms to support correct attack/release times and improved sound quality. Added a full UI in the settings panel to control these DSP effects.
 - **3D Spatial Audio Fixes:** Resolved an issue causing lag in 3D audio playback for progress bars.
 
@@ -292,11 +292,27 @@ You can view the source code, report issues, or contribute to the project on Git
 - **NVDA 2026.2 Compatibility:** Migrated to the new `NVDAHelper.localLib.generateBeep` API to resolve deprecation warnings and ensure stability on future NVDA versions.
 - **Auto-Update Fix:** Resolved a critical freeze in NVDA during the auto-update download process.
 
+## Novedades
+
+### Versión 9.32
+- **Sonidos de estado del sistema:** Nuevo motor de monitorización para batería, USB, red y energía.
+- **Mejoras DSP:** Filtros de Bass Boost y Noise Gate completamente reescritos para evitar chasquidos.
+- **Audio 3D:** Solución de retrasos en barras de progreso.
+
+### Versión 9.30 - 9.31
+- **Identificación Universal:** Detección de primer/último elemento para todos los roles.
+
+### Versión 9.27 - 9.28
+- **Sonidos alternativos:** Opciones de sonidos de reserva añadidos.
+- **Encabezados:** Soporte para niveles de encabezado 7, 8 y 9.
+
+### Versión 9.23 - 9.26
+- **Correcciones:** Solución de repetición de frases y compatibilidad con NVDA 2026.2.
+
 ## Traductores
-
 - **Español:** Hassan AlBarshoumy, Luis Carlos González Morales
+- **Italiano:** Christian Cantelmi, Ciro Cantelmi
+- **Ruso:** Valentin Kupriyanov
+- **Chino:** Cary-rowen, Jerry
+- **Alemán:** René L
 
-## Soporte
-
-Para cualquier problema, solicitud o informe de errores, por favor, póngase en contacto con el punto de soporte oficial:
-**[Telegram de Hassan AlBarshoumy](https://t.me/HassanAlBarshoumy)**

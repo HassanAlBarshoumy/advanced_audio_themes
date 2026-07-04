@@ -144,6 +144,11 @@ Advanced configuration for navigation modules.
 - **Detection scope:** Apply this universally to all roles, or selectively to specific roles (using the Select Roles button).
 - **Solo items behavior:** Decide if items that are the only element in a list should be treated as the first item, the last item, or ignored completely.
 
+#### 11. System Status Tab
+- **Enable system status sounds:** Master toggle for all hardware/system event audio cues.
+- **USB Monitoring:** Toggle monitoring of USB connections (keyboards, flash drives, etc.) and storage mount events.
+- **Events:** Individual toggles to enable or disable specific event notifications like Battery charging/discharging, Power state changes, and Network connectivity changes.
+
 ### Using the Audio Themes Studio V2
 
 The Audio Themes Studio allows you to create and edit audio themes. To open the studio:

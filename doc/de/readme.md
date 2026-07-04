@@ -1,4 +1,4 @@
-# Audio Themes NG & Phonetische Interpunktion
+# Erweiterte Audio-Themes (Advanced Audio Themes)
 
 Dieses Add-on bietet ein immersives Audio-Erlebnis für Nutzer des NVDA-Screenreaders, indem es Klänge für verschiedene UI-Ereignisse abspielt. Es ermöglicht die Erstellung, Installation und Anpassung von Audio-Themes, was das akustische Feedback der Benutzeroberfläche verbessert.
 
@@ -64,7 +64,24 @@ Sie können die Audio-Themes-Funktion in den NVDA-Einstellungen aktivieren oder 
 
 - **Über ein Theme:** Klicken Sie auf die Schaltfläche "Über", um Informationen zum ausgewählten Theme anzuzeigen.
 
-### Übersicht der Einstellungs-Tabs
+### Was ist neu
+
+### Version 9.32
+- **Systemstatus-Töne:** Einführung einer umfassenden Systemüberwachung für Akku, USB, Netzwerk und Stromversorgung.
+- **DSP-Verbesserungen:** Komplett überarbeitete Bass Boost- und Noise Gate-Filter.
+- **3D-Audio:** Behebung von Verzögerungen bei Fortschrittsbalken.
+
+### Version 9.30 - 9.31
+- **Erstes/Letztes Element:** Universelle Erkennung für erstes/letztes Element.
+
+### Version 9.27 - 9.28
+- **Fallback-Töne:** Fallback-Töne hinzugefügt.
+- **Überschriften:** Unterstützung für Überschriftenebenen 7, 8 und 9.
+
+### Version 9.23 - 9.26
+- **Fehlerbehebungen:** Fehler bei Satznavigation und NVDA 2026.2-Kompatibilität behoben.
+
+## Übersicht der Einstellungs-Tabs
 
 Das Einstellungsfeld "Erweiterte Audio-Themes" enthält mehrere Reiter (Tabs), um jeden Aspekt des Audioerlebnisses anzupassen. Im Folgenden finden Sie einen tiefen Einblick in jede verfügbare Option:
 
@@ -274,7 +291,7 @@ You can view the source code, report issues, or contribute to the project on Git
 ## Change Log
 
 ### Version 9.32
-- **System Status Sounds:** Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
+- **Systemstatus-Töne: Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
 - **Audio DSP Enhancements:** Completely rewrote the Bass Boost (Low-shelf filter) and Noise Gate algorithms to support correct attack/release times and improved sound quality. Added a full UI in the settings panel to control these DSP effects.
 - **3D Spatial Audio Fixes:** Resolved an issue causing lag in 3D audio playback for progress bars.
 
@@ -292,10 +309,29 @@ You can view the source code, report issues, or contribute to the project on Git
 - **NVDA 2026.2 Compatibility:** Migrated to the new `NVDAHelper.localLib.generateBeep` API to resolve deprecation warnings and ensure stability on future NVDA versions.
 - **Auto-Update Fix:** Resolved a critical freeze in NVDA during the auto-update download process.
 
-## Übersetzer
+## Was ist neu
 
+### Version 9.32
+- **Systemstatus-Töne:** Einführung einer umfassenden Systemüberwachung für Akku, USB, Netzwerk und Stromversorgung.
+- **DSP-Verbesserungen:** Komplett überarbeitete Bass Boost- und Noise Gate-Filter.
+- **3D-Audio:** Behebung von Verzögerungen bei Fortschrittsbalken.
+
+### Version 9.30 - 9.31
+- **Erstes/Letztes Element:** Universelle Erkennung für erstes/letztes Element.
+
+### Version 9.27 - 9.28
+- **Fallback-Töne:** Fallback-Töne hinzugefügt.
+- **Überschriften:** Unterstützung für Überschriftenebenen 7, 8 und 9.
+
+### Version 9.23 - 9.26
+- **Fehlerbehebungen:** Fehler bei Satznavigation und NVDA 2026.2-Kompatibilität behoben.
+
+## Übersetzer
 - **Spanisch:** Hassan AlBarshoumy, Luis Carlos González Morales
-- **Deutsch:** Hassan AlBarshoumy, [Ihr Name]
+- **Italienisch:** Christian Cantelmi, Ciro Cantelmi
+- **Russisch:** Valentin Kupriyanov
+- **Chinesisch:** Cary-rowen, Jerry
+- **Deutsch:** René L
 
 ## Support
 
