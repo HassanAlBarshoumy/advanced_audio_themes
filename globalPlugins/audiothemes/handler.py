@@ -207,6 +207,8 @@ class SpecialProps(IntEnum):
     sys_sleep = 2522
 
     emoji = 2523
+    emoji_before = 2524
+    emoji_after = 2525
 
 
 theme_roles = copy.copy(controlTypes.roleLabels)
@@ -256,6 +258,10 @@ theme_roles.update(
         SpecialProps.sys_sleep: _("System Sleep"),
         # Translators: The label of the sound played when an emoji character is encountered.
         SpecialProps.emoji: _("Emoji Sound"),
+        # Translators: The label of the sound played before an emoji character.
+        SpecialProps.emoji_before: _("Emoji Before Sound"),
+        # Translators: The label of the sound played after an emoji character.
+        SpecialProps.emoji_after: _("Emoji After Sound"),
     }
 )
 

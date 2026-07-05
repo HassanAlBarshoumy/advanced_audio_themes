@@ -3193,5 +3193,11 @@ msgstr ""
 msgid "Emoji Sound"
 msgstr "صوت الإيموجي"
 
+msgid "Emoji Before Sound"
+msgstr "صوت قبل الإيموجي"
+
+msgid "Emoji After Sound"
+msgstr "صوت بعد الإيموجي"
+
 msgid "Emoji repeat mode"
 msgstr "وضع تكرار الإيموجي"

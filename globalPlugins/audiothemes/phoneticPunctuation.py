@@ -465,16 +465,23 @@ def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
     return originalSpeechSpeechSpeak(newSequence, symbolLevel=symbolLevel, *args, **kwargs)
 
 class EmojiSoundCommand(speech.commands.BaseCallbackCommand):
-    """Plays emoji sound at the correct position during speech."""
+    """Plays emoji sound at the correct position during speech.
+    Tries specific sound_key first, falls back to base emoji sound.
+    """
+    def __init__(self, sound_key=SpecialProps.emoji):
+        self.sound_key = sound_key
+
     def run(self):
         try:
             handler = _utils_mod._handler_ref
             if handler and handler.enabled and handler.active_theme:
                 vol = get_emoji_volume()
                 with handler.active_theme._lock:
-                    has_sound = SpecialProps.emoji in handler.active_theme.sounds
-                if has_sound:
-                    handler.play({"name": "emoji", "role": 0, "volume_override": vol / 100.0}, SpecialProps.emoji)
+                    key = self.sound_key if self.sound_key in handler.active_theme.sounds else (
+                        SpecialProps.emoji if SpecialProps.emoji in handler.active_theme.sounds else None
+                    )
+                if key is not None:
+                    handler.play({"name": "emoji", "role": 0, "volume_override": vol / 100.0}, key)
         except Exception:
             pass
 
@@ -509,12 +516,12 @@ def _processEmojiSequence(sequence):
                 if position in ("before", "both") and do_prefix:
                     newSeq.append(prefixText)
                 if sound_position in ("before", "both") and do_sound:
-                    newSeq.append(EmojiSoundCommand())
+                    newSeq.append(EmojiSoundCommand(SpecialProps.emoji_before))
                 newSeq.append(item)
                 if position in ("after", "both") and do_prefix:
                     newSeq.append(suffixText)
                 if sound_position in ("after", "both") and do_sound:
-                    newSeq.append(EmojiSoundCommand())
+                    newSeq.append(EmojiSoundCommand(SpecialProps.emoji_after))
             else:
                 # per_emoji: insert prefix/suffix/sound at each emoji
                 items = []
@@ -526,12 +533,12 @@ def _processEmojiSequence(sequence):
                     if position in ("before", "both") and do_prefix:
                         items.append(prefixText)
                     if sound_position in ("before", "both") and do_sound:
-                        items.append(EmojiSoundCommand())
+                        items.append(EmojiSoundCommand(SpecialProps.emoji_before))
                     items.append(item[start:end])
                     if position in ("after", "both") and do_prefix:
                         items.append(suffixText)
                     if sound_position in ("after", "both") and do_sound:
-                        items.append(EmojiSoundCommand())
+                        items.append(EmojiSoundCommand(SpecialProps.emoji_after))
                     last_end = end
                 items.append(item[last_end:])
                 # Merge adjacent strings
