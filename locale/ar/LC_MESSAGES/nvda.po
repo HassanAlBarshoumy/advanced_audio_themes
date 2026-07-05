@@ -3101,6 +3101,9 @@ msgstr "نص بادئة الإيموجي"
 msgid "Prefix position:"
 msgstr "موضع البادئة:"
 
+msgid "Prefix position"
+msgstr "موضع البادئة"
+
 msgid "Before emoji"
 msgstr "قبل الإيموجي"
 
