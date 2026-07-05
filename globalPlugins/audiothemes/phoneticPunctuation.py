@@ -509,12 +509,24 @@ def _processEmojiSequence(sequence):
                     newSeq.append(item)
                     newSeq.append(prefixText)
             else:
-                result = item
-                if position in ("before", "both"):
-                    result = prefixText + result
-                if position in ("after", "both"):
-                    result = result + prefixText
-                newSeq.append(result)
+                # Insert prefix at each emoji position within the text
+                parts = []
+                last_end = 0
+                for emoji, cat, start, end in emojis:
+                    if not is_category_enabled(cat):
+                        continue
+                    # Text before this emoji
+                    parts.append(item[last_end:start])
+                    # Insert prefix before emoji
+                    if position in ("before", "both"):
+                        parts.append(prefixText)
+                    parts.append(item[start:end])
+                    # Insert prefix after emoji
+                    if position in ("after", "both"):
+                        parts.append(prefixText)
+                    last_end = end
+                parts.append(item[last_end:])
+                newSeq.append("".join(parts))
         else:
             newSeq.append(item)
     return newSeq
