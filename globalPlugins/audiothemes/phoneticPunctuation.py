@@ -50,9 +50,9 @@ from .utils import *
 from .commands import *
 from .emoji_handler import is_emoji_enabled, is_emoji_sound_enabled, is_emoji_prefix_enabled, get_emoji_prefix_text, get_emoji_suffix_text, get_emoji_position, get_emoji_repeat, find_emojis, is_category_enabled
 from .handler import SpecialProps
-from .utils import _handler_ref
 from . import commands
 from . import frenzy
+from . import utils as _utils_mod
 from config.configFlags import ReportLineIndentation
 import languageHandler
 import shutil
@@ -488,7 +488,7 @@ def _processEmojiSequence(sequence):
             continue
         if do_sound:
             try:
-                handler = _handler_ref
+                handler = _utils_mod._handler_ref
                 if handler and handler.enabled and handler.active_theme:
                     with handler.active_theme._lock:
                         has_emoji_sound = SpecialProps.emoji in handler.active_theme.sounds
