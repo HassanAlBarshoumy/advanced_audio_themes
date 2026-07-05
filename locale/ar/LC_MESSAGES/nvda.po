@@ -3122,6 +3122,15 @@ msgstr "قبل وبعد"
 msgid "No prefix"
 msgstr "بدون بادئة"
 
+msgid "Sound position:"
+msgstr "موضع الصوت:"
+
+msgid "Emoji sound position"
+msgstr "موضع صوت الإيموجي"
+
+msgid "No sound"
+msgstr "بدون صوت"
+
 msgid "Repeat mode:"
 msgstr "وضع التكرار:"
 

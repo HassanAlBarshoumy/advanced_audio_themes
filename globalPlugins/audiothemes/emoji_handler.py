@@ -446,6 +446,10 @@ def get_emoji_position():
     return config.conf["audiothemes"].get("emoji_position", "before")
 
 
+def get_emoji_sound_position():
+    return config.conf["audiothemes"].get("emoji_sound_position", "before")
+
+
 def get_emoji_repeat():
     return config.conf["audiothemes"].get("emoji_repeat", "per_emoji")
 

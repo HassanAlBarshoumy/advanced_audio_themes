@@ -1381,6 +1381,17 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.emojiSoundCheckbox = wx.CheckBox(page, -1, _("Play sound when emoji is encountered"))
         sizer.Add(self.emojiSoundCheckbox, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10)
 
+        # Sound position
+        sndPosLabel = wx.StaticText(page, -1, _("Sound position:"))
+        self.emojiSoundPositionChoice = wx.Choice(page, -1, choices=[
+            _("Before emoji"),
+            _("After emoji"),
+            _("Before and after"),
+            _("No sound"),
+        ], name=_("Emoji sound position"))
+        sizer.Add(sndPosLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
+        sizer.Add(self.emojiSoundPositionChoice, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+
         # Speech prefix enable
         self.emojiPrefixCheckbox = wx.CheckBox(page, -1, _("Speak prefix text before emoji descriptions"))
         sizer.Add(self.emojiPrefixCheckbox, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10)
@@ -1668,6 +1679,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # Emoji tab
         self.emojiEnableCheckbox.SetValue(_b(conf.get("emoji_enabled", True)))
         self.emojiSoundCheckbox.SetValue(_b(conf.get("emoji_sound", True)))
+        snd_pos_map = {"before": 0, "after": 1, "both": 2, "none": 3}
+        snd_pos_val = conf.get("emoji_sound_position", "before")
+        self.emojiSoundPositionChoice.SetSelection(snd_pos_map.get(snd_pos_val, 0))
         self.emojiPrefixCheckbox.SetValue(_b(conf.get("emoji_prefix", True)))
         self.emojiPrefixTextCtrl.SetValue(conf.get("emoji_prefix_text", "emoji"))
         self.emojiSuffixTextCtrl.SetValue(conf.get("emoji_suffix_text", "emoji"))
@@ -2102,6 +2116,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # Emoji tab
         conf["emoji_enabled"] = self.emojiEnableCheckbox.GetValue()
         conf["emoji_sound"] = self.emojiSoundCheckbox.GetValue()
+        snd_pos_map_rev = {0: "before", 1: "after", 2: "both", 3: "none"}
+        snd_sel = self.emojiSoundPositionChoice.GetSelection()
+        conf["emoji_sound_position"] = snd_pos_map_rev.get(snd_sel, "before")
         conf["emoji_prefix"] = self.emojiPrefixCheckbox.GetValue()
         conf["emoji_prefix_text"] = self.emojiPrefixTextCtrl.GetValue()
         conf["emoji_suffix_text"] = self.emojiSuffixTextCtrl.GetValue()

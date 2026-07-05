@@ -48,7 +48,7 @@ import wx
 from .common import *
 from .utils import *
 from .commands import *
-from .emoji_handler import is_emoji_enabled, is_emoji_sound_enabled, is_emoji_prefix_enabled, get_emoji_prefix_text, get_emoji_suffix_text, get_emoji_position, get_emoji_repeat, find_emojis, is_category_enabled
+from .emoji_handler import is_emoji_enabled, is_emoji_sound_enabled, is_emoji_prefix_enabled, get_emoji_prefix_text, get_emoji_suffix_text, get_emoji_position, get_emoji_sound_position, get_emoji_repeat, get_emoji_volume, find_emojis, is_category_enabled
 from .handler import SpecialProps
 from . import commands
 from . import frenzy
@@ -464,12 +464,28 @@ def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
     
     return originalSpeechSpeechSpeak(newSequence, symbolLevel=symbolLevel, *args, **kwargs)
 
+class EmojiSoundCommand(speech.commands.BaseCallbackCommand):
+    """Plays emoji sound at the correct position during speech."""
+    def run(self):
+        try:
+            handler = _utils_mod._handler_ref
+            if handler and handler.enabled and handler.active_theme:
+                vol = get_emoji_volume()
+                with handler.active_theme._lock:
+                    has_sound = SpecialProps.emoji in handler.active_theme.sounds
+                if has_sound:
+                    handler.play({"name": "emoji", "role": 0, "volume_override": vol / 100.0}, SpecialProps.emoji)
+        except Exception:
+            pass
+
+
 def _processEmojiSequence(sequence):
     prefix = get_emoji_prefix_text()
     suffix = get_emoji_suffix_text()
     position = get_emoji_position()
     repeat = get_emoji_repeat()
-    do_sound = is_emoji_sound_enabled()
+    sound_position = get_emoji_sound_position()
+    do_sound = is_emoji_sound_enabled() and sound_position != "none"
     do_prefix = is_emoji_prefix_enabled()
     if position == "none" or not do_prefix:
         do_prefix = False
@@ -486,49 +502,52 @@ def _processEmojiSequence(sequence):
         if not any(is_category_enabled(c) for c in cats):
             newSeq.append(item)
             continue
-        if do_sound:
-            try:
-                handler = _utils_mod._handler_ref
-                if handler and handler.enabled and handler.active_theme:
-                    with handler.active_theme._lock:
-                        has_emoji_sound = SpecialProps.emoji in handler.active_theme.sounds
-                    if has_emoji_sound:
-                        handler.play({"name": "emoji", "role": 0}, SpecialProps.emoji)
-            except Exception:
-                pass
-        if do_prefix:
-            prefixText = prefix + " "
-            suffixText = suffix + " "
+        if do_prefix or do_sound:
+            prefixText = prefix + " " if do_prefix else ""
+            suffixText = suffix + " " if do_prefix else ""
             if repeat == "per_block":
-                if position == "before":
+                if position in ("before", "both") and do_prefix:
                     newSeq.append(prefixText)
-                    newSeq.append(item)
-                elif position == "after":
-                    newSeq.append(item)
+                if sound_position in ("before", "both") and do_sound:
+                    newSeq.append(EmojiSoundCommand())
+                newSeq.append(item)
+                if position in ("after", "both") and do_prefix:
                     newSeq.append(suffixText)
-                else:
-                    newSeq.append(prefixText)
-                    newSeq.append(item)
-                    newSeq.append(suffixText)
+                if sound_position in ("after", "both") and do_sound:
+                    newSeq.append(EmojiSoundCommand())
             else:
-                # Insert prefix/suffix at each emoji position within the text
-                parts = []
+                # per_emoji: insert prefix/suffix/sound at each emoji
+                items = []
                 last_end = 0
                 for emoji, cat, start, end in emojis:
                     if not is_category_enabled(cat):
                         continue
-                    # Text before this emoji
-                    parts.append(item[last_end:start])
-                    # Insert prefix before emoji
-                    if position in ("before", "both"):
-                        parts.append(prefixText)
-                    parts.append(item[start:end])
-                    # Insert suffix after emoji
-                    if position in ("after", "both"):
-                        parts.append(suffixText)
+                    items.append(item[last_end:start])
+                    if position in ("before", "both") and do_prefix:
+                        items.append(prefixText)
+                    if sound_position in ("before", "both") and do_sound:
+                        items.append(EmojiSoundCommand())
+                    items.append(item[start:end])
+                    if position in ("after", "both") and do_prefix:
+                        items.append(suffixText)
+                    if sound_position in ("after", "both") and do_sound:
+                        items.append(EmojiSoundCommand())
                     last_end = end
-                parts.append(item[last_end:])
-                newSeq.append("".join(parts))
+                items.append(item[last_end:])
+                # Merge adjacent strings
+                merged = []
+                buf = ""
+                for x in items:
+                    if isinstance(x, str):
+                        buf += x
+                    else:
+                        if buf:
+                            merged.append(buf)
+                            buf = ""
+                        merged.append(x)
+                if buf:
+                    merged.append(buf)
+                newSeq.extend(merged)
         else:
             newSeq.append(item)
     return newSeq
