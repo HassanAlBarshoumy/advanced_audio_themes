@@ -65,6 +65,11 @@ class RoleSelectionDialog(wx.Dialog):
             if role_id not in blacklisted:
                 self.rolesListBox.CheckItem(idx, True)
             idx += 1
+        # Add emoji role
+        self.role_ids.append(SpecialProps.emoji)
+        self.rolesListBox.InsertItem(idx, _("Emoji Sound"))
+        if SpecialProps.emoji not in blacklisted:
+            self.rolesListBox.CheckItem(idx, True)
                 
         # Select All / Deselect All buttons
         btnSizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -159,6 +164,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.sysStatusPage = wx.Panel(self.notebook)
         self.setupSystemStatusPage(self.sysStatusPage)
         self.notebook.AddPage(self.sysStatusPage, _("System Status"))
+
+        # Tab 10: Emoji Settings
+        self.emojiPage = wx.Panel(self.notebook)
+        self.setupEmojiPage(self.emojiPage)
+        self.notebook.AddPage(self.emojiPage, _("Emoji"))
 
         settingsSizer.Add(self.notebook, 1, wx.EXPAND | wx.ALL, 5)
 
@@ -849,6 +859,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
                     self._role_list.append((role, label))
         except Exception as e:
             log.error(f"Error building role list: {e}")
+        self._role_list.append((SpecialProps.emoji, _("Emoji Sound")))
         self._role_list.sort(key=lambda x: x[1])
         
         # Per-role format choices
@@ -1359,6 +1370,87 @@ class AudioThemesSettingsPanel(SettingsPanel):
         sizer.AddStretchSpacer()
         page.SetSizer(sizer)
 
+    def setupEmojiPage(self, page):
+        sizer = wx.BoxSizer(wx.VERTICAL)
+
+        # Master enable
+        self.emojiEnableCheckbox = wx.CheckBox(page, -1, _("Enable emoji sounds and speech prefix"))
+        sizer.Add(self.emojiEnableCheckbox, 0, wx.ALL, 10)
+
+        # Sound enable
+        self.emojiSoundCheckbox = wx.CheckBox(page, -1, _("Play sound when emoji is encountered"))
+        sizer.Add(self.emojiSoundCheckbox, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10)
+
+        # Speech prefix enable
+        self.emojiPrefixCheckbox = wx.CheckBox(page, -1, _("Speak prefix text before emoji descriptions"))
+        sizer.Add(self.emojiPrefixCheckbox, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10)
+
+        # Prefix text
+        prefixLabel = wx.StaticText(page, -1, _("Prefix text:"))
+        self.emojiPrefixTextCtrl = wx.TextCtrl(page, -1, name=_("Emoji prefix text"))
+        sizer.Add(prefixLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
+        sizer.Add(self.emojiPrefixTextCtrl, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+
+        # Prefix position
+        posLabel = wx.StaticText(page, -1, _("Prefix position:"))
+        self.emojiPositionChoice = wx.Choice(page, -1, choices=[
+            _("Before emoji"),
+            _("After emoji"),
+            _("Before and after"),
+            _("No prefix"),
+        ], name=_("Prefix position"))
+        sizer.Add(posLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
+        sizer.Add(self.emojiPositionChoice, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+
+        # Repeat mode
+        repeatLabel = wx.StaticText(page, -1, _("Repeat mode:"))
+        self.emojiRepeatChoice = wx.Choice(page, -1, choices=[
+            _("Once per emoji character"),
+            _("Once per text block"),
+        ], name=_("Emoji repeat mode"))
+        sizer.Add(repeatLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
+        sizer.Add(self.emojiRepeatChoice, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+
+        # Volume slider
+        volLabel = wx.StaticText(page, -1, _("Emoji sound volume:"))
+        self.emojiVolumeSlider = wx.Slider(page, -1, minValue=0, maxValue=100, name=_("Emoji sound volume"))
+        sizer.Add(volLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
+        sizer.Add(self.emojiVolumeSlider, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+
+        # Category checkboxes
+        catBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Emoji Categories"))
+        self.emojiCatCheckboxes = {}
+        cats = [
+            ("emoji_cat_smileys", _("Smileys & Emotion")),
+            ("emoji_cat_people", _("People & Body")),
+            ("emoji_cat_animals", _("Animals & Nature")),
+            ("emoji_cat_food", _("Food & Drink")),
+            ("emoji_cat_travel", _("Travel & Places")),
+            ("emoji_cat_activities", _("Activities")),
+            ("emoji_cat_objects", _("Objects")),
+            ("emoji_cat_symbols", _("Symbols")),
+            ("emoji_cat_flags", _("Flags")),
+        ]
+        for key, label in cats:
+            cb = wx.CheckBox(page, -1, label)
+            self.emojiCatCheckboxes[key] = cb
+            catBox.Add(cb, 0, wx.ALL, 5)
+        sizer.Add(catBox, 0, wx.EXPAND | wx.ALL, 10)
+
+        # Note about role assignment
+        noteBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Note"))
+        note = wx.StaticText(page, -1, _(
+            "Emoji is now available as a role in the Audio Themes role system.\n"
+            "You can assign a custom emoji sound in your theme by creating\n"
+            "an emoji.wav file, or configure it via the role selection dialogs\n"
+            "in the First/Last and Speech Order tabs."
+        ))
+        noteBox.Add(note, 0, wx.ALL, 10)
+        sizer.Add(noteBox, 0, wx.EXPAND | wx.ALL, 10)
+
+        sizer.AddStretchSpacer()
+        page.SetSizer(sizer)
+
     def onSelectRoles(self, event):
         dlg = RoleSelectionDialog(self)
         if dlg.ShowModal() == wx.ID_OK:
@@ -1566,6 +1658,21 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.sysBatteryCriticalSpin.SetValue(_i(conf.get("sys_battery_critical_threshold", 10)))
         self.sysNetworkIntervalSpin.SetValue(_i(conf.get("sys_network_check_interval", 15), 15))
         self.sysBatteryIntervalSpin.SetValue(_i(conf.get("sys_battery_check_interval", 30), 30))
+
+        # Emoji tab
+        self.emojiEnableCheckbox.SetValue(_b(conf.get("emoji_enabled", True)))
+        self.emojiSoundCheckbox.SetValue(_b(conf.get("emoji_sound", True)))
+        self.emojiPrefixCheckbox.SetValue(_b(conf.get("emoji_prefix", True)))
+        self.emojiPrefixTextCtrl.SetValue(conf.get("emoji_prefix_text", "emoji"))
+        pos_map = {"before": 0, "after": 1, "both": 2, "none": 3}
+        pos_val = conf.get("emoji_position", "before")
+        self.emojiPositionChoice.SetSelection(pos_map.get(pos_val, 0))
+        rep_map = {"per_emoji": 0, "per_block": 1}
+        rep_val = conf.get("emoji_repeat", "per_emoji")
+        self.emojiRepeatChoice.SetSelection(rep_map.get(rep_val, 0))
+        self.emojiVolumeSlider.SetValue(_i(conf.get("emoji_volume", 20)))
+        for key in self.emojiCatCheckboxes:
+            self.emojiCatCheckboxes[key].SetValue(_b(conf.get(key, True)))
 
         # Speech Order
         fmt = conf.get("announceFormat", "0")
@@ -1984,6 +2091,21 @@ class AudioThemesSettingsPanel(SettingsPanel):
         conf["sys_battery_critical_threshold"] = self.sysBatteryCriticalSpin.GetValue()
         conf["sys_network_check_interval"] = self.sysNetworkIntervalSpin.GetValue()
         conf["sys_battery_check_interval"] = self.sysBatteryIntervalSpin.GetValue()
+
+        # Emoji tab
+        conf["emoji_enabled"] = self.emojiEnableCheckbox.GetValue()
+        conf["emoji_sound"] = self.emojiSoundCheckbox.GetValue()
+        conf["emoji_prefix"] = self.emojiPrefixCheckbox.GetValue()
+        conf["emoji_prefix_text"] = self.emojiPrefixTextCtrl.GetValue()
+        pos_map_rev = {0: "before", 1: "after", 2: "both", 3: "none"}
+        sel = self.emojiPositionChoice.GetSelection()
+        conf["emoji_position"] = pos_map_rev.get(sel, "before")
+        rep_map_rev = {0: "per_emoji", 1: "per_block"}
+        sel = self.emojiRepeatChoice.GetSelection()
+        conf["emoji_repeat"] = rep_map_rev.get(sel, "per_emoji")
+        conf["emoji_volume"] = self.emojiVolumeSlider.GetValue()
+        for key, cb in self.emojiCatCheckboxes.items():
+            conf[key] = cb.GetValue()
 
         # Speech Order
         if self.announceFormatChoice.GetSelection() != wx.NOT_FOUND:

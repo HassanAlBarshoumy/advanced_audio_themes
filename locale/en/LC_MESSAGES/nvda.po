@@ -2363,3 +2363,98 @@ msgstr ""
 
 msgid "Any adjacent item – standard"
 msgstr ""
+
+# Emoji settings
+msgid "Emoji"
+msgstr ""
+
+msgid "Enable emoji sounds and speech prefix"
+msgstr ""
+
+msgid "Play sound when emoji is encountered"
+msgstr ""
+
+msgid "Speak prefix text before emoji descriptions"
+msgstr ""
+
+msgid "Prefix text:"
+msgstr ""
+
+msgid "Emoji prefix text"
+msgstr ""
+
+msgid "Prefix position:"
+msgstr ""
+
+msgid "Before emoji"
+msgstr ""
+
+msgid "After emoji"
+msgstr ""
+
+msgid "Before and after"
+msgstr ""
+
+msgid "No prefix"
+msgstr ""
+
+msgid "Repeat mode:"
+msgstr ""
+
+msgid "Once per emoji character"
+msgstr ""
+
+msgid "Once per text block"
+msgstr ""
+
+msgid "Emoji sound volume:"
+msgstr ""
+
+msgid "Emoji sound volume"
+msgstr ""
+
+msgid "Emoji Categories"
+msgstr ""
+
+msgid "Smileys & Emotion"
+msgstr ""
+
+msgid "People & Body"
+msgstr ""
+
+msgid "Animals & Nature"
+msgstr ""
+
+msgid "Food & Drink"
+msgstr ""
+
+msgid "Travel & Places"
+msgstr ""
+
+msgid "Activities"
+msgstr ""
+
+msgid "Objects"
+msgstr ""
+
+msgid "Symbols"
+msgstr ""
+
+msgid "Flags"
+msgstr ""
+
+msgid "Note"
+msgstr ""
+
+msgid ""
+"Emoji is now available as a role in the Audio Themes role system.\n"
+"You can assign a custom emoji sound in your theme by creating\n"
+"an emoji.wav file, or configure it via the role selection dialogs\n"
+"in the First/Last and Speech Order tabs."
+msgstr ""
+
+msgid "Emoji Sound"
+msgstr ""
+
+msgid "Emoji repeat mode"
+msgstr ""

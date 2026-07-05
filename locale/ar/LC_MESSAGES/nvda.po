@@ -3078,3 +3078,102 @@ msgstr "صارم – نفس الدور فقط"
 
 msgid "Any adjacent item – standard"
 msgstr "أي عنصر مجاور – قياسي"
+
+# Emoji settings
+msgid "Emoji"
+msgstr "الرموز التعبيرية (إيموجي)"
+
+msgid "Enable emoji sounds and speech prefix"
+msgstr "تفعيل أصوات الإيموجي ونص البادئة"
+
+msgid "Play sound when emoji is encountered"
+msgstr "تشغيل صوت عند ظهور رمز تعبيري"
+
+msgid "Speak prefix text before emoji descriptions"
+msgstr "نطق نص البادئة قبل وصف الإيموجي"
+
+msgid "Prefix text:"
+msgstr "نص البادئة:"
+
+msgid "Emoji prefix text"
+msgstr "نص بادئة الإيموجي"
+
+msgid "Prefix position:"
+msgstr "موضع البادئة:"
+
+msgid "Before emoji"
+msgstr "قبل الإيموجي"
+
+msgid "After emoji"
+msgstr "بعد الإيموجي"
+
+msgid "Before and after"
+msgstr "قبل وبعد"
+
+msgid "No prefix"
+msgstr "بدون بادئة"
+
+msgid "Repeat mode:"
+msgstr "وضع التكرار:"
+
+msgid "Once per emoji character"
+msgstr "مرة لكل رمز تعبيري"
+
+msgid "Once per text block"
+msgstr "مرة لكل كتلة نصية"
+
+msgid "Emoji sound volume:"
+msgstr "مستوى صوت الإيموجي:"
+
+msgid "Emoji sound volume"
+msgstr "مستوى صوت الإيموجي"
+
+msgid "Emoji Categories"
+msgstr "فئات الإيموجي"
+
+msgid "Smileys & Emotion"
+msgstr "وجوه ضاحكة وعواطف"
+
+msgid "People & Body"
+msgstr "أشخاص وجسد"
+
+msgid "Animals & Nature"
+msgstr "حيوانات وطبيعة"
+
+msgid "Food & Drink"
+msgstr "طعام وشراب"
+
+msgid "Travel & Places"
+msgstr "سفر وأماكن"
+
+msgid "Activities"
+msgstr "أنشطة"
+
+msgid "Objects"
+msgstr "أشياء"
+
+msgid "Symbols"
+msgstr "رموز"
+
+msgid "Flags"
+msgstr "أعلام"
+
+msgid "Note"
+msgstr "ملاحظة"
+
+msgid ""
+"Emoji is now available as a role in the Audio Themes role system.\n"
+"You can assign a custom emoji sound in your theme by creating\n"
+"an emoji.wav file, or configure it via the role selection dialogs\n"
+"in the First/Last and Speech Order tabs."
+msgstr ""
+"الإيموجي متاح الآن كدور في نظام أدوار الثيمات الصوتية.\n"
+"يمكنك تخصيص صوت إيموجي في ثيمك عن طريق إنشاء\n"
+"ملف emoji.wav، أو تكوينه عبر حوارات اختيار الأدوار\n"
+"في تبويتي العنصر الأول/الأخير وترتيب النطق."
+
+msgid "Emoji Sound"
+msgstr "صوت الإيموجي"
+
+msgid "Emoji repeat mode"
+msgstr "وضع تكرار الإيموجي"

@@ -48,6 +48,9 @@ import wx
 from .common import *
 from .utils import *
 from .commands import *
+from .emoji_handler import is_emoji_enabled, is_emoji_sound_enabled, is_emoji_prefix_enabled, get_emoji_prefix_text, get_emoji_position, get_emoji_repeat, find_emojis, is_category_enabled
+from .handler import SpecialProps
+from .utils import _handler_ref
 from . import commands
 from . import frenzy
 from config.configFlags import ReportLineIndentation
@@ -454,9 +457,67 @@ def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
         mylog(str(newSequence))
     else:
         newSequence = speechSequence
+    # Emoji processing
+    if is_emoji_enabled():
+        newSequence = _processEmojiSequence(newSequence)
     newSequence = newSequence + [' '] # Otherwise v2024.2 throws weird Braille Exception + 
     
     return originalSpeechSpeechSpeak(newSequence, symbolLevel=symbolLevel, *args, **kwargs)
+
+def _processEmojiSequence(sequence):
+    prefix = get_emoji_prefix_text()
+    position = get_emoji_position()
+    repeat = get_emoji_repeat()
+    do_sound = is_emoji_sound_enabled()
+    do_prefix = is_emoji_prefix_enabled()
+    if position == "none" or not do_prefix:
+        do_prefix = False
+    newSeq = []
+    for item in sequence:
+        if not isinstance(item, str):
+            newSeq.append(item)
+            continue
+        emojis = find_emojis(item)
+        if not emojis:
+            newSeq.append(item)
+            continue
+        cats = {cat for _, cat, _, _ in emojis}
+        if not any(is_category_enabled(c) for c in cats):
+            newSeq.append(item)
+            continue
+        if do_sound:
+            try:
+                handler = _handler_ref
+                if handler and handler.enabled and handler.active_theme:
+                    with handler.active_theme._lock:
+                        has_emoji_sound = SpecialProps.emoji in handler.active_theme.sounds
+                    if has_emoji_sound:
+                        handler.play({"name": "emoji", "role": 0}, SpecialProps.emoji)
+            except Exception:
+                pass
+        if do_prefix:
+            prefixText = prefix + " "
+            if repeat == "per_block":
+                if position == "before":
+                    newSeq.append(prefixText)
+                    newSeq.append(item)
+                elif position == "after":
+                    newSeq.append(item)
+                    newSeq.append(prefixText)
+                else:
+                    newSeq.append(prefixText)
+                    newSeq.append(item)
+                    newSeq.append(prefixText)
+            else:
+                result = item
+                if position in ("before", "both"):
+                    result = prefixText + result
+                if position in ("after", "both"):
+                    result = result + prefixText
+                newSeq.append(result)
+        else:
+            newSeq.append(item)
+    return newSeq
 
 speechCancelledFlag = False
 def preCancelSpeech(*args, **kwargs):

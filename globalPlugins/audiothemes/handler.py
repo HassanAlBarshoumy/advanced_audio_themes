@@ -135,6 +135,22 @@ audiothemes_config_defaults = {
     "sys_network_check_interval": "integer(default=15, min=5, max=300)",
     "sys_battery_check_interval": "integer(default=30, min=5, max=300)",
     "sys_all_usb": "boolean(default=True)",
+    "emoji_enabled": "boolean(default=True)",
+    "emoji_sound": "boolean(default=True)",
+    "emoji_prefix": "boolean(default=True)",
+    "emoji_prefix_text": "string(default='emoji')",
+    "emoji_volume": "integer(default=20)",
+    "emoji_position": "string(default='before')",
+    "emoji_repeat": "string(default='per_emoji')",
+    "emoji_cat_smileys": "boolean(default=True)",
+    "emoji_cat_people": "boolean(default=True)",
+    "emoji_cat_animals": "boolean(default=True)",
+    "emoji_cat_food": "boolean(default=True)",
+    "emoji_cat_travel": "boolean(default=True)",
+    "emoji_cat_activities": "boolean(default=True)",
+    "emoji_cat_objects": "boolean(default=True)",
+    "emoji_cat_symbols": "boolean(default=True)",
+    "emoji_cat_flags": "boolean(default=True)",
     "config_version": "integer(default=1)",
 }
 
@@ -188,6 +204,8 @@ class SpecialProps(IntEnum):
     sys_wake = 2521
     sys_sleep = 2522
 
+    emoji = 2523
+
 
 theme_roles = copy.copy(controlTypes.roleLabels)
 theme_roles.update(
@@ -234,6 +252,8 @@ theme_roles.update(
         SpecialProps.sys_wake: _("System Wake"),
         # Translators: The label of the sound played when the system is going to sleep.
         SpecialProps.sys_sleep: _("System Sleep"),
+        # Translators: The label of the sound played when an emoji character is encountered.
+        SpecialProps.emoji: _("Emoji Sound"),
     }
 )
 
