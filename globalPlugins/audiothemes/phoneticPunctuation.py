@@ -48,7 +48,7 @@ import wx
 from .common import *
 from .utils import *
 from .commands import *
-from .emoji_handler import is_emoji_enabled, is_emoji_sound_enabled, is_emoji_prefix_enabled, get_emoji_prefix_text, get_emoji_position, get_emoji_repeat, find_emojis, is_category_enabled
+from .emoji_handler import is_emoji_enabled, is_emoji_sound_enabled, is_emoji_prefix_enabled, get_emoji_prefix_text, get_emoji_suffix_text, get_emoji_position, get_emoji_repeat, find_emojis, is_category_enabled
 from .handler import SpecialProps
 from .utils import _handler_ref
 from . import commands
@@ -466,6 +466,7 @@ def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
 
 def _processEmojiSequence(sequence):
     prefix = get_emoji_prefix_text()
+    suffix = get_emoji_suffix_text()
     position = get_emoji_position()
     repeat = get_emoji_repeat()
     do_sound = is_emoji_sound_enabled()
@@ -497,19 +498,20 @@ def _processEmojiSequence(sequence):
                 pass
         if do_prefix:
             prefixText = prefix + " "
+            suffixText = suffix + " "
             if repeat == "per_block":
                 if position == "before":
                     newSeq.append(prefixText)
                     newSeq.append(item)
                 elif position == "after":
                     newSeq.append(item)
-                    newSeq.append(prefixText)
+                    newSeq.append(suffixText)
                 else:
                     newSeq.append(prefixText)
                     newSeq.append(item)
-                    newSeq.append(prefixText)
+                    newSeq.append(suffixText)
             else:
-                # Insert prefix at each emoji position within the text
+                # Insert prefix/suffix at each emoji position within the text
                 parts = []
                 last_end = 0
                 for emoji, cat, start, end in emojis:
@@ -521,9 +523,9 @@ def _processEmojiSequence(sequence):
                     if position in ("before", "both"):
                         parts.append(prefixText)
                     parts.append(item[start:end])
-                    # Insert prefix after emoji
+                    # Insert suffix after emoji
                     if position in ("after", "both"):
-                        parts.append(prefixText)
+                        parts.append(suffixText)
                     last_end = end
                 parts.append(item[last_end:])
                 newSeq.append("".join(parts))

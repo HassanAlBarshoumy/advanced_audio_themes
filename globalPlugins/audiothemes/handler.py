@@ -139,6 +139,7 @@ audiothemes_config_defaults = {
     "emoji_sound": "boolean(default=True)",
     "emoji_prefix": "boolean(default=True)",
     "emoji_prefix_text": "string(default='emoji')",
+    "emoji_suffix_text": "string(default='emoji')",
     "emoji_volume": "integer(default=20)",
     "emoji_position": "string(default='before')",
     "emoji_repeat": "string(default='per_emoji')",

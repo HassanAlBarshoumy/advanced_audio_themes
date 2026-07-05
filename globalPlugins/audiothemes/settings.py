@@ -1391,6 +1391,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
         sizer.Add(prefixLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
         sizer.Add(self.emojiPrefixTextCtrl, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
 
+        # Suffix text
+        suffixLabel = wx.StaticText(page, -1, _("Suffix text:"))
+        self.emojiSuffixTextCtrl = wx.TextCtrl(page, -1, name=_("Emoji suffix text"))
+        sizer.Add(suffixLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
+        sizer.Add(self.emojiSuffixTextCtrl, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+
         # Prefix position
         posLabel = wx.StaticText(page, -1, _("Prefix position:"))
         self.emojiPositionChoice = wx.Choice(page, -1, choices=[
@@ -1664,6 +1670,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.emojiSoundCheckbox.SetValue(_b(conf.get("emoji_sound", True)))
         self.emojiPrefixCheckbox.SetValue(_b(conf.get("emoji_prefix", True)))
         self.emojiPrefixTextCtrl.SetValue(conf.get("emoji_prefix_text", "emoji"))
+        self.emojiSuffixTextCtrl.SetValue(conf.get("emoji_suffix_text", "emoji"))
         pos_map = {"before": 0, "after": 1, "both": 2, "none": 3}
         pos_val = conf.get("emoji_position", "before")
         self.emojiPositionChoice.SetSelection(pos_map.get(pos_val, 0))
@@ -2097,6 +2104,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         conf["emoji_sound"] = self.emojiSoundCheckbox.GetValue()
         conf["emoji_prefix"] = self.emojiPrefixCheckbox.GetValue()
         conf["emoji_prefix_text"] = self.emojiPrefixTextCtrl.GetValue()
+        conf["emoji_suffix_text"] = self.emojiSuffixTextCtrl.GetValue()
         pos_map_rev = {0: "before", 1: "after", 2: "both", 3: "none"}
         sel = self.emojiPositionChoice.GetSelection()
         conf["emoji_position"] = pos_map_rev.get(sel, "before")

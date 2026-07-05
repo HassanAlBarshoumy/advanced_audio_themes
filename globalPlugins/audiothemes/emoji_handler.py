@@ -434,6 +434,10 @@ def get_emoji_prefix_text():
     return config.conf["audiothemes"].get("emoji_prefix_text", "emoji")
 
 
+def get_emoji_suffix_text():
+    return config.conf["audiothemes"].get("emoji_suffix_text", "emoji")
+
+
 def get_emoji_volume():
     return config.conf["audiothemes"].get("emoji_volume", 20)
 
