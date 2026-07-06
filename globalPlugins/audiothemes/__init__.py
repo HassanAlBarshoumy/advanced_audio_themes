@@ -481,7 +481,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception:
             tones.beep(420, 40)
 
-    @script(description=_("Shows audio themes commands help."))
+    @script(description=_("Shows audio themes commands help."), gestures=[])
     def script_audioThemesHelp(self, gesture):
         if self._helpDialog is not None:
             try:
@@ -909,7 +909,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             nextHandler()
         except Exception as e:
             log.debugWarning(f"event_typedCharacter: {e}")
-    @script(description=_("Switches to the next audio theme."))
+    @script(description=_("Switches to the next audio theme."), gestures=[])
     def script_nextAudioTheme(self, gesture):
         themes = self.handler.get_installed_themes()
         if not themes: return
@@ -921,7 +921,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self.handler.configure()
         ui.message(new_theme.name)
 
-    @script(description=_("Switches to the previous audio theme."))
+    @script(description=_("Switches to the previous audio theme."), gestures=[])
     def script_previousAudioTheme(self, gesture):
         themes = self.handler.get_installed_themes()
         if not themes: return
@@ -933,7 +933,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self.handler.configure()
         ui.message(new_theme.name)
 
-    @script(description=_("Increases the audio themes volume by 5 percent."))
+    @script(description=_("Increases the audio themes volume by 5 percent."), gestures=[])
     def script_increaseAudioThemesVolume(self, gesture):
         vol = config.conf["audiothemes"]["volume"]
         new_vol = min(100, vol + 5)
@@ -941,7 +941,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self.handler.configure()
         ui.message(_("Volume {vol}").format(vol=new_vol))
 
-    @script(description=_("Decreases the audio themes volume by 5 percent."))
+    @script(description=_("Decreases the audio themes volume by 5 percent."), gestures=[])
     def script_decreaseAudioThemesVolume(self, gesture):
         vol = config.conf["audiothemes"]["volume"]
         new_vol = max(0, vol - 5)
@@ -1239,7 +1239,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         ui.message(msg)
         frenzy.updateRules()
 
-    @script(description=_("Rotates the global speech order format."))
+    @script(description=_("Rotates the global speech order format."), gestures=[])
     def script_rotateSpeechOrder(self, gesture):
         fmt = config.conf["audiothemes"].get("announceFormat", "0")
         
