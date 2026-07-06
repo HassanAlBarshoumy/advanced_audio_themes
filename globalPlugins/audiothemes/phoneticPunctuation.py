@@ -48,7 +48,7 @@ import wx
 from .common import *
 from .utils import *
 from .commands import *
-from .emoji_handler import is_emoji_enabled, is_emoji_sound_enabled, is_emoji_prefix_enabled, get_emoji_prefix_text, get_emoji_suffix_text, get_emoji_position, get_emoji_sound_position, get_emoji_repeat, get_emoji_volume, find_emojis, is_category_enabled
+from .emoji_handler import is_emoji_enabled, is_emoji_sound_enabled, is_emoji_prefix_enabled, get_emoji_prefix_text, get_emoji_suffix_text, get_emoji_position, get_emoji_sound_position, get_emoji_repeat, get_emoji_volume, find_emojis, is_category_enabled, get_special_prop_for_category, get_emoji_sound_repeat, get_emoji_prefix_repeat, is_emoji_sound_category_enabled, get_emoji_prefix_text_for_category, get_emoji_suffix_text_for_category, get_emoji_volume_for_category, get_emoji_sound_position_for_category, get_emoji_delay_before, get_emoji_delay_after, is_emoji_suppress_role_sound, is_emoji_blacklisted, get_emoji_custom_description
 from .handler import SpecialProps
 from . import commands
 from . import frenzy
@@ -417,6 +417,14 @@ def onPostNvdaStartup():
             wx.ICON_ERROR | wx.OK,
         )
         return
+    # Load CLDR emoji data in background (lazy, will use cache or download)
+    import threading
+    threading.Thread(target=_load_cldr_emoji_data, daemon=True).start()
+
+
+def _load_cldr_emoji_data():
+    from . import emoji_cldr_data
+    emoji_cldr_data.load()
 
 core.postNvdaStartup.register(onPostNvdaStartup)
 
@@ -466,36 +474,58 @@ def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
 
 class EmojiSoundCommand(speech.commands.BaseCallbackCommand):
     """Plays emoji sound at the correct position during speech.
-    Tries specific sound_key first, falls back to base emoji sound.
+    Tries category-specific sound first, then emoji_before/emoji_after/emoji, then general fallback.
     """
-    def __init__(self, sound_key=SpecialProps.emoji):
+    def __init__(self, category=None, position=None, sound_key=SpecialProps.emoji):
+        self.category = category
+        self.position = position
         self.sound_key = sound_key
 
     def run(self):
         try:
             handler = _utils_mod._handler_ref
             if handler and handler.enabled and handler.active_theme:
-                vol = get_emoji_volume()
+                cat_prop = get_special_prop_for_category(self.category) if self.category is not None else None
+                vol = get_emoji_volume_for_category(self.category) if self.category is not None else get_emoji_volume()
                 with handler.active_theme._lock:
-                    key = self.sound_key if self.sound_key in handler.active_theme.sounds else (
-                        SpecialProps.emoji if SpecialProps.emoji in handler.active_theme.sounds else None
-                    )
+                    keys_to_try = []
+                    if cat_prop is not None:
+                        keys_to_try.append(cat_prop)
+                    if self.sound_key != SpecialProps.emoji:
+                        keys_to_try.append(self.sound_key)
+                    keys_to_try.append(SpecialProps.emoji)
+                    key = None
+                    for k in keys_to_try:
+                        if k in handler.active_theme.sounds:
+                            key = k
+                            break
                 if key is not None:
                     handler.play({"name": "emoji", "role": 0, "volume_override": vol / 100.0}, key)
         except Exception:
             pass
 
 
+# Module-level flag for emoji role sound suppression
+_suppress_role_sound_flag = False
+
 def _processEmojiSequence(sequence):
-    prefix = get_emoji_prefix_text()
-    suffix = get_emoji_suffix_text()
-    position = get_emoji_position()
-    repeat = get_emoji_repeat()
-    sound_position = get_emoji_sound_position()
-    do_sound = is_emoji_sound_enabled() and sound_position != "none"
-    do_prefix = is_emoji_prefix_enabled()
-    if position == "none" or not do_prefix:
-        do_prefix = False
+    global _suppress_role_sound_flag
+    _suppress_role_sound_flag = False
+    master_enabled = is_emoji_enabled()
+    if not master_enabled:
+        return sequence
+    do_prefix_global = is_emoji_prefix_enabled()
+    do_sound_global = is_emoji_sound_enabled()
+    global_position = get_emoji_position()
+    global_sound_position = get_emoji_sound_position()
+    global_prefix = get_emoji_prefix_text()
+    global_suffix = get_emoji_suffix_text()
+    sound_repeat = get_emoji_sound_repeat()
+    prefix_repeat = get_emoji_prefix_repeat()
+    delay_before = get_emoji_delay_before()
+    delay_after = get_emoji_delay_after()
+    suppress_role = is_emoji_suppress_role_sound()
+
     newSeq = []
     for item in sequence:
         if not isinstance(item, str):
@@ -509,57 +539,158 @@ def _processEmojiSequence(sequence):
         if not any(is_category_enabled(c) for c in cats):
             newSeq.append(item)
             continue
-        if do_prefix or do_sound:
-            prefixText = prefix + " " if do_prefix else ""
-            suffixText = suffix + " " if do_prefix else ""
-            if repeat == "per_block":
-                if position in ("before", "both") and do_prefix:
-                    newSeq.append(prefixText)
-                if sound_position in ("before", "both") and do_sound:
-                    newSeq.append(EmojiSoundCommand(SpecialProps.emoji_before))
-                newSeq.append(item)
-                if position in ("after", "both") and do_prefix:
-                    newSeq.append(suffixText)
-                if sound_position in ("after", "both") and do_sound:
-                    newSeq.append(EmojiSoundCommand(SpecialProps.emoji_after))
-            else:
-                # per_emoji: insert prefix/suffix/sound at each emoji
-                items = []
-                last_end = 0
-                for emoji, cat, start, end in emojis:
-                    if not is_category_enabled(cat):
-                        continue
-                    items.append(item[last_end:start])
-                    if position in ("before", "both") and do_prefix:
-                        items.append(prefixText)
-                    if sound_position in ("before", "both") and do_sound:
-                        items.append(EmojiSoundCommand(SpecialProps.emoji_before))
-                    items.append(item[start:end])
-                    if position in ("after", "both") and do_prefix:
-                        items.append(suffixText)
-                    if sound_position in ("after", "both") and do_sound:
-                        items.append(EmojiSoundCommand(SpecialProps.emoji_after))
-                    last_end = end
-                items.append(item[last_end:])
-                # Merge adjacent strings
-                merged = []
-                buf = ""
-                for x in items:
-                    if isinstance(x, str):
-                        buf += x
-                    else:
-                        if buf:
-                            merged.append(buf)
-                            buf = ""
-                        merged.append(x)
-                if buf:
-                    merged.append(buf)
-                newSeq.extend(merged)
+
+        # Suppress role sound for this utterance if enabled
+        if suppress_role:
+            _suppress_role_sound_flag = True
         else:
+            _suppress_role_sound_flag = False
+
+        # Filter blacklisted emojis
+        emojis = [(e, c, s, en) for e, c, s, en in emojis if not is_emoji_blacklisted(e)]
+        if not emojis:
             newSeq.append(item)
+            continue
+
+        # Determine if we have any sound or prefix to add
+        has_any_sound = do_sound_global and global_sound_position != "none"
+        has_any_prefix = do_prefix_global and global_position != "none"
+
+        if not has_any_sound and not has_any_prefix:
+            newSeq.append(item)
+            continue
+
+        # Build before/after commands for both sound types
+        def _make_emoji_commands(cat, snd_pos, delay_b, delay_a, emoji_char=None):
+            """Return (before_commands, after_commands) for one emoji."""
+            before = []
+            after = []
+            effective_snd_pos = snd_pos
+            if cat is not None:
+                cat_snd_pos = get_emoji_sound_position_for_category(cat)
+                if cat_snd_pos != get_emoji_sound_position():
+                    effective_snd_pos = cat_snd_pos
+            effective_prefix = get_emoji_prefix_text_for_category(cat) if cat is not None else global_prefix
+            effective_suffix = get_emoji_suffix_text_for_category(cat) if cat is not None else global_suffix
+            effective_pos = global_position
+
+            if do_sound_global and effective_snd_pos != "none":
+                if delay_b > 0:
+                    before.append(speech.commands.BreakCommand(delay_b))
+                if effective_snd_pos in ("before", "both"):
+                    before.append(EmojiSoundCommand(category=cat, position="before", sound_key=SpecialProps.emoji_before))
+                if effective_snd_pos in ("after", "both"):
+                    after.append(EmojiSoundCommand(category=cat, position="after", sound_key=SpecialProps.emoji_after))
+                if delay_a > 0:
+                    after.append(speech.commands.BreakCommand(delay_a))
+
+            if do_prefix_global and effective_pos != "none":
+                prefix_text = effective_prefix + " " if effective_prefix else ""
+                suffix_text = effective_suffix + " " if effective_suffix else ""
+                if effective_pos in ("before", "both") and prefix_text.strip():
+                    before.append(prefix_text)
+                if effective_pos in ("after", "both") and suffix_text.strip():
+                    after.append(suffix_text)
+
+            return before, after
+
+        # Determine repeat modes
+        effective_sound_repeat = sound_repeat
+        effective_prefix_repeat = prefix_repeat
+
+        def _get_emoji_text(emoji_char):
+            """Return custom description or the original emoji character (let NVDA speak it)."""
+            desc = get_emoji_custom_description(emoji_char)
+            if desc:
+                return desc
+            return emoji_char
+
+        if effective_sound_repeat == "per_block" and effective_prefix_repeat == "per_block":
+            # Both per_block: single block-level instructions
+            before_cmds, after_cmds = _make_emoji_commands(None, global_sound_position, delay_before, delay_after)
+            newSeq.extend(before_cmds)
+            newSeq.append(item)
+            newSeq.extend(after_cmds)
+        elif effective_sound_repeat == "per_block" and effective_prefix_repeat == "per_emoji":
+            # Sound per_block, prefix per_emoji
+            # Insert block sound commands around the whole block, prefix per emoji inside
+            snd_before_cmds, snd_after_cmds = _make_emoji_commands(None, global_sound_position, delay_before, delay_after)
+            items = []
+            items.extend(snd_before_cmds)
+            last_end = 0
+            for emoji, cat, start, end in emojis:
+                if not is_category_enabled(cat):
+                    continue
+                items.append(item[last_end:start])
+                pfx_before, pfx_after = _make_emoji_commands(cat, "none", 0, 0)
+                items.extend(pfx_before)
+                items.append(_get_emoji_text(emoji))
+                items.extend(pfx_after)
+                last_end = end
+            items.append(item[last_end:])
+            items.extend(snd_after_cmds)
+            merged = _merge_strings(items)
+            newSeq.extend(merged)
+        elif effective_sound_repeat == "per_emoji" and effective_prefix_repeat == "per_block":
+            # Sound per_emoji, prefix per_block
+            pfx_before, pfx_after = _make_emoji_commands(None, "none", 0, 0)
+            items = []
+            items.extend(pfx_before)
+            last_end = 0
+            for emoji, cat, start, end in emojis:
+                if not is_category_enabled(cat):
+                    continue
+                items.append(item[last_end:start])
+                snd_before, snd_after = _make_emoji_commands(cat, global_sound_position, delay_before, delay_after)
+                items.extend(snd_before)
+                items.append(_get_emoji_text(emoji))
+                items.extend(snd_after)
+                last_end = end
+            items.append(item[last_end:])
+            items.extend(pfx_after)
+            merged = _merge_strings(items)
+            newSeq.extend(merged)
+        else:
+            # Both per_emoji: insert sound and prefix per emoji
+            items = []
+            last_end = 0
+            for emoji, cat, start, end in emojis:
+                if not is_category_enabled(cat):
+                    continue
+                items.append(item[last_end:start])
+                before_cmds, after_cmds = _make_emoji_commands(cat, global_sound_position, delay_before, delay_after)
+                items.extend(before_cmds)
+                items.append(_get_emoji_text(emoji))
+                items.extend(after_cmds)
+                last_end = end
+            items.append(item[last_end:])
+            merged = _merge_strings(items)
+            newSeq.extend(merged)
     return newSeq
 
+
+def _merge_strings(items):
+    """Merge adjacent string items in a list."""
+    merged = []
+    buf = ""
+    for x in items:
+        if isinstance(x, str):
+            buf += x
+        else:
+            if buf:
+                merged.append(buf)
+                buf = ""
+            merged.append(x)
+    if buf:
+        merged.append(buf)
+    return merged
+
 speechCancelledFlag = False
+
+def is_emoji_suppress_role_flag_set():
+    """Check if the current utterance should suppress role sounds due to emoji presence."""
+    return _suppress_role_sound_flag
+
 def preCancelSpeech(*args, **kwargs):
     global speechCancelledFlag
     speechCancelledFlag = True

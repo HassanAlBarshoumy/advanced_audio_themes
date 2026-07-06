@@ -98,12 +98,12 @@ class WNDCLASSEXW(ctypes.Structure):
         ("cbClsExtra", ctypes.c_int),
         ("cbWndExtra", ctypes.c_int),
         ("hInstance", ctypes.wintypes.HINSTANCE),
-        ("hIcon", ctypes.wintypes.HICON),
-        ("hCursor", ctypes.wintypes.HCURSOR),
-        ("hbrBackground", ctypes.wintypes.HBRUSH),
+        ("hIcon", ctypes.c_void_p),
+        ("hCursor", ctypes.c_void_p),
+        ("hbrBackground", ctypes.c_void_p),
         ("lpszMenuName", ctypes.wintypes.LPCWSTR),
         ("lpszClassName", ctypes.wintypes.LPCWSTR),
-        ("hIconSm", ctypes.wintypes.HICON),
+        ("hIconSm", ctypes.c_void_p),
     ]
 
 

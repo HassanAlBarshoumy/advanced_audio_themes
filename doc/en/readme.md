@@ -208,6 +208,7 @@ A set of highly advanced features are integrated into this add-on which might no
 
 ### 3. Audio Beacon
 - **Shortcut:** `NVDA+Shift+B` (or `NVDA+Shift+A` then `a`)
+> **Note:** `NVDA+Shift+B` is NVDA's standard battery status command in all keyboard layouts. If you use this shortcut for battery announcements, use the alternative sequence `NVDA+Shift+A` then `a` to activate the beacon instead.
 - **Description:** You can "drop" an audio beacon at the current navigator object's location. This is useful to mark an object and track it contextually during an Audio Sonar sweep.
 
 ### 4. Audio Themes Command Layer

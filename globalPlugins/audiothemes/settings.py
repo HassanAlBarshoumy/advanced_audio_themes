@@ -1377,11 +1377,13 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.emojiEnableCheckbox = wx.CheckBox(page, -1, _("Enable emoji sounds and speech prefix"))
         sizer.Add(self.emojiEnableCheckbox, 0, wx.ALL, 10)
 
-        # Sound enable
+        # ── Sound Settings ──
+        soundBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Sound Settings"))
         self.emojiSoundCheckbox = wx.CheckBox(page, -1, _("Play sound when emoji is encountered"))
-        sizer.Add(self.emojiSoundCheckbox, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10)
+        soundBox.Add(self.emojiSoundCheckbox, 0, wx.ALL, 5)
 
         # Sound position
+        sndPosGrid = wx.FlexGridSizer(2, 2, 5, 10)
         sndPosLabel = wx.StaticText(page, -1, _("Sound position:"))
         self.emojiSoundPositionChoice = wx.Choice(page, -1, choices=[
             _("Before emoji"),
@@ -1389,25 +1391,49 @@ class AudioThemesSettingsPanel(SettingsPanel):
             _("Before and after"),
             _("No sound"),
         ], name=_("Emoji sound position"))
-        sizer.Add(sndPosLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
-        sizer.Add(self.emojiSoundPositionChoice, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+        sndPosGrid.Add(sndPosLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+        sndPosGrid.Add(self.emojiSoundPositionChoice, 1, wx.EXPAND)
+        # Sound repeat
+        sndRepeatLabel = wx.StaticText(page, -1, _("Sound repeat:"))
+        self.emojiSoundRepeatChoice = wx.Choice(page, -1, choices=[
+            _("Once per emoji character"),
+            _("Once per text block"),
+        ], name=_("Emoji sound repeat"))
+        sndPosGrid.Add(sndRepeatLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+        sndPosGrid.Add(self.emojiSoundRepeatChoice, 1, wx.EXPAND)
+        soundBox.Add(sndPosGrid, 0, wx.EXPAND | wx.ALL, 5)
 
-        # Speech prefix enable
+        # Volume
+        volGrid = wx.BoxSizer(wx.HORIZONTAL)
+        volLabel = wx.StaticText(page, -1, _("Volume:"))
+        self.emojiVolumeSlider = wx.Slider(page, -1, minValue=0, maxValue=100, name=_("Emoji sound volume"))
+        self.emojiVolumeValueLabel = wx.StaticText(page, -1, "20%")
+        volGrid.Add(volLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        volGrid.Add(self.emojiVolumeSlider, 1, wx.EXPAND | wx.RIGHT, 5)
+        volGrid.Add(self.emojiVolumeValueLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+        soundBox.Add(volGrid, 0, wx.EXPAND | wx.ALL, 5)
+        self.emojiVolumeSlider.Bind(wx.EVT_SLIDER, self._onEmojiVolumeChanged)
+
+        # Delay
+        delayGrid = wx.FlexGridSizer(2, 2, 5, 10)
+        delayBeforeLabel = wx.StaticText(page, -1, _("Delay before sound (ms):"))
+        self.emojiDelayBeforeSpin = wx.SpinCtrl(page, -1, min=0, max=5000, initial=0, name=_("Delay before emoji sound"))
+        delayGrid.Add(delayBeforeLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+        delayGrid.Add(self.emojiDelayBeforeSpin, 0, wx.EXPAND)
+        delayAfterLabel = wx.StaticText(page, -1, _("Delay after sound (ms):"))
+        self.emojiDelayAfterSpin = wx.SpinCtrl(page, -1, min=0, max=5000, initial=0, name=_("Delay after emoji sound"))
+        delayGrid.Add(delayAfterLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+        delayGrid.Add(self.emojiDelayAfterSpin, 0, wx.EXPAND)
+        soundBox.Add(delayGrid, 0, wx.EXPAND | wx.ALL, 5)
+
+        sizer.Add(soundBox, 0, wx.EXPAND | wx.ALL, 5)
+
+        # ── Prefix Settings ──
+        prefixBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Speech Prefix Settings"))
         self.emojiPrefixCheckbox = wx.CheckBox(page, -1, _("Speak prefix text before emoji descriptions"))
-        sizer.Add(self.emojiPrefixCheckbox, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10)
+        prefixBox.Add(self.emojiPrefixCheckbox, 0, wx.ALL, 5)
 
-        # Prefix text
-        prefixLabel = wx.StaticText(page, -1, _("Prefix text:"))
-        self.emojiPrefixTextCtrl = wx.TextCtrl(page, -1, name=_("Emoji prefix text"))
-        sizer.Add(prefixLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
-        sizer.Add(self.emojiPrefixTextCtrl, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
-
-        # Suffix text
-        suffixLabel = wx.StaticText(page, -1, _("Suffix text:"))
-        self.emojiSuffixTextCtrl = wx.TextCtrl(page, -1, name=_("Emoji suffix text"))
-        sizer.Add(suffixLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
-        sizer.Add(self.emojiSuffixTextCtrl, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
-
+        prefGrid = wx.FlexGridSizer(4, 2, 5, 10)
         # Prefix position
         posLabel = wx.StaticText(page, -1, _("Prefix position:"))
         self.emojiPositionChoice = wx.Choice(page, -1, choices=[
@@ -1416,54 +1442,109 @@ class AudioThemesSettingsPanel(SettingsPanel):
             _("Before and after"),
             _("No prefix"),
         ], name=_("Prefix position"))
-        sizer.Add(posLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
-        sizer.Add(self.emojiPositionChoice, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
-
-        # Repeat mode
-        repeatLabel = wx.StaticText(page, -1, _("Repeat mode:"))
-        self.emojiRepeatChoice = wx.Choice(page, -1, choices=[
+        prefGrid.Add(posLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+        prefGrid.Add(self.emojiPositionChoice, 1, wx.EXPAND)
+        # Prefix repeat
+        prefRepeatLabel = wx.StaticText(page, -1, _("Prefix repeat:"))
+        self.emojiPrefixRepeatChoice = wx.Choice(page, -1, choices=[
             _("Once per emoji character"),
             _("Once per text block"),
-        ], name=_("Emoji repeat mode"))
-        sizer.Add(repeatLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
-        sizer.Add(self.emojiRepeatChoice, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+        ], name=_("Emoji prefix repeat"))
+        prefGrid.Add(prefRepeatLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+        prefGrid.Add(self.emojiPrefixRepeatChoice, 1, wx.EXPAND)
+        # Prefix text
+        prefixLabel = wx.StaticText(page, -1, _("Prefix text:"))
+        self.emojiPrefixTextCtrl = wx.TextCtrl(page, -1, name=_("Emoji prefix text"))
+        prefGrid.Add(prefixLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+        prefGrid.Add(self.emojiPrefixTextCtrl, 1, wx.EXPAND)
+        # Suffix text
+        suffixLabel = wx.StaticText(page, -1, _("Suffix text:"))
+        self.emojiSuffixTextCtrl = wx.TextCtrl(page, -1, name=_("Emoji suffix text"))
+        prefGrid.Add(suffixLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+        prefGrid.Add(self.emojiSuffixTextCtrl, 1, wx.EXPAND)
+        prefixBox.Add(prefGrid, 0, wx.EXPAND | wx.ALL, 5)
 
-        # Volume slider
-        volLabel = wx.StaticText(page, -1, _("Emoji sound volume:"))
-        self.emojiVolumeSlider = wx.Slider(page, -1, minValue=0, maxValue=100, name=_("Emoji sound volume"))
-        sizer.Add(volLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
-        sizer.Add(self.emojiVolumeSlider, 0, wx.EXPAND | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5)
+        # Suppress role sound
+        self.emojiSuppressRoleCheckbox = wx.CheckBox(page, -1, _("Suppress role sound (e.g. \"list item\") when emoji is present"))
+        prefixBox.Add(self.emojiSuppressRoleCheckbox, 0, wx.ALL, 5)
 
-        # Category checkboxes
+        sizer.Add(prefixBox, 0, wx.EXPAND | wx.ALL, 5)
+
+        # ── Category Settings ──
         catBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Emoji Categories"))
         self.emojiCatCheckboxes = {}
+        self.emojiSoundCatCheckboxes = {}
+        self.emojiCatPrefixTextCtrls = {}
+        self.emojiCatSuffixTextCtrls = {}
         cats = [
-            ("emoji_cat_smileys", _("Smileys & Emotion")),
-            ("emoji_cat_people", _("People & Body")),
-            ("emoji_cat_animals", _("Animals & Nature")),
-            ("emoji_cat_food", _("Food & Drink")),
-            ("emoji_cat_travel", _("Travel & Places")),
-            ("emoji_cat_activities", _("Activities")),
-            ("emoji_cat_objects", _("Objects")),
-            ("emoji_cat_symbols", _("Symbols")),
-            ("emoji_cat_flags", _("Flags")),
+            ("emoji_cat_smileys", _("Smileys & Emotion"), "smileys"),
+            ("emoji_cat_people", _("People & Body"), "people"),
+            ("emoji_cat_animals", _("Animals & Nature"), "animals"),
+            ("emoji_cat_food", _("Food & Drink"), "food"),
+            ("emoji_cat_travel", _("Travel & Places"), "travel"),
+            ("emoji_cat_activities", _("Activities"), "activities"),
+            ("emoji_cat_objects", _("Objects"), "objects"),
+            ("emoji_cat_symbols", _("Symbols"), "symbols"),
+            ("emoji_cat_flags", _("Flags"), "flags"),
         ]
-        for key, label in cats:
+        for key, label, cat_name in cats:
             cb = wx.CheckBox(page, -1, label)
             self.emojiCatCheckboxes[key] = cb
             catBox.Add(cb, 0, wx.ALL, 5)
-        sizer.Add(catBox, 0, wx.EXPAND | wx.ALL, 10)
+        sizer.Add(catBox, 0, wx.EXPAND | wx.ALL, 5)
+
+        # ── Advanced Settings ──
+        advBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Advanced Settings"))
+        self.advPerCategoryBtn = wx.Button(page, -1, _("Per-category prefix text, sound position, and volume..."))
+        advBox.Add(self.advPerCategoryBtn, 0, wx.ALL, 5)
+        self.Bind(wx.EVT_BUTTON, self.onEmojiPerCategory, self.advPerCategoryBtn)
+
+        # Blacklist
+        blLabel = wx.StaticText(page, -1, _("Emoji blacklist (type or paste emoji characters to exclude):"))
+        advBox.Add(blLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
+        self.emojiBlacklistCtrl = wx.TextCtrl(page, -1, name=_("Emoji blacklist"))
+        advBox.Add(self.emojiBlacklistCtrl, 0, wx.EXPAND | wx.ALL, 5)
+
+        # Custom descriptions
+        descLabel = wx.StaticText(page, -1, _("Custom descriptions (JSON format, e.g. {\"😊\": \"face smile\"}):"))
+        advBox.Add(descLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
+        self.emojiCustomDescCtrl = wx.TextCtrl(page, -1, name=_("Custom emoji descriptions"))
+        advBox.Add(self.emojiCustomDescCtrl, 0, wx.EXPAND | wx.ALL, 5)
+
+        sizer.Add(advBox, 0, wx.EXPAND | wx.ALL, 5)
+
+        # ── Test Area ──
+        testBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Test Emoji Processing"))
+        testLabel = wx.StaticText(page, -1, _("Type text with emoji to preview:"))
+        testBox.Add(testLabel, 0, wx.TOP | wx.LEFT | wx.RIGHT, 5)
+        testInputSizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.emojiTestInput = wx.TextCtrl(page, -1, value=_("Hello 😊 world 🌍!"), name=_("Test emoji text"))
+        testInputSizer.Add(self.emojiTestInput, 1, wx.EXPAND | wx.ALL, 5)
+        self.emojiTestBtn = wx.Button(page, -1, _("&Test"))
+        testInputSizer.Add(self.emojiTestBtn, 0, wx.ALL, 5)
+        testBox.Add(testInputSizer, 0, wx.EXPAND)
+        self.Bind(wx.EVT_BUTTON, self.onEmojiTest, self.emojiTestBtn)
+        sizer.Add(testBox, 0, wx.EXPAND | wx.ALL, 5)
+
+        # ── Export/Import ──
+        ioBox = wx.BoxSizer(wx.HORIZONTAL)
+        self.emojiExportBtn = wx.Button(page, -1, _("&Export emoji settings..."))
+        self.emojiImportBtn = wx.Button(page, -1, _("&Import emoji settings..."))
+        ioBox.Add(self.emojiExportBtn, 0, wx.ALL, 5)
+        ioBox.Add(self.emojiImportBtn, 0, wx.ALL, 5)
+        self.Bind(wx.EVT_BUTTON, self.onEmojiExport, self.emojiExportBtn)
+        self.Bind(wx.EVT_BUTTON, self.onEmojiImport, self.emojiImportBtn)
+        sizer.Add(ioBox, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
         # Note about role assignment
         noteBox = wx.StaticBoxSizer(wx.VERTICAL, page, _("Note"))
         note = wx.StaticText(page, -1, _(
-            "Emoji is now available as a role in the Audio Themes role system.\n"
-            "You can assign a custom emoji sound in your theme by creating\n"
-            "an emoji.wav file, or configure it via the role selection dialogs\n"
-            "in the First/Last and Speech Order tabs."
+            "Emoji sounds can be assigned in your theme by creating sound files\n"
+            "named emoji.wav, emoji_smileys.wav, emoji_people.wav, etc.\n"
+            "Per-category files take priority over the general emoji.wav."
         ))
         noteBox.Add(note, 0, wx.ALL, 10)
-        sizer.Add(noteBox, 0, wx.EXPAND | wx.ALL, 10)
+        sizer.Add(noteBox, 0, wx.EXPAND | wx.ALL, 5)
 
         sizer.AddStretchSpacer()
         page.SetSizer(sizer)
@@ -1485,6 +1566,178 @@ class AudioThemesSettingsPanel(SettingsPanel):
         if dlg.ShowModal() == wx.ID_OK:
             self._suppress_categories = dlg.getCategories()
         dlg.Destroy()
+
+    def _onEmojiVolumeChanged(self, event):
+        val = self.emojiVolumeSlider.GetValue()
+        self.emojiVolumeValueLabel.SetLabel(_("%d%%") % val)
+
+    def onEmojiPerCategory(self, event):
+        """Dialog for per-category prefix text, sound position, and volume."""
+        from .emoji_handler import CATEGORY_NAMES
+        dlg = wx.Dialog(self, title=_("Per-Category Emoji Settings"))
+        panel = dlg
+        mainSizer = wx.BoxSizer(wx.VERTICAL)
+        helpText = wx.StaticText(panel, -1, _(
+            "Configure per-category prefix text, sound position, and volume.\n"
+            "Leave a field empty to use the global setting."
+        ))
+        mainSizer.Add(helpText, 0, wx.ALL, 10)
+
+        # Load current JSON configs
+        import json
+        try:
+            pfx_raw = config.conf["audiothemes"].get("emoji_prefix_text_per_category", "{}")
+            pfx_per_cat = json.loads(pfx_raw) if isinstance(pfx_raw, str) else pfx_raw
+        except Exception:
+            pfx_per_cat = {}
+        try:
+            sfx_raw = config.conf["audiothemes"].get("emoji_suffix_text_per_category", "{}")
+            sfx_per_cat = json.loads(sfx_raw) if isinstance(sfx_raw, str) else sfx_raw
+        except Exception:
+            sfx_per_cat = {}
+        try:
+            snd_pos_raw = config.conf["audiothemes"].get("emoji_sound_position_per_category", "{}")
+            snd_pos_per_cat = json.loads(snd_pos_raw) if isinstance(snd_pos_raw, str) else snd_pos_raw
+        except Exception:
+            snd_pos_per_cat = {}
+        try:
+            vol_raw = config.conf["audiothemes"].get("emoji_volume_per_category", "{}")
+            vol_per_cat = json.loads(vol_raw) if isinstance(vol_raw, str) else vol_raw
+        except Exception:
+            vol_per_cat = {}
+
+        # Grid of controls
+        grid = wx.FlexGridSizer(len(CATEGORY_NAMES) + 1, 5, 5, 10)
+        grid.Add(wx.StaticText(panel, -1, _("Category")), 0, wx.ALIGN_CENTER_VERTICAL)
+        grid.Add(wx.StaticText(panel, -1, _("Prefix Text")), 0, wx.ALIGN_CENTER_VERTICAL)
+        grid.Add(wx.StaticText(panel, -1, _("Suffix Text")), 0, wx.ALIGN_CENTER_VERTICAL)
+        grid.Add(wx.StaticText(panel, -1, _("Sound Position")), 0, wx.ALIGN_CENTER_VERTICAL)
+        grid.Add(wx.StaticText(panel, -1, _("Volume (0-100)")), 0, wx.ALIGN_CENTER_VERTICAL)
+
+        self._emojiCatPrefixCtrls = {}
+        self._emojiCatSuffixCtrls = {}
+        self._emojiCatSoundPosCtrls = {}
+        self._emojiCatVolCtrls = {}
+        pos_choices = ["", _("Before"), _("After"), _("Before and after"), _("No sound")]
+        pos_values = ["", "before", "after", "both", "none"]
+
+        for cat_id in sorted(CATEGORY_NAMES.keys()):
+            cat_name = CATEGORY_NAMES[cat_id]
+            catLabel = wx.StaticText(panel, -1, cat_name.capitalize())
+            grid.Add(catLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+
+            pfxCtrl = wx.TextCtrl(panel, -1, value=pfx_per_cat.get(cat_name, ""), name=_("Prefix text for %s") % cat_name)
+            self._emojiCatPrefixCtrls[cat_id] = pfxCtrl
+            grid.Add(pfxCtrl, 1, wx.EXPAND)
+
+            sfxCtrl = wx.TextCtrl(panel, -1, value=sfx_per_cat.get(cat_name, ""), name=_("Suffix text for %s") % cat_name)
+            self._emojiCatSuffixCtrls[cat_id] = sfxCtrl
+            grid.Add(sfxCtrl, 1, wx.EXPAND)
+
+            cur_pos = snd_pos_per_cat.get(cat_name, "")
+            posChoice = wx.Choice(panel, -1, choices=pos_choices, name=_("Sound position for %s") % cat_name)
+            if cur_pos in pos_values:
+                posChoice.SetSelection(pos_values.index(cur_pos))
+            self._emojiCatSoundPosCtrls[cat_id] = posChoice
+            grid.Add(posChoice, 1, wx.EXPAND)
+
+            cur_vol = vol_per_cat.get(cat_name, "")
+            volCtrl = wx.SpinCtrl(panel, -1, min=0, max=100, initial=int(cur_vol) if cur_vol else 0, name=_("Volume for %s") % cat_name)
+            self._emojiCatVolCtrls[cat_id] = volCtrl
+            grid.Add(volCtrl, 0, wx.EXPAND)
+
+        mainSizer.Add(grid, 0, wx.EXPAND | wx.ALL, 10)
+
+        btnSizer = dlg.CreateButtonSizer(wx.OK | wx.CANCEL)
+        mainSizer.Add(btnSizer, 0, wx.ALIGN_CENTER | wx.ALL, 10)
+
+        dlg.SetSizer(mainSizer)
+        dlg.SetMinSize((600, 400))
+        dlg.Fit()
+        dlg.CenterOnParent()
+
+        if dlg.ShowModal() == wx.ID_OK:
+            new_pfx = {}
+            new_sfx = {}
+            new_snd = {}
+            new_vol = {}
+            for cat_id in CATEGORY_NAMES:
+                cat_name = CATEGORY_NAMES[cat_id]
+                pfx_val = self._emojiCatPrefixCtrls[cat_id].GetValue().strip()
+                sfx_val = self._emojiCatSuffixCtrls[cat_id].GetValue().strip()
+                pos_sel = self._emojiCatSoundPosCtrls[cat_id].GetSelection()
+                snd_val = pos_values[pos_sel] if pos_sel != wx.NOT_FOUND and pos_sel > 0 else ""
+                vol_val = self._emojiCatVolCtrls[cat_id].GetValue()
+                if pfx_val:
+                    new_pfx[cat_name] = pfx_val
+                if sfx_val:
+                    new_sfx[cat_name] = sfx_val
+                if snd_val:
+                    new_snd[cat_name] = snd_val
+                if vol_val:
+                    new_vol[cat_name] = str(vol_val)
+            config.conf["audiothemes"]["emoji_prefix_text_per_category"] = json.dumps(new_pfx)
+            config.conf["audiothemes"]["emoji_suffix_text_per_category"] = json.dumps(new_sfx)
+            config.conf["audiothemes"]["emoji_sound_position_per_category"] = json.dumps(new_snd)
+            config.conf["audiothemes"]["emoji_volume_per_category"] = json.dumps(new_vol)
+        dlg.Destroy()
+
+    def onEmojiTest(self, event):
+        """Test emoji processing with user-provided text."""
+        import speech
+        text = self.emojiTestInput.GetValue()
+        if not text.strip():
+            text = _("Hello 😊 world 🌍!")
+            self.emojiTestInput.SetValue(text)
+        from .phoneticPunctuation import _processEmojiSequence
+        processed = _processEmojiSequence([text])
+        speech.speech.speak(processed)
+
+    def onEmojiExport(self, event):
+        """Export emoji settings to a JSON file."""
+        import json
+        conf = config.conf["audiothemes"]
+        emoji_keys = [k for k in conf if k.startswith("emoji_")]
+        data = {k: conf[k] for k in emoji_keys}
+        fd = wx.FileDialog(
+            self,
+            _("Export Emoji Settings"),
+            wildcard="JSON files (*.json)|*.json",
+            defaultFile="emoji_settings.json",
+            style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
+        )
+        if fd.ShowModal() == wx.ID_OK:
+            path = fd.GetPath()
+            try:
+                with open(path, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=4, ensure_ascii=False)
+                wx.MessageBox(_("Emoji settings exported successfully."), _("Success"), style=wx.ICON_INFORMATION)
+            except Exception as e:
+                wx.MessageBox(_("Error exporting emoji settings:\n%s") % str(e), _("Error"), style=wx.ICON_ERROR)
+        fd.Destroy()
+
+    def onEmojiImport(self, event):
+        """Import emoji settings from a JSON file."""
+        import json
+        fd = wx.FileDialog(
+            self,
+            _("Import Emoji Settings"),
+            wildcard="JSON files (*.json)|*.json",
+            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST
+        )
+        if fd.ShowModal() == wx.ID_OK:
+            path = fd.GetPath()
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                conf = config.conf["audiothemes"]
+                for k, v in data.items():
+                    if k.startswith("emoji_"):
+                        conf[k] = v
+                wx.MessageBox(_("Emoji settings imported successfully.\nClose and reopen settings to see changes."), _("Success"), style=wx.ICON_INFORMATION)
+            except Exception as e:
+                wx.MessageBox(_("Error importing emoji settings:\n%s") % str(e), _("Error"), style=wx.ICON_ERROR)
+        fd.Destroy()
 
     def _initialize_at_state(self):
         def _b(v):
@@ -1682,18 +1935,26 @@ class AudioThemesSettingsPanel(SettingsPanel):
         snd_pos_map = {"before": 0, "after": 1, "both": 2, "none": 3}
         snd_pos_val = conf.get("emoji_sound_position", "before")
         self.emojiSoundPositionChoice.SetSelection(snd_pos_map.get(snd_pos_val, 0))
+        rep_map = {"per_emoji": 0, "per_block": 1}
+        snd_rep_val = conf.get("emoji_sound_repeat", "per_emoji")
+        self.emojiSoundRepeatChoice.SetSelection(rep_map.get(snd_rep_val, 0))
+        self.emojiVolumeSlider.SetValue(_i(conf.get("emoji_volume", 20)))
+        self._onEmojiVolumeChanged(None)
+        self.emojiDelayBeforeSpin.SetValue(_i(conf.get("emoji_delay_before", 0)))
+        self.emojiDelayAfterSpin.SetValue(_i(conf.get("emoji_delay_after", 0)))
         self.emojiPrefixCheckbox.SetValue(_b(conf.get("emoji_prefix", True)))
         self.emojiPrefixTextCtrl.SetValue(conf.get("emoji_prefix_text", "emoji"))
-        self.emojiSuffixTextCtrl.SetValue(conf.get("emoji_suffix_text", "emoji"))
+        self.emojiSuffixTextCtrl.SetValue(conf.get("emoji_suffix_text", ""))
         pos_map = {"before": 0, "after": 1, "both": 2, "none": 3}
         pos_val = conf.get("emoji_position", "before")
         self.emojiPositionChoice.SetSelection(pos_map.get(pos_val, 0))
-        rep_map = {"per_emoji": 0, "per_block": 1}
-        rep_val = conf.get("emoji_repeat", "per_emoji")
-        self.emojiRepeatChoice.SetSelection(rep_map.get(rep_val, 0))
-        self.emojiVolumeSlider.SetValue(_i(conf.get("emoji_volume", 20)))
+        pref_rep_val = conf.get("emoji_prefix_repeat", "per_emoji")
+        self.emojiPrefixRepeatChoice.SetSelection(rep_map.get(pref_rep_val, 0))
+        self.emojiSuppressRoleCheckbox.SetValue(_b(conf.get("emoji_suppress_role_sound", False)))
         for key in self.emojiCatCheckboxes:
             self.emojiCatCheckboxes[key].SetValue(_b(conf.get(key, True)))
+        self.emojiBlacklistCtrl.SetValue(conf.get("emoji_blacklist", ""))
+        self.emojiCustomDescCtrl.SetValue(conf.get("emoji_custom_descriptions", "{}"))
 
         # Speech Order
         fmt = conf.get("announceFormat", "0")
@@ -2119,18 +2380,25 @@ class AudioThemesSettingsPanel(SettingsPanel):
         snd_pos_map_rev = {0: "before", 1: "after", 2: "both", 3: "none"}
         snd_sel = self.emojiSoundPositionChoice.GetSelection()
         conf["emoji_sound_position"] = snd_pos_map_rev.get(snd_sel, "before")
+        rep_map_rev = {0: "per_emoji", 1: "per_block"}
+        snd_rep_sel = self.emojiSoundRepeatChoice.GetSelection()
+        conf["emoji_sound_repeat"] = rep_map_rev.get(snd_rep_sel, "per_emoji")
+        conf["emoji_volume"] = self.emojiVolumeSlider.GetValue()
+        conf["emoji_delay_before"] = self.emojiDelayBeforeSpin.GetValue()
+        conf["emoji_delay_after"] = self.emojiDelayAfterSpin.GetValue()
         conf["emoji_prefix"] = self.emojiPrefixCheckbox.GetValue()
         conf["emoji_prefix_text"] = self.emojiPrefixTextCtrl.GetValue()
         conf["emoji_suffix_text"] = self.emojiSuffixTextCtrl.GetValue()
         pos_map_rev = {0: "before", 1: "after", 2: "both", 3: "none"}
         sel = self.emojiPositionChoice.GetSelection()
         conf["emoji_position"] = pos_map_rev.get(sel, "before")
-        rep_map_rev = {0: "per_emoji", 1: "per_block"}
-        sel = self.emojiRepeatChoice.GetSelection()
-        conf["emoji_repeat"] = rep_map_rev.get(sel, "per_emoji")
-        conf["emoji_volume"] = self.emojiVolumeSlider.GetValue()
+        pref_rep_sel = self.emojiPrefixRepeatChoice.GetSelection()
+        conf["emoji_prefix_repeat"] = rep_map_rev.get(pref_rep_sel, "per_emoji")
+        conf["emoji_suppress_role_sound"] = self.emojiSuppressRoleCheckbox.GetValue()
         for key, cb in self.emojiCatCheckboxes.items():
             conf[key] = cb.GetValue()
+        conf["emoji_blacklist"] = self.emojiBlacklistCtrl.GetValue()
+        conf["emoji_custom_descriptions"] = self.emojiCustomDescCtrl.GetValue()
 
         # Speech Order
         if self.announceFormatChoice.GetSelection() != wx.NOT_FOUND:

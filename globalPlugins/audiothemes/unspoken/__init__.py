@@ -490,7 +490,7 @@ class UnspokenPlayer:
 					ratio = target_peak / peak
 					float_samples = array('f', [s * ratio for s in float_samples])
 
-		if config.conf["unspoken"].get("SmoothEnvelope", True):
+		if config.conf["unspoken"].get("SmoothEnvelope", False):
 			fade_samples = int(sample_rate * 0.01)
 			num_samples = len(float_samples)
 			fade_samples = min(fade_samples, num_samples // 2)

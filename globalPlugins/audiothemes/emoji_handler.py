@@ -1,7 +1,9 @@
+import json
 import re
 import config
 import speech
 from .handler import SpecialProps
+from . import emoji_cldr_data
 
 EMOJI_CATEGORY_SMILEYS = 0
 EMOJI_CATEGORY_PEOPLE = 1
@@ -130,273 +132,39 @@ _EMOJI_SEQUENCE_PATTERNS = [
 
 _emoji_re = re.compile("|".join(p.pattern for p in _EMOJI_SEQUENCE_PATTERNS))
 
-_EMOJI_CATEGORY_RANGES = {
-    EMOJI_CATEGORY_SMILEYS: re.compile(
-        u"["
-        u"\U0001F600-\U0001F64F"
-        u"\u263A\u2639"
-        u"\u2763-\u2764"
-        u"\U0001F9D0-\U0001F9DF"
-        u"]"
-    ),
-    EMOJI_CATEGORY_PEOPLE: re.compile(
-        u"["
-        u"\U0001F9B0-\U0001F9FF"
-        u"\U0001F9D0-\U0001F9FF"
-        u"\U0001F468-\U0001F487"
-        u"\U0001F9CD-\U0001F9CF"
-        u"\U0001F64B-\U0001F64F"
-        u"\U0001F926"
-        u"\U0001F937-\U0001F93A"
-        u"\U0001F93C-\U0001F93E"
-        u"\U0001F645-\U0001F647"
-        u"\U0001F64B-\U0001F64F"
-        u"\U0001F44A-\U0001F450"
-        u"\U0001F440-\U0001F443"
-        u"\U0001F444-\U0001F445"
-        u"\U0001F446-\U0001F44F"
-        u"\U0001F44A"
-        u"]"
-    ),
-    EMOJI_CATEGORY_ANIMALS: re.compile(
-        u"["
-        u"\U0001F400-\U0001F43E"
-        u"\U0001F980-\U0001F984"
-        u"\U0001F985-\U0001F991"
-        u"\U0001F992-\U0001F9A2"
-        u"\U0001F9A5-\U0001F9AA"
-        u"\U0001F9AE-\U0001F9B4"
-        u"\U0001FAB0-\U0001FAB6"
-        u"\U0001FAC0-\U0001FAC5"
-        u"\U0001FABF"
-        u"\U0001F490-\U0001F49F"
-        u"\U00002600-\U00002604"
-        u"\U00002614-\U00002615"
-        u"\U0001F30E-\U0001F331"
-        u"\U0001F332-\U0001F33F"
-        u"\U0001F340-\U0001F345"
-        u"\U0001F346-\U0001F34A"
-        u"\U0001FAB0-\U0001FAB6"
-        u"]"
-    ),
-    EMOJI_CATEGORY_FOOD: re.compile(
-        u"["
-        u"\U0001F32D-\U0001F32F"
-        u"\U0001F330-\U0001F331"
-        u"\U0001F336"
-        u"\U0001F33D-\U0001F341"
-        u"\U0001F343"
-        u"\U0001F345-\U0001F353"
-        u"\U0001F354-\U0001F35A"
-        u"\U0001F35B-\U0001F363"
-        u"\U0001F364-\U0001F36B"
-        u"\U0001F36C-\U0001F37F"
-        u"\U0001F9C0-\U0001F9C2"
-        u"\U0001F9C3-\U0001F9CA"
-        u"\U0001FAD0-\U0001FAD6"
-        u"]"
-    ),
-    EMOJI_CATEGORY_TRAVEL: re.compile(
-        u"["
-        u"\U0001F680-\U0001F6C5"
-        u"\U0001F6C6-\U0001F6CF"
-        u"\U0001F6D0-\U0001F6D2"
-        u"\U0001F6D5-\U0001F6D7"
-        u"\U0001F6DD-\U0001F6DF"
-        u"\U0001F6EB-\U0001F6EC"
-        u"\U0001F6F3-\U0001F6F8"
-        u"\U0001F6F9-\U0001F6FC"
-        u"\U0001F30B-\U0001F30F"
-        u"\U0001F310-\U0001F31F"
-        u"\U00002668-\U0000266A"
-        u"\U00002668-\U0000266A"
-        u"\U000026F0-\U000026F5"
-        u"\U000026F7-\U000026FA"
-        u"\U000026FD"
-        u"\U00002702"
-        u"\U0001F6CE-\U0001F6CF"
-        u"\U0001F6CC"
-        u"\U0001F6CB"
-        u"\U0001F6C0-\U0001F6C5"
-        u"\U000026E9-\U000026EA"
-        u"\U000026C4-\U000026C5"
-        u"]"
-    ),
-    EMOJI_CATEGORY_ACTIVITIES: re.compile(
-        u"["
-        u"\U000026BD-\U000026BE"
-        u"\U000026F1"
-        u"\U000026F7-\U000026F9"
-        u"\U000026FA"
-        u"\U0001F3A0-\U0001F3B0"
-        u"\U0001F3B1-\U0001F3C0"
-        u"\U0001F3C2-\U0001F3F0"
-        u"\U0001F3F4-\U0001F3FF"
-        u"\U0001F6A3"
-        u"\U0001F6B4-\U0001F6B6"
-        u"\U0001F6F7"
-        u"\U0001F938-\U0001F93E"
-        u"\U0001F93C-\U0001F93E"
-        u"\U0001F9D0-\U0001F9DF"
-        u"\U0001F9E9-\U0001F9F1"
-        u"\U0001F9F2-\U0001F9FB"
-        u"\U0001FA70-\U0001FA73"
-        u"\U0001FA80-\U0001FA82"
-        u"\U0001FA90-\U0001FA95"
-        u"\U000023F0"
-        u"\U000023F3"
-        u"\U000026E9-\U000026EA"
-        u"\U000026F1"
-        u"\U000026BD"
-        u"]"
-    ),
-    EMOJI_CATEGORY_OBJECTS: re.compile(
-        u"["
-        u"\U0001F4A1-\U0001F4B0"
-        u"\U0001F4B1-\U0001F4FC"
-        u"\U0001F4FD-\U0001F4FF"
-        u"\U0001F500-\U0001F53D"
-        u"\U0001F550-\U0001F567"
-        u"\U0001F5A5-\U0001F5FF"
-        u"\U0001F6F8"
-        u"\U0001F6F9-\U0001F6FC"
-        u"\U0001F6E1-\U0001F6EB"
-        u"\U0001F9E9-\U0001F9F1"
-        u"\U0001F9F2-\U0001F9FB"
-        u"\U0001FA70-\U0001FA74"
-        u"\U0001FA78-\U0001FA7C"
-        u"\U0001FA80-\U0001FA86"
-        u"\U0001FA90-\U0001FAA8"
-        u"\U0001FAB0-\U0001FAB6"
-        u"\U0001FAC0-\U0001FAC5"
-        u"\U0001FAD0-\U0001FAD6"
-        u"\U0001FAE0-\U0001FAE8"
-        u"\U0001FAF0-\U0001FAF8"
-        u"\U0000231A-\U0000231B"
-        u"\U000023E9-\U000023EC"
-        u"\U000023F0"
-        u"\U000023F3"
-        u"\U0000260E"
-        u"\U00002611"
-        u"\U00002618"
-        u"\U000026A1"
-        u"]"
-    ),
-    EMOJI_CATEGORY_SYMBOLS: re.compile(
-        u"["
-        u"\U00002764"
-        u"\U00002795-\U00002797"
-        u"\U0000274C"
-        u"\U0000274E"
-        u"\U00002753-\U00002755"
-        u"\U00002757"
-        u"\U00002763-\U00002764"
-        u"\U000027A1"
-        u"\U000027B0"
-        u"\U000027BF"
-        u"\U00002B05-\U00002B07"
-        u"\U00002B1B-\U00002B1C"
-        u"\U00002B50"
-        u"\U00002B55"
-        u"\U00002600-\U00002604"
-        u"\U0000260E"
-        u"\U00002611"
-        u"\U00002614-\U00002615"
-        u"\U00002618"
-        u"\U00002620"
-        u"\U00002622-\U00002623"
-        u"\U00002626"
-        u"\U0000262A"
-        u"\U0000262E-\U0000262F"
-        u"\U00002638-\U0000263A"
-        u"\U00002640-\U00002642"
-        u"\U00002648-\U00002653"
-        u"\U0000265F-\U00002660"
-        u"\U00002663"
-        u"\U00002665-\U00002666"
-        u"\U00002668"
-        u"\U0000267B"
-        u"\U0000267E-\U0000267F"
-        u"\U00002692-\U00002697"
-        u"\U00002699"
-        u"\U0000269B-\U0000269C"
-        u"\U000026A0-\U000026A1"
-        u"\U000026A7"
-        u"\U000026AA-\U000026AB"
-        u"\U000026B0-\U000026B1"
-        u"\U000026C4-\U000026C5"
-        u"\U000026C8"
-        u"\U000026CE-\U000026CF"
-        u"\U000026D1"
-        u"\U000026D3-\U000026D4"
-        u"\U000026E9-\U000026EA"
-        u"\U000026F0-\U000026F5"
-        u"\U000026F7-\U000026FA"
-        u"\U000026FD"
-        u"\U00002702"
-        u"\U00002705"
-        u"\U00002708-\U0000270D"
-        u"\U0000270F"
-        u"\U00002712"
-        u"\U00002714"
-        u"\U00002716"
-        u"\U0000271D"
-        u"\U00002721"
-        u"\U00002728"
-        u"\U00002733-\U00002734"
-        u"\U00002744"
-        u"\U00002747"
-        u"\U000020E3"
-        u"\U000000A9"
-        u"\U000000AE"
-        u"\U00002122"
-        u"\U00002139"
-        u"\U00002194-\U00002199"
-        u"\U000021A9-\U000021AA"
-        u"\U00002328"
-        u"\U000023CF"
-        u"\U000023E9-\U000023F3"
-        u"\U000023F8-\U000023FA"
-        u"\U000024C2"
-        u"\U000025AA-\U000025AB"
-        u"\U000025B6"
-        u"\U000025C0"
-        u"\U000025FB-\U000025FE"
-        u"\U00002600-\U000027BF"
-        u"\U00002934-\U00002935"
-        u"\U00002B05-\U00002B55"
-        u"\U00003030"
-        u"\U0000303D"
-        u"\U00003297"
-        u"\U00003299"
-        u"]"
-    ),
-    EMOJI_CATEGORY_FLAGS: re.compile(
-        u"["
-        u"\U0001F3F3-\U0001F3F4"
-        u"\U0001F3C1"
-        u"\U0001F6A9"
-        u"\U0001F38C-\U0001F38D"
-        u"\U0001F3FB-\U0001F3FF"
-        u"]"
-        u"|[\U0001F1E6-\U0001F1FF]{2}"
-    ),
-}
-
 FLAGS_REGIONAL_INDICATOR = re.compile(
     u"[\U0001F1E6-\U0001F1FF]{2}"
 )
 
 
-def _category_for_codepoint(ch):
-    if FLAGS_REGIONAL_INDICATOR.match(ch):
+def _get_emoji_category(emoji_str):
+    """Get category for an emoji using CLDR data first, then fallback to range-based detection."""
+    cat = emoji_cldr_data.get_emoji_category(emoji_str)
+    if cat is not None:
+        return cat
+    return _fallback_category(emoji_str)
+
+
+def _fallback_category(emoji_str):
+    """Fallback category detection for emoji not in CLDR data."""
+    if FLAGS_REGIONAL_INDICATOR.match(emoji_str):
         return EMOJI_CATEGORY_FLAGS
-    cp = ord(ch[0])
-    for cat, cr in _EMOJI_CATEGORY_RANGES.items():
-        if cr.match(ch):
-            return cat
-    if 0x1F1E6 <= cp <= 0x1F1FF:
-        return EMOJI_CATEGORY_FLAGS
+    cp = ord(emoji_str[0])
+    emoji_ranges = [
+        (EMOJI_CATEGORY_SMILEYS, [(0x1F600, 0x1F64F), (0x2639, 0x263A), (0x2763, 0x2764)]),
+        (EMOJI_CATEGORY_PEOPLE, [(0x1F468, 0x1F487), (0x1F44A, 0x1F450), (0x1F440, 0x1F445), (0x1F9B0, 0x1F9FF)]),
+        (EMOJI_CATEGORY_ANIMALS, [(0x1F400, 0x1F43E), (0x1F980, 0x1F9AA), (0x1FAB0, 0x1FAC5)]),
+        (EMOJI_CATEGORY_FOOD, [(0x1F32D, 0x1F37F), (0x1F9C0, 0x1F9CA), (0x1FAD0, 0x1FAD6)]),
+        (EMOJI_CATEGORY_TRAVEL, [(0x1F680, 0x1F6C5), (0x1F30B, 0x1F31F), (0x26C4, 0x26C5), (0x26F0, 0x26F5)]),
+        (EMOJI_CATEGORY_ACTIVITIES, [(0x1F3A0, 0x1F3F0), (0x26BD, 0x26BE), (0x1F9E9, 0x1F9FB)]),
+        (EMOJI_CATEGORY_OBJECTS, [(0x1F4A1, 0x1F53D), (0x1F550, 0x1F567), (0x1F5A5, 0x1F5FF), (0x231A, 0x231B), (0x23E9, 0x23F3)]),
+        (EMOJI_CATEGORY_SYMBOLS, [(0x2600, 0x27BF), (0x2934, 0x2935), (0x2B05, 0x2B55), (0x00A9, 0x00AE), (0x2122, 0x2139)]),
+        (EMOJI_CATEGORY_FLAGS, [(0x1F3F3, 0x1F3F4), (0x1F1E6, 0x1F1FF)]),
+    ]
+    for cat, ranges in emoji_ranges:
+        for lo, hi in ranges:
+            if lo <= cp <= hi:
+                return cat
     if 0x1F3FB <= cp <= 0x1F3FF:
         return EMOJI_CATEGORY_PEOPLE
     return EMOJI_CATEGORY_SMILEYS
@@ -406,8 +174,35 @@ def find_emojis(text):
     matches = []
     for m in _emoji_re.finditer(text):
         emoji = m.group(0)
-        cat = _category_for_codepoint(emoji)
+        cat = _get_emoji_category(emoji)
         matches.append((emoji, cat, m.start(), m.end()))
+    all_cldr = emoji_cldr_data.get_all_emoji()
+    if not all_cldr:
+        return matches
+    covered = bytearray(len(text))
+    for _, _, start, end in matches:
+        for i in range(start, end):
+            covered[i] = 1
+    cldr_by_len = sorted(all_cldr, key=len, reverse=True)
+    i = 0
+    while i < len(text):
+        if covered[i]:
+            i += 1
+            continue
+        found = False
+        for emoji in cldr_by_len:
+            elen = len(emoji)
+            if i + elen <= len(text) and text[i:i+elen] == emoji:
+                cat = _get_emoji_category(emoji)
+                matches.append((emoji, cat, i, i+elen))
+                for j in range(i, i+elen):
+                    covered[j] = 1
+                i += elen
+                found = True
+                break
+        if not found:
+            i += 1
+    matches.sort(key=lambda x: x[2])
     return matches
 
 
@@ -452,6 +247,86 @@ def get_emoji_sound_position():
 
 def get_emoji_repeat():
     return config.conf["audiothemes"].get("emoji_repeat", "per_emoji")
+
+
+CATEGORY_TO_PROP = {
+    EMOJI_CATEGORY_SMILEYS: SpecialProps.emoji_smileys,
+    EMOJI_CATEGORY_PEOPLE: SpecialProps.emoji_people,
+    EMOJI_CATEGORY_ANIMALS: SpecialProps.emoji_animals,
+    EMOJI_CATEGORY_FOOD: SpecialProps.emoji_food,
+    EMOJI_CATEGORY_TRAVEL: SpecialProps.emoji_travel,
+    EMOJI_CATEGORY_ACTIVITIES: SpecialProps.emoji_activities,
+    EMOJI_CATEGORY_OBJECTS: SpecialProps.emoji_objects,
+    EMOJI_CATEGORY_SYMBOLS: SpecialProps.emoji_symbols,
+    EMOJI_CATEGORY_FLAGS: SpecialProps.emoji_flags,
+}
+
+
+def get_special_prop_for_category(cat):
+    return CATEGORY_TO_PROP.get(cat, SpecialProps.emoji)
+
+
+def get_emoji_sound_repeat():
+    return config.conf["audiothemes"].get("emoji_sound_repeat", "per_emoji")
+
+
+def get_emoji_prefix_repeat():
+    return config.conf["audiothemes"].get("emoji_prefix_repeat", "per_emoji")
+
+
+def is_emoji_sound_category_enabled(cat):
+    key = "emoji_sound_cat_" + CATEGORY_NAMES.get(cat, "smileys")
+    return config.conf["audiothemes"].get(key, True)
+
+
+def _get_json_config(key, default="{}"):
+    raw = config.conf["audiothemes"].get(key, default)
+    try:
+        return json.loads(raw) if isinstance(raw, str) else raw
+    except (json.JSONDecodeError, TypeError):
+        return {}
+
+
+def get_emoji_prefix_text_for_category(cat):
+    per_cat = _get_json_config("emoji_prefix_text_per_category")
+    return per_cat.get(CATEGORY_NAMES.get(cat, "")) or get_emoji_prefix_text()
+
+
+def get_emoji_suffix_text_for_category(cat):
+    per_cat = _get_json_config("emoji_suffix_text_per_category")
+    return per_cat.get(CATEGORY_NAMES.get(cat, "")) or get_emoji_suffix_text()
+
+
+def get_emoji_volume_for_category(cat):
+    per_cat = _get_json_config("emoji_volume_per_category")
+    return per_cat.get(CATEGORY_NAMES.get(cat)) or get_emoji_volume()
+
+
+def get_emoji_sound_position_for_category(cat):
+    per_cat = _get_json_config("emoji_sound_position_per_category")
+    return per_cat.get(CATEGORY_NAMES.get(cat)) or get_emoji_sound_position()
+
+
+def get_emoji_delay_before():
+    return int(config.conf["audiothemes"].get("emoji_delay_before", 0))
+
+
+def get_emoji_delay_after():
+    return int(config.conf["audiothemes"].get("emoji_delay_after", 0))
+
+
+def is_emoji_suppress_role_sound():
+    return config.conf["audiothemes"].get("emoji_suppress_role_sound", False)
+
+
+def is_emoji_blacklisted(emoji_char):
+    raw = config.conf["audiothemes"].get("emoji_blacklist", "")
+    return emoji_char in raw
+
+
+def get_emoji_custom_description(emoji_char):
+    descs = _get_json_config("emoji_custom_descriptions")
+    return descs.get(emoji_char)
 
 
 def is_category_enabled(cat):

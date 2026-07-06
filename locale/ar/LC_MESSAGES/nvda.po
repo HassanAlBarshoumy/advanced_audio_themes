@@ -3201,3 +3201,160 @@ msgstr "صوت بعد الإيموجي"
 
 msgid "Emoji repeat mode"
 msgstr "وضع تكرار الإيموجي"
+
+msgid "Sound Settings"
+msgstr "إعدادات الصوت"
+
+msgid "Sound repeat:"
+msgstr "تكرار الصوت:"
+
+msgid "Emoji sound repeat"
+msgstr "تكرار صوت الإيموجي"
+
+msgid "Volume:"
+msgstr "مستوى الصوت:"
+
+msgid "Delay before emoji sound"
+msgstr "التأخير قبل صوت الإيموجي"
+
+msgid "Delay after emoji sound"
+msgstr "التأخير بعد صوت الإيموجي"
+
+msgid "Delay before sound (ms):"
+msgstr "التأخير قبل الصوت (مللي ثانية):"
+
+msgid "Delay after sound (ms):"
+msgstr "التأخير بعد الصوت (مللي ثانية):"
+
+msgid "Speech Prefix Settings"
+msgstr "إعدادات البادئة المنطوقة"
+
+msgid "Prefix repeat:"
+msgstr "تكرار البادئة:"
+
+msgid "Emoji prefix repeat"
+msgstr "تكرار بادئة الإيموجي"
+
+msgid "Suppress role sound (e.g. \"list item\") when emoji is present"
+msgstr "كتم صوت الدور (مثل \"عنصر قائمة\") عند وجود إيموجي"
+
+msgid "Advanced Settings"
+msgstr "إعدادات متقدمة"
+
+msgid "Per-category prefix text, sound position, and volume..."
+msgstr "نص البادئة وموضع الصوت ومستوى الصوت حسب التصنيف..."
+
+msgid "Emoji blacklist (type or paste emoji characters to exclude):"
+msgstr "قائمة حظر الإيموجي (اكتب أو ألصق إيموجيات لاستبعادها):"
+
+msgid "Emoji blacklist"
+msgstr "قائمة حظر الإيموجي"
+
+msgid "Custom descriptions (JSON format, e.g. {\": \"face smile\"}):"
+msgstr "أوصاف مخصصة (صيغة JSON، مثل {\": \"وجه مبتسم\"}):"
+
+msgid "Custom emoji descriptions"
+msgstr "أوصاف إيموجي مخصصة"
+
+msgid "Test Emoji Processing"
+msgstr "اختبار معالجة الإيموجي"
+
+msgid "Type text with emoji to preview:"
+msgstr "اكتب نصاً مع إيموجي للمعاينة:"
+
+msgid "Hello 😊 world 🌍!"
+msgstr "مرحباً 😊 أيها العالم 🌍!"
+
+msgid "Test emoji text"
+msgstr "نص اختبار الإيموجي"
+
+msgid "&Test"
+msgstr "ا&ختبار"
+
+msgid "&Export emoji settings..."
+msgstr "&تصدير إعدادات الإيموجي..."
+
+msgid "&Import emoji settings..."
+msgstr "&استيراد إعدادات الإيموجي..."
+
+msgid ""
+"Emoji sounds can be assigned in your theme by creating sound files\n"
+"named emoji.wav, emoji_smileys.wav, emoji_people.wav, etc.\n"
+"Per-category files take priority over the general emoji.wav."
+msgstr ""
+"يمكن تعيين أصوات الإيموجي في السمة الخاصة بك عن طريق إنشاء ملفات صوت\n"
+"تسمى emoji.wav و emoji_smileys.wav و emoji_people.wav إلخ.\n"
+"الملفات حسب التصنيف لها أولوية على الملف العام emoji.wav."
+
+msgid "%d%%"
+msgstr "%d٪"
+
+msgid "Per-Category Emoji Settings"
+msgstr "إعدادات الإيموجي حسب التصنيف"
+
+msgid ""
+"Configure per-category prefix text, sound position, and volume.\n"
+"Leave a field empty to use the global setting."
+msgstr ""
+"قم بتكوين نص البادئة وموضع الصوت ومستوى الصوت حسب التصنيف.\n"
+"اترك الحقل فارغاً لاستخدام الإعداد العام."
+
+msgid "Prefix Text"
+msgstr "نص البادئة"
+
+msgid "Suffix Text"
+msgstr "نص اللاحقة"
+
+msgid "Sound Position"
+msgstr "موضع الصوت"
+
+msgid "Volume (0-100)"
+msgstr "مستوى الصوت (0-100)"
+
+msgid "Before"
+msgstr "قبل"
+
+msgid "After"
+msgstr "بعد"
+
+msgid "Prefix text for %s"
+msgstr "نص البادئة لـ %s"
+
+msgid "Suffix text for %s"
+msgstr "نص اللاحقة لـ %s"
+
+msgid "Sound position for %s"
+msgstr "موضع الصوت لـ %s"
+
+msgid "Volume for %s"
+msgstr "مستوى الصوت لـ %s"
+
+msgid "Export Emoji Settings"
+msgstr "تصدير إعدادات الإيموجي"
+
+msgid "Emoji settings exported successfully."
+msgstr "تم تصدير إعدادات الإيموجي بنجاح."
+
+msgid ""
+"Error exporting emoji settings:\n"
+"%s"
+msgstr ""
+"خطأ في تصدير إعدادات الإيموجي:\n"
+"%s"
+
+msgid "Import Emoji Settings"
+msgstr "استيراد إعدادات الإيموجي"
+
+msgid ""
+"Emoji settings imported successfully.\n"
+"Close and reopen settings to see changes."
+msgstr ""
+"تم استيراد إعدادات الإيموجي بنجاح.\n"
+"أغلق الإعدادات وأعد فتحها لرؤية التغييرات."
+
+msgid ""
+"Error importing emoji settings:\n"
+"%s"
+msgstr ""
+"خطأ في استيراد إعدادات الإيموجي:\n"
+"%s"

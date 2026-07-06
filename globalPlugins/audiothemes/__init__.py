@@ -71,6 +71,41 @@ initSentenceNavConfiguration()
 
 from .navLayer import NavLayerMixin
 
+def _text_contains_emoji(text):
+    """Check if text contains any emoji characters."""
+    if not text:
+        return False
+    # Quick Unicode range check for common emoji
+    # Covers most emoji blocks up to Unicode 16.0
+    i = 0
+    n = len(text)
+    while i < n:
+        cp = ord(text[i])
+        # Surrogate pairs in UTF-16
+        if 0xD800 <= cp <= 0xDBFF and i + 1 < n:
+            low = ord(text[i + 1])
+            if 0xDC00 <= low <= 0xDFFF:
+                cp = 0x10000 + (cp - 0xD800) * 0x400 + (low - 0xDC00)
+                i += 1
+        i += 1
+        if cp > 0xFFFF:
+            return True
+        if 0x2600 <= cp <= 0x27BF:
+            return True
+        if 0x2B50 == cp or 0x2934 == cp or 0x2935 == cp:
+            return True
+        if 0x2B05 <= cp <= 0x2B07:
+            return True
+        if 0x2B1B <= cp <= 0x2B1C:
+            return True
+        if 0x3030 == cp or 0x303D == cp or 0x3297 == cp or 0x3299 == cp:
+            return True
+        if 0xFE00 <= cp <= 0xFE0F:
+            return True  # Variation selectors (typically follow emoji)
+        if 0x1F000 <= cp <= 0x1FFFF:
+            return True
+    return False
+
 class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPluginHandler.GlobalPlugin):
 
     scriptCategory = "Advanced Audio Themes"
@@ -1024,6 +1059,14 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                         if has_state_snd:
                             self.handler.play(obj_info, state_snd)
 
+            # --- Emoji role sound suppression ---
+            emoji_suppress = config.conf["audiothemes"].get("emoji_suppress_role_sound", False)
+            if emoji_suppress and (
+                obj_info.get("suppress_role_sound") or
+                _text_contains_emoji(obj_info.get("name", ""))
+            ):
+                return
+
             # --- Role-based sound (always played unless suppress_role + a state played) ---
             order = self.getOrder(obj_info)
             snd = obj_info.get("snd")
@@ -1051,6 +1094,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         try:
             from .handler import STATE_OFFSET
             from . import utils
+            from .phoneticPunctuation import is_emoji_suppress_role_flag_set
             # Route heading level 7-9 to SpecialProps heading7/8/9
             if heading_level is not None and heading_level >= 7:
                 h_key = {
@@ -1061,12 +1105,14 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 if h_key is not None:
                     role_val = h_key.value
             foreground_app = utils.getCurrentContext()[0]
+            suppress_role = is_emoji_suppress_role_flag_set()
             obj_info = {
                 "role": role_val,
                 "states": frozenset(states) if isinstance(states, (list, set)) else frozenset(),
                 "foreground_app": foreground_app,
                 "snd": None,
                 "force_3d": False,
+                "suppress_role_sound": suppress_role,
             }
             utils.threadPool.add_task(self.playObject, obj_info)
         except Exception as e:

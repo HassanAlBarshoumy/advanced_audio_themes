@@ -153,6 +153,35 @@ audiothemes_config_defaults = {
     "emoji_cat_objects": "boolean(default=True)",
     "emoji_cat_symbols": "boolean(default=True)",
     "emoji_cat_flags": "boolean(default=True)",
+    # Per-category sound toggles (independent from prefix toggles)
+    "emoji_sound_cat_smileys": "boolean(default=True)",
+    "emoji_sound_cat_people": "boolean(default=True)",
+    "emoji_sound_cat_animals": "boolean(default=True)",
+    "emoji_sound_cat_food": "boolean(default=True)",
+    "emoji_sound_cat_travel": "boolean(default=True)",
+    "emoji_sound_cat_activities": "boolean(default=True)",
+    "emoji_sound_cat_objects": "boolean(default=True)",
+    "emoji_sound_cat_symbols": "boolean(default=True)",
+    "emoji_sound_cat_flags": "boolean(default=True)",
+    # Separate repeat modes for sound and prefix
+    "emoji_sound_repeat": "string(default='per_emoji')",
+    "emoji_prefix_repeat": "string(default='per_emoji')",
+    # Per-category prefix/suffix text (JSON)
+    "emoji_prefix_text_per_category": "string(default='{}')",
+    "emoji_suffix_text_per_category": "string(default='{}')",
+    # Per-category volume override (JSON)
+    "emoji_volume_per_category": "string(default='{}')",
+    # Delay before/after emoji sound (ms)
+    "emoji_delay_before": "integer(default=0, min=0, max=5000)",
+    "emoji_delay_after": "integer(default=0, min=0, max=5000)",
+    # Suppress role sound when emoji is present
+    "emoji_suppress_role_sound": "boolean(default=False)",
+    # Emoji blacklist (string of emoji characters)
+    "emoji_blacklist": "string(default='')",
+    # Per-emoji custom descriptions (JSON map)
+    "emoji_custom_descriptions": "string(default='{}')",
+    # Per-category sound position (JSON map)
+    "emoji_sound_position_per_category": "string(default='{}')",
     "config_version": "integer(default=1)",
 }
 
@@ -210,6 +239,17 @@ class SpecialProps(IntEnum):
     emoji_before = 2524
     emoji_after = 2525
 
+    # Per-category emoji sounds (2526-2534)
+    emoji_smileys = 2526
+    emoji_people = 2527
+    emoji_animals = 2528
+    emoji_food = 2529
+    emoji_travel = 2530
+    emoji_activities = 2531
+    emoji_objects = 2532
+    emoji_symbols = 2533
+    emoji_flags = 2534
+
 
 theme_roles = copy.copy(controlTypes.roleLabels)
 theme_roles.update(
@@ -262,6 +302,24 @@ theme_roles.update(
         SpecialProps.emoji_before: _("Emoji Before Sound"),
         # Translators: The label of the sound played after an emoji character.
         SpecialProps.emoji_after: _("Emoji After Sound"),
+        # Translators: The label of the sound for emoji category smileys.
+        SpecialProps.emoji_smileys: _("Emoji Smileys Sound"),
+        # Translators: The label of the sound for emoji category people.
+        SpecialProps.emoji_people: _("Emoji People Sound"),
+        # Translators: The label of the sound for emoji category animals.
+        SpecialProps.emoji_animals: _("Emoji Animals Sound"),
+        # Translators: The label of the sound for emoji category food.
+        SpecialProps.emoji_food: _("Emoji Food Sound"),
+        # Translators: The label of the sound for emoji category travel.
+        SpecialProps.emoji_travel: _("Emoji Travel Sound"),
+        # Translators: The label of the sound for emoji category activities.
+        SpecialProps.emoji_activities: _("Emoji Activities Sound"),
+        # Translators: The label of the sound for emoji category objects.
+        SpecialProps.emoji_objects: _("Emoji Objects Sound"),
+        # Translators: The label of the sound for emoji category symbols.
+        SpecialProps.emoji_symbols: _("Emoji Symbols Sound"),
+        # Translators: The label of the sound for emoji category flags.
+        SpecialProps.emoji_flags: _("Emoji Flags Sound"),
     }
 )
 
