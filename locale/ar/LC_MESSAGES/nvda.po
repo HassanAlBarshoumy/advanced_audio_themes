@@ -3358,3 +3358,160 @@ msgid ""
 msgstr ""
 "خطأ في استيراد إعدادات الإيموجي:\n"
 "%s"
+
+msgid "Action"
+msgstr "الإجراء"
+
+msgid "All selected"
+msgstr "تم تحديد الكل"
+
+msgid "Alternate redo."
+msgstr "إعادة بديلة."
+
+msgid "Announcement Mode"
+msgstr "وضع الإعلان"
+
+msgid "Announcement delay (ms):"
+msgstr "تأخير الإعلان (مللي ثانية):"
+
+msgid ""
+"Assign sounds for clipboard actions in the Audio Themes Studio.\n"
+"Place sound files named clipboard_copy.wav, clipboard_cut.wav, etc.\n"
+"in your theme folder, or use the Studio to assign any audio file."
+msgstr ""
+"قم بتعيين أصوات لإجراءات الحافظة في استوديو السمات الصوتية.\n"
+"ضع ملفات صوتية بأسماء clipboard_copy.wav، clipboard_cut.wav، إلخ\n"
+"في مجلد السمة الخاص بك، أو استخدم الاستوديو لتعيين أي ملف صوتي."
+
+msgid "Clipboard Alternate Redo"
+msgstr "إعادة الحافظة البديلة"
+
+msgid "Clipboard Copy"
+msgstr "نسخ الحافظة"
+
+msgid "Clipboard Cut"
+msgstr "قص الحافظة"
+
+msgid "Clipboard Paste"
+msgstr "لصق الحافظة"
+
+msgid "Clipboard Paste Plain Text"
+msgstr "لصق النص العادي للحافظة"
+
+msgid "Clipboard Redo"
+msgstr "إعادة الحافظة"
+
+msgid "Clipboard Select All"
+msgstr "تحديد الكل للحافظة"
+
+msgid "Clipboard Undo"
+msgstr "تراجع الحافظة"
+
+msgid "Clipboard actions"
+msgstr "إجراءات الحافظة"
+
+msgid "Clipboard announcement delay"
+msgstr "تأخير إعلان الحافظة"
+
+msgid "Clipboard announcement mode"
+msgstr "وضع الإعلان الصوتي للحافظة"
+
+msgid "Clipboard sound volume"
+msgstr "مستوى صوت الحافظة"
+
+msgid "Configure each clipboard action individually:"
+msgstr "قم بتكوين كل إجراء من إجراءات الحافظة بشكل فردي:"
+
+msgid "Copied to clipboard"
+msgstr "تم النسخ إلى الحافظة"
+
+msgid "Copy selected text to clipboard."
+msgstr "نسخ النص المحدد إلى الحافظة."
+
+msgid "Custom Clipboard Speech Text"
+msgstr "تخصيص نص نطق الحافظة"
+
+msgid "Custom Sounds"
+msgstr "أصوات مخصصة"
+
+msgid "Custom text for %s"
+msgstr "نص مخصص لـ %s"
+
+msgid "Customize speech text..."
+msgstr "تخصيص نص النطق..."
+
+msgid ""
+"Customize what NVDA speaks for each clipboard action.\n"
+"Leave empty to use defaults."
+msgstr ""
+"خصص ما ينطقه NVDA لكل إجراء من إجراءات الحافظة.\n"
+"اترك فارغًا لاستخدام الإعدادات الافتراضية."
+
+msgid "Cut selected text to clipboard."
+msgstr "قص النص المحدد إلى الحافظة."
+
+msgid "Cut to clipboard"
+msgstr "تم القص إلى الحافظة"
+
+msgid "Edit per-action settings..."
+msgstr "تعديل إعدادات كل إجراء..."
+
+msgid "Enable clipboard announcements"
+msgstr "تفعيل الإعلانات الصوتية للحافظة"
+
+msgid "Paste text from clipboard."
+msgstr "لصق النص من الحافظة."
+
+msgid "Paste unformatted text from clipboard."
+msgstr "لصق النص غير المنسق من الحافظة."
+
+msgid "Pasted as plain text"
+msgstr "تم اللصق كنص عادي"
+
+msgid "Pasted from clipboard"
+msgstr "تم اللصق من الحافظة"
+
+msgid "Per-Action Clipboard Settings"
+msgstr "إعدادات الحافظة لكل إجراء"
+
+msgid "Per-Action Settings"
+msgstr "إعدادات كل إجراء"
+
+msgid "Play Sound"
+msgstr "تشغيل الصوت"
+
+msgid "Redo last undone action."
+msgstr "إعادة آخر إجراء تم التراجع عنه."
+
+msgid "Redone"
+msgstr "تمت الإعادة"
+
+msgid "Select all content."
+msgstr "تحديد كل المحتوى."
+
+msgid "Sound"
+msgstr "صوت"
+
+msgid "Sound only"
+msgstr "صوت فقط"
+
+msgid "Sound volume:"
+msgstr "مستوى الصوت:"
+
+msgid "Speak Message"
+msgstr "نطق الرسالة"
+
+msgid "Speech"
+msgstr "نطق"
+
+msgid "Speech and Sound"
+msgstr "نطق وصوت"
+
+msgid "Speech only"
+msgstr "نطق فقط"
+
+msgid "Undo last action."
+msgstr "تراجع عن آخر إجراء."
+
+msgid "Undone"
+msgstr "تم التراجع"

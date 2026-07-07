@@ -2960,113 +2960,272 @@ msgid "Found {count} matching file(s):\n"
 msgstr "Найдено {count} подходящих файл(ов):\n"
 
 msgid "AC Power Connected"
-msgstr ""
+msgstr "Питание переменного тока подключено"
 
 msgid "AC Power Disconnected"
-msgstr ""
+msgstr "Питание переменного тока отключено"
 
 msgid "AC power connected/disconnected"
-msgstr ""
+msgstr "Питание переменного тока подключено/отключено"
 
 msgid "Battery check interval (seconds):"
-msgstr ""
+msgstr "Интервал проверки батареи (секунды):"
 
 msgid "Battery Critical"
-msgstr ""
+msgstr "Критический уровень батареи"
 
 msgid "Battery Fully Charged"
-msgstr ""
+msgstr "Батарея полностью заряжена"
 
 msgid "Battery Low"
-msgstr ""
+msgstr "Низкий уровень батареи"
 
 msgid "Battery level changes (low, critical, full)"
-msgstr ""
+msgstr "Изменения уровня батареи (низкий, критический, полный)"
 
 msgid "Battery Thresholds"
-msgstr ""
+msgstr "Пороги батареи"
 
 msgid "Check Intervals"
-msgstr ""
+msgstr "Интервалы проверки"
 
 msgid "Critical battery threshold (%):"
-msgstr ""
+msgstr "Порог критического уровня батареи (%):"
 
 msgid "Custom Sound Files"
-msgstr ""
+msgstr "Пользовательские звуковые файлы"
 
 msgid "Enable system status sounds"
-msgstr ""
+msgstr "Включить звуки состояния системы"
 
 msgid "Events"
-msgstr ""
+msgstr "События"
 
 msgid "Low battery threshold (%):"
-msgstr ""
+msgstr "Порог низкого уровня батареи (%):"
 
 msgid "Monitor all USB devices (keyboard, mouse, storage, etc.)"
-msgstr ""
+msgstr "Отслеживать все USB-устройства (клавиатура, мышь, накопители и т.д.)"
 
 msgid "Network check interval (seconds):"
-msgstr ""
+msgstr "Интервал проверки сети (секунды):"
 
 msgid "Network Connected"
-msgstr ""
+msgstr "Сеть подключена"
 
 msgid "Network connect/disconnect"
-msgstr ""
+msgstr "Сеть подключить/отключить"
 
 msgid "Network Disconnected"
-msgstr ""
+msgstr "Сеть отключена"
 
 msgid "Storage Volume Mounted"
-msgstr ""
+msgstr "Накопитель подключён"
 
 msgid "Storage volume mount/unmount"
-msgstr ""
+msgstr "Накопитель подключить/отключить"
 
 msgid "Storage Volume Unmounted"
-msgstr ""
+msgstr "Накопитель отключён"
 
 msgid "System Sleep"
-msgstr ""
+msgstr "Сон системы"
 
 msgid "System Status"
-msgstr ""
+msgstr "Состояние системы"
 
 msgid "System status sounds volume:"
-msgstr ""
+msgstr "Громкость звуков состояния системы:"
 
 msgid "System Wake"
-msgstr ""
+msgstr "Пробуждение системы"
 
 msgid "System wake/sleep"
-msgstr ""
+msgstr "Система пробуждение/сон"
 
 msgid "USB Device Plugged"
-msgstr ""
+msgstr "USB-устройство подключено"
 
 msgid "USB device plug/unplug"
-msgstr ""
+msgstr "USB-устройство подключить/отключить"
 
 msgid "USB Device Unplugged"
-msgstr ""
+msgstr "USB-устройство отключено"
 
 msgid "USB Monitoring"
-msgstr ""
+msgstr "Мониторинг USB"
 
 msgid "Detection mode"
-msgstr ""
+msgstr "Режим обнаружения"
 
 msgid "Controls how first/last items are identified."
-msgstr ""
+msgstr "Определяет, как идентифицируются первый/последний элементы."
 
 msgid ""
 "Smart (Recommended) – ignore separators, fall back to any adjacent item"
 msgstr ""
+"Умный (Рекомендуется) – игнорировать разделители, вернуться к любому "
+"соседнему элементу"
 
 msgid "Strict – same role only"
-msgstr ""
+msgstr "Строгий – только та же роль"
 
 msgid "Any adjacent item – standard"
+msgstr "Любой соседний элемент – стандарт"
+
+msgid "Action"
+msgstr "Действие"
+
+msgid "All selected"
+msgstr "Всё выделено"
+
+msgid "Alternate redo."
+msgstr "Альтернативный повтор."
+
+msgid "Announcement Mode"
+msgstr "Режим объявления"
+
+msgid "Announcement delay (ms):"
+msgstr "Задержка объявления (мс):"
+
+msgid ""
+"Assign sounds for clipboard actions in the Audio Themes Studio.\n"
+"Place sound files named clipboard_copy.wav, clipboard_cut.wav, etc.\n"
+"in your theme folder, or use the Studio to assign any audio file."
 msgstr ""
+"Назначьте звуки для действий буфера обмена в Audio Themes Studio.\n"
+"Поместите звуковые файлы с именами clipboard_copy.wav, clipboard_cut.wav и т.д.\n"
+"в папку вашей темы или используйте Studio для назначения любого аудиофайла."
+
+msgid "Clipboard Alternate Redo"
+msgstr "Альтернативный повтор буфера обмена"
+
+msgid "Clipboard Copy"
+msgstr "Копирование буфера обмена"
+
+msgid "Clipboard Cut"
+msgstr "Вырезание буфера обмена"
+
+msgid "Clipboard Paste"
+msgstr "Вставка буфера обмена"
+
+msgid "Clipboard Paste Plain Text"
+msgstr "Вставка простого текста буфера обмена"
+
+msgid "Clipboard Redo"
+msgstr "Повтор буфера обмена"
+
+msgid "Clipboard Select All"
+msgstr "Выделить всё буфера обмена"
+
+msgid "Clipboard Undo"
+msgstr "Отмена буфера обмена"
+
+msgid "Clipboard actions"
+msgstr "Действия буфера обмена"
+
+msgid "Clipboard announcement delay"
+msgstr "Задержка объявления буфера обмена"
+
+msgid "Clipboard announcement mode"
+msgstr "Режим объявления буфера обмена"
+
+msgid "Clipboard sound volume"
+msgstr "Громкость звука буфера обмена"
+
+msgid "Configure each clipboard action individually:"
+msgstr "Настройте каждое действие буфера обмена индивидуально:"
+
+msgid "Copied to clipboard"
+msgstr "Скопировано в буфер обмена"
+
+msgid "Copy selected text to clipboard."
+msgstr "Копировать выделенный текст в буфер обмена."
+
+msgid "Custom Clipboard Speech Text"
+msgstr "Пользовательский текст речи буфера обмена"
+
+msgid "Custom Sounds"
+msgstr "Пользовательские звуки"
+
+msgid "Custom text for %s"
+msgstr "Пользовательский текст для %s"
+
+msgid "Customize speech text..."
+msgstr "Настроить текст речи..."
+
+msgid ""
+"Customize what NVDA speaks for each clipboard action.\n"
+"Leave empty to use defaults."
+msgstr ""
+"Настройте, что NVDA произносит для каждого действия буфера обмена.\n"
+"Оставьте пустым для использования значений по умолчанию."
+
+msgid "Cut selected text to clipboard."
+msgstr "Вырезать выделенный текст в буфер обмена."
+
+msgid "Cut to clipboard"
+msgstr "Вырезано в буфер обмена"
+
+msgid "Edit per-action settings..."
+msgstr "Изменить настройки каждого действия..."
+
+msgid "Enable clipboard announcements"
+msgstr "Включить объявления буфера обмена"
+
+msgid "Paste text from clipboard."
+msgstr "Вставить текст из буфера обмена."
+
+msgid "Paste unformatted text from clipboard."
+msgstr "Вставить неформатированный текст из буфера обмена."
+
+msgid "Pasted as plain text"
+msgstr "Вставлено как простой текст"
+
+msgid "Pasted from clipboard"
+msgstr "Вставлено из буфера обмена"
+
+msgid "Per-Action Clipboard Settings"
+msgstr "Настройки буфера обмена для каждого действия"
+
+msgid "Per-Action Settings"
+msgstr "Настройки каждого действия"
+
+msgid "Play Sound"
+msgstr "Воспроизвести звук"
+
+msgid "Redo last undone action."
+msgstr "Повторить последнее отменённое действие."
+
+msgid "Redone"
+msgstr "Повторено"
+
+msgid "Select all content."
+msgstr "Выделить всё содержимое."
+
+msgid "Sound"
+msgstr "Звук"
+
+msgid "Sound only"
+msgstr "Только звук"
+
+msgid "Sound volume:"
+msgstr "Громкость звука:"
+
+msgid "Speak Message"
+msgstr "Произнести сообщение"
+
+msgid "Speech"
+msgstr "Речь"
+
+msgid "Speech and Sound"
+msgstr "Речь и звук"
+
+msgid "Speech only"
+msgstr "Только речь"
+
+msgid "Undo last action."
+msgstr "Отменить последнее действие."
+
+msgid "Undone"
+msgstr "Отменено"

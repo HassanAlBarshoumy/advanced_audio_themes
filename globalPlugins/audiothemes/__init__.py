@@ -46,6 +46,7 @@ from .update_checker import check_for_updates_auto
 from . import phoneticPunctuation as pp
 from . import utils
 from . import frenzy
+from .clipboard import ClipboardManager
 
 # Import the SentenceNav engine (Alt+Arrow sentence/phrase navigation)
 from .sentenceNavEngine import SentenceNavMixin, initSentenceNavConfiguration
@@ -322,6 +323,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self._helpDialog = None
         self._helpPending = False
         self._studioDialog = None
+        self._clipboard_mgr = ClipboardManager(self.handler)
         self._rebindInstanceGestures()
         wx.CallAfter(showPendingConflicts)
 
@@ -715,11 +717,41 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             dy = c_y - b_y
 
             desktop = self._audio_beacon_desktop
-            if desktop:
-                nx = dx / float(desktop[2])
-                ny = dy / float(desktop[3])
-                obj_info["progress_angle"] = nx * 90.0
-                self.handler.play_theme_sound("beacon", angle_x=nx * 90.0, angle_y=ny * 50.0)
+            if not desktop:
+                return
+
+            nx = dx / float(desktop[2])
+            ny = dy / float(desktop[3])
+
+            # Try theme beacon sound first
+            if self.handler.play_theme_sound("beacon", angle_x=nx * 90.0, angle_y=ny * 50.0):
+                return
+
+            # Fallback: generate tone when theme has no beacon sound
+            from .utils import is_sound_suppressed
+            if is_sound_suppressed("ui_beeps"):
+                return
+
+            distance = (dx * dx + dy * dy) ** 0.5
+            max_dist = (desktop[2] * desktop[2] + desktop[3] * desktop[3]) ** 0.5
+            closeness = max(0.05, 1.0 - distance / max_dist)
+
+            pitch = int(300 + closeness * 900)
+            volume = int(25 * closeness)
+            pan = max(-1.0, min(1.0, nx * 2.0))
+            left = int(volume * (1.0 - max(0.0, pan)))
+            right = int(volume * (1.0 - max(0.0, -pan)))
+
+            import tones
+            try:
+                from . import frenzy
+                df = frenzy.get_ducking_factor("ui_beeps")
+                if df < 1.0:
+                    tones.beep(pitch, 30, left=int(left * df), right=int(right * df))
+                else:
+                    tones.beep(pitch, 30, left=left, right=right)
+            except Exception:
+                tones.beep(pitch, 30, left=left, right=right)
         except Exception as e:
             try:
                 from logHandler import log
@@ -1405,6 +1437,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         for child in children:
             try:
                 obj_info = self._snapshot_obj(child)
+                obj_info["force_3d"] = True
                 # Force X pan based on screen position
                 desktop = obj_info.get("desktop_location")
                 if desktop and desktop[2] > 0:
@@ -1452,6 +1485,40 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     #
     # Plain DownArrow/UpArrow → NVDA built-in line navigation (no override!)
     # ────────────────────────────────────────────────
+
+    # ── Clipboard Announcement Scripts ──────────────────────────────────
+
+    @script(description=_("Copy selected text to clipboard."), gestures=['kb:control+c'], category="Advanced Audio Themes")
+    def script_clipboard_copy(self, gesture):
+        self._clipboard_mgr.announce("copy", gesture)
+
+    @script(description=_("Cut selected text to clipboard."), gestures=['kb:control+x'], category="Advanced Audio Themes")
+    def script_clipboard_cut(self, gesture):
+        self._clipboard_mgr.announce("cut", gesture)
+
+    @script(description=_("Paste text from clipboard."), gestures=['kb:control+v'], category="Advanced Audio Themes")
+    def script_clipboard_paste(self, gesture):
+        self._clipboard_mgr.announce("paste", gesture)
+
+    @script(description=_("Select all content."), gestures=['kb:control+a'], category="Advanced Audio Themes")
+    def script_clipboard_selectall(self, gesture):
+        self._clipboard_mgr.announce("selectall", gesture)
+
+    @script(description=_("Undo last action."), gestures=['kb:control+z'], category="Advanced Audio Themes")
+    def script_clipboard_undo(self, gesture):
+        self._clipboard_mgr.announce("undo", gesture)
+
+    @script(description=_("Redo last undone action."), gestures=['kb:control+y'], category="Advanced Audio Themes")
+    def script_clipboard_redo(self, gesture):
+        self._clipboard_mgr.announce("redo", gesture)
+
+    @script(description=_("Paste unformatted text from clipboard."), gestures=['kb:control+shift+v'], category="Advanced Audio Themes")
+    def script_clipboard_pasteplain(self, gesture):
+        self._clipboard_mgr.announce("pasteplain", gesture)
+
+    @script(description=_("Alternate redo."), gestures=['kb:control+shift+z'], category="Advanced Audio Themes")
+    def script_clipboard_redo2(self, gesture):
+        self._clipboard_mgr.announce("redo2", gesture)
 
     # Plain DownArrow/UpArrow → NVDA built-in line navigation (no override!)
     # ────────────────────────────────────────────────

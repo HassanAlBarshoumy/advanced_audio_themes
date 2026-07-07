@@ -182,6 +182,36 @@ audiothemes_config_defaults = {
     "emoji_custom_descriptions": "string(default='{}')",
     # Per-category sound position (JSON map)
     "emoji_sound_position_per_category": "string(default='{}')",
+    # Clipboard Announcements
+    "clipboard_enabled": "boolean(default=False)",
+    "clipboard_announce_mode": "string(default='both')",
+    "clipboard_volume": "integer(default=20, min=0, max=100)",
+    "clipboard_delay": "integer(default=50, min=0, max=500)",
+    "clipboard_copy": "boolean(default=True)",
+    "clipboard_cut": "boolean(default=True)",
+    "clipboard_paste": "boolean(default=True)",
+    "clipboard_selectall": "boolean(default=True)",
+    "clipboard_undo": "boolean(default=True)",
+    "clipboard_redo": "boolean(default=True)",
+    "clipboard_pasteplain": "boolean(default=True)",
+    "clipboard_redo2": "boolean(default=True)",
+    "clipboard_copy_sound": "boolean(default=True)",
+    "clipboard_cut_sound": "boolean(default=True)",
+    "clipboard_paste_sound": "boolean(default=True)",
+    "clipboard_selectall_sound": "boolean(default=True)",
+    "clipboard_undo_sound": "boolean(default=True)",
+    "clipboard_redo_sound": "boolean(default=True)",
+    "clipboard_pasteplain_sound": "boolean(default=True)",
+    "clipboard_redo2_sound": "boolean(default=True)",
+    "clipboard_copy_speech": "boolean(default=True)",
+    "clipboard_cut_speech": "boolean(default=True)",
+    "clipboard_paste_speech": "boolean(default=True)",
+    "clipboard_selectall_speech": "boolean(default=True)",
+    "clipboard_undo_speech": "boolean(default=True)",
+    "clipboard_redo_speech": "boolean(default=True)",
+    "clipboard_pasteplain_speech": "boolean(default=True)",
+    "clipboard_redo2_speech": "boolean(default=True)",
+    "clipboard_custom_texts": "string(default='{}')",
     "config_version": "integer(default=1)",
 }
 
@@ -249,6 +279,16 @@ class SpecialProps(IntEnum):
     emoji_objects = 2532
     emoji_symbols = 2533
     emoji_flags = 2534
+
+    # Clipboard Announcements (2535-2542)
+    clipboard_copy = 2535
+    clipboard_cut = 2536
+    clipboard_paste = 2537
+    clipboard_selectall = 2538
+    clipboard_undo = 2539
+    clipboard_redo = 2540
+    clipboard_pasteplain = 2541
+    clipboard_redo2 = 2542
 
 
 theme_roles = copy.copy(controlTypes.roleLabels)
@@ -320,6 +360,22 @@ theme_roles.update(
         SpecialProps.emoji_symbols: _("Emoji Symbols Sound"),
         # Translators: The label of the sound for emoji category flags.
         SpecialProps.emoji_flags: _("Emoji Flags Sound"),
+        # Translators: The label of the sound for clipboard copy.
+        SpecialProps.clipboard_copy: _("Clipboard Copy"),
+        # Translators: The label of the sound for clipboard cut.
+        SpecialProps.clipboard_cut: _("Clipboard Cut"),
+        # Translators: The label of the sound for clipboard paste.
+        SpecialProps.clipboard_paste: _("Clipboard Paste"),
+        # Translators: The label of the sound for clipboard select all.
+        SpecialProps.clipboard_selectall: _("Clipboard Select All"),
+        # Translators: The label of the sound for clipboard undo.
+        SpecialProps.clipboard_undo: _("Clipboard Undo"),
+        # Translators: The label of the sound for clipboard redo.
+        SpecialProps.clipboard_redo: _("Clipboard Redo"),
+        # Translators: The label of the sound for clipboard paste plain text.
+        SpecialProps.clipboard_pasteplain: _("Clipboard Paste Plain Text"),
+        # Translators: The label of the sound for clipboard alternate redo.
+        SpecialProps.clipboard_redo2: _("Clipboard Alternate Redo"),
     }
 )
 
@@ -1002,6 +1058,23 @@ class AudioThemesHandler:
             return angle_x, angle_y
         except Exception:
             return 0.0, 0.0
+
+    def play_clipboard_sound(self, special_prop, volume=None):
+        if not self.enabled or self.active_theme is None:
+            return False
+        theme = self.active_theme
+        with theme._lock:
+            sound_obj = theme.sounds.get(special_prop)
+        if sound_obj is None:
+            return False
+        vol = (volume if volume is not None
+               else config.conf["audiothemes"].get("clipboard_volume", 20))
+        self.player.play(
+            {"name": str(special_prop.value), "role": 0, "system_sound": True,
+             "volume_override": vol / 100.0},
+            sound_obj
+        )
+        return True
 
     def get_typing_pack_for_app(self, app_name):
         with self._config_lock:

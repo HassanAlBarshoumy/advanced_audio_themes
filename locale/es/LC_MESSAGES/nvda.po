@@ -3012,113 +3012,273 @@ msgid "text blocks"
 msgstr "Bloques de texto"
 
 msgid "AC Power Connected"
-msgstr ""
+msgstr "Corriente CA conectada"
 
 msgid "AC Power Disconnected"
-msgstr ""
+msgstr "Corriente CA desconectada"
 
 msgid "AC power connected/disconnected"
-msgstr ""
+msgstr "Corriente CA conectada/desconectada"
 
 msgid "Battery check interval (seconds):"
-msgstr ""
+msgstr "Intervalo de verificación de batería (segundos):"
 
 msgid "Battery Critical"
-msgstr ""
+msgstr "Batería crítica"
 
 msgid "Battery Fully Charged"
-msgstr ""
+msgstr "Batería completamente cargada"
 
 msgid "Battery Low"
-msgstr ""
+msgstr "Batería baja"
 
 msgid "Battery level changes (low, critical, full)"
-msgstr ""
+msgstr "Cambios de nivel de batería (baja, crítica, completa)"
 
 msgid "Battery Thresholds"
-msgstr ""
+msgstr "Umbrales de batería"
 
 msgid "Check Intervals"
-msgstr ""
+msgstr "Intervalos de verificación"
 
 msgid "Critical battery threshold (%):"
-msgstr ""
+msgstr "Umbral de batería crítica (%):"
 
 msgid "Custom Sound Files"
-msgstr ""
+msgstr "Archivos de sonido personalizados"
 
 msgid "Enable system status sounds"
-msgstr ""
+msgstr "Activar sonidos de estado del sistema"
 
 msgid "Events"
-msgstr ""
+msgstr "Eventos"
 
 msgid "Low battery threshold (%):"
-msgstr ""
+msgstr "Umbral de batería baja (%):"
 
 msgid "Monitor all USB devices (keyboard, mouse, storage, etc.)"
 msgstr ""
+"Monitorear todos los dispositivos USB (teclado, ratón, almacenamiento, etc.)"
 
 msgid "Network check interval (seconds):"
-msgstr ""
+msgstr "Intervalo de verificación de red (segundos):"
 
 msgid "Network Connected"
-msgstr ""
+msgstr "Red conectada"
 
 msgid "Network connect/disconnect"
-msgstr ""
+msgstr "Red conectar/desconectar"
 
 msgid "Network Disconnected"
-msgstr ""
+msgstr "Red desconectada"
 
 msgid "Storage Volume Mounted"
-msgstr ""
+msgstr "Volumen de almacenamiento montado"
 
 msgid "Storage volume mount/unmount"
-msgstr ""
+msgstr "Volumen de almacenamiento montar/desmontar"
 
 msgid "Storage Volume Unmounted"
-msgstr ""
+msgstr "Volumen de almacenamiento desmontado"
 
 msgid "System Sleep"
-msgstr ""
+msgstr "Suspensión del sistema"
 
 msgid "System Status"
-msgstr ""
+msgstr "Estado del sistema"
 
 msgid "System status sounds volume:"
-msgstr ""
+msgstr "Volumen de sonidos de estado del sistema:"
 
 msgid "System Wake"
-msgstr ""
+msgstr "Activación del sistema"
 
 msgid "System wake/sleep"
-msgstr ""
+msgstr "Sistema activar/suspender"
 
 msgid "USB Device Plugged"
-msgstr ""
+msgstr "Dispositivo USB conectado"
 
 msgid "USB device plug/unplug"
-msgstr ""
+msgstr "Dispositivo USB conectar/desconectar"
 
 msgid "USB Device Unplugged"
-msgstr ""
+msgstr "Dispositivo USB desconectado"
 
 msgid "USB Monitoring"
-msgstr ""
+msgstr "Monitoreo USB"
 
 msgid "Detection mode"
-msgstr ""
+msgstr "Modo de detección"
 
 msgid "Controls how first/last items are identified."
-msgstr ""
+msgstr "Controla cómo se identifican los elementos primero/último."
 
 msgid ""
 "Smart (Recommended) – ignore separators, fall back to any adjacent item"
 msgstr ""
+"Inteligente (Recomendado) – ignorar separadores, recurrir a cualquier "
+"elemento adyacente"
 
 msgid "Strict – same role only"
-msgstr ""
+msgstr "Estricto – solo el mismo rol"
 
 msgid "Any adjacent item – standard"
+msgstr "Cualquier elemento adyacente – estándar"
+
+msgid "Action"
+msgstr "Acción"
+
+msgid "All selected"
+msgstr "Todo seleccionado"
+
+msgid "Alternate redo."
+msgstr "Rehacer alternativo."
+
+msgid "Announcement Mode"
+msgstr "Modo de anuncio"
+
+msgid "Announcement delay (ms):"
+msgstr "Retardo del anuncio (ms):"
+
+msgid ""
+"Assign sounds for clipboard actions in the Audio Themes Studio.\n"
+"Place sound files named clipboard_copy.wav, clipboard_cut.wav, etc.\n"
+"in your theme folder, or use the Studio to assign any audio file."
 msgstr ""
+"Asigne sonidos para las acciones del portapapeles en Audio Themes Studio.\n"
+"Coloque archivos de sonido llamados clipboard_copy.wav, clipboard_cut.wav, etc.\n"
+"en su carpeta de temas, o use el Studio para asignar cualquier archivo de audio."
+
+msgid "Clipboard Alternate Redo"
+msgstr "Portapapeles Rehacer Alternativo"
+
+msgid "Clipboard Copy"
+msgstr "Portapapeles Copiar"
+
+msgid "Clipboard Cut"
+msgstr "Portapapeles Cortar"
+
+msgid "Clipboard Paste"
+msgstr "Portapapeles Pegar"
+
+msgid "Clipboard Paste Plain Text"
+msgstr "Portapapeles Pegar Texto Plano"
+
+msgid "Clipboard Redo"
+msgstr "Portapapeles Rehacer"
+
+msgid "Clipboard Select All"
+msgstr "Portapapeles Seleccionar Todo"
+
+msgid "Clipboard Undo"
+msgstr "Portapapeles Deshacer"
+
+msgid "Clipboard actions"
+msgstr "Acciones del portapapeles"
+
+msgid "Clipboard announcement delay"
+msgstr "Retardo del anuncio del portapapeles"
+
+msgid "Clipboard announcement mode"
+msgstr "Modo de anuncio del portapapeles"
+
+msgid "Clipboard sound volume"
+msgstr "Volumen del sonido del portapapeles"
+
+msgid "Configure each clipboard action individually:"
+msgstr "Configure cada acción del portapapeles individualmente:"
+
+msgid "Copied to clipboard"
+msgstr "Copiado al portapapeles"
+
+msgid "Copy selected text to clipboard."
+msgstr "Copiar texto seleccionado al portapapeles."
+
+msgid "Custom Clipboard Speech Text"
+msgstr "Texto de voz personalizado del portapapeles"
+
+msgid "Custom Sounds"
+msgstr "Sonidos personalizados"
+
+msgid "Custom text for %s"
+msgstr "Texto personalizado para %s"
+
+msgid "Customize speech text..."
+msgstr "Personalizar texto de voz..."
+
+msgid ""
+"Customize what NVDA speaks for each clipboard action.\n"
+"Leave empty to use defaults."
+msgstr ""
+"Personalice lo que NVDA dice para cada acción del portapapeles.\n"
+"Déjelo vacío para usar los valores predeterminados."
+
+msgid "Cut selected text to clipboard."
+msgstr "Cortar texto seleccionado al portapapeles."
+
+msgid "Cut to clipboard"
+msgstr "Cortado al portapapeles"
+
+msgid "Edit per-action settings..."
+msgstr "Editar configuración por acción..."
+
+msgid "Enable clipboard announcements"
+msgstr "Activar anuncios del portapapeles"
+
+msgid "Paste text from clipboard."
+msgstr "Pegar texto del portapapeles."
+
+msgid "Paste unformatted text from clipboard."
+msgstr "Pegar texto sin formato del portapapeles."
+
+msgid "Pasted as plain text"
+msgstr "Pegado como texto plano"
+
+msgid "Pasted from clipboard"
+msgstr "Pegado desde el portapapeles"
+
+msgid "Per-Action Clipboard Settings"
+msgstr "Configuración del portapapeles por acción"
+
+msgid "Per-Action Settings"
+msgstr "Configuración por acción"
+
+msgid "Play Sound"
+msgstr "Reproducir sonido"
+
+msgid "Redo last undone action."
+msgstr "Rehacer la última acción deshecha."
+
+msgid "Redone"
+msgstr "Rehecho"
+
+msgid "Select all content."
+msgstr "Seleccionar todo el contenido."
+
+msgid "Sound"
+msgstr "Sonido"
+
+msgid "Sound only"
+msgstr "Solo sonido"
+
+msgid "Sound volume:"
+msgstr "Volumen del sonido:"
+
+msgid "Speak Message"
+msgstr "Hablar mensaje"
+
+msgid "Speech"
+msgstr "Voz"
+
+msgid "Speech and Sound"
+msgstr "Voz y sonido"
+
+msgid "Speech only"
+msgstr "Solo voz"
+
+msgid "Undo last action."
+msgstr "Deshacer la última acción."
+
+msgid "Undone"
+msgstr "Deshecho"

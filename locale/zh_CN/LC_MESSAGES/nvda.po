@@ -2922,113 +2922,270 @@ msgid "Found {count} matching file(s):\n"
 msgstr "找到 {count} 个匹配的文件：\n"
 
 msgid "AC Power Connected"
-msgstr ""
+msgstr "交流电源已连接"
 
 msgid "AC Power Disconnected"
-msgstr ""
+msgstr "交流电源已断开"
 
 msgid "AC power connected/disconnected"
-msgstr ""
+msgstr "交流电源连接/断开"
 
 msgid "Battery check interval (seconds):"
-msgstr ""
+msgstr "电池检查间隔（秒）："
 
 msgid "Battery Critical"
-msgstr ""
+msgstr "电池严重不足"
 
 msgid "Battery Fully Charged"
-msgstr ""
+msgstr "电池已充满"
 
 msgid "Battery Low"
-msgstr ""
+msgstr "电池电量低"
 
 msgid "Battery level changes (low, critical, full)"
-msgstr ""
+msgstr "电池电量变化（低、严重、满）"
 
 msgid "Battery Thresholds"
-msgstr ""
+msgstr "电池阈值"
 
 msgid "Check Intervals"
-msgstr ""
+msgstr "检查间隔"
 
 msgid "Critical battery threshold (%):"
-msgstr ""
+msgstr "电池严重不足阈值（%）："
 
 msgid "Custom Sound Files"
-msgstr ""
+msgstr "自定义声音文件"
 
 msgid "Enable system status sounds"
-msgstr ""
+msgstr "启用系统状态声音"
 
 msgid "Events"
-msgstr ""
+msgstr "事件"
 
 msgid "Low battery threshold (%):"
-msgstr ""
+msgstr "电池电量低阈值（%）："
 
 msgid "Monitor all USB devices (keyboard, mouse, storage, etc.)"
-msgstr ""
+msgstr "监视所有 USB 设备（键盘、鼠标、存储等）"
 
 msgid "Network check interval (seconds):"
-msgstr ""
+msgstr "网络检查间隔（秒）："
 
 msgid "Network Connected"
-msgstr ""
+msgstr "网络已连接"
 
 msgid "Network connect/disconnect"
-msgstr ""
+msgstr "网络连接/断开"
 
 msgid "Network Disconnected"
-msgstr ""
+msgstr "网络已断开"
 
 msgid "Storage Volume Mounted"
-msgstr ""
+msgstr "存储卷已装载"
 
 msgid "Storage volume mount/unmount"
-msgstr ""
+msgstr "存储卷装载/卸载"
 
 msgid "Storage Volume Unmounted"
-msgstr ""
+msgstr "存储卷已卸载"
 
 msgid "System Sleep"
-msgstr ""
+msgstr "系统睡眠"
 
 msgid "System Status"
-msgstr ""
+msgstr "系统状态"
 
 msgid "System status sounds volume:"
-msgstr ""
+msgstr "系统状态声音音量："
 
 msgid "System Wake"
-msgstr ""
+msgstr "系统唤醒"
 
 msgid "System wake/sleep"
-msgstr ""
+msgstr "系统唤醒/睡眠"
 
 msgid "USB Device Plugged"
-msgstr ""
+msgstr "USB 设备已插入"
 
 msgid "USB device plug/unplug"
-msgstr ""
+msgstr "USB 设备插入/拔出"
 
 msgid "USB Device Unplugged"
-msgstr ""
+msgstr "USB 设备已拔出"
 
 msgid "USB Monitoring"
-msgstr ""
+msgstr "USB 监视"
 
 msgid "Detection mode"
-msgstr ""
+msgstr "检测模式"
 
 msgid "Controls how first/last items are identified."
-msgstr ""
+msgstr "控制如何识别第一个/最后一个项目。"
 
 msgid ""
 "Smart (Recommended) – ignore separators, fall back to any adjacent item"
-msgstr ""
+msgstr "智能（推荐）– 忽略分隔符，回退到任何相邻项目"
 
 msgid "Strict – same role only"
-msgstr ""
+msgstr "严格 – 仅相同角色"
 
 msgid "Any adjacent item – standard"
+msgstr "任何相邻项目 – 标准"
+
+msgid "Action"
+msgstr "操作"
+
+msgid "All selected"
+msgstr "已全选"
+
+msgid "Alternate redo."
+msgstr "替代重做。"
+
+msgid "Announcement Mode"
+msgstr "公告模式"
+
+msgid "Announcement delay (ms):"
+msgstr "公告延迟（毫秒）："
+
+msgid ""
+"Assign sounds for clipboard actions in the Audio Themes Studio.\n"
+"Place sound files named clipboard_copy.wav, clipboard_cut.wav, etc.\n"
+"in your theme folder, or use the Studio to assign any audio file."
 msgstr ""
+"在音频主题工作室中为剪贴板操作分配声音。\n"
+"将名为 clipboard_copy.wav、clipboard_cut.wav 等的音频文件\n"
+"放在您的主题文件夹中，或使用工作室分配任何音频文件。"
+
+msgid "Clipboard Alternate Redo"
+msgstr "剪贴板替代重做"
+
+msgid "Clipboard Copy"
+msgstr "剪贴板复制"
+
+msgid "Clipboard Cut"
+msgstr "剪贴板剪切"
+
+msgid "Clipboard Paste"
+msgstr "剪贴板粘贴"
+
+msgid "Clipboard Paste Plain Text"
+msgstr "剪贴板粘贴纯文本"
+
+msgid "Clipboard Redo"
+msgstr "剪贴板重做"
+
+msgid "Clipboard Select All"
+msgstr "剪贴板全选"
+
+msgid "Clipboard Undo"
+msgstr "剪贴板撤销"
+
+msgid "Clipboard actions"
+msgstr "剪贴板操作"
+
+msgid "Clipboard announcement delay"
+msgstr "剪贴板公告延迟"
+
+msgid "Clipboard announcement mode"
+msgstr "剪贴板公告模式"
+
+msgid "Clipboard sound volume"
+msgstr "剪贴板声音音量"
+
+msgid "Configure each clipboard action individually:"
+msgstr "单独配置每个剪贴板操作："
+
+msgid "Copied to clipboard"
+msgstr "已复制到剪贴板"
+
+msgid "Copy selected text to clipboard."
+msgstr "将所选文本复制到剪贴板。"
+
+msgid "Custom Clipboard Speech Text"
+msgstr "自定义剪贴板语音文本"
+
+msgid "Custom Sounds"
+msgstr "自定义声音"
+
+msgid "Custom text for %s"
+msgstr "%s 的自定义文本"
+
+msgid "Customize speech text..."
+msgstr "自定义语音文本..."
+
+msgid ""
+"Customize what NVDA speaks for each clipboard action.\n"
+"Leave empty to use defaults."
+msgstr ""
+"自定义 NVDA 为每个剪贴板操作朗读的内容。\n"
+"留空以使用默认值。"
+
+msgid "Cut selected text to clipboard."
+msgstr "将所选文本剪切到剪贴板。"
+
+msgid "Cut to clipboard"
+msgstr "已剪切到剪贴板"
+
+msgid "Edit per-action settings..."
+msgstr "编辑每项操作设置..."
+
+msgid "Enable clipboard announcements"
+msgstr "启用剪贴板公告"
+
+msgid "Paste text from clipboard."
+msgstr "从剪贴板粘贴文本。"
+
+msgid "Paste unformatted text from clipboard."
+msgstr "从剪贴板粘贴无格式文本。"
+
+msgid "Pasted as plain text"
+msgstr "已粘贴为纯文本"
+
+msgid "Pasted from clipboard"
+msgstr "已从剪贴板粘贴"
+
+msgid "Per-Action Clipboard Settings"
+msgstr "每项剪贴板操作设置"
+
+msgid "Per-Action Settings"
+msgstr "每项操作设置"
+
+msgid "Play Sound"
+msgstr "播放声音"
+
+msgid "Redo last undone action."
+msgstr "重做上一个已撤销的操作。"
+
+msgid "Redone"
+msgstr "已重做"
+
+msgid "Select all content."
+msgstr "全选内容。"
+
+msgid "Sound"
+msgstr "声音"
+
+msgid "Sound only"
+msgstr "仅声音"
+
+msgid "Sound volume:"
+msgstr "声音音量："
+
+msgid "Speak Message"
+msgstr "朗读消息"
+
+msgid "Speech"
+msgstr "语音"
+
+msgid "Speech and Sound"
+msgstr "语音和声音"
+
+msgid "Speech only"
+msgstr "仅语音"
+
+msgid "Undo last action."
+msgstr "撤销上一个操作。"
+
+msgid "Undone"
+msgstr "已撤销"

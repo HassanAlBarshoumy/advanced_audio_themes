@@ -165,7 +165,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.setupSystemStatusPage(self.sysStatusPage)
         self.notebook.AddPage(self.sysStatusPage, _("System Status"))
 
-        # Tab 10: Emoji Settings
+        # Tab 10: Clipboard Announcements
+        self.clipboardPage = wx.Panel(self.notebook)
+        self.setupClipboardPage(self.clipboardPage)
+        self.notebook.AddPage(self.clipboardPage, _("Clipboard"))
+
+        # Tab 11: Emoji Settings
         self.emojiPage = wx.Panel(self.notebook)
         self.setupEmojiPage(self.emojiPage)
         self.notebook.AddPage(self.emojiPage, _("Emoji"))
@@ -1549,6 +1554,184 @@ class AudioThemesSettingsPanel(SettingsPanel):
         sizer.AddStretchSpacer()
         page.SetSizer(sizer)
 
+    def setupClipboardPage(self, page):
+        sizer = wx.BoxSizer(wx.VERTICAL)
+
+        # Master toggle
+        self.clipboardEnableCheckbox = wx.CheckBox(page, -1, _("Enable clipboard announcements"))
+        sizer.Add(self.clipboardEnableCheckbox, 0, wx.ALL, 10)
+
+        self.clipboardInnerPanel = wx.Panel(page)
+        innerPanel = self.clipboardInnerPanel
+        innerSizer = wx.BoxSizer(wx.VERTICAL)
+
+        # Announce mode
+        modeBox = wx.StaticBoxSizer(wx.VERTICAL, innerPanel, _("Announcement Mode"))
+        self.clipboardModeChoice = wx.Choice(innerPanel, -1, choices=[
+            _("Speech and Sound"),
+            _("Speech only"),
+            _("Sound only"),
+        ], name=_("Clipboard announcement mode"))
+        modeBox.Add(self.clipboardModeChoice, 0, wx.EXPAND | wx.ALL, 5)
+        innerSizer.Add(modeBox, 0, wx.EXPAND | wx.ALL, 5)
+
+        # Volume and delay
+        volDelayGrid = wx.FlexGridSizer(2, 2, 5, 10)
+        volLabel = wx.StaticText(innerPanel, -1, _("Sound volume:"))
+        self.clipboardVolumeSlider = wx.Slider(innerPanel, -1, minValue=0, maxValue=100, name=_("Clipboard sound volume"))
+        volDelayGrid.Add(volLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+        volDelayGrid.Add(self.clipboardVolumeSlider, 1, wx.EXPAND)
+        delayLabel = wx.StaticText(innerPanel, -1, _("Announcement delay (ms):"))
+        self.clipboardDelaySpin = wx.SpinCtrl(innerPanel, -1, min=0, max=500, initial=50, name=_("Clipboard announcement delay"))
+        volDelayGrid.Add(delayLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+        volDelayGrid.Add(self.clipboardDelaySpin, 0, wx.EXPAND)
+        innerSizer.Add(volDelayGrid, 0, wx.EXPAND | wx.ALL, 5)
+
+        # Per-action controls in a list
+        actionsBox = wx.StaticBoxSizer(wx.VERTICAL, innerPanel, _("Per-Action Settings"))
+        self.clipboardActionList = wx.ListCtrl(innerPanel, style=wx.LC_REPORT | wx.LC_SINGLE_SEL, name=_("Clipboard actions"))
+        self.clipboardActionList.AppendColumn(_("Action"), width=120)
+        self.clipboardActionList.AppendColumn(_("Enabled"), width=70)
+        self.clipboardActionList.AppendColumn(_("Sound"), width=60)
+        self.clipboardActionList.AppendColumn(_("Speech"), width=60)
+        self.clipboardActionList.SetMinSize((-1, 180))
+        actionsBox.Add(self.clipboardActionList, 1, wx.EXPAND | wx.ALL, 5)
+
+        btnSizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.clipboardPerActionBtn = wx.Button(innerPanel, -1, _("Edit per-action settings..."))
+        self.clipboardCustomTextBtn = wx.Button(innerPanel, -1, _("Customize speech text..."))
+        btnSizer.Add(self.clipboardPerActionBtn, 0, wx.ALL, 5)
+        btnSizer.Add(self.clipboardCustomTextBtn, 0, wx.ALL, 5)
+        actionsBox.Add(btnSizer, 0, wx.ALIGN_CENTER, 5)
+        innerSizer.Add(actionsBox, 1, wx.EXPAND | wx.ALL, 5)
+
+        # Note about Studio
+        noteBox = wx.StaticBoxSizer(wx.VERTICAL, innerPanel, _("Custom Sounds"))
+        note = wx.StaticText(innerPanel, -1, _(
+            "Assign sounds for clipboard actions in the Audio Themes Studio.\n"
+            "Place sound files named clipboard_copy.wav, clipboard_cut.wav, etc.\n"
+            "in your theme folder, or use the Studio to assign any audio file."
+        ))
+        noteBox.Add(note, 0, wx.ALL, 10)
+        innerSizer.Add(noteBox, 0, wx.EXPAND | wx.ALL, 5)
+
+        innerPanel.SetSizer(innerSizer)
+
+        # Binding for master toggle
+        self.Bind(wx.EVT_CHECKBOX, self._on_clipboard_enabled_changed, self.clipboardEnableCheckbox)
+        self.Bind(wx.EVT_BUTTON, self._on_clipboard_per_action, self.clipboardPerActionBtn)
+        self.Bind(wx.EVT_BUTTON, self._on_clipboard_custom_text, self.clipboardCustomTextBtn)
+        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self._on_clipboard_per_action, self.clipboardActionList)
+
+        # Populate action list
+        self._clipboard_actions = [
+            ("clipboard_copy", _("Copy"), "clipboard_copy"),
+            ("clipboard_cut", _("Cut"), "clipboard_cut"),
+            ("clipboard_paste", _("Paste"), "clipboard_paste"),
+            ("clipboard_selectall", _("Select All"), "clipboard_selectall"),
+            ("clipboard_undo", _("Undo"), "clipboard_undo"),
+            ("clipboard_redo", _("Redo"), "clipboard_redo"),
+            ("clipboard_pasteplain", _("Paste Plain"), "clipboard_pasteplain"),
+            ("clipboard_redo2", _("Redo (Alt)"), "clipboard_redo2"),
+        ]
+        for idx, (config_key, label, action_id) in enumerate(self._clipboard_actions):
+            idx2 = self.clipboardActionList.InsertItem(self.clipboardActionList.GetItemCount(), label)
+            self.clipboardActionList.SetItemData(idx2, idx)
+
+        sizer.Add(innerPanel, 1, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 10)
+        page.SetSizer(sizer)
+        self.clipboardInnerPanel.Show(self.clipboardEnableCheckbox.IsChecked())
+
+    def _on_clipboard_enabled_changed(self, event):
+        self.clipboardInnerPanel.Show(event.IsChecked())
+        self.clipboardInnerPanel.GetParent().Layout()
+
+    def _on_clipboard_per_action(self, event):
+        conf = config.conf["audiothemes"]
+        dlg = wx.Dialog(self, title=_("Per-Action Clipboard Settings"))
+        mainSizer = wx.BoxSizer(wx.VERTICAL)
+        helpText = wx.StaticText(dlg, -1, _("Configure each clipboard action individually:"))
+        mainSizer.Add(helpText, 0, wx.ALL, 10)
+        grid = wx.FlexGridSizer(len(self._clipboard_actions) + 1, 4, 5, 10)
+        grid.Add(wx.StaticText(dlg, -1, _("Action")), 0, wx.ALIGN_CENTER_VERTICAL)
+        grid.Add(wx.StaticText(dlg, -1, _("Enabled")), 0, wx.ALIGN_CENTER_VERTICAL)
+        grid.Add(wx.StaticText(dlg, -1, _("Play Sound")), 0, wx.ALIGN_CENTER_VERTICAL)
+        grid.Add(wx.StaticText(dlg, -1, _("Speak Message")), 0, wx.ALIGN_CENTER_VERTICAL)
+        self._clipboard_action_cbs = {}
+        for config_key, label, action_id in self._clipboard_actions:
+            action_label = wx.StaticText(dlg, -1, label)
+            enabled_cb = wx.CheckBox(dlg, -1, "")
+            enabled_cb.SetValue(conf.get(config_key, True))
+            sound_cb = wx.CheckBox(dlg, -1, "")
+            sound_cb.SetValue(conf.get(config_key + "_sound", True))
+            speech_cb = wx.CheckBox(dlg, -1, "")
+            speech_cb.SetValue(conf.get(config_key + "_speech", True))
+            self._clipboard_action_cbs[config_key] = (enabled_cb, sound_cb, speech_cb)
+            grid.Add(action_label, 0, wx.ALIGN_CENTER_VERTICAL)
+            grid.Add(enabled_cb, 0, wx.ALIGN_CENTER)
+            grid.Add(sound_cb, 0, wx.ALIGN_CENTER)
+            grid.Add(speech_cb, 0, wx.ALIGN_CENTER)
+        mainSizer.Add(grid, 0, wx.EXPAND | wx.ALL, 10)
+        btnSizer = dlg.CreateButtonSizer(wx.OK | wx.CANCEL)
+        mainSizer.Add(btnSizer, 0, wx.ALIGN_CENTER | wx.ALL, 10)
+        dlg.SetSizer(mainSizer)
+        dlg.Fit()
+        if dlg.ShowModal() == wx.ID_OK:
+            for config_key, (enabled_cb, sound_cb, speech_cb) in self._clipboard_action_cbs.items():
+                conf[config_key] = enabled_cb.IsChecked()
+                conf[config_key + "_sound"] = sound_cb.IsChecked()
+                conf[config_key + "_speech"] = speech_cb.IsChecked()
+            self._init_clipboard_action_list()
+        dlg.Destroy()
+
+    def _on_clipboard_custom_text(self, event):
+        conf = config.conf["audiothemes"]
+        import json
+        try:
+            raw = conf.get("clipboard_custom_texts", "{}")
+            custom_texts = json.loads(raw) if isinstance(raw, str) else raw
+        except Exception:
+            custom_texts = {}
+        dlg = wx.Dialog(self, title=_("Custom Clipboard Speech Text"))
+        mainSizer = wx.BoxSizer(wx.VERTICAL)
+        helpText = wx.StaticText(dlg, -1, _("Customize what NVDA speaks for each clipboard action.\nLeave empty to use defaults."))
+        mainSizer.Add(helpText, 0, wx.ALL, 10)
+        from .clipboard import ACTION_MAP
+        self._clipboard_text_ctrls = {}
+        grid = wx.FlexGridSizer(len(ACTION_MAP), 2, 5, 10)
+        for action_id, (action_prop, action_cfg_key, default_text) in ACTION_MAP.items():
+            label = wx.StaticText(dlg, -1, action_id.capitalize())
+            ctrl = wx.TextCtrl(dlg, -1, value=custom_texts.get(action_id, ""), name=_("Custom text for %s") % action_id)
+            self._clipboard_text_ctrls[action_id] = ctrl
+            grid.Add(label, 0, wx.ALIGN_CENTER_VERTICAL)
+            grid.Add(ctrl, 1, wx.EXPAND)
+        mainSizer.Add(grid, 0, wx.EXPAND | wx.ALL, 10)
+        btnSizer = dlg.CreateButtonSizer(wx.OK | wx.CANCEL)
+        mainSizer.Add(btnSizer, 0, wx.ALIGN_CENTER | wx.ALL, 10)
+        dlg.SetSizer(mainSizer)
+        dlg.SetMinSize((400, 350))
+        dlg.Fit()
+        if dlg.ShowModal() == wx.ID_OK:
+            new_texts = {}
+            for action_id, ctrl in self._clipboard_text_ctrls.items():
+                val = ctrl.GetValue().strip()
+                if val:
+                    new_texts[action_id] = val
+            conf["clipboard_custom_texts"] = json.dumps(new_texts)
+        dlg.Destroy()
+
+    def _init_clipboard_action_list(self):
+        conf = config.conf["audiothemes"]
+        for i, (config_key, label, action_id) in enumerate(self._clipboard_actions):
+            enabled = conf.get(config_key, True)
+            sound_key = config_key + "_sound"
+            speech_key = config_key + "_speech"
+            has_sound = conf.get(sound_key, True)
+            has_speech = conf.get(speech_key, True)
+            self.clipboardActionList.SetItem(i, 1, _("Yes") if enabled else _("No"))
+            self.clipboardActionList.SetItem(i, 2, _("Yes") if has_sound else _("No"))
+            self.clipboardActionList.SetItem(i, 3, _("Yes") if has_speech else _("No"))
+
     def onSelectRoles(self, event):
         dlg = RoleSelectionDialog(self)
         if dlg.ShowModal() == wx.ID_OK:
@@ -1928,6 +2111,16 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.sysBatteryCriticalSpin.SetValue(_i(conf.get("sys_battery_critical_threshold", 10)))
         self.sysNetworkIntervalSpin.SetValue(_i(conf.get("sys_network_check_interval", 15), 15))
         self.sysBatteryIntervalSpin.SetValue(_i(conf.get("sys_battery_check_interval", 30), 30))
+
+        # Clipboard tab
+        self.clipboardEnableCheckbox.SetValue(_b(conf.get("clipboard_enabled", False)))
+        mode_map = {"both": 0, "speech": 1, "sound": 2}
+        mode_val = conf.get("clipboard_announce_mode", "both")
+        self.clipboardModeChoice.SetSelection(mode_map.get(mode_val, 0))
+        self.clipboardVolumeSlider.SetValue(_i(conf.get("clipboard_volume", 20)))
+        self.clipboardDelaySpin.SetValue(_i(conf.get("clipboard_delay", 50)))
+        self._init_clipboard_action_list()
+        self._on_clipboard_enabled_changed(DummyEvent(self.clipboardEnableCheckbox.IsChecked()))
 
         # Emoji tab
         self.emojiEnableCheckbox.SetValue(_b(conf.get("emoji_enabled", True)))
@@ -2373,6 +2566,15 @@ class AudioThemesSettingsPanel(SettingsPanel):
         conf["sys_battery_critical_threshold"] = self.sysBatteryCriticalSpin.GetValue()
         conf["sys_network_check_interval"] = self.sysNetworkIntervalSpin.GetValue()
         conf["sys_battery_check_interval"] = self.sysBatteryIntervalSpin.GetValue()
+
+        # Clipboard tab
+        conf["clipboard_enabled"] = self.clipboardEnableCheckbox.IsChecked()
+        mode_map_rev = {0: "both", 1: "speech", 2: "sound"}
+        sel = self.clipboardModeChoice.GetSelection()
+        conf["clipboard_announce_mode"] = mode_map_rev.get(sel, "both")
+        conf["clipboard_volume"] = self.clipboardVolumeSlider.GetValue()
+        conf["clipboard_delay"] = self.clipboardDelaySpin.GetValue()
+        # Per-action settings are saved via the edit dialog
 
         # Emoji tab
         conf["emoji_enabled"] = self.emojiEnableCheckbox.GetValue()
