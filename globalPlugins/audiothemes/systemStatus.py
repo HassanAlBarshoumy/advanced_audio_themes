@@ -35,17 +35,7 @@ GUID_DEVINTERFACE_USB_DEVICE = (
     0x90, 0x1F, 0x00, 0xC0, 0x4F, 0xB9, 0x51, 0xED
 )
 
-# GUID for all device interfaces (allows any device type)
-GUID_DEVINTERFACE_ALL = (
-    0x4d36e96c, 0xe325, 0x11ce,
-    0xbf, 0xc1, 0x08, 0x00, 0x2b, 0xe1, 0x03, 0x18
-)
-
 DEVICE_NOTIFY_WINDOW_HANDLE = 0x0000
-DEVICE_NOTIFY_ALL_INTERFACE_CLASSES = 0x0004
-
-DBTF_MEDIA = 0x0001
-DBTF_NET = 0x0002
 
 
 class DEV_BROADCAST_HDR(ctypes.Structure):
@@ -63,16 +53,6 @@ class DEV_BROADCAST_DEVICEINTERFACE(ctypes.Structure):
         ("dbcc_reserved", ctypes.wintypes.DWORD),
         ("dbcc_classguid", ctypes.c_byte * 16),
         ("dbcc_name", ctypes.wintypes.WCHAR * 256),
-    ]
-
-
-class DEV_BROADCAST_VOLUME(ctypes.Structure):
-    _fields_ = [
-        ("dbcv_size", ctypes.wintypes.DWORD),
-        ("dbcv_devicetype", ctypes.wintypes.DWORD),
-        ("dbcv_reserved", ctypes.wintypes.DWORD),
-        ("dbcv_unitmask", ctypes.wintypes.DWORD),
-        ("dbcv_flags", ctypes.wintypes.WORD),
     ]
 
 
@@ -142,9 +122,6 @@ class SYSTEM_POWER_STATUS(ctypes.Structure):
         ("BatteryFullLifeTime", ctypes.wintypes.DWORD),
     ]
 
-WS_POPUP = 0x80000000
-
-
 class SystemStatusMonitor:
     _battery_timer_id = 1
     _network_timer_id = 2
@@ -155,7 +132,6 @@ class SystemStatusMonitor:
         self._thread = None
         self._hwnd = None
         self._usb_notify_handle = None
-        self._volume_notify_handle = None
         self._last_ac_state = None
         self._last_network_state = None
         self._last_battery_percent = None
@@ -270,31 +246,10 @@ class SystemStatusMonitor:
                     % kernel32.GetLastError()
                 )
 
-        # Register for storage volume notifications
-        vol = DEV_BROADCAST_VOLUME()
-        vol.dbcv_size = ctypes.sizeof(DEV_BROADCAST_VOLUME)
-        vol.dbcv_devicetype = DBT_DEVTYP_VOLUME
-        vol.dbcv_reserved = 0
-        vol.dbcv_unitmask = 0
-        vol.dbcv_flags = 0
-        self._volume_notify_handle = user32.RegisterDeviceNotificationW(
-            self._hwnd,
-            ctypes.byref(vol),
-            DEVICE_NOTIFY_WINDOW_HANDLE
-        )
-        if not self._volume_notify_handle:
-            log.debugWarning(
-                "SystemStatusMonitor: RegisterDeviceNotificationW (Volume) failed with error %d"
-                % kernel32.GetLastError()
-            )
-
     def _unregister_device_notifications(self):
         if self._usb_notify_handle:
             user32.UnregisterDeviceNotification(self._usb_notify_handle)
             self._usb_notify_handle = None
-        if self._volume_notify_handle:
-            user32.UnregisterDeviceNotification(self._volume_notify_handle)
-            self._volume_notify_handle = None
 
     def _window_proc(self, hwnd, msg, wparam, lparam):
         try:
@@ -329,7 +284,7 @@ class SystemStatusMonitor:
             elif wparam == DBT_DEVICEREMOVECOMPLETE:
                 self._callback(SpecialProps.sys_usb_unplug)
 
-        elif hdr.dbch_devicetype == DBT_DEVTYP_VOLUME and self._volume_notify_handle:
+        elif hdr.dbch_devicetype == DBT_DEVTYP_VOLUME:
             if wparam == DBT_DEVICEARRIVAL:
                 self._callback(SpecialProps.sys_volume_plug)
             elif wparam == DBT_DEVICEREMOVECOMPLETE:
