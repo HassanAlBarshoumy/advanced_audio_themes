@@ -265,7 +265,10 @@ class SystemStatusMonitor:
                 DEVICE_NOTIFY_WINDOW_HANDLE
             )
             if not self._usb_notify_handle:
-                log.debugWarning("SystemStatusMonitor: RegisterDeviceNotificationW (USB) failed")
+                log.debugWarning(
+                    "SystemStatusMonitor: RegisterDeviceNotificationW (USB) failed with error %d"
+                    % kernel32.GetLastError()
+                )
 
         # Register for storage volume notifications
         vol = DEV_BROADCAST_VOLUME()
@@ -280,7 +283,10 @@ class SystemStatusMonitor:
             DEVICE_NOTIFY_WINDOW_HANDLE
         )
         if not self._volume_notify_handle:
-            log.debugWarning("SystemStatusMonitor: RegisterDeviceNotificationW (Volume) failed")
+            log.debugWarning(
+                "SystemStatusMonitor: RegisterDeviceNotificationW (Volume) failed with error %d"
+                % kernel32.GetLastError()
+            )
 
     def _unregister_device_notifications(self):
         if self._usb_notify_handle:
