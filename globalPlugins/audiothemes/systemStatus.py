@@ -122,9 +122,14 @@ user32 = ctypes.windll.user32
 kernel32 = ctypes.windll.kernel32
 
 user32.CreateWindowExW.argtypes = [
-    ctypes.wintypes.DWORD, ctypes.wintypes.LPCWSTR, ctypes.wintypes.LPCWSTR,
-    ctypes.wintypes.DWORD, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int,
-    ctypes.wintypes.HWND, ctypes.wintypes.HMENU, ctypes.wintypes.HINSTANCE,
+    ctypes.wintypes.DWORD,
+    ctypes.c_void_p,
+    ctypes.wintypes.LPCWSTR,
+    ctypes.wintypes.DWORD,
+    ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int,
+    ctypes.wintypes.HWND,
+    ctypes.wintypes.HMENU,
+    ctypes.wintypes.HINSTANCE,
     ctypes.c_void_p,
 ]
 user32.CreateWindowExW.restype = ctypes.wintypes.HWND
