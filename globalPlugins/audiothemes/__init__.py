@@ -18,6 +18,7 @@
 """
 
 from contextlib import suppress
+from functools import lru_cache
 import ctypes
 import _ctypes
 import time
@@ -72,17 +73,17 @@ initSentenceNavConfiguration()
 
 from .navLayer import NavLayerMixin
 
+@lru_cache(maxsize=256)
 def _text_contains_emoji(text):
     """Check if text contains any emoji characters."""
     if not text:
         return False
-    # Quick Unicode range check for common emoji
-    # Covers most emoji blocks up to Unicode 16.0
+    if text.isascii():
+        return False
     i = 0
     n = len(text)
     while i < n:
         cp = ord(text[i])
-        # Surrogate pairs in UTF-16
         if 0xD800 <= cp <= 0xDBFF and i + 1 < n:
             low = ord(text[i + 1])
             if 0xDC00 <= low <= 0xDFFF:
@@ -102,7 +103,7 @@ def _text_contains_emoji(text):
         if 0x3030 == cp or 0x303D == cp or 0x3297 == cp or 0x3299 == cp:
             return True
         if 0xFE00 <= cp <= 0xFE0F:
-            return True  # Variation selectors (typically follow emoji)
+            return True
         if 0x1F000 <= cp <= 0x1FFFF:
             return True
     return False

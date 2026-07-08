@@ -17,6 +17,7 @@ import core
 import ctypes
 from ctypes import create_string_buffer, byref
 from enum import Enum
+from functools import lru_cache
 import globalPluginHandler
 import globalVars
 import gui
@@ -701,14 +702,10 @@ def preCancelSpeech(*args, **kwargs):
     
 
 def preProcessSpeechSymbols(locale, text, level):
-    # global rulesByFrenzy, cached_passThrough_regex
     if not cached_passThrough_regex:
         return originalProcessSpeechSymbols(locale, text, level)
-        
+
     r = cached_passThrough_regex
-    if r.search(""):
-        return originalProcessSpeechSymbols(locale, text, level)
-        
     prevIndex = 0
     result = []
     for m in r.finditer(text):
@@ -1030,6 +1027,11 @@ def resetProsodies(sequence):
     return [getProsodyClass(prosodyName)() for prosodyName in allProsodies] + sequence
 
 original_processSpeechSymbol = None
+
+@lru_cache(maxsize=256)
+def _cached_native_symbol(locale, symbol, level):
+    return originalProcessSpeechSymbols(locale, symbol, level)
+
 def new_processSpeechSymbol(locale, symbol):
     if isPhoneticPunctuationEnabled():
         with _rules_lock:
@@ -1042,13 +1044,8 @@ def new_processSpeechSymbol(locale, symbol):
             # or produce empty output, we should NOT fire the earcon either.
             currentLevel = config.conf["speech"]["symbolLevel"]
             try:
-                nativeOut = originalProcessSpeechSymbols(locale, symbol, currentLevel)
-                # nativeOut == symbol means NVDA kept it as a literal (below level threshold)
-                # nativeOut == "" means NVDA wants it completely silent at this level
-                # In both cases, the symbol is not "announced" at this level.
-                # Only fire the earcon if NVDA would have spoken a description for it.
+                nativeOut = _cached_native_symbol(locale, symbol, currentLevel)
                 if nativeOut == symbol or not nativeOut.strip():
-                    # Symbol is silent or literal at this level — skip earcon
                     return nativeOut
             except Exception as e:
                 import logging

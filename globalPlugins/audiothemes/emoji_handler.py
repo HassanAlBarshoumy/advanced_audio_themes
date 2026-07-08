@@ -2,6 +2,7 @@ import json
 import re
 import config
 import speech
+from functools import lru_cache
 from .handler import SpecialProps
 from . import emoji_cldr_data
 
@@ -137,6 +138,7 @@ FLAGS_REGIONAL_INDICATOR = re.compile(
 )
 
 
+@lru_cache(maxsize=512)
 def _get_emoji_category(emoji_str):
     """Get category for an emoji using CLDR data first, then fallback to range-based detection."""
     cat = emoji_cldr_data.get_emoji_category(emoji_str)
@@ -170,6 +172,21 @@ def _fallback_category(emoji_str):
     return EMOJI_CATEGORY_SMILEYS
 
 
+_cldr_index = None
+
+def _ensure_cldr_index():
+    global _cldr_index
+    if _cldr_index is not None:
+        return
+    all_cldr = emoji_cldr_data.get_all_emoji()
+    if not all_cldr:
+        return
+    _cldr_index = {}
+    for emo in all_cldr:
+        _cldr_index.setdefault(emo[0], []).append(emo)
+    for lst in _cldr_index.values():
+        lst.sort(key=len, reverse=True)
+
 def find_emojis(text):
     matches = []
     for m in _emoji_re.finditer(text):
@@ -183,23 +200,25 @@ def find_emojis(text):
     for _, _, start, end in matches:
         for i in range(start, end):
             covered[i] = 1
-    cldr_by_len = sorted(all_cldr, key=len, reverse=True)
+    _ensure_cldr_index()
     i = 0
     while i < len(text):
         if covered[i]:
             i += 1
             continue
         found = False
-        for emoji in cldr_by_len:
-            elen = len(emoji)
-            if i + elen <= len(text) and text[i:i+elen] == emoji:
-                cat = _get_emoji_category(emoji)
-                matches.append((emoji, cat, i, i+elen))
-                for j in range(i, i+elen):
-                    covered[j] = 1
-                i += elen
-                found = True
-                break
+        candidates = _cldr_index.get(text[i])
+        if candidates:
+            for emoji in candidates:
+                elen = len(emoji)
+                if i + elen <= len(text) and text[i:i+elen] == emoji:
+                    cat = _get_emoji_category(emoji)
+                    matches.append((emoji, cat, i, i+elen))
+                    for j in range(i, i+elen):
+                        covered[j] = 1
+                    i += elen
+                    found = True
+                    break
         if not found:
             i += 1
     matches.sort(key=lambda x: x[2])
@@ -319,6 +338,7 @@ def is_emoji_suppress_role_sound():
     return config.conf["audiothemes"].get("emoji_suppress_role_sound", False)
 
 
+@lru_cache(maxsize=128)
 def is_emoji_blacklisted(emoji_char):
     raw = config.conf["audiothemes"].get("emoji_blacklist", "")
     return emoji_char in raw
