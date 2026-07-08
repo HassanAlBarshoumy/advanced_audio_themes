@@ -121,35 +121,7 @@ class SYSTEM_POWER_STATUS(ctypes.Structure):
 user32 = ctypes.windll.user32
 kernel32 = ctypes.windll.kernel32
 
-user32.CreateWindowExW.argtypes = [
-    ctypes.wintypes.DWORD, ctypes.c_void_p, ctypes.wintypes.LPCWSTR,
-    ctypes.wintypes.DWORD, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int,
-    ctypes.wintypes.HWND, ctypes.wintypes.HMENU, ctypes.wintypes.HINSTANCE,
-    ctypes.c_void_p,
-]
-user32.CreateWindowExW.restype = ctypes.wintypes.HWND
-user32.RegisterDeviceNotificationW.argtypes = [
-    ctypes.wintypes.HWND, ctypes.c_void_p, ctypes.wintypes.DWORD,
-]
-user32.RegisterDeviceNotificationW.restype = ctypes.c_void_p
-user32.DefWindowProcW.argtypes = [
-    ctypes.wintypes.HWND, ctypes.wintypes.UINT, ctypes.wintypes.WPARAM, ctypes.wintypes.LPARAM,
-]
-user32.DefWindowProcW.restype = ctypes.wintypes.LRESULT
-user32.GetMessageW.argtypes = [
-    ctypes.wintypes.LPMSG, ctypes.wintypes.HWND, ctypes.wintypes.UINT, ctypes.wintypes.UINT,
-]
-user32.GetMessageW.restype = ctypes.wintypes.BOOL
-user32.DispatchMessageW.argtypes = [ctypes.wintypes.LPMSG]
-user32.DispatchMessageW.restype = ctypes.wintypes.LRESULT
-user32.PostMessageW.argtypes = [
-    ctypes.wintypes.HWND, ctypes.wintypes.UINT, ctypes.wintypes.WPARAM, ctypes.wintypes.LPARAM,
-]
-user32.PostMessageW.restype = ctypes.wintypes.BOOL
-user32.SetTimer.argtypes = [
-    ctypes.wintypes.HWND, ctypes.wintypes.UINT_PTR, ctypes.wintypes.UINT, ctypes.c_void_p,
-]
-user32.SetTimer.restype = ctypes.wintypes.UINT_PTR
+WS_POPUP = 0x80000000
 
 
 class SystemStatusMonitor:
@@ -212,7 +184,7 @@ class SystemStatusMonitor:
         self._hwnd = user32.CreateWindowExW(
             0, atom, "AudioThemesSystemStatus", 0,
             0, 0, 0, 0,
-            ctypes.wintypes.HWND(-3),
+            0,
             0, hinstance, 0
         )
         if not self._hwnd:
