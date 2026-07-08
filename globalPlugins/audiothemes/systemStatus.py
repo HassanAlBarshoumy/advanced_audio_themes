@@ -179,10 +179,11 @@ class SystemStatusMonitor:
             log.debugWarning("SystemStatusMonitor: RegisterClassExW failed")
             return
 
+        HWND_MESSAGE = ctypes.c_void_p(-3).value
         self._hwnd = user32.CreateWindowExW(
             0, atom, "AudioThemesSystemStatus", 0,
             0, 0, 0, 0,
-            0xFFFF,
+            HWND_MESSAGE,
             0, hinstance, 0
         )
         if not self._hwnd:
