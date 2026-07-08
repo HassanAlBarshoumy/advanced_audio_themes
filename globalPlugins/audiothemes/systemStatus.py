@@ -86,7 +86,7 @@ class GUID(ctypes.Structure):
 
 
 WNDPROC = ctypes.WINFUNCTYPE(
-    ctypes.c_int, ctypes.c_void_p, ctypes.c_uint, ctypes.c_void_p, ctypes.c_void_p
+    LRESULT, ctypes.wintypes.HWND, ctypes.wintypes.UINT, WPARAM, LPARAM
 )
 
 
@@ -120,6 +120,28 @@ class SYSTEM_POWER_STATUS(ctypes.Structure):
 
 user32 = ctypes.windll.user32
 kernel32 = ctypes.windll.kernel32
+
+WPARAM = ctypes.wintypes.WPARAM
+LPARAM = ctypes.wintypes.LPARAM
+LRESULT = LPARAM
+
+user32.DefWindowProcW.argtypes = [
+    ctypes.wintypes.HWND, ctypes.wintypes.UINT, WPARAM, LPARAM,
+]
+user32.DefWindowProcW.restype = LRESULT
+user32.CreateWindowExW.restype = ctypes.wintypes.HWND
+user32.RegisterDeviceNotificationW.argtypes = [
+    ctypes.wintypes.HWND, ctypes.c_void_p, ctypes.wintypes.DWORD,
+]
+user32.RegisterDeviceNotificationW.restype = ctypes.c_void_p
+user32.PostMessageW.argtypes = [
+    ctypes.wintypes.HWND, ctypes.wintypes.UINT, WPARAM, LPARAM,
+]
+user32.PostMessageW.restype = ctypes.wintypes.BOOL
+user32.GetMessageW.argtypes = [
+    ctypes.wintypes.LPMSG, ctypes.wintypes.HWND, ctypes.wintypes.UINT, ctypes.wintypes.UINT,
+]
+user32.GetMessageW.restype = ctypes.wintypes.BOOL
 
 WS_POPUP = 0x80000000
 
