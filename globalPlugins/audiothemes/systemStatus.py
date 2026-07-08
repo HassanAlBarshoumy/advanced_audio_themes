@@ -121,6 +121,14 @@ class SYSTEM_POWER_STATUS(ctypes.Structure):
 user32 = ctypes.windll.user32
 kernel32 = ctypes.windll.kernel32
 
+user32.CreateWindowExW.argtypes = [
+    ctypes.wintypes.DWORD, ctypes.wintypes.LPCWSTR, ctypes.wintypes.LPCWSTR,
+    ctypes.wintypes.DWORD, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int,
+    ctypes.wintypes.HWND, ctypes.wintypes.HMENU, ctypes.wintypes.HINSTANCE,
+    ctypes.c_void_p,
+]
+user32.CreateWindowExW.restype = ctypes.wintypes.HWND
+
 
 class SystemStatusMonitor:
     _battery_timer_id = 1
@@ -179,11 +187,10 @@ class SystemStatusMonitor:
             log.debugWarning("SystemStatusMonitor: RegisterClassExW failed")
             return
 
-        HWND_MESSAGE = ctypes.c_void_p(-3).value
         self._hwnd = user32.CreateWindowExW(
             0, atom, "AudioThemesSystemStatus", 0,
             0, 0, 0, 0,
-            HWND_MESSAGE,
+            -3,
             0, hinstance, 0
         )
         if not self._hwnd:
