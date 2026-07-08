@@ -268,13 +268,15 @@ class SystemStatusMonitor:
                 log.debugWarning("SystemStatusMonitor: RegisterDeviceNotificationW (USB) failed")
 
         # Register for storage volume notifications
-        vol_hdr = DEV_BROADCAST_HDR()
-        vol_hdr.dbch_size = ctypes.sizeof(DEV_BROADCAST_HDR)
-        vol_hdr.dbch_devicetype = DBT_DEVTYP_VOLUME
-        vol_hdr.dbch_reserved = 0
+        vol = DEV_BROADCAST_VOLUME()
+        vol.dbcv_size = ctypes.sizeof(DEV_BROADCAST_VOLUME)
+        vol.dbcv_devicetype = DBT_DEVTYP_VOLUME
+        vol.dbcv_reserved = 0
+        vol.dbcv_unitmask = 0
+        vol.dbcv_flags = 0
         self._volume_notify_handle = user32.RegisterDeviceNotificationW(
             self._hwnd,
-            ctypes.byref(vol_hdr),
+            ctypes.byref(vol),
             DEVICE_NOTIFY_WINDOW_HANDLE
         )
         if not self._volume_notify_handle:
