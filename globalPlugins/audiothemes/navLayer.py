@@ -236,13 +236,15 @@ class NavLayerMixin:
     @script(description="Read All.")
     def script_navLayerReadAll(self, gesture):
         self._playNavTone(1500, 40)
-        self._doNavLayerExit()
-        import inputCore
-        try:
-            gest = keyboardHandler.KeyboardInputGesture.fromName("NVDA+downArrow")
-            inputCore.manager.executeGesture(gest)
-        except LookupError:
-            pass
+        ti = getattr(api.getFocusObject(), 'treeInterceptor', None)
+        if ti and ti.isReady:
+            try:
+                gest = keyboardHandler.KeyboardInputGesture.fromName("NVDA+downArrow")
+                script = ti.getScript(gest)
+                if script:
+                    script(gest)
+            except LookupError:
+                pass
 
     @script(description="Exit navigation layer.")
     def script_navLayerExit(self, gesture):
