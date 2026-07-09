@@ -74,7 +74,7 @@ class NavLayerMixin:
             "kb:escape": "navLayerExit",
             "kb:c": "navLayerCopy",
             "kb:s": "navLayerSpell",
-            "kb:r": "navLayerReadAll"
+
         }
 
     def _loadActiveModes(self):
@@ -232,17 +232,6 @@ class NavLayerMixin:
             import speech
             speech.speakText(text)
             speech.speakSpelling(text)
-
-    @script(description="Read All.")
-    def script_navLayerReadAll(self, gesture):
-        self._playNavTone(1500, 40)
-        self._doNavLayerExit()
-        import inputCore
-        try:
-            gest = keyboardHandler.KeyboardInputGesture.fromName("NVDA+downArrow")
-            inputCore.manager.executeGesture(gest)
-        except LookupError:
-            pass
 
     @script(description="Exit navigation layer.")
     def script_navLayerExit(self, gesture):
