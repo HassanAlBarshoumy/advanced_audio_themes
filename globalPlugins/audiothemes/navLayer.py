@@ -185,6 +185,7 @@ class NavLayerMixin:
         winUser.keybd_event(ord('C'), 0, 0, 0)
         winUser.keybd_event(ord('C'), 0, winUser.KEYEVENTF_KEYUP, 0)
         winUser.keybd_event(winUser.VK_CONTROL, 0, winUser.KEYEVENTF_KEYUP, 0)
+        ui.message(_("Copied") if "_" in globals() else "Copied")
 
     @script(description="Spell current unit.")
     def script_navLayerSpell(self, gesture):
@@ -223,10 +224,8 @@ class NavLayerMixin:
                     info.expand(api.textInfos.UNIT_WORD)
                 text = info.text
             import speech
-            speech.speakText(text, symbolLevel=speech.symbolLevel.ALL)
-            import speech.spelling
-            for char in text:
-                speech.spelling.spellCharacter(char)
+            speech.speakText(text)
+            speech.speakSpelling(text)
         except Exception:
             pass
 
@@ -234,6 +233,8 @@ class NavLayerMixin:
     def script_navLayerReadAll(self, gesture):
         self._playNavTone(1500, 40)
         self._doNavLayerExit()
+        import speech
+        speech.cancelSpeech()
         try:
             import inputCore
             gest = keyboardHandler.KeyboardInputGesture.fromName("NVDA+downArrow")
