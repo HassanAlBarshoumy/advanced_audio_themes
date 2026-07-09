@@ -236,15 +236,7 @@ class NavLayerMixin:
     @script(description="Read All.")
     def script_navLayerReadAll(self, gesture):
         self._playNavTone(1500, 40)
-        ti = getattr(api.getFocusObject(), 'treeInterceptor', None)
-        if ti and ti.isReady:
-            try:
-                gest = keyboardHandler.KeyboardInputGesture.fromName("NVDA+downArrow")
-                script = ti.getScript(gest)
-                if script:
-                    script(gest)
-            except LookupError:
-                pass
+        self._sendNormalKey("NVDA+downArrow")
 
     @script(description="Exit navigation layer.")
     def script_navLayerExit(self, gesture):
@@ -261,6 +253,8 @@ class NavLayerMixin:
         if hasattr(self, '_rebindInstanceGestures'):
             self._rebindInstanceGestures()
         
+        from speech.sayAll import SayAllHandler
+        SayAllHandler.stop()
         self._playNavTone(800, 50)
         wx.CallAfter(wx.CallLater, 60, lambda: self._playNavTone(600, 50))
         ui.message(_("Exited navigation layer") if "_" in globals() else "Exited navigation layer")
@@ -280,6 +274,8 @@ class NavLayerMixin:
         try:
             inputCore.manager.executeGesture(gest)
         finally:
+            from speech.sayAll import SayAllHandler
+            SayAllHandler.stop()
             self._navLayerActive = True
             self.bindGestures(self._navLayerGestures)
 
@@ -299,6 +295,8 @@ class NavLayerMixin:
         try:
             inputCore.manager.executeGesture(gest)
         finally:
+            from speech.sayAll import SayAllHandler
+            SayAllHandler.stop()
             self._navLayerActive = True
             self.bindGestures(self._navLayerGestures)
 
