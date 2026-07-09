@@ -241,7 +241,7 @@ class NavLayerMixin:
         speech.cancelSpeech()
         try:
             import inputCore
-            gest = keyboardHandler.KeyboardInputGesture.fromName("NVDA+shift+downArrow")
+            gest = keyboardHandler.KeyboardInputGesture.fromName("NVDA+downArrow")
             inputCore.manager.executeGesture(gest)
         except LookupError:
             pass
