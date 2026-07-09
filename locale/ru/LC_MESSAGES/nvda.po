@@ -3229,3 +3229,145 @@ msgstr "Отменить последнее действие."
 
 msgid "Undone"
 msgstr "Отменено"
+
+msgid "Toggles audio ducking on and off."
+msgstr "Включает или выключает подавление звука."
+
+msgid "Toggles emoji enhancement sounds on and off."
+msgstr "Включает или выключает звуки улучшения эмодзи."
+
+msgid "Toggles app-specific audio profiles on and off."
+msgstr "Включает или выключает звуковые профили для приложений."
+
+msgid "Toggles 3D spatial audio mode on and off."
+msgstr "Включает или выключает режим 3D-пространственного звука."
+
+msgid "Toggles clipboard announcement sounds on and off."
+msgstr "Включает или выключает звуки объявлений буфера обмена."
+
+msgid "Toggles system status monitoring sounds on and off."
+msgstr "Включает или выключает звуки мониторинга состояния системы."
+
+msgid "Opens the Audio Themes Studio to create and edit themes."
+msgstr "Открывает студию звуковых тем для создания и редактирования тем."
+
+msgid "Toggles speaking of object roles on and off."
+msgstr "Включает или выключает озвучивание ролей объектов."
+
+msgid "Opens the Audio Themes settings panel."
+msgstr "Открывает панель настроек звуковых тем."
+
+msgid "Cycles the audio output mode between stereo and mono."
+msgstr "Переключает режим вывода звука между стерео и моно."
+
+msgid "Reports current system power status (battery and AC)."
+msgstr "Сообщает текущее состояние питания системы (батарея и сеть)."
+
+msgid "Audio ducking enabled"
+msgstr "Подавление звука включено"
+
+msgid "Audio ducking disabled"
+msgstr "Подавление звука отключено"
+
+msgid "Emoji sounds enabled"
+msgstr "Звуки эмодзи включены"
+
+msgid "Emoji sounds disabled"
+msgstr "Звуки эмодзи отключены"
+
+msgid "App profiles enabled"
+msgstr "Профили приложений включены"
+
+msgid "App profiles disabled"
+msgstr "Профили приложений отключены"
+
+msgid "3D audio enabled"
+msgstr "3D-звук включен"
+
+msgid "3D audio disabled"
+msgstr "3D-звук отключен"
+
+msgid "Clipboard announcements enabled"
+msgstr "Объявления буфера обмена включены"
+
+msgid "Clipboard announcements disabled"
+msgstr "Объявления буфера обмена отключены"
+
+msgid "System status sounds enabled"
+msgstr "Звуки состояния системы включены"
+
+msgid "System status sounds disabled"
+msgstr "Звуки состояния системы отключены"
+
+msgid "Speak roles enabled"
+msgstr "Озвучивание ролей включено"
+
+msgid "Speak roles disabled"
+msgstr "Озвучивание ролей отключено"
+
+msgid "Output mode: {mode}"
+msgstr "Режим вывода: {mode}"
+
+msgid "Plugged in"
+msgstr "Подключен к сети"
+
+msgid "On battery"
+msgstr "Работа от батареи"
+
+msgid "System status: {ac}, battery status unknown"
+msgstr "Состояние системы: {ac}, состояние батареи неизвестно"
+
+msgid "System status: {ac}, battery {percent}%"
+msgstr "Состояние системы: {ac}, батарея {percent}%"
+
+msgid "Unable to retrieve system power status"
+msgstr "Не удалось получить состояние питания системы"
+
+msgid "Toggle Audio Ducking"
+msgstr "Переключить подавление звука"
+
+msgid "Toggle Emoji Sounds"
+msgstr "Переключить звуки эмодзи"
+
+msgid "Toggle App Profiles"
+msgstr "Переключить профили приложений"
+
+msgid "Toggle 3D Audio"
+msgstr "Переключить 3D-звук"
+
+msgid "Speak Current URL"
+msgstr "Произнести текущий URL"
+
+msgid "Toggle Clipboard Announcements"
+msgstr "Переключить объявления буфера обмена"
+
+msgid "Toggle System Status Sounds"
+msgstr "Переключить звуки состояния системы"
+
+msgid "Open Audio Themes Studio"
+msgstr "Открыть студию звуковых тем"
+
+msgid "Toggle Speak Roles"
+msgstr "Переключить озвучивание ролей"
+
+msgid "Open Audio Themes Settings"
+msgstr "Открыть настройки звуковых тем"
+
+msgid "Toggle Output Mode (Stereo/Mono)"
+msgstr "Переключить режим вывода (стерео/моно)"
+
+msgid "Report System Power Status"
+msgstr "Сообщить состояние питания системы"
+
+msgid "Navigation Layer (arrows, s=spell, r=read all, c=copy)"
+msgstr ""
+"Слой навигации (стрелки, s=произнести по буквам, r=читать всё, c=копировать)"
+
+msgid "Spell current unit"
+msgstr "Произнести текущую единицу по буквам"
+
+msgid "Copy current unit"
+msgstr "Копировать текущую единицу"
+
+msgid "Read All"
+msgstr "Читать всё"

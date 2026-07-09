@@ -189,6 +189,8 @@ class NavLayerMixin:
     @script(description="Spell current unit.")
     def script_navLayerSpell(self, gesture):
         self._playNavTone(1500, 40)
+        if not self._activeModes:
+            self._loadActiveModes()
         mode = self._activeModes[self._navLayerModeIndex]
         obj = api.getNavigatorObject()
         if not obj:
@@ -230,8 +232,14 @@ class NavLayerMixin:
 
     @script(description="Read All.")
     def script_navLayerReadAll(self, gesture):
+        self._playNavTone(1500, 40)
         self._doNavLayerExit()
-        self._sendNormalKey("NVDA+downArrow")
+        try:
+            import inputCore
+            gest = keyboardHandler.KeyboardInputGesture.fromName("NVDA+downArrow")
+            inputCore.manager.executeGesture(gest)
+        except LookupError:
+            pass
 
     @script(description="Exit navigation layer.")
     def script_navLayerExit(self, gesture):

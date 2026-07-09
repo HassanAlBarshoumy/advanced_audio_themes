@@ -319,6 +319,18 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             "kb:a": "toggleAudioBeacon",
             "kb:r": "audioSonar",
             "kb:w": "speakObject",
+            "kb:d": "toggleAudioDucking",
+            "kb:e": "toggleEmojiSounds",
+            "kb:f": "toggleAppProfiles",
+            "kb:g": "toggle3DAudio",
+            "kb:j": "speakCurrentURL",
+            "kb:k": "toggleClipboard",
+            "kb:l": "toggleSystemStatus",
+            "kb:m": "openStudio",
+            "kb:q": "toggleSpeakRoles",
+            "kb:v": "openSettings",
+            "kb:x": "toggleOutputMode",
+            "kb:z": "reportSystemStatus",
             "kb:h": "audioThemesHelp",
         }
         self._helpDialog = None
@@ -419,7 +431,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     @script(description=_("Audio themes command layer. Press this then a command key (e.g. h for help)."), gestures=['kb:NVDA+shift+a'])
     def script_audioThemesLayer(self, gesture):
         if getattr(self, "toggling", False):
-            self.script_error(gesture)
+            self.finish()
             return
         self.bindGestures(self._audioThemesLayerGestures)
         self.toggling = True
@@ -518,42 +530,57 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     "u: " + _("Toggle Typing Sounds"),
                     "a: " + _("Toggle Audio Beacon"),
                     "r: " + _("Audio Sonar"),
-                    "w: " + _("Speak Object 3D Coordinates") + " " + _("(Plays 3D sound even if 3D mode is disabled)")
+                    "w: " + _("Speak Object 3D Coordinates") + " " + _("(Plays 3D sound even if 3D mode is disabled)"),
+                    "d: " + _("Toggle Audio Ducking"),
+                    "e: " + _("Toggle Emoji Sounds"),
+                    "f: " + _("Toggle App Profiles"),
+                    "g: " + _("Toggle 3D Audio"),
+                    "j: " + _("Speak Current URL"),
+                    "k: " + _("Toggle Clipboard Announcements"),
+                    "l: " + _("Toggle System Status Sounds"),
+                    "m: " + _("Open Audio Themes Studio"),
+                    "q: " + _("Toggle Speak Roles"),
+                    "v: " + _("Open Audio Themes Settings"),
+                    "x: " + _("Toggle Output Mode (Stereo/Mono)"),
+                    "z: " + _("Report System Power Status"),
+                    "NVDA+windows+n: " + _("Navigation Layer (arrows, s=spell, r=read all, c=copy)"),
                 ]
             )
             self._helpDialog = dlg
             if dlg.ShowModal() == wx.ID_OK:
                 sel = dlg.GetSelection()
-                if sel == 0:
-                    self.script_toggleAudioThemes(None)
-                elif sel == 1:
-                    self.script_togglePp(None)
-                elif sel == 2:
-                    self.script_nextAudioTheme(None)
-                elif sel == 3:
-                    self.script_previousAudioTheme(None)
-                elif sel == 4:
-                    self.script_increaseAudioThemesVolume(None)
-                elif sel == 5:
-                    self.script_decreaseAudioThemesVolume(None)
-                elif sel == 6:
-                    self.script_toggleStateVerbosity(None)
-                elif sel == 7:
-                    self.script_speakHeadingLevel(None)
-                elif sel == 8:
-                    self.script_rotateSpeechOrder(None)
-                elif sel == 9:
-                    self.script_cycleAudioThemes(None)
-                elif sel == 10:
-                    self.script_cycleTypingSounds(None)
-                elif sel == 11:
-                    self.script_toggleTypingSounds(None)
-                elif sel == 12:
-                    self.script_toggleAudioBeacon(None)
-                elif sel == 13:
-                    self.script_audioSonar(None)
-                elif sel == 14:
-                    self.script_speakObject(None)
+                cmds = [
+                    self.script_toggleAudioThemes,
+                    self.script_togglePp,
+                    self.script_nextAudioTheme,
+                    self.script_previousAudioTheme,
+                    self.script_increaseAudioThemesVolume,
+                    self.script_decreaseAudioThemesVolume,
+                    self.script_toggleStateVerbosity,
+                    self.script_speakHeadingLevel,
+                    self.script_rotateSpeechOrder,
+                    self.script_cycleAudioThemes,
+                    self.script_cycleTypingSounds,
+                    self.script_toggleTypingSounds,
+                    self.script_toggleAudioBeacon,
+                    self.script_audioSonar,
+                    self.script_speakObject,
+                    self.script_toggleAudioDucking,
+                    self.script_toggleEmojiSounds,
+                    self.script_toggleAppProfiles,
+                    self.script_toggle3DAudio,
+                    self.script_speakCurrentURL,
+                    self.script_toggleClipboard,
+                    self.script_toggleSystemStatus,
+                    self.script_openStudio,
+                    self.script_toggleSpeakRoles,
+                    self.script_openSettings,
+                    self.script_toggleOutputMode,
+                    self.script_reportSystemStatus,
+                    self.script_navigationLayer,
+                ]
+                if 0 <= sel < len(cmds):
+                    cmds[sel](None)
             dlg.Destroy()
             self._helpDialog = None
             self._helpPending = False
@@ -1487,6 +1514,117 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     except:
                         pass
         utils.threadPool.add_task(sweep)
+
+    @script(description=_("Toggles audio ducking on and off."))
+    def script_toggleAudioDucking(self, gesture):
+        enabled = not config.conf["audiothemes"]["audio_ducking_enabled"]
+        config.conf["audiothemes"]["audio_ducking_enabled"] = enabled
+        ui.message(_("Audio ducking enabled") if enabled else _("Audio ducking disabled"))
+
+    @script(description=_("Toggles emoji enhancement sounds on and off."))
+    def script_toggleEmojiSounds(self, gesture):
+        enabled = not config.conf["audiothemes"]["emoji_enabled"]
+        config.conf["audiothemes"]["emoji_enabled"] = enabled
+        ui.message(_("Emoji sounds enabled") if enabled else _("Emoji sounds disabled"))
+
+    @script(description=_("Toggles app-specific audio profiles on and off."))
+    def script_toggleAppProfiles(self, gesture):
+        enabled = not config.conf["audiothemes"]["app_profiles_enabled"]
+        config.conf["audiothemes"]["app_profiles_enabled"] = enabled
+        ui.message(_("App profiles enabled") if enabled else _("App profiles disabled"))
+
+    @script(description=_("Toggles 3D spatial audio mode on and off."))
+    def script_toggle3DAudio(self, gesture):
+        enabled = not config.conf["audiothemes"]["audio3d"]
+        config.conf["audiothemes"]["audio3d"] = enabled
+        self.handler.configure()
+        ui.message(_("3D audio enabled") if enabled else _("3D audio disabled"))
+
+    @script(description=_("Toggles clipboard announcement sounds on and off."))
+    def script_toggleClipboard(self, gesture):
+        enabled = not config.conf["audiothemes"]["clipboard_enabled"]
+        config.conf["audiothemes"]["clipboard_enabled"] = enabled
+        ui.message(_("Clipboard announcements enabled") if enabled else _("Clipboard announcements disabled"))
+
+    @script(description=_("Toggles system status monitoring sounds on and off."))
+    def script_toggleSystemStatus(self, gesture):
+        enabled = not config.conf["audiothemes"]["sys_status_enabled"]
+        config.conf["audiothemes"]["sys_status_enabled"] = enabled
+        ui.message(_("System status sounds enabled") if enabled else _("System status sounds disabled"))
+
+    @script(description=_("Opens the Audio Themes Studio to create and edit themes."))
+    def script_openStudio(self, gesture):
+        if self._studioDialog is not None:
+            try:
+                self._studioDialog.Raise()
+                return
+            except Exception:
+                self._studioDialog = None
+        from .studio import AudioThemesStudioStartupDialog
+        import wx
+        with AudioThemesStudioStartupDialog(self, _("Audio Themes Studio")) as dlg:
+            self._studioDialog = dlg
+            dlg.Raise()
+            dlg.ShowModal()
+        self._studioDialog = None
+
+    @script(description=_("Toggles speaking of object roles on and off."))
+    def script_toggleSpeakRoles(self, gesture):
+        enabled = not config.conf["audiothemes"]["speak_roles"]
+        config.conf["audiothemes"]["speak_roles"] = enabled
+        self.handler.configure()
+        ui.message(_("Speak roles enabled") if enabled else _("Speak roles disabled"))
+
+    @script(description=_("Opens the Audio Themes settings panel."))
+    def script_openSettings(self, gesture):
+        import wx
+        from gui import mainFrame
+        def do_open():
+            try:
+                if hasattr(mainFrame, "popupSettingsDialog"):
+                    mainFrame.popupSettingsDialog(AudioThemesSettingsPanel)
+                else:
+                    mainFrame._popupSettingsDialog(AudioThemesSettingsPanel)
+            except Exception as e:
+                from logHandler import log
+                log.error(f"Failed to open Audio Themes settings: {e}", exc_info=True)
+                ui.message(_("Failed to open settings. Please open through NVDA Preferences."))
+        wx.CallAfter(do_open)
+
+    @script(description=_("Cycles the audio output mode between stereo and mono."))
+    def script_toggleOutputMode(self, gesture):
+        current = config.conf["audiothemes"]["output_mode"]
+        new_mode = "mono" if current == "stereo" else "stereo"
+        config.conf["audiothemes"]["output_mode"] = new_mode
+        self.handler.configure()
+        ui.message(_("Output mode: {mode}").format(mode=new_mode))
+
+    @script(description=_("Reports current system power status (battery and AC)."))
+    def script_reportSystemStatus(self, gesture):
+        try:
+            import ctypes
+            class SYSTEM_POWER_STATUS(ctypes.Structure):
+                _fields_ = [
+                    ("ACLineStatus", ctypes.c_byte),
+                    ("BatteryFlag", ctypes.c_byte),
+                    ("BatteryLifePercent", ctypes.c_byte),
+                    ("Reserved1", ctypes.c_byte),
+                    ("BatteryLifeTime", ctypes.wintypes.DWORD),
+                    ("BatteryFullLifeTime", ctypes.wintypes.DWORD),
+                ]
+            sps = SYSTEM_POWER_STATUS()
+            ret = ctypes.windll.kernel32.GetSystemPowerStatus(ctypes.byref(sps))
+            if ret:
+                ac = _("Plugged in") if sps.ACLineStatus == 1 else _("On battery")
+                if sps.BatteryLifePercent == 255:
+                    msg = _("System status: {ac}, battery status unknown").format(ac=ac)
+                else:
+                    msg = _("System status: {ac}, battery {percent}%").format(ac=ac, percent=sps.BatteryLifePercent)
+                ui.message(msg)
+            else:
+                ui.message(_("Unable to retrieve system power status"))
+        except Exception:
+            ui.message(_("Unable to retrieve system power status"))
 
     # ────────────────────────────────────────────────
     # SentenceNav scripts are inherited from SentenceNavMixin:

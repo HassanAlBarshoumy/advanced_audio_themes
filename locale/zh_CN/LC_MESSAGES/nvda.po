@@ -3189,3 +3189,144 @@ msgstr "撤销上一个操作。"
 
 msgid "Undone"
 msgstr "已撤销"
+
+msgid "Toggles audio ducking on and off."
+msgstr "切换音频闪避功能的开与关。"
+
+msgid "Toggles emoji enhancement sounds on and off."
+msgstr "切换表情符号增强音效的开与关。"
+
+msgid "Toggles app-specific audio profiles on and off."
+msgstr "切换特定应用程序音频配置文件的开关。"
+
+msgid "Toggles 3D spatial audio mode on and off."
+msgstr "切换3D空间音频模式的开关。"
+
+msgid "Toggles clipboard announcement sounds on and off."
+msgstr "切换剪贴板通知音效的开关。"
+
+msgid "Toggles system status monitoring sounds on and off."
+msgstr "切换系统状态监控音效的开关。"
+
+msgid "Opens the Audio Themes Studio to create and edit themes."
+msgstr "打开音频主题工作室以创建和编辑主题。"
+
+msgid "Toggles speaking of object roles on and off."
+msgstr "切换朗读对象角色的开关。"
+
+msgid "Opens the Audio Themes settings panel."
+msgstr "打开音频主题设置面板。"
+
+msgid "Cycles the audio output mode between stereo and mono."
+msgstr "在立体声和单声道之间循环切换音频输出模式。"
+
+msgid "Reports current system power status (battery and AC)."
+msgstr "报告当前系统电源状态（电池和交流电）。"
+
+msgid "Audio ducking enabled"
+msgstr "音频闪避已启用"
+
+msgid "Audio ducking disabled"
+msgstr "音频闪避已禁用"
+
+msgid "Emoji sounds enabled"
+msgstr "表情符号音效已启用"
+
+msgid "Emoji sounds disabled"
+msgstr "表情符号音效已禁用"
+
+msgid "App profiles enabled"
+msgstr "应用程序配置文件已启用"
+
+msgid "App profiles disabled"
+msgstr "应用程序配置文件已禁用"
+
+msgid "3D audio enabled"
+msgstr "3D音频已启用"
+
+msgid "3D audio disabled"
+msgstr "3D音频已禁用"
+
+msgid "Clipboard announcements enabled"
+msgstr "剪贴板通知已启用"
+
+msgid "Clipboard announcements disabled"
+msgstr "剪贴板通知已禁用"
+
+msgid "System status sounds enabled"
+msgstr "系统状态音效已启用"
+
+msgid "System status sounds disabled"
+msgstr "系统状态音效已禁用"
+
+msgid "Speak roles enabled"
+msgstr "朗读角色已启用"
+
+msgid "Speak roles disabled"
+msgstr "朗读角色已禁用"
+
+msgid "Output mode: {mode}"
+msgstr "输出模式：{mode}"
+
+msgid "Plugged in"
+msgstr "已接通电源"
+
+msgid "On battery"
+msgstr "使用电池"
+
+msgid "System status: {ac}, battery status unknown"
+msgstr "系统状态：{ac}，电池状态未知"
+
+msgid "System status: {ac}, battery {percent}%"
+msgstr "系统状态：{ac}，电池{percent}%"
+
+msgid "Unable to retrieve system power status"
+msgstr "无法获取系统电源状态"
+
+msgid "Toggle Audio Ducking"
+msgstr "切换音频闪避"
+
+msgid "Toggle Emoji Sounds"
+msgstr "切换表情符号音效"
+
+msgid "Toggle App Profiles"
+msgstr "切换应用程序配置文件"
+
+msgid "Toggle 3D Audio"
+msgstr "切换3D音频"
+
+msgid "Speak Current URL"
+msgstr "朗读当前URL"
+
+msgid "Toggle Clipboard Announcements"
+msgstr "切换剪贴板通知"
+
+msgid "Toggle System Status Sounds"
+msgstr "切换系统状态音效"
+
+msgid "Open Audio Themes Studio"
+msgstr "打开音频主题工作室"
+
+msgid "Toggle Speak Roles"
+msgstr "切换朗读角色"
+
+msgid "Open Audio Themes Settings"
+msgstr "打开音频主题设置"
+
+msgid "Toggle Output Mode (Stereo/Mono)"
+msgstr "切换输出模式（立体声/单声道）"
+
+msgid "Report System Power Status"
+msgstr "报告系统电源状态"
+
+msgid "Navigation Layer (arrows, s=spell, r=read all, c=copy)"
+msgstr "导航层（方向键，s=拼读，r=朗读全部，c=复制）"
+
+msgid "Spell current unit"
+msgstr "拼读当前单元"
+
+msgid "Copy current unit"
+msgstr "复制当前单元"
+
+msgid "Read All"
+msgstr "朗读全部"

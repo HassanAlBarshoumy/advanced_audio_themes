@@ -2458,3 +2458,144 @@ msgstr ""
 
 msgid "Emoji repeat mode"
 msgstr ""
+
+msgid "Toggles audio ducking on and off."
+msgstr ""
+
+msgid "Toggles emoji enhancement sounds on and off."
+msgstr ""
+
+msgid "Toggles app-specific audio profiles on and off."
+msgstr ""
+
+msgid "Toggles 3D spatial audio mode on and off."
+msgstr ""
+
+msgid "Toggles clipboard announcement sounds on and off."
+msgstr ""
+
+msgid "Toggles system status monitoring sounds on and off."
+msgstr ""
+
+msgid "Opens the Audio Themes Studio to create and edit themes."
+msgstr ""
+
+msgid "Toggles speaking of object roles on and off."
+msgstr ""
+
+msgid "Opens the Audio Themes settings panel."
+msgstr ""
+
+msgid "Cycles the audio output mode between stereo and mono."
+msgstr ""
+
+msgid "Reports current system power status (battery and AC)."
+msgstr ""
+
+msgid "Audio ducking enabled"
+msgstr ""
+
+msgid "Audio ducking disabled"
+msgstr ""
+
+msgid "Emoji sounds enabled"
+msgstr ""
+
+msgid "Emoji sounds disabled"
+msgstr ""
+
+msgid "App profiles enabled"
+msgstr ""
+
+msgid "App profiles disabled"
+msgstr ""
+
+msgid "3D audio enabled"
+msgstr ""
+
+msgid "3D audio disabled"
+msgstr ""
+
+msgid "Clipboard announcements enabled"
+msgstr ""
+
+msgid "Clipboard announcements disabled"
+msgstr ""
+
+msgid "System status sounds enabled"
+msgstr ""
+
+msgid "System status sounds disabled"
+msgstr ""
+
+msgid "Speak roles enabled"
+msgstr ""
+
+msgid "Speak roles disabled"
+msgstr ""
+
+msgid "Output mode: {mode}"
+msgstr ""
+
+msgid "Plugged in"
+msgstr ""
+
+msgid "On battery"
+msgstr ""
+
+msgid "System status: {ac}, battery status unknown"
+msgstr ""
+
+msgid "System status: {ac}, battery {percent}%"
+msgstr ""
+
+msgid "Unable to retrieve system power status"
+msgstr ""
+
+msgid "Toggle Audio Ducking"
+msgstr ""
+
+msgid "Toggle Emoji Sounds"
+msgstr ""
+
+msgid "Toggle App Profiles"
+msgstr ""
+
+msgid "Toggle 3D Audio"
+msgstr ""
+
+msgid "Speak Current URL"
+msgstr ""
+
+msgid "Toggle Clipboard Announcements"
+msgstr ""
+
+msgid "Toggle System Status Sounds"
+msgstr ""
+
+msgid "Open Audio Themes Studio"
+msgstr ""
+
+msgid "Toggle Speak Roles"
+msgstr ""
+
+msgid "Open Audio Themes Settings"
+msgstr ""
+
+msgid "Toggle Output Mode (Stereo/Mono)"
+msgstr ""
+
+msgid "Report System Power Status"
+msgstr ""
+
+msgid "Navigation Layer (arrows, s=spell, r=read all, c=copy)"
+msgstr ""
+
+msgid "Spell current unit"
+msgstr ""
+
+msgid "Copy current unit"
+msgstr ""
+
+msgid "Read All"
+msgstr ""

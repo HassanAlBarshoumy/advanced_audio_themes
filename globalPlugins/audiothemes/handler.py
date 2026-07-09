@@ -95,6 +95,7 @@ audiothemes_config_defaults = {
     "announceFormat": "string(default='0')",
     "roleAnnounceFormats": "string(default='{\"5\": \"sc\"}')",
     "app_profiles": "string(default='{}')",
+    "app_profiles_enabled": "boolean(default=True)",
     "navLayerPassThrough": "boolean(default=True)",
     "navLayerTimeout": "boolean(default=True)",
     "navLayerPlaySounds": "boolean(default=True)",
@@ -989,7 +990,7 @@ class AudioThemesHandler:
 
     def get_theme_for_app(self, app_name):
         with self._config_lock:
-            if not app_name:
+            if not app_name or not config.conf["audiothemes"]["app_profiles_enabled"]:
                 return self.active_theme
             app_name = app_name.lower()
             profile = self._app_profiles_cache.get(app_name)
@@ -1079,7 +1080,7 @@ class AudioThemesHandler:
     def get_typing_pack_for_app(self, app_name):
         with self._config_lock:
             global_pack = config.conf["audiothemes"].get("typing_sound_pack", "1blueSwitch")
-            if not app_name:
+            if not app_name or not config.conf["audiothemes"]["app_profiles_enabled"]:
                 return global_pack
             app_name = app_name.lower()
             profile = self._app_profiles_cache.get(app_name)

@@ -3252,3 +3252,144 @@ msgstr "Annulla l'ultima azione."
 
 msgid "Undone"
 msgstr "Annullato"
+
+msgid "Toggles audio ducking on and off."
+msgstr "Attiva o disattiva l'abbassamento audio."
+
+msgid "Toggles emoji enhancement sounds on and off."
+msgstr "Attiva o disattiva i suoni di miglioramento delle emoji."
+
+msgid "Toggles app-specific audio profiles on and off."
+msgstr "Attiva o disattiva i profili audio specifici per app."
+
+msgid "Toggles 3D spatial audio mode on and off."
+msgstr "Attiva o disattiva la modalità audio spaziale 3D."
+
+msgid "Toggles clipboard announcement sounds on and off."
+msgstr "Attiva o disattiva i suoni di annuncio degli appunti."
+
+msgid "Toggles system status monitoring sounds on and off."
+msgstr "Attiva o disattiva i suoni di monitoraggio dello stato del sistema."
+
+msgid "Opens the Audio Themes Studio to create and edit themes."
+msgstr "Apre lo Studio Temi Audio per creare e modificare temi."
+
+msgid "Toggles speaking of object roles on and off."
+msgstr "Attiva o disattiva la pronuncia dei ruoli degli oggetti."
+
+msgid "Opens the Audio Themes settings panel."
+msgstr "Apre il pannello delle impostazioni dei Temi Audio."
+
+msgid "Cycles the audio output mode between stereo and mono."
+msgstr "Alterna la modalità di uscita audio tra stereo e mono."
+
+msgid "Reports current system power status (battery and AC)."
+msgstr "Segnala lo stato di alimentazione del sistema (batteria e CA)."
+
+msgid "Audio ducking enabled"
+msgstr "Abbassamento audio attivato"
+
+msgid "Audio ducking disabled"
+msgstr "Abbassamento audio disattivato"
+
+msgid "Emoji sounds enabled"
+msgstr "Suoni emoji attivati"
+
+msgid "Emoji sounds disabled"
+msgstr "Suoni emoji disattivati"
+
+msgid "App profiles enabled"
+msgstr "Profili app attivati"
+
+msgid "App profiles disabled"
+msgstr "Profili app disattivati"
+
+msgid "3D audio enabled"
+msgstr "Audio 3D attivato"
+
+msgid "3D audio disabled"
+msgstr "Audio 3D disattivato"
+
+msgid "Clipboard announcements enabled"
+msgstr "Annunci appunti attivati"
+
+msgid "Clipboard announcements disabled"
+msgstr "Annunci appunti disattivati"
+
+msgid "System status sounds enabled"
+msgstr "Suoni stato sistema attivati"
+
+msgid "System status sounds disabled"
+msgstr "Suoni stato sistema disattivati"
+
+msgid "Speak roles enabled"
+msgstr "Pronuncia ruoli attivata"
+
+msgid "Speak roles disabled"
+msgstr "Pronuncia ruoli disattivata"
+
+msgid "Output mode: {mode}"
+msgstr "Modalità di uscita: {mode}"
+
+msgid "Plugged in"
+msgstr "Collegato alla rete elettrica"
+
+msgid "On battery"
+msgstr "Alimentazione a batteria"
+
+msgid "System status: {ac}, battery status unknown"
+msgstr "Stato sistema: {ac}, stato batteria sconosciuto"
+
+msgid "System status: {ac}, battery {percent}%"
+msgstr "Stato sistema: {ac}, batteria {percent}%"
+
+msgid "Unable to retrieve system power status"
+msgstr "Impossibile recuperare lo stato di alimentazione del sistema"
+
+msgid "Toggle Audio Ducking"
+msgstr "Attiva/disattiva abbassamento audio"
+
+msgid "Toggle Emoji Sounds"
+msgstr "Attiva/disattiva suoni emoji"
+
+msgid "Toggle App Profiles"
+msgstr "Attiva/disattiva profili app"
+
+msgid "Toggle 3D Audio"
+msgstr "Attiva/disattiva audio 3D"
+
+msgid "Speak Current URL"
+msgstr "Pronuncia URL corrente"
+
+msgid "Toggle Clipboard Announcements"
+msgstr "Attiva/disattiva annunci appunti"
+
+msgid "Toggle System Status Sounds"
+msgstr "Attiva/disattiva suoni stato sistema"
+
+msgid "Open Audio Themes Studio"
+msgstr "Apri lo Studio Temi Audio"
+
+msgid "Toggle Speak Roles"
+msgstr "Attiva/disattiva pronuncia ruoli"
+
+msgid "Open Audio Themes Settings"
+msgstr "Apri impostazioni Temi Audio"
+
+msgid "Toggle Output Mode (Stereo/Mono)"
+msgstr "Attiva/disattiva modalità uscita (stereo/mono)"
+
+msgid "Report System Power Status"
+msgstr "Segnala stato alimentazione sistema"
+
+msgid "Navigation Layer (arrows, s=spell, r=read all, c=copy)"
+msgstr "Livello di navigazione (frecce, s=compitare, r=leggi tutto, c=copia)"
+
+msgid "Spell current unit"
+msgstr "Compitare l'unità corrente"
+
+msgid "Copy current unit"
+msgstr "Copia l'unità corrente"
+
+msgid "Read All"
+msgstr "Leggi tutto"

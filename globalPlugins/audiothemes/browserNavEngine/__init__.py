@@ -59,6 +59,9 @@ import winUser
 import wx
 from wx.stc import StyledTextCtrl
 
+# Reference to the active Audio Themes GlobalPlugin for layer interception
+_activeAudioThemesPlugin = None
+
 from . addonConfig import *
 from . beeper import *
 from . import quickJump
@@ -370,6 +373,30 @@ def preExecuteGesture(selfself, gesture, *args, **kwargs):
         # Block this keystroke!
         blockBeeper.fancyBeep("DG#", length=100, left=50, right=50)
         return
+    
+    # Audio Themes Layer: intercept before browse mode consumes single-letter keys
+    gp = _activeAudioThemesPlugin
+    if gp is not None and isinstance(gesture, keyboardHandler.KeyboardInputGesture):
+        if getattr(gp, 'toggling', False):
+            layer_gestures = getattr(gp, '_audioThemesLayerGestures', {})
+            for ident in gesture.normalizedIdentifiers:
+                if ident in layer_gestures:
+                    script = gp.getScript(gesture)
+                    if script:
+                        script(gesture)
+                        return
+                    break
+        # Navigation Layer: intercept before browse mode consumes arrow/letter keys
+        if getattr(gp, '_navLayerActive', False):
+            nav_gestures = getattr(gp, '_navLayerGestures', {})
+            for ident in gesture.normalizedIdentifiers:
+                if ident in nav_gestures:
+                    script = gp.getScript(gesture)
+                    if script:
+                        script(gesture)
+                        return
+                    break
+    
     return originalExecuteGesture(selfself, gesture, *args, **kwargs)
 
 def blockAllKeys(timeoutSeconds):
@@ -727,6 +754,8 @@ class BrowserNavMixin:
 
     def initBrowserNav(self):
         """Call from the main GlobalPlugin.__init__ to wire up BrowserNav."""
+        global _activeAudioThemesPlugin
+        _activeAudioThemesPlugin = self
         self.injectBrowseModeKeystrokes()
         self.lastJupyterText = ""
         global originalExecuteGesture, originalCaretMovementScriptHelper, originalQuickNavScript, originalTableScriptHelper, original_set_selection
@@ -770,6 +799,8 @@ class BrowserNavMixin:
 
     def terminateBrowserNav(self):
         """Call from the main GlobalPlugin.terminate to restore BrowserNav patches."""
+        global _activeAudioThemesPlugin
+        _activeAudioThemesPlugin = None
         from contextlib import suppress
         cursorManager.CursorManager._caretMovementScriptHelper = originalCaretMovementScriptHelper
         inputCore.InputManager.executeGesture = originalExecuteGesture

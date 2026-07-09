@@ -3260,3 +3260,145 @@ msgstr "Letzte Aktion rückgängig machen."
 
 msgid "Undone"
 msgstr "Rückgängig gemacht"
+
+msgid "Toggles audio ducking on and off."
+msgstr "Schaltet die Audio-Ducking-Funktion ein oder aus."
+
+msgid "Toggles emoji enhancement sounds on and off."
+msgstr "Schaltet die Emoji-Verbesserungstöne ein oder aus."
+
+msgid "Toggles app-specific audio profiles on and off."
+msgstr "Schaltet anwendungsspezifische Audioprofile ein oder aus."
+
+msgid "Toggles 3D spatial audio mode on and off."
+msgstr "Schaltet den 3D-Raumklangmodus ein oder aus."
+
+msgid "Toggles clipboard announcement sounds on and off."
+msgstr "Schaltet die Zwischenablage-Ansagetöne ein oder aus."
+
+msgid "Toggles system status monitoring sounds on and off."
+msgstr "Schaltet die Systemstatus-Überwachungstöne ein oder aus."
+
+msgid "Opens the Audio Themes Studio to create and edit themes."
+msgstr ""
+"Öffnet das Audio Themes Studio zum Erstellen und Bearbeiten von Designs."
+
+msgid "Toggles speaking of object roles on and off."
+msgstr "Schaltet das Ansagen von Objektrollen ein oder aus."
+
+msgid "Opens the Audio Themes settings panel."
+msgstr "Öffnet das Einstellungsfenster für Audio-Designs."
+
+msgid "Cycles the audio output mode between stereo and mono."
+msgstr "Schaltet den Audioausgabemodus zwischen Stereo und Mono um."
+
+msgid "Reports current system power status (battery and AC)."
+msgstr "Meldet den aktuellen Systemstromstatus (Akku und Netzteil)."
+
+msgid "Audio ducking enabled"
+msgstr "Audio-Ducking aktiviert"
+
+msgid "Audio ducking disabled"
+msgstr "Audio-Ducking deaktiviert"
+
+msgid "Emoji sounds enabled"
+msgstr "Emoji-Töne aktiviert"
+
+msgid "Emoji sounds disabled"
+msgstr "Emoji-Töne deaktiviert"
+
+msgid "App profiles enabled"
+msgstr "App-Profile aktiviert"
+
+msgid "App profiles disabled"
+msgstr "App-Profile deaktiviert"
+
+msgid "3D audio enabled"
+msgstr "3D-Audio aktiviert"
+
+msgid "3D audio disabled"
+msgstr "3D-Audio deaktiviert"
+
+msgid "Clipboard announcements enabled"
+msgstr "Zwischenablage-Ansagen aktiviert"
+
+msgid "Clipboard announcements disabled"
+msgstr "Zwischenablage-Ansagen deaktiviert"
+
+msgid "System status sounds enabled"
+msgstr "Systemstatus-Töne aktiviert"
+
+msgid "System status sounds disabled"
+msgstr "Systemstatus-Töne deaktiviert"
+
+msgid "Speak roles enabled"
+msgstr "Rollenansage aktiviert"
+
+msgid "Speak roles disabled"
+msgstr "Rollenansage deaktiviert"
+
+msgid "Output mode: {mode}"
+msgstr "Ausgabemodus: {mode}"
+
+msgid "Plugged in"
+msgstr "Netzbetrieb"
+
+msgid "On battery"
+msgstr "Akubetrieb"
+
+msgid "System status: {ac}, battery status unknown"
+msgstr "Systemstatus: {ac}, Akkustatus unbekannt"
+
+msgid "System status: {ac}, battery {percent}%"
+msgstr "Systemstatus: {ac}, Akku {percent}%"
+
+msgid "Unable to retrieve system power status"
+msgstr "Systemstromstatus kann nicht abgerufen werden"
+
+msgid "Toggle Audio Ducking"
+msgstr "Audio-Ducking umschalten"
+
+msgid "Toggle Emoji Sounds"
+msgstr "Emoji-Töne umschalten"
+
+msgid "Toggle App Profiles"
+msgstr "App-Profile umschalten"
+
+msgid "Toggle 3D Audio"
+msgstr "3D-Audio umschalten"
+
+msgid "Speak Current URL"
+msgstr "Aktuelle URL ansagen"
+
+msgid "Toggle Clipboard Announcements"
+msgstr "Zwischenablage-Ansagen umschalten"
+
+msgid "Toggle System Status Sounds"
+msgstr "Systemstatus-Töne umschalten"
+
+msgid "Open Audio Themes Studio"
+msgstr "Audio Themes Studio öffnen"
+
+msgid "Toggle Speak Roles"
+msgstr "Rollenansage umschalten"
+
+msgid "Open Audio Themes Settings"
+msgstr "Audio Themes Einstellungen öffnen"
+
+msgid "Toggle Output Mode (Stereo/Mono)"
+msgstr "Ausgabemodus umschalten (Stereo/Mono)"
+
+msgid "Report System Power Status"
+msgstr "Systemstromstatus melden"
+
+msgid "Navigation Layer (arrows, s=spell, r=read all, c=copy)"
+msgstr "Navigationsebene (Pfeile, s=Buchstabieren, r=Alles lesen, c=Kopieren)"
+
+msgid "Spell current unit"
+msgstr "Aktuelle Einheit buchstabieren"
+
+msgid "Copy current unit"
+msgstr "Aktuelle Einheit kopieren"
+
+msgid "Read All"
+msgstr "Alles lesen"

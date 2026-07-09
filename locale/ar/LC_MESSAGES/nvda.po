@@ -3515,3 +3515,144 @@ msgstr "تراجع عن آخر إجراء."
 
 msgid "Undone"
 msgstr "تم التراجع"
+
+msgid "Toggles audio ducking on and off."
+msgstr "يقوم بتشغيل أو إيقاف خاصية خفض الصوت."
+
+msgid "Toggles emoji enhancement sounds on and off."
+msgstr "يقوم بتشغيل أو إيقاف أصوات تحسين الرموز التعبيرية."
+
+msgid "Toggles app-specific audio profiles on and off."
+msgstr "يقوم بتشغيل أو إيقاف ملفات الصوت الخاصة بالتطبيقات."
+
+msgid "Toggles 3D spatial audio mode on and off."
+msgstr "يقوم بتشغيل أو إيقاف وضع الصوت المكاني ثلاثي الأبعاد."
+
+msgid "Toggles clipboard announcement sounds on and off."
+msgstr "يقوم بتشغيل أو إيقاف أصوات الإعلان عن الحافظة."
+
+msgid "Toggles system status monitoring sounds on and off."
+msgstr "يقوم بتشغيل أو إيقاف أصوات مراقبة حالة النظام."
+
+msgid "Opens the Audio Themes Studio to create and edit themes."
+msgstr "يفتح استوديو السمات الصوتية لإنشاء وتحرير السمات."
+
+msgid "Toggles speaking of object roles on and off."
+msgstr "يقوم بتشغيل أو إيقاف نطق أدوار الكائنات."
+
+msgid "Opens the Audio Themes settings panel."
+msgstr "يفتح لوحة إعدادات السمات الصوتية."
+
+msgid "Cycles the audio output mode between stereo and mono."
+msgstr "يقوم بالتبديل بين وضعي الصوت ستيريو وأحادي."
+
+msgid "Reports current system power status (battery and AC)."
+msgstr "الإبلاغ عن حالة طاقة النظام الحالية (البطارية والتيار الكهربائي)."
+
+msgid "Audio ducking enabled"
+msgstr "تم تمكين خفض الصوت"
+
+msgid "Audio ducking disabled"
+msgstr "تم تعطيل خفض الصوت"
+
+msgid "Emoji sounds enabled"
+msgstr "تم تمكين أصوات الرموز التعبيرية"
+
+msgid "Emoji sounds disabled"
+msgstr "تم تعطيل أصوات الرموز التعبيرية"
+
+msgid "App profiles enabled"
+msgstr "تم تمكين ملفات التطبيقات"
+
+msgid "App profiles disabled"
+msgstr "تم تعطيل ملفات التطبيقات"
+
+msgid "3D audio enabled"
+msgstr "تم تمكين الصوت ثلاثي الأبعاد"
+
+msgid "3D audio disabled"
+msgstr "تم تعطيل الصوت ثلاثي الأبعاد"
+
+msgid "Clipboard announcements enabled"
+msgstr "تم تمكين إعلانات الحافظة"
+
+msgid "Clipboard announcements disabled"
+msgstr "تم تعطيل إعلانات الحافظة"
+
+msgid "System status sounds enabled"
+msgstr "تم تمكين أصوات حالة النظام"
+
+msgid "System status sounds disabled"
+msgstr "تم تعطيل أصوات حالة النظام"
+
+msgid "Speak roles enabled"
+msgstr "تم تمكين نطق الأدوار"
+
+msgid "Speak roles disabled"
+msgstr "تم تعطيل نطق الأدوار"
+
+msgid "Output mode: {mode}"
+msgstr "وضع الإخراج: {mode}"
+
+msgid "Plugged in"
+msgstr "موصل بالتيار الكهربائي"
+
+msgid "On battery"
+msgstr "يعمل على البطارية"
+
+msgid "System status: {ac}, battery status unknown"
+msgstr "حالة النظام: {ac}، حالة البطارية غير معروفة"
+
+msgid "System status: {ac}, battery {percent}%"
+msgstr "حالة النظام: {ac}، البطارية {percent}%"
+
+msgid "Unable to retrieve system power status"
+msgstr "غير قادر على استرداد حالة طاقة النظام"
+
+msgid "Toggle Audio Ducking"
+msgstr "تبديل خفض الصوت"
+
+msgid "Toggle Emoji Sounds"
+msgstr "تبديل أصوات الرموز التعبيرية"
+
+msgid "Toggle App Profiles"
+msgstr "تبديل ملفات التطبيقات"
+
+msgid "Toggle 3D Audio"
+msgstr "تبديل الصوت ثلاثي الأبعاد"
+
+msgid "Speak Current URL"
+msgstr "نطق عنوان URL الحالي"
+
+msgid "Toggle Clipboard Announcements"
+msgstr "تبديل إعلانات الحافظة"
+
+msgid "Toggle System Status Sounds"
+msgstr "تبديل أصوات حالة النظام"
+
+msgid "Open Audio Themes Studio"
+msgstr "فتح استوديو السمات الصوتية"
+
+msgid "Toggle Speak Roles"
+msgstr "تبديل نطق الأدوار"
+
+msgid "Open Audio Themes Settings"
+msgstr "فتح إعدادات السمات الصوتية"
+
+msgid "Toggle Output Mode (Stereo/Mono)"
+msgstr "تبديل وضع الإخراج (ستيريو/أحادي)"
+
+msgid "Report System Power Status"
+msgstr "الإبلاغ عن حالة طاقة النظام"
+
+msgid "Navigation Layer (arrows, s=spell, r=read all, c=copy)"
+msgstr "طبقة التنقل (أسهم، s=تهجئة، r=قراءة الكل، c=نسخ)"
+
+msgid "Spell current unit"
+msgstr "تهجئة الوحدة الحالية"
+
+msgid "Copy current unit"
+msgstr "نسخ الوحدة الحالية"
+
+msgid "Read All"
+msgstr "قراءة الكل"
