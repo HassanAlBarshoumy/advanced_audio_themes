@@ -54,12 +54,10 @@ a:focus, a:hover {outline: solid}
 <li><strong>Advanced Navigation:</strong> Integrated SentenceNav and BrowserNav engines for seamless text and web navigation without conflicting arrow keys.</li>
 <li><strong>Navigation Layer:</strong> Press NVDA+Win+N to enter a fast navigation mode where arrow keys move by sentences, paragraphs, or other elements without holding modifiers.</li>
 <li><strong>Cloud Theme Store:</strong> Download, preview, and install community-created themes directly from within the Audio Themes Studio.</li>
-<li>
-<p><strong>App-Specific Profiles:</strong> Automatically switch to a specific audio theme and typing sound pack based on the active application.</p>
-</li>
-<li>
-<p><strong>System Status Sounds:</strong> Plays audio cues for system-level events such as AC power changes, battery status, USB device connection, and network connectivity.</p>
-</li>
+<li><strong>App-Specific Profiles:</strong> Automatically switch to a specific audio theme and typing sound pack based on the active application.</li>
+<li><strong>System Status Sounds:</strong> Plays audio cues for system-level events such as AC power changes, battery status, USB device connection, and network connectivity.</li>
+<li><strong>Emoji Enhancement:</strong> Full emoji detection engine with CLDR-based categorization (9 categories), customizable sounds per category, speech prefix/suffix insertion, and per-emoji or per-block repeat modes.</li>
+<li><strong>Clipboard Announcements:</strong> Audio and speech feedback for clipboard operations (Copy, Cut, Paste, Select All, Undo, Redo, Paste Plain Text) with per-action customization and configurable delay.</li>
 </ul>
 <h2>Development &amp; Credits</h2>
 <p>The development and consolidation of this add-on began in early May (specifically May 3, 2026) exclusively by <strong>Hassan AlBarshoumy</strong>.</p>
@@ -181,6 +179,34 @@ This add-on heavily benefited from the merging and development of previous open-
 <li><strong>USB Monitoring:</strong> Toggle monitoring of USB connections (keyboards, flash drives, etc.) and storage mount events.</li>
 <li><strong>Events:</strong> Individual toggles to enable or disable specific event notifications like Battery charging/discharging, Power state changes, and Network connectivity changes.</li>
 </ul>
+<h4>12. Clipboard Tab</h4>
+<ul>
+<li><strong>Enable clipboard announcements:</strong> Master toggle for audio and speech feedback on clipboard actions.</li>
+<li><strong>Announcement Mode:</strong> Choose between "Speech and Sound", "Speech only", or "Sound only".</li>
+<li><strong>Sound volume:</strong> Adjust the volume of clipboard action sounds.</li>
+<li><strong>Announcement delay (ms):</strong> Fine-tune the delay before the announcement plays (0-500ms).</li>
+<li><strong>Per-Action Settings:</strong> A detailed list of all clipboard actions (Copy, Cut, Paste, Select All, Undo, Redo, Paste Plain Text, Alternate Redo) where you can individually enable/disable each action, toggle its sound, toggle its speech, and set custom announcement text.</li>
+</ul>
+<h4>13. Emoji Tab</h4>
+<ul>
+<li><strong>Enable emoji sounds and speech prefix:</strong> Master toggle for the entire emoji enhancement system.</li>
+<li><strong>Sound Settings:</strong></li>
+<li><strong>Play sound when emoji is encountered:</strong> Toggle emoji sounds.</li>
+<li><strong>Sound position:</strong> Choose when the sound plays: Before emoji, After emoji, Before and after, or No sound.</li>
+<li><strong>Sound repeat:</strong> Play the sound once per individual emoji character, or once per text block.</li>
+<li><strong>Volume:</strong> Adjust emoji sound volume (0-100%).</li>
+<li><strong>Delay before/after sound (ms):</strong> Fine-tune timing of emoji sounds.</li>
+<li><strong>Speech Prefix Settings:</strong></li>
+<li><strong>Speak prefix text before emoji descriptions:</strong> Toggle the spoken prefix.</li>
+<li><strong>Prefix text:</strong> The word spoken before the emoji description (default: "emoji").</li>
+<li><strong>Suffix text:</strong> The word spoken after the emoji description.</li>
+<li><strong>Prefix position:</strong> Choose where the prefix appears: Before, After, Both, or None.</li>
+<li><strong>Prefix repeat:</strong> Speak once per emoji character, or once per text block.</li>
+<li><strong>Category-based sounds:</strong> Each of the 9 CLDR emoji categories (Smileys, People, Animals, Food, Travel, Activities, Objects, Symbols, Flags) has its own toggle and can have a unique sound file in your theme folder.</li>
+<li><strong>Suppress role sound when emoji is present:</strong> Prevents the UI role sound from playing when the focused element contains emojis.</li>
+<li><strong>Emoji blacklist:</strong> Exclude specific emojis from triggering sounds.</li>
+<li><strong>Custom descriptions:</strong> Override the default emoji description with your own text (JSON format).</li>
+</ul>
 <h3>Using the Audio Themes Studio V2</h3>
 <p>The Audio Themes Studio allows you to create and edit audio themes. To open the studio:</p>
 <ol>
@@ -235,7 +261,10 @@ To utilize this feature:
 </ul>
 <h3>3. Audio Beacon</h3>
 <ul>
-<li><strong>Shortcut:</strong> <code>NVDA+Shift+B</code> (or <code>NVDA+Shift+A</code> then <code>a</code>)</li>
+<li><strong>Shortcut:</strong> <code>NVDA+Shift+B</code> (or <code>NVDA+Shift+A</code> then <code>a</code>)<blockquote>
+<p><strong>Note:</strong> <code>NVDA+Shift+B</code> is NVDA's standard battery status command in all keyboard layouts. If you use this shortcut for battery announcements, use the alternative sequence <code>NVDA+Shift+A</code> then <code>a</code> to activate the beacon instead.</p>
+</blockquote>
+</li>
 <li><strong>Description:</strong> You can "drop" an audio beacon at the current navigator object's location. This is useful to mark an object and track it contextually during an Audio Sonar sweep.</li>
 </ul>
 <h3>4. Audio Themes Command Layer</h3>
@@ -359,13 +388,23 @@ To utilize this feature:
 <h2>Compatibility &amp; Requirements</h2>
 <ul>
 <li><strong>NVDA Version:</strong> Requires NVDA 2024.1.0 or later.</li>
-<li><strong>Last Tested NVDA Version:</strong> 2026.1.0</li>
+<li><strong>Last Tested NVDA Version:</strong> 2026.2.0</li>
 <li><strong>Operating System:</strong> Windows 10 or Windows 11.</li>
 </ul>
 <h2>Source Code &amp; Repository</h2>
 <p>You can view the source code, report issues, or contribute to the project on GitHub:
 <a href="https://github.com/HassanAlBarshoumy/advanced_audio_themes">Advanced Audio Themes Repository</a></p>
 <h2>Change Log</h2>
+<h3>Version 9.33</h3>
+<ul>
+<li><strong>Emoji Enhancement Engine:</strong> A brand-new emoji detection and enhancement system powered by Unicode CLDR data. Emojis are automatically detected in speech and can play unique sounds per category (Smileys, People, Animals, Food, Travel, Activities, Objects, Symbols, Flags). Includes configurable speech prefix/suffix, per-emoji or per-block repeat, volume control, delay timing, category-based toggles, blacklisting, custom descriptions, and role sound suppression. Full settings GUI with a dedicated "Emoji" tab.</li>
+<li><strong>Clipboard Announcements:</strong> A new clipboard feedback system that plays sounds and speaks confirmations for Copy, Cut, Paste, Select All, Undo, Redo, and Paste Plain Text. Each action can be individually configured with custom announcement text, toggled sound/speech, and adjustable delay. Full settings GUI with a dedicated "Clipboard" tab.</li>
+<li><strong>New Built-in Theme:</strong> Added the "HAS Future Sound" audio theme with a fresh set of modern sounds.</li>
+<li><strong>ZIP Theme Import Fix:</strong> Fixed a bug where importing a ZIP theme without an <code>info.json</code> file would leave a UUID-named folder instead of using the theme's filename.</li>
+<li><strong>System Status Hardening:</strong> Extensive Win32 fixes for 64-bit systems including proper <code>argtypes</code> for all user32 functions, correct <code>DEV_BROADCAST_VOLUME</code> struct usage, and reliable device notification registration.</li>
+<li><strong>Performance:</strong> Optimized emoji and symbol processing with CLDR index caching for near-zero overhead.</li>
+<li><strong>Input Gestures:</strong> 6 scripts that previously had no default gestures now appear in NVDA's Input Gestures dialog, allowing users to assign custom shortcuts.</li>
+</ul>
 <h3>Version 9.32</h3>
 <ul>
 <li><strong>System Status Sounds:</strong> Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.</li>
@@ -393,10 +432,10 @@ To utilize this feature:
 <ul>
 <li><strong>Arabic:</strong> Hassan AlBarshoumy</li>
 <li><strong>Spanish:</strong> Hassan AlBarshoumy, Luis Carlos González Morales</li>
-<li><strong>German:</strong> Hassan AlBarshoumy, [Your Name]</li>
-<li><strong>Italian:</strong> [Your Name]</li>
-<li><strong>Russian:</strong> [Your Name]</li>
-<li><strong>Chinese:</strong> [Your Name]</li>
+<li><strong>Italian:</strong> Christian Cantelmi, Ciro Cantelmi</li>
+<li><strong>Russian:</strong> Valentin Kupriyanov</li>
+<li><strong>Chinese:</strong> Cary-rowen, Jerry</li>
+<li><strong>German:</strong> René L</li>
 </ul>
 <h2>Support</h2>
 <p>For any issues, requests, or bug reports, please refer to the official contact point:

@@ -921,6 +921,27 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
             except:
                 pass
+        # Clipboard shortcut detection
+        if not injected:
+            try:
+                if config.conf["audiothemes"]["clipboard_enabled"]:
+                    import winUser
+                    if winUser.getAsyncKeyState(winUser.VK_CONTROL) & 0x8000:
+                        shift = winUser.getAsyncKeyState(winUser.VK_SHIFT) & 0x8000
+                        if vkCode == 0x43:  # C
+                            self._clipboard_mgr.announce("copy")
+                        elif vkCode == 0x58:  # X
+                            self._clipboard_mgr.announce("cut")
+                        elif vkCode == 0x56:  # V
+                            self._clipboard_mgr.announce("pasteplain" if shift else "paste")
+                        elif vkCode == 0x41:  # A
+                            self._clipboard_mgr.announce("selectall")
+                        elif vkCode == 0x5A:  # Z
+                            self._clipboard_mgr.announce("redo2" if shift else "undo")
+                        elif vkCode == 0x59:  # Y
+                            self._clipboard_mgr.announce("redo")
+            except Exception:
+                pass
         if self._original_keyDownEvent:
             return self._original_keyDownEvent(vkCode, scanCode, extended, injected)
         return True
@@ -1487,39 +1508,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     # Plain DownArrow/UpArrow → NVDA built-in line navigation (no override!)
     # ────────────────────────────────────────────────
 
-    # ── Clipboard Announcement Scripts ──────────────────────────────────
-
-    @script(description=_("Copy selected text to clipboard."), gestures=['kb:control+c'], category="Advanced Audio Themes")
-    def script_clipboard_copy(self, gesture):
-        self._clipboard_mgr.announce("copy", gesture)
-
-    @script(description=_("Cut selected text to clipboard."), gestures=['kb:control+x'], category="Advanced Audio Themes")
-    def script_clipboard_cut(self, gesture):
-        self._clipboard_mgr.announce("cut", gesture)
-
-    @script(description=_("Paste text from clipboard."), gestures=['kb:control+v'], category="Advanced Audio Themes")
-    def script_clipboard_paste(self, gesture):
-        self._clipboard_mgr.announce("paste", gesture)
-
-    @script(description=_("Select all content."), gestures=['kb:control+a'], category="Advanced Audio Themes")
-    def script_clipboard_selectall(self, gesture):
-        self._clipboard_mgr.announce("selectall", gesture)
-
-    @script(description=_("Undo last action."), gestures=['kb:control+z'], category="Advanced Audio Themes")
-    def script_clipboard_undo(self, gesture):
-        self._clipboard_mgr.announce("undo", gesture)
-
-    @script(description=_("Redo last undone action."), gestures=['kb:control+y'], category="Advanced Audio Themes")
-    def script_clipboard_redo(self, gesture):
-        self._clipboard_mgr.announce("redo", gesture)
-
-    @script(description=_("Paste unformatted text from clipboard."), gestures=['kb:control+shift+v'], category="Advanced Audio Themes")
-    def script_clipboard_pasteplain(self, gesture):
-        self._clipboard_mgr.announce("pasteplain", gesture)
-
-    @script(description=_("Alternate redo."), gestures=['kb:control+shift+z'], category="Advanced Audio Themes")
-    def script_clipboard_redo2(self, gesture):
-        self._clipboard_mgr.announce("redo2", gesture)
-
-    # Plain DownArrow/UpArrow → NVDA built-in line navigation (no override!)
+    # Clipboard detection is handled via keyboard hook in _new_keyDownEvent
+    # to avoid breaking NVDA's built-in clipboard handling.
     # ────────────────────────────────────────────────

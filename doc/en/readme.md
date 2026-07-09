@@ -21,8 +21,9 @@ This add-on provides an immersive audio experience for NVDA screen reader users 
 - **Navigation Layer:** Press NVDA+Win+N to enter a fast navigation mode where arrow keys move by sentences, paragraphs, or other elements without holding modifiers.
 - **Cloud Theme Store:** Download, preview, and install community-created themes directly from within the Audio Themes Studio.
 - **App-Specific Profiles:** Automatically switch to a specific audio theme and typing sound pack based on the active application.
-
 - **System Status Sounds:** Plays audio cues for system-level events such as AC power changes, battery status, USB device connection, and network connectivity.
+- **Emoji Enhancement:** Full emoji detection engine with CLDR-based categorization (9 categories), customizable sounds per category, speech prefix/suffix insertion, and per-emoji or per-block repeat modes.
+- **Clipboard Announcements:** Audio and speech feedback for clipboard operations (Copy, Cut, Paste, Select All, Undo, Redo, Paste Plain Text) with per-action customization and configurable delay.
 
 ## Development & Credits
 
@@ -149,6 +150,32 @@ Advanced configuration for navigation modules.
 - **USB Monitoring:** Toggle monitoring of USB connections (keyboards, flash drives, etc.) and storage mount events.
 - **Events:** Individual toggles to enable or disable specific event notifications like Battery charging/discharging, Power state changes, and Network connectivity changes.
 
+#### 12. Clipboard Tab
+- **Enable clipboard announcements:** Master toggle for audio and speech feedback on clipboard actions.
+- **Announcement Mode:** Choose between "Speech and Sound", "Speech only", or "Sound only".
+- **Sound volume:** Adjust the volume of clipboard action sounds.
+- **Announcement delay (ms):** Fine-tune the delay before the announcement plays (0-500ms).
+- **Per-Action Settings:** A detailed list of all clipboard actions (Copy, Cut, Paste, Select All, Undo, Redo, Paste Plain Text, Alternate Redo) where you can individually enable/disable each action, toggle its sound, toggle its speech, and set custom announcement text.
+
+#### 13. Emoji Tab
+- **Enable emoji sounds and speech prefix:** Master toggle for the entire emoji enhancement system.
+- **Sound Settings:**
+  - **Play sound when emoji is encountered:** Toggle emoji sounds.
+  - **Sound position:** Choose when the sound plays: Before emoji, After emoji, Before and after, or No sound.
+  - **Sound repeat:** Play the sound once per individual emoji character, or once per text block.
+  - **Volume:** Adjust emoji sound volume (0-100%).
+  - **Delay before/after sound (ms):** Fine-tune timing of emoji sounds.
+- **Speech Prefix Settings:**
+  - **Speak prefix text before emoji descriptions:** Toggle the spoken prefix.
+  - **Prefix text:** The word spoken before the emoji description (default: "emoji").
+  - **Suffix text:** The word spoken after the emoji description.
+  - **Prefix position:** Choose where the prefix appears: Before, After, Both, or None.
+  - **Prefix repeat:** Speak once per emoji character, or once per text block.
+- **Category-based sounds:** Each of the 9 CLDR emoji categories (Smileys, People, Animals, Food, Travel, Activities, Objects, Symbols, Flags) has its own toggle and can have a unique sound file in your theme folder.
+- **Suppress role sound when emoji is present:** Prevents the UI role sound from playing when the focused element contains emojis.
+- **Emoji blacklist:** Exclude specific emojis from triggering sounds.
+- **Custom descriptions:** Override the default emoji description with your own text (JSON format).
+
 ### Using the Audio Themes Studio V2
 
 The Audio Themes Studio allows you to create and edit audio themes. To open the studio:
@@ -270,7 +297,7 @@ A set of highly advanced features are integrated into this add-on which might no
 
 ## Compatibility & Requirements
 - **NVDA Version:** Requires NVDA 2024.1.0 or later.
-- **Last Tested NVDA Version:** 2026.1.0
+- **Last Tested NVDA Version:** 2026.2.0
 - **Operating System:** Windows 10 or Windows 11.
 
 ## Source Code & Repository
@@ -278,6 +305,15 @@ You can view the source code, report issues, or contribute to the project on Git
 [Advanced Audio Themes Repository](https://github.com/HassanAlBarshoumy/advanced_audio_themes)
 
 ## Change Log
+
+### Version 9.33
+- **Emoji Enhancement Engine:** A brand-new emoji detection and enhancement system powered by Unicode CLDR data. Emojis are automatically detected in speech and can play unique sounds per category (Smileys, People, Animals, Food, Travel, Activities, Objects, Symbols, Flags). Includes configurable speech prefix/suffix, per-emoji or per-block repeat, volume control, delay timing, category-based toggles, blacklisting, custom descriptions, and role sound suppression. Full settings GUI with a dedicated "Emoji" tab.
+- **Clipboard Announcements:** A new clipboard feedback system that plays sounds and speaks confirmations for Copy, Cut, Paste, Select All, Undo, Redo, and Paste Plain Text. Each action can be individually configured with custom announcement text, toggled sound/speech, and adjustable delay. Full settings GUI with a dedicated "Clipboard" tab.
+- **New Built-in Theme:** Added the "HAS Future Sound" audio theme with a fresh set of modern sounds.
+- **ZIP Theme Import Fix:** Fixed a bug where importing a ZIP theme without an `info.json` file would leave a UUID-named folder instead of using the theme's filename.
+- **System Status Hardening:** Extensive Win32 fixes for 64-bit systems including proper `argtypes` for all user32 functions, correct `DEV_BROADCAST_VOLUME` struct usage, and reliable device notification registration.
+- **Performance:** Optimized emoji and symbol processing with CLDR index caching for near-zero overhead.
+- **Input Gestures:** 6 scripts that previously had no default gestures now appear in NVDA's Input Gestures dialog, allowing users to assign custom shortcuts.
 
 ### Version 9.32
 - **System Status Sounds:** Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
@@ -302,10 +338,10 @@ You can view the source code, report issues, or contribute to the project on Git
 
 - **Arabic:** Hassan AlBarshoumy
 - **Spanish:** Hassan AlBarshoumy, Luis Carlos González Morales
-- **German:** Hassan AlBarshoumy, [Your Name]
-- **Italian:** [Your Name]
-- **Russian:** [Your Name]
-- **Chinese:** [Your Name]
+- **Italian:** Christian Cantelmi, Ciro Cantelmi
+- **Russian:** Valentin Kupriyanov
+- **Chinese:** Cary-rowen, Jerry
+- **German:** René L
 
 ## Support
 

@@ -23,6 +23,8 @@ Este complemento proporciona una experiencia de audio inmersiva para los usuario
 - **Perfiles específicos de aplicaciones:** Cambia automáticamente a un tema de audio y paquete de sonidos de escritura específicos según la aplicación activa.
 
 - **Sonidos del Estado del Sistema (System Status Sounds):** Reproduce señales de audio para eventos a nivel del sistema, como cambios en la energía de CA, estado de la batería, conexión de dispositivos USB y conectividad de red.
+- **Mejora de Emoji:** Motor de procesamiento de emojis que mejora la pronunciación y el manejo de emojis en toda la interfaz.
+- **Anuncios del Portapapeles:** Reproduce señales de audio cuando se copia, corta o pega contenido en el portapapeles.
 
 ## Desarrollo y Créditos
 
@@ -144,6 +146,12 @@ Configuración avanzada para módulos de navegación.
 - **Alcance de detección:** Aplica esto universalmente a todos los roles, o selectivamente a roles específicos (usando el botón "Seleccionar roles").
 - **Comportamiento para elementos individuales:** Decide si los elementos que son el único elemento en una lista deben tratarse como el primero, el último o ser ignorados por completo.
 
+#### 12. Pestaña del Portapapeles
+- Configura los anuncios sonoros del portapapeles al copiar, cortar o pegar contenido. Permite seleccionar sonidos personalizados y ajustar el volumen de las notificaciones del portapapeles.
+
+#### 13. Pestaña de Emoji
+- Configura el motor de mejora de emojis. Permite ajustar la pronunciación, el reemplazo de texto y el comportamiento del procesamiento de emojis en toda la interfaz.
+
 ### Uso del Audio Themes Studio V2
 
 El Audio Themes Studio te permite crear y editar temas de audio. Para abrir el estudio:
@@ -264,7 +272,7 @@ En este complemento están integradas una serie de funciones muy avanzadas que p
 
 ## Compatibility & Requirements
 - **NVDA Version:** Requires NVDA 2024.1.0 or later.
-- **Last Tested NVDA Version:** 2026.1.0
+- **Last Tested NVDA Version:** 2026.2.0
 - **Operating System:** Windows 10 or Windows 11.
 
 ## Source Code & Repository
@@ -272,6 +280,15 @@ You can view the source code, report issues, or contribute to the project on Git
 [Advanced Audio Themes Repository](https://github.com/HassanAlBarshoumy/advanced_audio_themes)
 
 ## Change Log
+
+### Version 9.33
+- **Motor de Emoji:** Nuevo motor de procesamiento de emojis para mejorar la pronunciación y el manejo de emojis.
+- **Anuncios del Portapapeles:** Señales de audio al copiar, cortar o pegar contenido.
+- **Nuevo Tema HAS Future Sound:** Tema de audio futurista incluido de serie.
+- **Corrección ZIP:** Solucionado un problema con la importación de temas en formato ZIP.
+- **Endurecimiento Sistema:** Refuerzo de la estabilidad de los sonidos del estado del sistema.
+- **Rendimiento:** Mejoras generales de rendimiento y optimización del motor de audio.
+- **Gestos:** Nuevos gestos de entrada y mejoras en la asignación de atajos de teclado.
 
 ### Version 9.32
 - **Sonidos de estado del sistema: Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
@@ -293,6 +310,15 @@ You can view the source code, report issues, or contribute to the project on Git
 - **Auto-Update Fix:** Resolved a critical freeze in NVDA during the auto-update download process.
 
 ## Novedades
+
+### Versión 9.33
+- **Motor de Emoji:** Nuevo motor de procesamiento de emojis.
+- **Anuncios del Portapapeles:** Señales de audio para operaciones del portapapeles.
+- **Nuevo Tema:** HAS Future Sound incluido de serie.
+- **Corrección ZIP:** Solucionado problema de importación de temas ZIP.
+- **Endurecimiento Sistema:** Mayor estabilidad del estado del sistema.
+- **Rendimiento:** Optimización general del motor de audio.
+- **Gestos:** Nuevos gestos de entrada.
 
 ### Versión 9.32
 - **Sonidos de estado del sistema:** Nuevo motor de monitorización para batería, USB, red y energía.

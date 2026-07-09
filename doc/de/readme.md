@@ -23,6 +23,8 @@ Dieses Add-on bietet ein immersives Audio-Erlebnis für Nutzer des NVDA-Screenre
 - **App-spezifische Profile:** Wechselt automatisch zu einem bestimmten Audio-Theme und Tippgeräusch-Paket basierend auf der aktiven Anwendung.
 
 - **Systemstatus-Sounds:** Spielt Audiohinweise für Ereignisse auf Systemebene ab, z. B. Änderungen der Stromversorgung, Akkustatus, USB-Geräteverbindung und Netzwerkkonnektivität.
+- **Emoji-Verbesserung:** Erweiterte Emoji-Unterstützung mit verbesserter Erkennung, Aussprache und akustischem Feedback für Emoji-Zeichen.
+- **Zwischenablage-Benachrichtigungen:** Akustische Benachrichtigungen beim Kopieren, Ausschneiden und Einfügen von Inhalten über die Zwischenablage.
 
 ## Entwicklung & Credits
 
@@ -65,6 +67,15 @@ Sie können die Audio-Themes-Funktion in den NVDA-Einstellungen aktivieren oder 
 - **Über ein Theme:** Klicken Sie auf die Schaltfläche "Über", um Informationen zum ausgewählten Theme anzuzeigen.
 
 ### Was ist neu
+
+### Version 9.33
+- **Emoji-Engine:** Neue Emoji-Verarbeitungs-Engine für verbesserte Erkennung und akustisches Feedback.
+- **Zwischenablage-Benachrichtigungen:** Akustische Benachrichtigungen beim Kopieren, Ausschneiden und Einfügen.
+- **Neues Theme HAS Future Sound:** Ein brandneues Audio-Theme mit futuristischen Klängen.
+- **ZIP-Import-Fix:** Behebung eines Fehlers beim Importieren von Themes aus ZIP-Dateien.
+- **Systemstatus-Härtung:** Verbesserte Stabilität und Zuverlässigkeit der Systemstatus-Überwachung.
+- **Leistung:** Allgemeine Leistungsoptimierungen für schnellere Reaktionszeiten.
+- **Eingabegesten:** Verbesserte Eingabegesten-Zuordnung und -Verwaltung.
 
 ### Version 9.32
 - **Systemstatus-Töne:** Einführung einer umfassenden Systemüberwachung für Akku, USB, Netzwerk und Stromversorgung.
@@ -160,6 +171,16 @@ Erweiterte Konfiguration für Navigationsmodule.
 - **Erkennung des ersten/letzten Elements aktivieren:** Spielt einen einzigartigen Anschlagton ab, wenn Sie den Anfang oder das Ende einer Liste, eines Menüs oder einer Baumansicht erreichen.
 - **Erkennungsbereich:** Wenden Sie dies universell auf alle Rollen an oder selektiv auf bestimmte Rollen (mithilfe der Schaltfläche "Rollen auswählen").
 - **Verhalten bei einzelnen Elementen:** Entscheiden Sie, ob Elemente, die das einzige in einer Liste sind, als erstes Element, letztes Element oder gar nicht behandelt werden sollen.
+
+#### 12. Zwischenablage-Registerkarte
+- **Zwischenablage-Benachrichtigungen aktivieren:** Hauptschalter zum Ein- oder Ausschalten der akustischen Rückmeldungen bei Zwischenablage-Operationen.
+- **Ereignisse:** Individuelle Steuerung der Töne für Kopieren, Ausschneiden und Einfügen.
+- **Lautstärke:** Anpassung der Lautstärke für Zwischenablage-Benachrichtigungen.
+
+#### 13. Emoji-Registerkarte
+- **Emoji-Verbesserung aktivieren:** Hauptschalter zum Ein- oder Ausschalten der erweiterten Emoji-Unterstützung.
+- **Akustisches Feedback:** Konfiguration der Töne, die beim Erkennen von Emoji-Zeichen abgespielt werden.
+- **Aussprache:** Einstellungen zur verbesserten Aussprache und Beschreibung von Emojis.
 
 ### Verwendung des Audio Themes Studio V2
 
@@ -281,7 +302,7 @@ In dieses Add-on ist eine Reihe hochgradig erweiterter Funktionen integriert, di
 
 ## Compatibility & Requirements
 - **NVDA Version:** Requires NVDA 2024.1.0 or later.
-- **Last Tested NVDA Version:** 2026.1.0
+- **Last Tested NVDA Version:** 2026.2.0
 - **Operating System:** Windows 10 or Windows 11.
 
 ## Source Code & Repository
@@ -290,8 +311,17 @@ You can view the source code, report issues, or contribute to the project on Git
 
 ## Change Log
 
+### Version 9.33
+- **Emoji-Engine:** Neue Emoji-Verarbeitungs-Engine für verbesserte Erkennung und akustisches Feedback.
+- **Zwischenablage-Benachrichtigungen:** Akustische Benachrichtigungen beim Kopieren, Ausschneiden und Einfügen.
+- **Neues Theme HAS Future Sound:** Ein brandneues Audio-Theme mit futuristischen Klängen.
+- **ZIP-Import-Fix:** Behebung eines Fehlers beim Importieren von Themes aus ZIP-Dateien.
+- **Systemstatus-Härtung:** Verbesserte Stabilität und Zuverlässigkeit der Systemstatus-Überwachung.
+- **Leistung:** Allgemeine Leistungsoptimierungen für schnellere Reaktionszeiten.
+- **Eingabegesten:** Verbesserte Eingabegesten-Zuordnung und -Verwaltung.
+
 ### Version 9.32
-- **Systemstatus-Töne: Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
+- **Systemstatus-Töne:** Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
 - **Audio DSP Enhancements:** Completely rewrote the Bass Boost (Low-shelf filter) and Noise Gate algorithms to support correct attack/release times and improved sound quality. Added a full UI in the settings panel to control these DSP effects.
 - **3D Spatial Audio Fixes:** Resolved an issue causing lag in 3D audio playback for progress bars.
 
@@ -310,6 +340,15 @@ You can view the source code, report issues, or contribute to the project on Git
 - **Auto-Update Fix:** Resolved a critical freeze in NVDA during the auto-update download process.
 
 ## Was ist neu
+
+### Version 9.33
+- **Emoji-Engine:** Neue Emoji-Verarbeitungs-Engine für verbesserte Erkennung und akustisches Feedback.
+- **Zwischenablage-Benachrichtigungen:** Akustische Benachrichtigungen beim Kopieren, Ausschneiden und Einfügen.
+- **Neues Theme HAS Future Sound:** Ein brandneues Audio-Theme mit futuristischen Klängen.
+- **ZIP-Import-Fix:** Behebung eines Fehlers beim Importieren von Themes aus ZIP-Dateien.
+- **Systemstatus-Härtung:** Verbesserte Stabilität und Zuverlässigkeit der Systemstatus-Überwachung.
+- **Leistung:** Allgemeine Leistungsoptimierungen für schnellere Reaktionszeiten.
+- **Eingabegesten:** Verbesserte Eingabegesten-Zuordnung und -Verwaltung.
 
 ### Version 9.32
 - **Systemstatus-Töne:** Einführung einer umfassenden Systemüberwachung für Akku, USB, Netzwerk und Stromversorgung.

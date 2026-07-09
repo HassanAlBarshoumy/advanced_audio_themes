@@ -23,6 +23,8 @@ Questo componente aggiuntivo offre un'esperienza audio immersiva per gli utenti 
 - **Profili specifici dell'app:** Passa automaticamente a un tema audio e a un pacchetto di suoni di digitazione specifici in base all'applicazione attiva.
 
 - **Suoni di Stato del Sistema (System Status Sounds):** Riproduce segnali audio per eventi a livello di sistema come variazioni di alimentazione CA, stato della batteria, connessione di dispositivi USB e connettività di rete.
+- **Miglioramento Emoji:** Motore di elaborazione emoji che migliora la pronuncia e la gestione degli emoji nell'intera interfaccia.
+- **Annunci degli Appunti:** Riproduce segnali audio quando si copia, taglia o incolla contenuto negli appunti.
 
 ## Sviluppo e Riconoscimenti
 
@@ -144,6 +146,12 @@ Configurazione avanzata per i moduli di navigazione.
 - **Ambito di rilevamento:** Applica questo universalmente a tutti i ruoli o selettivamente a ruoli specifici (utilizzando il pulsante "Seleziona ruoli").
 - **Comportamento per gli elementi singoli:** Decidi se gli elementi che sono gli unici presenti in un elenco devono essere trattati come il primo, l'ultimo o essere ignorati completamente.
 
+#### 12. Scheda Appunti
+- Configura gli annunci sonori degli appunti per le operazioni di copia, taglio e incollaggio del contenuto. Consente di selezionare suoni personalizzati e regolare il volume delle notifiche degli appunti.
+
+#### 13. Scheda Emoji
+- Configura il motore di miglioramento degli emoji. Consente di regolare la pronuncia, la sostituzione del testo e il comportamento dell'elaborazione degli emoji nell'intera interfaccia.
+
 ### Utilizzo di Audio Themes Studio V2
 
 Audio Themes Studio consente di creare e modificare temi audio. Per aprire lo studio:
@@ -264,7 +272,7 @@ In questo componente aggiuntivo sono integrate una serie di funzionalità altame
 
 ## Compatibility & Requirements
 - **NVDA Version:** Requires NVDA 2024.1.0 or later.
-- **Last Tested NVDA Version:** 2026.1.0
+- **Last Tested NVDA Version:** 2026.2.0
 - **Operating System:** Windows 10 or Windows 11.
 
 ## Source Code & Repository
@@ -272,6 +280,15 @@ You can view the source code, report issues, or contribute to the project on Git
 [Advanced Audio Themes Repository](https://github.com/HassanAlBarshoumy/advanced_audio_themes)
 
 ## Change Log
+
+### Version 9.33
+- **Motore Emoji:** Nuovo motore di elaborazione emoji per migliorare la pronuncia e la gestione degli emoji.
+- **Annunci Appunti:** Segnali audio durante le operazioni di copia, taglio e incollaggio.
+- **Nuovo Tema:** Tema audio futuristico HAS Future Sound incluso di serie.
+- **Correzione ZIP:** Risolto un problema con l'importazione dei temi in formato ZIP.
+- **Rafforzamento stato sistema:** Migliorata la stabilità dei suoni di stato del sistema.
+- **Prestazioni:** Miglioramenti generali delle prestazioni e ottimizzazione del motore audio.
+- **Gesti di input:** Nuovi gesti di input e miglioramenti nell'assegnazione delle scorciatoie da tastiera.
 
 ### Version 9.32
 - **Suoni di stato del sistema: Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.
@@ -293,6 +310,15 @@ You can view the source code, report issues, or contribute to the project on Git
 - **Auto-Update Fix:** Resolved a critical freeze in NVDA during the auto-update download process.
 
 ## Novità
+
+### Versione 9.33
+- **Motore Emoji:** Nuovo motore di elaborazione emoji.
+- **Annunci Appunti:** Segnali audio per le operazioni degli appunti.
+- **Nuovo Tema:** HAS Future Sound incluso di serie.
+- **Correzione ZIP:** Risolto problema di importazione temi ZIP.
+- **Rafforzamento stato sistema:** Maggiore stabilità dello stato del sistema.
+- **Prestazioni:** Ottimizzazione generale del motore audio.
+- **Gesti di input:** Nuovi gesti di input.
 
 ### Versione 9.32
 - **Suoni di stato del sistema:** Nuovo motore di monitoraggio per batteria, USB, rete e alimentazione.

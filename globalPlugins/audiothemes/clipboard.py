@@ -37,7 +37,7 @@ class ClipboardManager:
     def __init__(self, handler):
         self._handler = handler
 
-    def announce(self, action_id, gesture=None):
+    def announce(self, action_id):
         conf = config.conf["audiothemes"]
         if not conf.get("clipboard_enabled", False):
             return
@@ -47,8 +47,6 @@ class ClipboardManager:
         special_prop, config_key, default_speech = entry
         if not conf.get(config_key, True):
             return
-        if gesture is not None:
-            gesture.send()
         delay = conf.get("clipboard_delay", 50)
         if delay > 0:
             wx.CallLater(delay, self._do_announce, action_id, special_prop, config_key, default_speech)
