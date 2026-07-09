@@ -236,9 +236,6 @@ class NavLayerMixin:
     @script(description="Read All.")
     def script_navLayerReadAll(self, gesture):
         self._playNavTone(1500, 40)
-        self._doNavLayerExit()
-        import speech
-        speech.cancelSpeech()
         try:
             import inputCore
             gest = keyboardHandler.KeyboardInputGesture.fromName("NVDA+downArrow")

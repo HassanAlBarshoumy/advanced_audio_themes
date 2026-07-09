@@ -391,6 +391,8 @@ def preExecuteGesture(selfself, gesture, *args, **kwargs):
             nav_gestures = getattr(gp, '_navLayerGestures', {})
             for ident in gesture.normalizedIdentifiers:
                 if ident in nav_gestures:
+                    import speech
+                    speech.cancelSpeech()
                     script = gp.getScript(gesture)
                     if script:
                         script(gesture)
