@@ -180,23 +180,22 @@ class NavLayerMixin:
     @script(description="Copy current unit.")
     def script_navLayerCopy(self, gesture):
         self._playNavTone(1500, 40)
-        # Bypasses KeyboardInputGesture entirely to avoid Arabic layout LookupError
-        winUser.keybd_event(winUser.VK_CONTROL, 0, 0, 0)
-        winUser.keybd_event(ord('C'), 0, 0, 0)
-        winUser.keybd_event(ord('C'), 0, winUser.KEYEVENTF_KEYUP, 0)
-        winUser.keybd_event(winUser.VK_CONTROL, 0, winUser.KEYEVENTF_KEYUP, 0)
-        ui.message(_("Copied") if "_" in globals() else "Copied")
+        text = self._getCurrentUnitText()
+        if text:
+            import wx
+            if wx.TheClipboard.Open():
+                wx.TheClipboard.SetData(wx.TextDataObject(text))
+                wx.TheClipboard.Close()
+            ui.message(_("Copied") if "_" in globals() else "Copied")
 
-    @script(description="Spell current unit.")
-    def script_navLayerSpell(self, gesture):
-        self._playNavTone(1500, 40)
-        if not self._activeModes:
-            self._loadActiveModes()
-        mode = self._activeModes[self._navLayerModeIndex]
-        obj = api.getNavigatorObject()
-        if not obj:
-            return
+    def _getCurrentUnitText(self):
         try:
+            if not self._activeModes:
+                self._loadActiveModes()
+            mode = self._activeModes[self._navLayerModeIndex]
+            obj = api.getNavigatorObject()
+            if not obj:
+                return None
             m_id = mode["id"]
             if m_id == "sentence":
                 from .sentenceNavEngine import getCaretIndexWithinParagraph, Context, getRegex, getCurrentLanguage
@@ -208,26 +207,31 @@ class NavLayerMixin:
                 context = Context(paragraphInfo, caretIndex, caretInfo)
                 regex = getRegex(getCurrentLanguage())
                 sentenceStr, _, _, _, _ = self.expandSentence(context, regex, 0)
-                text = sentenceStr
+                return sentenceStr
+            focus = obj
+            if hasattr(obj, "treeInterceptor") and obj.treeInterceptor is not None and hasattr(obj.treeInterceptor, "makeTextInfo"):
+                focus = obj.treeInterceptor
+            info = focus.makeTextInfo(api.textInfos.POSITION_CARET)
+            if m_id == "word":
+                info.expand(api.textInfos.UNIT_WORD)
+            elif m_id == "line":
+                info.expand(api.textInfos.UNIT_LINE)
+            elif m_id == "paragraph":
+                info.expand(api.textInfos.UNIT_PARAGRAPH)
             else:
-                focus = obj
-                if hasattr(obj, "treeInterceptor") and obj.treeInterceptor is not None and hasattr(obj.treeInterceptor, "makeTextInfo"):
-                    focus = obj.treeInterceptor
-                info = focus.makeTextInfo(api.textInfos.POSITION_CARET)
-                if m_id == "word":
-                    info.expand(api.textInfos.UNIT_WORD)
-                elif m_id == "line":
-                    info.expand(api.textInfos.UNIT_LINE)
-                elif m_id == "paragraph":
-                    info.expand(api.textInfos.UNIT_PARAGRAPH)
-                else:
-                    info.expand(api.textInfos.UNIT_WORD)
-                text = info.text
+                info.expand(api.textInfos.UNIT_WORD)
+            return info.text
+        except Exception:
+            return None
+
+    @script(description="Spell current unit.")
+    def script_navLayerSpell(self, gesture):
+        self._playNavTone(1500, 40)
+        text = self._getCurrentUnitText()
+        if text:
             import speech
             speech.speakText(text)
             speech.speakSpelling(text)
-        except Exception:
-            pass
 
     @script(description="Read All.")
     def script_navLayerReadAll(self, gesture):
@@ -237,7 +241,7 @@ class NavLayerMixin:
         speech.cancelSpeech()
         try:
             import inputCore
-            gest = keyboardHandler.KeyboardInputGesture.fromName("NVDA+downArrow")
+            gest = keyboardHandler.KeyboardInputGesture.fromName("NVDA+shift+downArrow")
             inputCore.manager.executeGesture(gest)
         except LookupError:
             pass
