@@ -237,8 +237,10 @@ class NavLayerMixin:
     def script_navLayerReadAll(self, gesture):
         self._playNavTone(1500, 40)
         ti = getattr(api.getFocusObject(), 'treeInterceptor', None)
-        if ti and ti.isReady:
-            ti.script_sayAll(gesture)
+        if ti and hasattr(ti, 'isReady') and ti.isReady:
+            from speech.sayAll import SayAllHandler
+            info = ti.makeTextInfo(api.textInfos.POSITION_CARET)
+            SayAllHandler.readText(ti, info)
 
     @script(description="Exit navigation layer.")
     def script_navLayerExit(self, gesture):
