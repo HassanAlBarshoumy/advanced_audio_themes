@@ -100,7 +100,7 @@ class NavLayerMixin:
             
             if not script_func or not getattr(script_func, "__name__", "").startswith("script_navLayer"):
                 if passThrough:
-                    self._doNavLayerExit()
+                    wx.CallAfter(self._doNavLayerExit)
                     return super().getScript(gesture)
                 else:
                     self._resetNavLayerTimer()
@@ -236,7 +236,13 @@ class NavLayerMixin:
     @script(description="Read All.")
     def script_navLayerReadAll(self, gesture):
         self._playNavTone(1500, 40)
-        self._sendNormalKey("NVDA+downArrow")
+        self._doNavLayerExit()
+        import inputCore
+        try:
+            gest = keyboardHandler.KeyboardInputGesture.fromName("NVDA+downArrow")
+            inputCore.manager.executeGesture(gest)
+        except LookupError:
+            pass
 
     @script(description="Exit navigation layer.")
     def script_navLayerExit(self, gesture):
