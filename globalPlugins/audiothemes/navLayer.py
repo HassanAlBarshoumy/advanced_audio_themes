@@ -269,7 +269,8 @@ class NavLayerMixin:
         self._navLayerActive = False
         self._suppressAllGestures = True
         try:
-            inputCore.manager.executeGesture(gest)
+            from .browserNavEngine import originalExecuteGesture
+            originalExecuteGesture(inputCore.manager, gest)
         finally:
             from speech.sayAll import SayAllHandler
             SayAllHandler.stop()
@@ -288,7 +289,8 @@ class NavLayerMixin:
         self._navLayerActive = False
         self._suppressAllGestures = True
         try:
-            inputCore.manager.executeGesture(gest)
+            from .browserNavEngine import originalExecuteGesture
+            originalExecuteGesture(inputCore.manager, gest)
         finally:
             from speech.sayAll import SayAllHandler
             SayAllHandler.stop()
