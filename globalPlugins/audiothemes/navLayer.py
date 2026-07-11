@@ -271,6 +271,8 @@ class NavLayerMixin:
         try:
             from .browserNavEngine import originalExecuteGesture
             originalExecuteGesture(inputCore.manager, gest)
+        except inputCore.NoInputGestureAction:
+            self._playNavTone(300, 100)
         finally:
             from speech.sayAll import SayAllHandler
             SayAllHandler.stop()
@@ -291,6 +293,8 @@ class NavLayerMixin:
         try:
             from .browserNavEngine import originalExecuteGesture
             originalExecuteGesture(inputCore.manager, gest)
+        except inputCore.NoInputGestureAction:
+            self._playNavTone(300, 100)
         finally:
             from speech.sayAll import SayAllHandler
             SayAllHandler.stop()
