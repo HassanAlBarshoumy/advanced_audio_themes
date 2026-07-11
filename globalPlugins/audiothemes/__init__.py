@@ -237,6 +237,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        from logHandler import log
+        log.info("Starting Advanced Audio Themes version 9.34")
         from . import utils
         utils.threadPool.restart()
         self.handler = AudioThemesHandler()
@@ -475,8 +477,11 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
     def finish(self):
         self.toggling = False
-        self.clearGestureBindings()
-        self._rebindInstanceGestures()
+        for ident in self._audioThemesLayerGestures:
+            try:
+                self.removeGestureBinding(ident)
+            except (LookupError, ValueError):
+                pass
 
     def noFinish(self):
         pass

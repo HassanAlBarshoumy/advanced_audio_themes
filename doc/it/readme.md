@@ -70,25 +70,21 @@ Puoi abilitare o disabilitare la funzionalità dei temi audio nelle impostazioni
 
 Il pannello delle impostazioni Temi audio avanzati contiene diverse schede per personalizzare ogni aspetto dell'esperienza audio. Di seguito un approfondimento su ogni opzione disponibile:
 
-#### 1. Scheda Generale
-- **Abilita temi audio:** Interruttore principale per accendere o spegnere il motore dei temi audio.
-- **Seleziona tema:** Menu a discesa per scegliere il tema audio attivo tra quelli installati.
-- **Informazioni / Rimuovi / Aggiungi nuovo:** Gestisci i tuoi temi. Puoi installare nuovi temi da file `.atp` o `.zip`.
-- **Store dei temi:** Apre lo store integrato per scaricare i temi creati dalla community.
-- **Theme Studio:** Apre lo studio per modificare o remixare il tema attualmente selezionato.
-- **Anteprima:** Riproduce una sequenza di suoni campione del tema attivo.
-- **Riproduci i suoni in modalità 3D:** Abilita l'elaborazione dell'audio spaziale.
-- **Annuncia i ruoli:** Scegli se NVDA deve pronunciare i ruoli dei controlli (come "pulsante", "link").
-- **Annuncia i ruoli durante leggi tutto:** Abilita o disabilita la pronuncia dei ruoli durante la lettura continua. Puoi usare il pulsante "Seleziona ruoli..." per specificare esattamente quali ruoli pronunciare.
-- **Usa il volume del sintetizzatore vocale:** Collega il volume del tema al volume della voce di NVDA. Disabilitalo per usare il cursore manuale.
-- **Attenuazione audio (Ducking):** Abbassa il volume dell'audio di sottofondo quando NVDA parla. Puoi scegliere quali categorie di suoni attenuare e impostare la percentuale del volume attenuato.
-- **Comportamenti di fallback:** Definisce cosa succede quando manca un suono per un ruolo specifico o per un primo/ultimo elemento (ad esempio, riproduci silenzio, riproduci un suono personalizzato o riproduci il primo suono disponibile).
-- **I suoni di stato sopprimono il suono del ruolo:** Se un elemento ha un suono di stato (ad es. casella di controllo attivata), impedirà la riproduzione del suono del ruolo per evitare confusione audio.
-- **Lista nera (Blacklist) applicazioni:** Un elenco separato da virgole di eseguibili di applicazioni in cui i temi audio devono essere completamente disabilitati. Puoi anche personalizzare quali categorie specifiche di suoni vengono soppresse in queste app.
-- **Suoni di digitazione:** Abilita i suoni della macchina da scrivere o della tastiera meccanica. Le opzioni includono la digitazione spaziale (simulazione delle posizioni fisiche sulla tastiera), la mappatura spaziale intelligente, la restrizione dei suoni alle caselle di modifica, la selezione di pacchetti di suoni e la regolazione del volume.
-- **Gestione della configurazione:** Cerca aggiornamenti, includi le versioni beta ed esporta/importa l'intera configurazione (inclusi temi, regole e suoni) in un singolo file `.atcfg`.
+#### 1. Livello di navigazione (Navigation Layer)
+- **Scorciatoia:** `NVDA+Win+N`
+- **Descrizione:** Un ambiente di navigazione altamente ottimizzato e isolato progettato per accelerare la lettura del testo e la navigazione web. Una volta entrato, non è più necessario tenere premuti i tasti modificatori come `Alt` o `Shift`. Puoi navigare comodamente usando solo i tasti freccia.
+- **Come usare (mentre sei nel livello):**
+  - **Frecce Sinistra / Destra:** Passa tra **27 diverse modalità di navigazione** (Carattere, Parola, Riga, Frase, Paragrafo e elementi web come Intestazioni, Link, Pulsanti, Campi di modifica, Tabelle, Elenchi, Grafica, Punti di riferimento e altro).
+  - **Frecce Su / Giù:** Salta all'elemento precedente o successivo in base alla modalità attualmente selezionata.
+  - **Premi `C`:** Copia istantaneamente il testo dell'unità corrente negli appunti.
+  - **Premi `S`:** Compita il testo dell'unità corrente.
+  - **Premi `Escape`:** Esce dal livello e torna al normale funzionamento.
+- **Funzioni intelligenti e personalizzazione:**
+  - **Uscita automatica (Timeout):** Se lasciato inattivo per 10 secondi, il livello si disattiva automaticamente con un leggero segnale acustico in modo da non rimanere mai bloccati all'interno.
+  - **Pass-through dei tasti:** Premendo un tasto non associato al livello si uscirà immediatamente dal livello e l'input verrà passato al sistema operativo senza interruzioni.
+  - **Personalizzazione completa (Scheda impostazioni 6):** Puoi abilitare o disabilitare ciascuna delle 27 modalità per mantenere pulita la tua navigazione, regolare il timeout del livello e configurare i suoni delle azioni.
 
-#### 2. Scheda Motore Audio
+### 2. Scheda Motore Audio
 - **Normalizzazione intelligente del volume:** Regola dinamicamente i suoni deboli e forti a un livello costante.
 - **Inviluppo fluido:** Applica micro dissolvenze in apertura e in chiusura per evitare crepitii o clic audio.
 - **Panning 3D fluido:** Crea un effetto di scivolamento quando gli oggetti si spostano sullo schermo invece di saltare istantaneamente.
@@ -269,6 +265,11 @@ In questo componente aggiuntivo sono integrate una serie di funzionalità altame
 | **Alt+Maiusc+Frecce** | Navigazione avanzata per paragrafi. |
 | **NVDA+Alt+Frecce** | Navigazione web avanzata (BrowserNav). |
 | **NVDA+Win+N** | Attiva il livello di navigazione (navigazione veloce senza modificatori). |
+| **Ctrl+C / X / V** | Copia, Taglia e Incolla con annunci audio. |
+| **Ctrl+A** | Seleziona Tutto con annuncio audio. |
+| **Ctrl+Z / Y** | Annulla e Ripeti con annunci audio. |
+| **Ctrl+Shift+V** | Incolla testo non formattato con annuncio audio. |
+| **Ctrl+Shift+Z** | Ripeti alternativo con annuncio audio. |
 
 ## Compatibility & Requirements
 - **NVDA Version:** Requires NVDA 2024.1.0 or later.
@@ -334,6 +335,22 @@ You can view the source code, report issues, or contribute to the project on Git
 
 ### Versione 9.23 - 9.26
 - **Correzioni:** Correzione di bug nella navigazione e compatibilità con NVDA 2026.2.
+
+### Versione 9.21 - 9.22
+- **Miglioramenti dell'Importazione:** Aggiunto il supporto per l'importazione di cartelle non compresse come temi e una finestra di dialogo per scegliere tra l'importazione di una cartella o di un file ZIP/.atp.
+- **Aggiornamento automatico e Pre-rilascio:** Aggiunte caselle di controllo nella scheda Generale per gestire gli aggiornamenti automatici e optare per le build beta pre-rilascio.
+
+### Versione 9.20
+- **Ottimizzazione dell'interfaccia utente delle Impostazioni:** Importanti miglioramenti delle prestazioni nella finestra di dialogo delle Impostazioni. Sostituite le griglie lente con ListCtrl veloci e implementato il caricamento lento per le schede pesanti.
+- **Caching dei Temi:** Caching dei temi installati per ridurre le operazioni di I/O dei file all'avvio.
+
+### Versione 9.11 - 9.13
+- **Rilevamento dei Conflitti:** Aggiunta una finestra di dialogo intelligente all'avvio che rileva i componenti aggiuntivi NVDA in conflitto (come i vecchi plugin dei temi audio) e consente all'utente di disabilitarli o disinstallarli in modo sicuro.
+
+### Versione 9.4 - 9.10
+- **Decodifica MP3 Nativa:** Integrato libmpg123 per una decodifica MP3 rapida e nativa senza fare affidamento interamente su FFmpeg.
+- **Pipeline di Elaborazione Audio:** Aggiunto il caching RAM per OGG, il supporto per file WAV a 24 bit e migrazione completa delle funzionalità DSP audio (SmartVolume, Envelope, TrimSilence) nella nuova pipeline.
+- **Traduzioni:** Completata al 100% la localizzazione in arabo, spagnolo, italiano, russo, tedesco e cinese.
 
 ## Traduttori
 - **Spagnolo:** Hassan AlBarshoumy, Luis Carlos González Morales

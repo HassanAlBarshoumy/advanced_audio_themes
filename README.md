@@ -220,14 +220,59 @@ A set of highly advanced features are integrated into this add-on which might no
 
 ### 1. Navigation Layer
 - **Shortcut:** `NVDA+Win+N`
-- **Description:** Once you enter this layer, you no longer need to hold `Alt`, `Shift`, or any modifier key to navigate. You can use just the arrow keys!
-- **How to use:**
-  - Use Left/Right Arrows to cycle through **27 different navigation modes** (Character, Word, Line, Sentence, Paragraph, Heading, Link, Button, Edit field, Table, etc.).
-  - Use Up/Down Arrows to jump to the previous/next item based on the current mode.
-  - Press `C` to copy the current item to the clipboard.
-  - Press `S` to spell the current item.
-  - Press `R` to Read All starting from the current item.
-  - Press `Escape` to exit the layer.
+- **Description:** A highly optimized, isolated navigation environment designed to accelerate text and web browsing. Once entered, you are freed from holding modifier keys like `Alt` or `Shift`. You can navigate effortlessly using just the arrow keys, reducing finger strain and speeding up your workflow.
+
+#### Layer Controls
+| Key | Action |
+| --- | ------ |
+| **Left Arrow** | Previous navigation mode |
+| **Right Arrow** | Next navigation mode |
+| **Up Arrow** | Move to previous item in current mode |
+| **Down Arrow** | Move to next item in current mode |
+| **C** | Copy the text of the current unit to the clipboard |
+| **S** | Spell out the text of the current unit letter by letter |
+| **Escape** | Exit the navigation layer and return to normal operation |
+
+#### All 27 Navigation Modes
+The 27 modes are split into two groups: **text modes** (navigate by reading units) and **web element modes** (jump to specific HTML elements). You cycle through all enabled modes using Left/Right arrows.
+
+**Text Modes (arrow-key driven):**
+1. **Character** — Navigate one character at a time (left/right arrows)
+2. **Word** — Navigate one word at a time
+3. **Line** — Navigate one line at a time
+4. **Sentence** — Navigate one sentence at a time
+5. **Paragraph** — Navigate one paragraph at a time
+
+**Web Element Modes (single-key driven via NVDA's quicknav):**
+6. **Heading** (`H`) — Jump between headings of all levels
+7. **Link** (`K`) — Jump between links
+8. **Unvisited Link** (`U`) — Jump between unvisited links only
+9. **Visited Link** (`V`) — Jump between visited links only
+10. **Form Field** (`F`) — Jump between form fields (input, select, textarea)
+11. **Button** (`B`) — Jump between buttons
+12. **Edit Field** (`E`) — Jump between editable text fields
+13. **Check Box** (`X`) — Jump between check boxes
+14. **Combo Box** (`C`) — Jump between combo boxes / drop-down lists
+15. **Radio Button** (`R`) — Jump between radio buttons
+16. **Image** (`G`) — Jump between images and graphics
+17. **List** (`L`) — Jump between HTML lists
+18. **List Item** (`I`) — Jump between individual list items
+19. **Table** (`T`) — Jump between HTML tables
+20. **Frame** (`M`) — Jump between frames and iframes
+21. **Article** (`A`) — Jump between article elements
+22. **Landmark** (`D`) — Jump between ARIA landmark regions
+23. **Separator** (`S`) — Jump between separators / horizontal rules
+24. **Quote** (`Q`) — Jump between block quotes
+25. **Object** (`O`) — Jump between embedded objects (Flash, Java, etc.)
+26. **Text Block** (`N`) — Jump between text blocks
+27. **Search** (`F3`) — Jump between search / find-in-page inputs
+
+> **Note:** When a web element mode is selected, pressing Up/Down arrows sends the corresponding quick-nav key (e.g. `H` for headings, `K` for links), causing NVDA to jump to the previous/next matching element in the page. This is identical to pressing those keys in NVDA's browse mode, but without needing to hold a modifier.
+
+#### Smart Features & Customization
+- **Auto-Exit (Timeout):** If left idle for 10 seconds, the layer automatically exits with a soft audio cue so you are never trapped inside.
+- **Key Pass-through:** Pressing any key not bound to the layer (e.g., Windows key) will immediately exit the layer and pass the keypress to the OS seamlessly.
+- **Full Customization (Settings Tab 6):** You can enable or disable any of the 27 modes to keep your mode-cycling clutter-free, adjust layer timeout, and configure action sounds.
 
 ### 2. Audio Sonar
 - **Shortcut:** `NVDA+Alt+R` (or `NVDA+Shift+A` then `r`)
@@ -294,6 +339,11 @@ A set of highly advanced features are integrated into this add-on which might no
 | **Alt+Shift+Arrows** | Advanced Paragraph Navigation. |
 | **NVDA+Alt+Arrows** | Advanced Web Navigation (BrowserNav). |
 | **NVDA+Win+N** | Toggle Navigation Layer (fast navigation without modifiers). |
+| **Ctrl+C / X / V** | Copy, Cut, and Paste with audio announcements. |
+| **Ctrl+A** | Select All with audio announcement. |
+| **Ctrl+Z / Y** | Undo and Redo with audio announcements. |
+| **Ctrl+Shift+V** | Paste plain text with audio announcement. |
+| **Ctrl+Shift+Z** | Alternate redo with audio announcement. |
 
 ## Compatibility & Requirements
 - **NVDA Version:** Requires NVDA 2024.1.0 or later.
@@ -305,6 +355,11 @@ You can view the source code, report issues, or contribute to the project on Git
 [Advanced Audio Themes Repository](https://github.com/HassanAlBarshoumy/advanced_audio_themes)
 
 ## Change Log
+
+### Version 9.34
+- **Critical Bug Fix — Gesture Binding Corruption:** Fixed a severe issue where all addon and user-assigned keyboard shortcuts (e.g. `NVDA+Alt+P` from NVDAExtensionGlobalPlugin) would break and disappear from the Input Gestures dialog after opening and closing either the Audio Themes Command Layer (`NVDA+Shift+A`) or the Navigation Layer (`NVDA+Win+N`). The root cause was `clearGestureBindings()` + `_rebindInstanceGestures()` being called on every layer deactivation, which wiped all entries from NVDA's internal `boundGestures` map. Replaced with targeted `removeGestureBinding()` calls per-layer and a suppression flag for gesture execution — `boundGestures` is never touched during layer open/close cycles.
+- **Navigation Layer Documentation:** Expanded the Navigation Layer section in this readme to include a complete reference table of all layer controls and a detailed list of all 27 navigation modes with descriptions.
+- **Startup Logging:** Added an INFO-level log entry at add-on initialization to record the loaded version in the NVDA log.
 
 ### Version 9.33
 - **Emoji Enhancement Engine:** A brand-new emoji detection and enhancement system powered by Unicode CLDR data. Emojis are automatically detected in speech and can play unique sounds per category (Smileys, People, Animals, Food, Travel, Activities, Objects, Symbols, Flags). Includes configurable speech prefix/suffix, per-emoji or per-block repeat, volume control, delay timing, category-based toggles, blacklisting, custom descriptions, and role sound suppression. Full settings GUI with a dedicated "Emoji" tab.
@@ -333,6 +388,22 @@ You can view the source code, report issues, or contribute to the project on Git
 - **Sentence Navigation Fixes:** Fixed a bug causing NVDA to endlessly repeat sentences when reading Arabic text in VirtualBuffers.
 - **NVDA 2026.2 Compatibility:** Migrated to the new `NVDAHelper.localLib.generateBeep` API to resolve deprecation warnings and ensure stability on future NVDA versions.
 - **Auto-Update Fix:** Resolved a critical freeze in NVDA during the auto-update download process.
+
+### Version 9.21 - 9.22
+- **Import Enhancements:** Added support for importing uncompressed folders as themes, and a dialog to choose between importing a folder or ZIP/.atp file.
+- **Auto-Update & Pre-release:** Added checkboxes in the General tab to handle auto-updates and opt into pre-release beta builds.
+
+### Version 9.20
+- **Settings UI Optimization:** Major performance improvements to the Settings dialog. Replaced slow grids with fast ListCtrls and implemented lazy-loading for all heavy tabs.
+- **Theme Caching:** Cached installed themes to reduce file I/O on startup.
+
+### Version 9.11 - 9.13
+- **Conflict Detection:** Added a smart startup dialog that detects conflicting NVDA add-ons (like older audio themes plugins) and allows the user to disable or uninstall them safely.
+
+### Version 9.4 - 9.10
+- **Native MP3 Decoding:** Integrated libmpg123 for fast, native MP3 decoding without relying entirely on FFmpeg.
+- **Audio Processing Pipeline:** Added OGG RAM caching, 24-bit WAV support, and completely migrated audio DSP features (SmartVolume, Envelope, TrimSilence) to the new pipeline.
+- **Translations:** Completed 100% full localization for Arabic, Spanish, Italian, Russian, German, and Chinese.
 
 ## Translators
 

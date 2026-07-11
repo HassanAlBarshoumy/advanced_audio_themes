@@ -63,26 +63,22 @@ Questo componente aggiuntivo ha beneficiato notevolmente della fusione e dello s
 </ul>
 <h3>Panoramica delle schede delle impostazioni</h3>
 <p>Il pannello delle impostazioni Temi audio avanzati contiene diverse schede per personalizzare ogni aspetto dell'esperienza audio. Di seguito un approfondimento su ogni opzione disponibile:</p>
-<h4>1. Scheda Generale</h4>
+<h4>1. Livello di navigazione (Navigation Layer)</h4>
 <ul>
-<li><strong>Abilita temi audio:</strong> Interruttore principale per accendere o spegnere il motore dei temi audio.</li>
-<li><strong>Seleziona tema:</strong> Menu a discesa per scegliere il tema audio attivo tra quelli installati.</li>
-<li><strong>Informazioni / Rimuovi / Aggiungi nuovo:</strong> Gestisci i tuoi temi. Puoi installare nuovi temi da file <code>.atp</code> o <code>.zip</code>.</li>
-<li><strong>Store dei temi:</strong> Apre lo store integrato per scaricare i temi creati dalla community.</li>
-<li><strong>Theme Studio:</strong> Apre lo studio per modificare o remixare il tema attualmente selezionato.</li>
-<li><strong>Anteprima:</strong> Riproduce una sequenza di suoni campione del tema attivo.</li>
-<li><strong>Riproduci i suoni in modalità 3D:</strong> Abilita l'elaborazione dell'audio spaziale.</li>
-<li><strong>Annuncia i ruoli:</strong> Scegli se NVDA deve pronunciare i ruoli dei controlli (come "pulsante", "link").</li>
-<li><strong>Annuncia i ruoli durante leggi tutto:</strong> Abilita o disabilita la pronuncia dei ruoli durante la lettura continua. Puoi usare il pulsante "Seleziona ruoli..." per specificare esattamente quali ruoli pronunciare.</li>
-<li><strong>Usa il volume del sintetizzatore vocale:</strong> Collega il volume del tema al volume della voce di NVDA. Disabilitalo per usare il cursore manuale.</li>
-<li><strong>Attenuazione audio (Ducking):</strong> Abbassa il volume dell'audio di sottofondo quando NVDA parla. Puoi scegliere quali categorie di suoni attenuare e impostare la percentuale del volume attenuato.</li>
-<li><strong>Comportamenti di fallback:</strong> Definisce cosa succede quando manca un suono per un ruolo specifico o per un primo/ultimo elemento (ad esempio, riproduci silenzio, riproduci un suono personalizzato o riproduci il primo suono disponibile).</li>
-<li><strong>I suoni di stato sopprimono il suono del ruolo:</strong> Se un elemento ha un suono di stato (ad es. casella di controllo attivata), impedirà la riproduzione del suono del ruolo per evitare confusione audio.</li>
-<li><strong>Lista nera (Blacklist) applicazioni:</strong> Un elenco separato da virgole di eseguibili di applicazioni in cui i temi audio devono essere completamente disabilitati. Puoi anche personalizzare quali categorie specifiche di suoni vengono soppresse in queste app.</li>
-<li><strong>Suoni di digitazione:</strong> Abilita i suoni della macchina da scrivere o della tastiera meccanica. Le opzioni includono la digitazione spaziale (simulazione delle posizioni fisiche sulla tastiera), la mappatura spaziale intelligente, la restrizione dei suoni alle caselle di modifica, la selezione di pacchetti di suoni e la regolazione del volume.</li>
-<li><strong>Gestione della configurazione:</strong> Cerca aggiornamenti, includi le versioni beta ed esporta/importa l'intera configurazione (inclusi temi, regole e suoni) in un singolo file <code>.atcfg</code>.</li>
+<li><strong>Scorciatoia:</strong> <code>NVDA+Win+N</code></li>
+<li><strong>Descrizione:</strong> Un ambiente di navigazione altamente ottimizzato e isolato progettato per accelerare la lettura del testo e la navigazione web. Una volta entrato, non è più necessario tenere premuti i tasti modificatori come <code>Alt</code> o <code>Shift</code>. Puoi navigare comodamente usando solo i tasti freccia.</li>
+<li><strong>Come usare (mentre sei nel livello):</strong></li>
+<li><strong>Frecce Sinistra / Destra:</strong> Passa tra <strong>27 diverse modalità di navigazione</strong> (Carattere, Parola, Riga, Frase, Paragrafo e elementi web come Intestazioni, Link, Pulsanti, Campi di modifica, Tabelle, Elenchi, Grafica, Punti di riferimento e altro).</li>
+<li><strong>Frecce Su / Giù:</strong> Salta all'elemento precedente o successivo in base alla modalità attualmente selezionata.</li>
+<li><strong>Premi <code>C</code>:</strong> Copia istantaneamente il testo dell'unità corrente negli appunti.</li>
+<li><strong>Premi <code>S</code>:</strong> Compita il testo dell'unità corrente.</li>
+<li><strong>Premi <code>Escape</code>:</strong> Esce dal livello e torna al normale funzionamento.</li>
+<li><strong>Funzioni intelligenti e personalizzazione:</strong></li>
+<li><strong>Uscita automatica (Timeout):</strong> Se lasciato inattivo per 10 secondi, il livello si disattiva automaticamente con un leggero segnale acustico in modo da non rimanere mai bloccati all'interno.</li>
+<li><strong>Pass-through dei tasti:</strong> Premendo un tasto non associato al livello si uscirà immediatamente dal livello e l'input verrà passato al sistema operativo senza interruzioni.</li>
+<li><strong>Personalizzazione completa (Scheda impostazioni 6):</strong> Puoi abilitare o disabilitare ciascuna delle 27 modalità per mantenere pulita la tua navigazione, regolare il timeout del livello e configurare i suoni delle azioni.</li>
 </ul>
-<h4>2. Scheda Motore Audio</h4>
+<h3>2. Scheda Motore Audio</h3>
 <ul>
 <li><strong>Normalizzazione intelligente del volume:</strong> Regola dinamicamente i suoni deboli e forti a un livello costante.</li>
 <li><strong>Inviluppo fluido:</strong> Applica micro dissolvenze in apertura e in chiusura per evitare crepitii o clic audio.</li>
@@ -324,6 +320,26 @@ Per utilizzare questa funzione:
 <td><strong>NVDA+Win+N</strong></td>
 <td>Attiva il livello di navigazione (navigazione veloce senza modificatori).</td>
 </tr>
+<tr>
+<td><strong>Ctrl+C / X / V</strong></td>
+<td>Copia, Taglia e Incolla con annunci audio.</td>
+</tr>
+<tr>
+<td><strong>Ctrl+A</strong></td>
+<td>Seleziona Tutto con annuncio audio.</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Z / Y</strong></td>
+<td>Annulla e Ripeti con annunci audio.</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+V</strong></td>
+<td>Incolla testo non formattato con annuncio audio.</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+Z</strong></td>
+<td>Ripeti alternativo con annuncio audio.</td>
+</tr>
 </tbody>
 </table>
 <h2>Compatibility &amp; Requirements</h2>
@@ -398,6 +414,26 @@ Per utilizzare questa funzione:
 <h3>Versione 9.23 - 9.26</h3>
 <ul>
 <li><strong>Correzioni:</strong> Correzione di bug nella navigazione e compatibilità con NVDA 2026.2.</li>
+</ul>
+<h3>Versione 9.21 - 9.22</h3>
+<ul>
+<li><strong>Miglioramenti dell'Importazione:</strong> Aggiunto il supporto per l'importazione di cartelle non compresse come temi e una finestra di dialogo per scegliere tra l'importazione di una cartella o di un file ZIP/.atp.</li>
+<li><strong>Aggiornamento automatico e Pre-rilascio:</strong> Aggiunte caselle di controllo nella scheda Generale per gestire gli aggiornamenti automatici e optare per le build beta pre-rilascio.</li>
+</ul>
+<h3>Versione 9.20</h3>
+<ul>
+<li><strong>Ottimizzazione dell'interfaccia utente delle Impostazioni:</strong> Importanti miglioramenti delle prestazioni nella finestra di dialogo delle Impostazioni. Sostituite le griglie lente con ListCtrl veloci e implementato il caricamento lento per le schede pesanti.</li>
+<li><strong>Caching dei Temi:</strong> Caching dei temi installati per ridurre le operazioni di I/O dei file all'avvio.</li>
+</ul>
+<h3>Versione 9.11 - 9.13</h3>
+<ul>
+<li><strong>Rilevamento dei Conflitti:</strong> Aggiunta una finestra di dialogo intelligente all'avvio che rileva i componenti aggiuntivi NVDA in conflitto (come i vecchi plugin dei temi audio) e consente all'utente di disabilitarli o disinstallarli in modo sicuro.</li>
+</ul>
+<h3>Versione 9.4 - 9.10</h3>
+<ul>
+<li><strong>Decodifica MP3 Nativa:</strong> Integrato libmpg123 per una decodifica MP3 rapida e nativa senza fare affidamento interamente su FFmpeg.</li>
+<li><strong>Pipeline di Elaborazione Audio:</strong> Aggiunto il caching RAM per OGG, il supporto per file WAV a 24 bit e migrazione completa delle funzionalità DSP audio (SmartVolume, Envelope, TrimSilence) nella nuova pipeline.</li>
+<li><strong>Traduzioni:</strong> Completata al 100% la localizzazione in arabo, spagnolo, italiano, russo, tedesco e cinese.</li>
 </ul>
 <h2>Traduttori</h2>
 <ul>

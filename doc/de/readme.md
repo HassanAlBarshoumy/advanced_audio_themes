@@ -96,25 +96,21 @@ Sie können die Audio-Themes-Funktion in den NVDA-Einstellungen aktivieren oder 
 
 Das Einstellungsfeld "Erweiterte Audio-Themes" enthält mehrere Reiter (Tabs), um jeden Aspekt des Audioerlebnisses anzupassen. Im Folgenden finden Sie einen tiefen Einblick in jede verfügbare Option:
 
-#### 1. Reiter "Allgemein"
-- **Audio-Themes aktivieren:** Hauptschalter zum Ein- oder Ausschalten der Audio-Themes-Engine.
-- **Theme auswählen:** Dropdown-Menü zur Auswahl des aktiven Audio-Themes aus den installierten Themes.
-- **Über / Entfernen / Neu hinzufügen:** Verwalten Sie Ihre Themes. Sie können neue Themes aus `.atp`- oder `.zip`-Dateien installieren.
-- **Theme Store:** Öffnet den integrierten Store zum Herunterladen von der Community erstellter Themes.
-- **Theme Studio:** Öffnet das Studio, um das aktuell ausgewählte Theme zu bearbeiten oder neu zu mischen.
-- **Vorschau:** Spielt eine Sequenz von Beispielklängen des aktiven Themes ab.
-- **Töne im 3D-Modus abspielen:** Aktiviert die räumliche Audioverarbeitung.
-- **Rollen ansagen:** Umschalten, ob NVDA Steuerelementrollen (wie "Schaltfläche", "Link") anspricht.
-- **Rollen beim fortlaufenden Lesen ansagen:** Schaltet die Rollenansage beim fortlaufenden Lesen ein oder aus. Mit der Schaltfläche "Rollen auswählen..." können Sie genau festlegen, welche Rollen angesagt werden sollen.
-- **Lautstärke des Sprachausgabegeräts verwenden:** Verknüpft die Theme-Lautstärke mit der NVDA-Stimmenlautstärke. Deaktivieren Sie dies, um den manuellen Schieberegler zu verwenden.
-- **Audio-Ducking:** Senkt die Lautstärke des Hintergrund-Audios, wenn NVDA spricht. Sie können wählen, welche Klangkategorien abgedämpft werden sollen und den Prozentsatz der abgedämpften Lautstärke festlegen.
-- **Ersatzverhalten (Fallback):** Legen Sie fest, was passiert, wenn ein Ton für eine bestimmte Rolle oder ein erstes/letztes Element fehlt (z. B. Stille abspielen, einen benutzerdefinierten Ton abspielen oder den ersten verfügbaren Ton abspielen).
-- **Status-Töne unterdrücken den Rollenton:** Wenn ein Element einen Status-Ton hat (z.B. aktiviertes Kontrollkästchen), wird verhindert, dass der Rollenton abgespielt wird, um akustische Überladung zu vermeiden.
-- **Anwendungs-Sperrliste (Blacklist):** Eine kommagetrennte Liste ausführbarer Anwendungsdateien, bei denen Audio-Themes vollständig deaktiviert werden sollen. Sie können auch anpassen, welche spezifischen Klangkategorien in diesen Apps unterdrückt werden.
-- **Tipp-Sounds:** Aktivieren Sie Schreibmaschinen- oder mechanische Tastaturgeräusche. Zu den Optionen gehören räumliches Tippen, intelligente räumliche Zuordnung, Beschränkung der Töne auf Eingabefelder, Auswahl von Soundpaketen und Lautstärkeanpassung.
-- **Konfigurationsmanagement:** Suchen Sie nach Updates, schließen Sie Beta-Versionen ein und Exportieren/Importieren Sie Ihre gesamte Konfiguration in eine einzige `.atcfg`-Datei.
+#### 1. Navigationsschicht (Navigation Layer)
+- **Tastenkürzel:** `NVDA+Win+N`
+- **Beschreibung:** Eine hochoptimierte, isolierte Navigationsumgebung, die das Lesen von Texten und das Surfen im Internet beschleunigt. Sobald Sie sich darin befinden, müssen Sie keine Modifikatortasten wie `Alt` oder `Shift` mehr gedrückt halten. Sie können mühelos nur mit den Pfeiltasten navigieren, was die Finger entlastet.
+- **Bedienung (innerhalb der Schicht):**
+  - **Links / Rechts Pfeiltasten:** Wechseln Sie zwischen **27 verschiedenen Navigationsmodi** (Zeichen, Wort, Zeile, Satz, Absatz und Web-Elemente wie Überschriften, Links, Schaltflächen, Eingabefelder, Tabellen, Listen, Grafiken, Sprungmarken usw.).
+  - **Auf / Ab Pfeiltasten:** Springen Sie basierend auf dem aktuell ausgewählten Modus zum vorherigen oder nächsten Element.
+  - **Drücken Sie `C`:** Kopiert den Text der aktuellen Einheit sofort in die Zwischenablage.
+  - **Drücken Sie `S`:** Buchstabiert den Text der aktuellen Einheit.
+  - **Drücken Sie `Escape`:** Verlässt die Schicht und kehrt zum normalen Betrieb zurück.
+- **Intelligente Funktionen & Anpassung:**
+  - **Automatisches Beenden (Timeout):** Wenn Sie 10 Sekunden lang nichts tun, wird die Schicht automatisch mit einem leisen akustischen Signal beendet.
+  - **Tasten-Passthrough (Durchreichen):** Das Drücken einer Taste, die nicht an die Schicht gebunden ist, beendet die Schicht sofort und leitet den Tastendruck nahtlos an das Betriebssystem weiter.
+  - **Vollständige Anpassung (Einstellungen Tab 6):** Sie können jeden der 27 Modi aktivieren oder deaktivieren, um den Modus-Wechsel übersichtlich zu halten, das Schicht-Timeout anpassen und Aktionssounds konfigurieren.
 
-#### 2. Reiter "Audio-Engine"
+### 2. Reiter "Audio-Engine"
 - **Intelligente Lautstärkenormalisierung:** Passt leise und laute Töne dynamisch an ein konstantes Niveau an.
 - **Weiche Hüllkurve:** Wendet Mikro-Fade-Ins und Fade-Outs an, um Audio-Knacksen oder -Klicken zu verhindern.
 - **Weiches 3D-Panning:** Erzeugt einen Gleiteffekt, wenn sich Objekte über den Bildschirm bewegen, anstatt sofort zu springen.
@@ -299,6 +295,11 @@ In dieses Add-on ist eine Reihe hochgradig erweiterter Funktionen integriert, di
 | **Alt+Umschalt+Pfeiltasten** | Erweiterte Absatznavigation. |
 | **NVDA+Alt+Pfeiltasten** | Erweiterte Webnavigation (BrowserNav). |
 | **NVDA+Win+N** | Navigationsebene umschalten (schnelle Navigation ohne Modifikatoren). |
+| **Strg+C / X / V** | Kopieren, Ausschneiden und Einfügen mit akustischen Ansagen. |
+| **Strg+A** | Alles auswählen mit akustischer Ansage. |
+| **Strg+Z / Y** | Rückgängig und Wiederherstellen mit akustischen Ansagen. |
+| **Strg+Umschalt+V** | Einfachen Text einfügen mit akustischer Ansage. |
+| **Strg+Umschalt+Z** | Alternatives Wiederherstellen mit akustischer Ansage. |
 
 ## Compatibility & Requirements
 - **NVDA Version:** Requires NVDA 2024.1.0 or later.
@@ -364,6 +365,22 @@ You can view the source code, report issues, or contribute to the project on Git
 
 ### Version 9.23 - 9.26
 - **Fehlerbehebungen:** Fehler bei Satznavigation und NVDA 2026.2-Kompatibilität behoben.
+
+### Version 9.21 - 9.22
+- **Importverbesserungen:** Unterstützung für den Import entkomprimierter Ordner als Themen hinzugefügt sowie ein Dialog zur Auswahl zwischen Ordner oder ZIP/.atp-Datei.
+- **Auto-Update & Vorabversion:** Kontrollkästchen im Tab "Allgemein" hinzugefügt, um Auto-Updates zu verwalten und Beta-Builds vor der Veröffentlichung zu nutzen.
+
+### Version 9.20
+- **Optimierung der Einstellungs-Benutzeroberfläche:** Erhebliche Leistungsverbesserungen im Einstellungsdialog. Langsame Raster wurden durch schnelle ListCtrls ersetzt und Lazy-Loading für alle rechenintensiven Tabs implementiert.
+- **Theme-Caching:** Installierte Themen werden zwischengespeichert, um Datei-I/O beim Start zu reduzieren.
+
+### Version 9.11 - 9.13
+- **Konflikterkennung:** Ein intelligenter Startdialog wurde hinzugefügt, der in Konflikt stehende NVDA-Add-ons (wie ältere Audio-Themes-Plugins) erkennt und es dem Benutzer ermöglicht, diese sicher zu deaktivieren oder zu deinstallieren.
+
+### Version 9.4 - 9.10
+- **Native MP3-Dekodierung:** libmpg123 integriert für eine schnelle, native MP3-Dekodierung ohne vollständige Abhängigkeit von FFmpeg.
+- **Audio-Verarbeitungspipeline:** OGG RAM-Caching und 24-Bit-WAV-Unterstützung hinzugefügt und Audio-DSP-Funktionen (SmartVolume, Envelope, TrimSilence) vollständig auf die neue Pipeline umgestellt.
+- **Übersetzungen:** 100%ige Lokalisierung für Arabisch, Spanisch, Italienisch, Russisch, Deutsch und Chinesisch abgeschlossen.
 
 ## Übersetzer
 - **Spanisch:** Hassan AlBarshoumy, Luis Carlos González Morales

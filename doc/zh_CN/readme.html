@@ -199,14 +199,17 @@
 <h3>1. 导航层 (Navigation Layer)</h3>
 <ul>
 <li><strong>快捷键：</strong> <code>NVDA+Win+N</code></li>
-<li><strong>描述：</strong> 进入此层后，您无需再按住 <code>Alt</code>、<code>Shift</code> 或任何修饰键即可进行导航。您只需使用方向键！</li>
-<li><strong>如何使用：</strong></li>
-<li>使用 左右方向键 循环切换 <strong>27 种不同的导航模式</strong>（字符、单词、行、句子、段落、标题、链接、按钮、编辑字段、表格等）。</li>
-<li>使用 上下方向键 根据当前模式跳转到上一个/下一个项目。</li>
-<li>按 <code>C</code> 将当前项目复制到剪贴板。</li>
-<li>按 <code>S</code> 拼读当前项目。</li>
-<li>按 <code>R</code> 从当前项目开始连续朗读。</li>
-<li>按 <code>Escape</code> 退出导航层。</li>
+<li><strong>描述：</strong> 这是一个高度优化的隔离导航环境，旨在加速文本和网页浏览。进入后，您无需按住 <code>Alt</code> 或 <code>Shift</code> 等修饰键即可轻松导航，只需使用方向键即可，从而减轻手指疲劳并加快工作流程。</li>
+<li><strong>使用方法（在导航层中）：</strong></li>
+<li><strong>左 / 右方向键：</strong> 在 <strong>27 种不同的导航模式</strong> 之间循环切换（字符、单词、行、句子、段落，以及标题、链接、按钮、编辑框、表格、列表、图形、地标等网页元素）。</li>
+<li><strong>上 / 下方向键：</strong> 根据当前选择的模式跳转到上一个或下一个项目。</li>
+<li><strong>按 <code>C</code> 键：</strong> 立即将当前项目的文本复制到剪贴板。</li>
+<li><strong>按 <code>S</code> 键：</strong> 拼读当前项目的文本。</li>
+<li><strong>按 <code>Escape</code> 键：</strong> 退出导航层并返回正常操作。</li>
+<li><strong>智能功能与自定义：</strong></li>
+<li><strong>自动退出 (Timeout)：</strong> 如果闲置 10 秒钟未操作，导航层将发出轻柔的提示音并自动退出，确保您不会被困在其中。</li>
+<li><strong>按键穿透 (Pass-through)：</strong> 按下未绑定到导航层的任何按键将立即退出该层，并将按键操作无缝传递给操作系统。</li>
+<li><strong>完全自定义 (设置选项卡 6)：</strong> 您可以启用或禁用这 27 种模式中的任何一种，以保持模式切换的整洁，调整导航层的超时时间，并配置操作提示音。</li>
 </ul>
 <h3>2. 音频声纳 (Audio Sonar)</h3>
 <ul>
@@ -334,6 +337,26 @@
 <td><strong>NVDA+Win+N</strong></td>
 <td>切换导航层（无需按修饰键的快速导航）。</td>
 </tr>
+<tr>
+<td><strong>Ctrl+C / X / V</strong></td>
+<td>复制、剪切和粘贴，并带有语音和音频提示。</td>
+</tr>
+<tr>
+<td><strong>Ctrl+A</strong></td>
+<td>全选，并带有音频提示。</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Z / Y</strong></td>
+<td>撤销和重做，并带有音频提示。</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+V</strong></td>
+<td>粘贴纯文本，并带有音频提示。</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+Z</strong></td>
+<td>备用重做，并带有音频提示。</td>
+</tr>
 </tbody>
 </table>
 <h2>兼容性与要求</h2>
@@ -380,5 +403,25 @@
 <h2>技术支持</h2>
 <p>如果遇到任何问题、有任何请求或要报告错误，请联系官方支持通道：
 <strong><a href="https://t.me/HassanAlBarshoumy">Hassan AlBarshoumy 的 Telegram</a></strong></p>
+<h3>版本 9.21 - 9.22</h3>
+<ul>
+<li><strong>导入增强：</strong> 增加了对未压缩文件夹作为主题导入的支持，以及一个对话框，用于在导入文件夹或 ZIP/.atp 文件之间进行选择。</li>
+<li><strong>自动更新和预览版：</strong> 在“常规”选项卡中添加了复选框，以处理自动更新和选择加入预览测试版。</li>
+</ul>
+<h3>版本 9.20</h3>
+<ul>
+<li><strong>设置 UI 优化：</strong> 设置对话框的性能大幅提升。用快速的 ListCtrl 替换了缓慢的网格，并对所有繁重的选项卡实施了延迟加载。</li>
+<li><strong>主题缓存：</strong> 缓存已安装的主题以减少启动时的文件 I/O。</li>
+</ul>
+<h3>版本 9.11 - 9.13</h3>
+<ul>
+<li><strong>冲突检测：</strong> 添加了一个智能启动对话框，该对话框可检测冲突的 NVDA 附加组件（如较旧的音频主题插件），并允许用户安全地禁用或卸载它们。</li>
+</ul>
+<h3>版本 9.4 - 9.10</h3>
+<ul>
+<li><strong>原生 MP3 解码：</strong> 集成了 libmpg123，可进行快速的原生 MP3 解码，而无需完全依赖 FFmpeg。</li>
+<li><strong>音频处理管道：</strong> 增加了 OGG RAM 缓存、24 位 WAV 支持，并将音频 DSP 功能（SmartVolume、Envelope、TrimSilence）完全迁移到新管道。</li>
+<li><strong>翻译：</strong> 完成了阿拉伯语、西班牙语、意大利语、俄语、德语和中文的 100% 本地化。</li>
+</ul>
 </body>
 </html>

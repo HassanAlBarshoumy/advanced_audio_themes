@@ -70,25 +70,21 @@ Puede activar o desactivar la función de temas de audio en la configuración de
 
 El panel de configuración de Temas de Audio Avanzados contiene varias pestañas para personalizar cada aspecto de la experiencia de audio. A continuación, se detalla cada opción disponible:
 
-#### 1. Pestaña General
-- **Activar temas de audio:** Interruptor principal para encender o apagar el motor de temas de audio.
-- **Seleccionar tema:** Menú desplegable para elegir el tema de audio activo de los instalados.
-- **Acerca de / Eliminar / Añadir nuevo:** Gestiona tus temas. Puedes instalar temas nuevos desde archivos `.atp` o `.zip`.
-- **Tienda de Temas:** Abre la tienda integrada para descargar temas creados por la comunidad.
-- **Theme Studio:** Abre el estudio para editar o remezclar el tema actualmente seleccionado.
-- **Vista previa:** Reproduce una secuencia de sonidos de muestra del tema activo.
-- **Reproducir sonidos en modo 3D:** Activa el procesamiento de audio espacial.
-- **Anunciar roles:** Alterna si NVDA habla los roles de los controles (como "botón", "enlace").
-- **Anunciar roles durante lectura continua:** Alterna la pronunciación de roles durante la lectura continua. Puedes usar el botón "Seleccionar roles..." para especificar exactamente qué roles hablar.
-- **Usar el volumen del sintetizador de voz:** Vincula el volumen del tema al volumen de la voz de NVDA. Desactívalo para usar el control deslizante manual.
-- **Atenuación de audio (Ducking):** Reduce el volumen del audio de fondo cuando NVDA habla. Puedes elegir qué categorías de sonido se atenuarán y establecer el porcentaje de volumen atenuado.
-- **Comportamientos alternativos:** Define qué sucede cuando falta un sonido para un rol específico o un primer/último elemento (por ejemplo, reproducir silencio, un sonido personalizado o el primer sonido disponible).
-- **Sonidos de estado suprimen el sonido del rol:** Si un elemento tiene un sonido de estado (p. ej., casilla verificada), evitará que se reproduzca el sonido del rol para evitar la saturación auditiva.
-- **Lista negra de aplicaciones:** Una lista de ejecutables de aplicaciones separada por comas donde los temas de audio deben desactivarse por completo. También puedes personalizar qué categorías de sonido específicas se suprimen en estas aplicaciones.
-- **Sonidos de escritura:** Habilita sonidos de máquina de escribir o teclado mecánico. Las opciones incluyen escritura espacial (simulando posiciones de teclado físico), asignación espacial inteligente, restricción de sonidos a cuadros de edición, selección de paquetes de sonidos y ajuste de volumen.
-- **Gestión de configuración:** Busca actualizaciones, incluye versiones beta y Exporta/Importa toda tu configuración (incluyendo temas, reglas y sonidos) a un único archivo `.atcfg`.
+#### 1. Capa de Navegación (Navigation Layer)
+- **Atajo:** `NVDA+Win+N`
+- **Descripción:** Un entorno de navegación altamente optimizado y aislado diseñado para acelerar la lectura de textos y la navegación web. Una vez activado, te liberas de mantener presionadas las teclas modificadoras como `Alt` o `Shift`. Puedes navegar sin esfuerzo utilizando solo las teclas de flecha, reduciendo la fatiga de los dedos.
+- **Cómo usar (mientras estás en la capa):**
+  - **Flechas Izquierda / Derecha:** Alterna entre **27 modos de navegación diferentes** (Carácter, Palabra, Línea, Oración, Párrafo y elementos web como Encabezados, Enlaces, Botones, Campos de edición, Tablas, Listas, Gráficos, Regiones, etc.).
+  - **Flechas Arriba / Abajo:** Salta al elemento anterior o siguiente basándose en el modo seleccionado actualmente.
+  - **Presiona `C`:** Copia instantáneamente el texto de la unidad actual al portapapeles.
+  - **Presiona `S`:** Deletrea el texto de la unidad actual.
+  - **Presiona `Escape`:** Sale de la capa y vuelve al funcionamiento normal.
+- **Funciones Inteligentes y Personalización:**
+  - **Salida Automática (Timeout):** Si se deja inactiva durante 10 segundos, la capa se cierra automáticamente con un suave aviso de audio para que nunca te quedes atrapado dentro.
+  - **Paso de Teclas (Pass-through):** Presionar cualquier tecla no vinculada a la capa saldrá inmediatamente de la misma y pasará la pulsación al sistema operativo sin problemas.
+  - **Personalización Completa (Pestaña de Configuración 6):** Puedes activar o desactivar cualquiera de los 27 modos para mantener tu ciclo de modos libre de desorden, ajustar el tiempo de espera de la capa y configurar los sonidos de acción.
 
-#### 2. Pestaña Motor de Audio
+### 2. Pestaña Motor de Audio
 - **Normalización inteligente de volumen:** Ajusta dinámicamente sonidos silenciosos y fuertes a un nivel constante.
 - **Envolvente suave:** Aplica micro desvanecimientos (fade-ins y fade-outs) para evitar chasquidos o clics en el audio.
 - **Panoramización 3D suave:** Crea un efecto de deslizamiento cuando los objetos se mueven por la pantalla en lugar de saltar instantáneamente.
@@ -269,6 +265,11 @@ En este complemento están integradas una serie de funciones muy avanzadas que p
 | **Alt+Shift+Flechas** | Navegación avanzada por párrafos. |
 | **NVDA+Alt+Flechas** | Navegación Web avanzada (BrowserNav). |
 | **NVDA+Win+N** | Alternar la Capa de Navegación (navegación rápida sin modificadores). |
+| **Ctrl+C / X / V** | Copiar, Cortar y Pegar con anuncios de audio. |
+| **Ctrl+A** | Seleccionar todo con anuncio de audio. |
+| **Ctrl+Z / Y** | Deshacer y Rehacer con anuncios de audio. |
+| **Ctrl+Shift+V** | Pegar texto sin formato con anuncio de audio. |
+| **Ctrl+Shift+Z** | Rehacer alternativo con anuncio de audio. |
 
 ## Compatibility & Requirements
 - **NVDA Version:** Requires NVDA 2024.1.0 or later.
@@ -342,3 +343,20 @@ You can view the source code, report issues, or contribute to the project on Git
 - **Chino:** Cary-rowen, Jerry
 - **Alemán:** René L
 
+
+
+### Versión 9.21 - 9.22
+- **Mejoras de Importación:** Se agregó soporte para importar carpetas sin comprimir como temas, y un diálogo para elegir entre importar una carpeta o un archivo ZIP/.atp.
+- **Actualización automática y Pre-lanzamiento:** Se agregaron casillas en la pestaña General para manejar actualizaciones automáticas y optar por versiones beta.
+
+### Versión 9.20
+- **Optimización de la Interfaz de Configuración:** Importantes mejoras de rendimiento en el diálogo de configuración. Se reemplazaron las cuadrículas lentas por ListCtrls rápidos y se implementó la carga diferida para las pestañas pesadas.
+- **Caché de Temas:** Almacenamiento en caché de temas instalados para reducir la entrada/salida de archivos al inicio.
+
+### Versión 9.11 - 9.13
+- **Detección de Conflictos:** Se agregó un diálogo de inicio inteligente que detecta complementos de NVDA conflictivos (como plugins de temas de audio más antiguos) y permite al usuario deshabilitarlos o desinstalarlos de manera segura.
+
+### Versión 9.4 - 9.10
+- **Decodificación MP3 Nativa:** Se integró libmpg123 para una decodificación MP3 nativa y rápida sin depender completamente de FFmpeg.
+- **Tubería de Procesamiento de Audio:** Se agregó almacenamiento en caché RAM para OGG, soporte para WAV de 24 bits, y se migraron completamente las características de DSP de audio (SmartVolume, Envelope, TrimSilence).
+- **Traducciones:** Se completó el 100% de la localización para Árabe, Español, Italiano, Ruso, Alemán y Chino.

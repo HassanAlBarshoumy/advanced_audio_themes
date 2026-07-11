@@ -62,6 +62,7 @@ class NavLayerMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._navLayerActive = False
+        self._suppressAllGestures = False
         self._navLayerModeIndex = 0
         self._navLayerTimer = None
         self._activeModes = []
@@ -74,7 +75,6 @@ class NavLayerMixin:
             "kb:escape": "navLayerExit",
             "kb:c": "navLayerCopy",
             "kb:s": "navLayerSpell",
-
         }
 
     def _loadActiveModes(self):
@@ -93,6 +93,8 @@ class NavLayerMixin:
             self._activeModes = [self._ALL_MODES[2]] # Fallback to Line
 
     def getScript(self, gesture):
+        if self._suppressAllGestures:
+            return None
         if self._navLayerActive:
             script_func = super().getScript(gesture)
             nlConf = config.conf.get("audiothemes", {})
@@ -244,9 +246,11 @@ class NavLayerMixin:
             self._navLayerTimer.cancel()
             self._navLayerTimer = None
             
-        self.clearGestureBindings()
-        if hasattr(self, '_rebindInstanceGestures'):
-            self._rebindInstanceGestures()
+        for ident in self._navLayerGestures:
+            try:
+                self.removeGestureBinding(ident)
+            except (LookupError, ValueError):
+                pass
         
         from speech.sayAll import SayAllHandler
         SayAllHandler.stop()
@@ -263,16 +267,14 @@ class NavLayerMixin:
             return
             
         self._navLayerActive = False
-        self.clearGestureBindings()
-        if hasattr(self, '_rebindInstanceGestures'):
-            self._rebindInstanceGestures()
+        self._suppressAllGestures = True
         try:
             inputCore.manager.executeGesture(gest)
         finally:
             from speech.sayAll import SayAllHandler
             SayAllHandler.stop()
+            self._suppressAllGestures = False
             self._navLayerActive = True
-            self.bindGestures(self._navLayerGestures)
 
     def _sendVKKey(self, vk, shift=False):
         import inputCore
@@ -284,16 +286,14 @@ class NavLayerMixin:
         gest = keyboardHandler.KeyboardInputGesture(modifiers, vk, 0, False)
         
         self._navLayerActive = False
-        self.clearGestureBindings()
-        if hasattr(self, '_rebindInstanceGestures'):
-            self._rebindInstanceGestures()
+        self._suppressAllGestures = True
         try:
             inputCore.manager.executeGesture(gest)
         finally:
             from speech.sayAll import SayAllHandler
             SayAllHandler.stop()
+            self._suppressAllGestures = False
             self._navLayerActive = True
-            self.bindGestures(self._navLayerGestures)
 
     def _performNavAction(self, direction):
         if not self._activeModes: return

@@ -245,14 +245,17 @@ To utilize this feature:
 <h3>1. Navigation Layer</h3>
 <ul>
 <li><strong>Shortcut:</strong> <code>NVDA+Win+N</code></li>
-<li><strong>Description:</strong> Once you enter this layer, you no longer need to hold <code>Alt</code>, <code>Shift</code>, or any modifier key to navigate. You can use just the arrow keys!</li>
-<li><strong>How to use:</strong></li>
-<li>Use Left/Right Arrows to cycle through <strong>27 different navigation modes</strong> (Character, Word, Line, Sentence, Paragraph, Heading, Link, Button, Edit field, Table, etc.).</li>
-<li>Use Up/Down Arrows to jump to the previous/next item based on the current mode.</li>
-<li>Press <code>C</code> to copy the current item to the clipboard.</li>
-<li>Press <code>S</code> to spell the current item.</li>
-<li>Press <code>R</code> to Read All starting from the current item.</li>
-<li>Press <code>Escape</code> to exit the layer.</li>
+<li><strong>Description:</strong> A highly optimized, isolated navigation environment designed to accelerate text and web browsing. Once entered, you are freed from holding modifier keys like <code>Alt</code> or <code>Shift</code>. You can navigate effortlessly using just the arrow keys, reducing finger strain and speeding up your workflow.</li>
+<li><strong>How to use (while in the layer):</strong></li>
+<li><strong>Left / Right Arrows:</strong> Cycle through <strong>27 different navigation modes</strong> (Character, Word, Line, Sentence, Paragraph, and web elements like Headings, Links, Buttons, Edit fields, Tables, Lists, Graphics, Landmarks, and more).</li>
+<li><strong>Up / Down Arrows:</strong> Jump to the previous or next item based on your currently selected mode.</li>
+<li><strong>Press <code>C</code>:</strong> Instantly copy the text of the current unit to your clipboard.</li>
+<li><strong>Press <code>S</code>:</strong> Spell out the text of the current unit.</li>
+<li><strong>Press <code>Escape</code>:</strong> Exit the layer and return to normal operation.</li>
+<li><strong>Smart Features &amp; Customization:</strong></li>
+<li><strong>Auto-Exit (Timeout):</strong> If left idle for 10 seconds, the layer automatically exits with a soft audio cue so you are never trapped inside.</li>
+<li><strong>Key Pass-through:</strong> Pressing any key not bound to the layer (e.g., Windows key) will immediately exit the layer and pass the keypress to the OS seamlessly.</li>
+<li><strong>Full Customization (Settings Tab 6):</strong> You can enable or disable any of the 27 modes to keep your mode-cycling clutter-free, adjust layer timeout, and configure action sounds.</li>
 </ul>
 <h3>2. Audio Sonar</h3>
 <ul>
@@ -383,6 +386,26 @@ To utilize this feature:
 <td><strong>NVDA+Win+N</strong></td>
 <td>Toggle Navigation Layer (fast navigation without modifiers).</td>
 </tr>
+<tr>
+<td><strong>Ctrl+C / X / V</strong></td>
+<td>Copy, Cut, and Paste with audio announcements.</td>
+</tr>
+<tr>
+<td><strong>Ctrl+A</strong></td>
+<td>Select All with audio announcement.</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Z / Y</strong></td>
+<td>Undo and Redo with audio announcements.</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+V</strong></td>
+<td>Paste plain text with audio announcement.</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+Z</strong></td>
+<td>Alternate redo with audio announcement.</td>
+</tr>
 </tbody>
 </table>
 <h2>Compatibility &amp; Requirements</h2>
@@ -427,6 +450,26 @@ To utilize this feature:
 <li><strong>Sentence Navigation Fixes:</strong> Fixed a bug causing NVDA to endlessly repeat sentences when reading Arabic text in VirtualBuffers.</li>
 <li><strong>NVDA 2026.2 Compatibility:</strong> Migrated to the new <code>NVDAHelper.localLib.generateBeep</code> API to resolve deprecation warnings and ensure stability on future NVDA versions.</li>
 <li><strong>Auto-Update Fix:</strong> Resolved a critical freeze in NVDA during the auto-update download process.</li>
+</ul>
+<h3>Version 9.21 - 9.22</h3>
+<ul>
+<li><strong>Import Enhancements:</strong> Added support for importing uncompressed folders as themes, and a dialog to choose between importing a folder or ZIP/.atp file.</li>
+<li><strong>Auto-Update &amp; Pre-release:</strong> Added checkboxes in the General tab to handle auto-updates and opt into pre-release beta builds.</li>
+</ul>
+<h3>Version 9.20</h3>
+<ul>
+<li><strong>Settings UI Optimization:</strong> Major performance improvements to the Settings dialog. Replaced slow grids with fast ListCtrls and implemented lazy-loading for all heavy tabs.</li>
+<li><strong>Theme Caching:</strong> Cached installed themes to reduce file I/O on startup.</li>
+</ul>
+<h3>Version 9.11 - 9.13</h3>
+<ul>
+<li><strong>Conflict Detection:</strong> Added a smart startup dialog that detects conflicting NVDA add-ons (like older audio themes plugins) and allows the user to disable or uninstall them safely.</li>
+</ul>
+<h3>Version 9.4 - 9.10</h3>
+<ul>
+<li><strong>Native MP3 Decoding:</strong> Integrated libmpg123 for fast, native MP3 decoding without relying entirely on FFmpeg.</li>
+<li><strong>Audio Processing Pipeline:</strong> Added OGG RAM caching, 24-bit WAV support, and completely migrated audio DSP features (SmartVolume, Envelope, TrimSilence) to the new pipeline.</li>
+<li><strong>Translations:</strong> Completed 100% full localization for Arabic, Spanish, Italian, Russian, German, and Chinese.</li>
 </ul>
 <h2>Translators</h2>
 <ul>

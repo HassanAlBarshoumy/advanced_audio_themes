@@ -63,26 +63,22 @@ Este complemento se ha beneficiado enormemente de la fusión y el desarrollo de 
 </ul>
 <h3>Descripción general de las pestañas de configuración</h3>
 <p>El panel de configuración de Temas de Audio Avanzados contiene varias pestañas para personalizar cada aspecto de la experiencia de audio. A continuación, se detalla cada opción disponible:</p>
-<h4>1. Pestaña General</h4>
+<h4>1. Capa de Navegación (Navigation Layer)</h4>
 <ul>
-<li><strong>Activar temas de audio:</strong> Interruptor principal para encender o apagar el motor de temas de audio.</li>
-<li><strong>Seleccionar tema:</strong> Menú desplegable para elegir el tema de audio activo de los instalados.</li>
-<li><strong>Acerca de / Eliminar / Añadir nuevo:</strong> Gestiona tus temas. Puedes instalar temas nuevos desde archivos <code>.atp</code> o <code>.zip</code>.</li>
-<li><strong>Tienda de Temas:</strong> Abre la tienda integrada para descargar temas creados por la comunidad.</li>
-<li><strong>Theme Studio:</strong> Abre el estudio para editar o remezclar el tema actualmente seleccionado.</li>
-<li><strong>Vista previa:</strong> Reproduce una secuencia de sonidos de muestra del tema activo.</li>
-<li><strong>Reproducir sonidos en modo 3D:</strong> Activa el procesamiento de audio espacial.</li>
-<li><strong>Anunciar roles:</strong> Alterna si NVDA habla los roles de los controles (como "botón", "enlace").</li>
-<li><strong>Anunciar roles durante lectura continua:</strong> Alterna la pronunciación de roles durante la lectura continua. Puedes usar el botón "Seleccionar roles..." para especificar exactamente qué roles hablar.</li>
-<li><strong>Usar el volumen del sintetizador de voz:</strong> Vincula el volumen del tema al volumen de la voz de NVDA. Desactívalo para usar el control deslizante manual.</li>
-<li><strong>Atenuación de audio (Ducking):</strong> Reduce el volumen del audio de fondo cuando NVDA habla. Puedes elegir qué categorías de sonido se atenuarán y establecer el porcentaje de volumen atenuado.</li>
-<li><strong>Comportamientos alternativos:</strong> Define qué sucede cuando falta un sonido para un rol específico o un primer/último elemento (por ejemplo, reproducir silencio, un sonido personalizado o el primer sonido disponible).</li>
-<li><strong>Sonidos de estado suprimen el sonido del rol:</strong> Si un elemento tiene un sonido de estado (p. ej., casilla verificada), evitará que se reproduzca el sonido del rol para evitar la saturación auditiva.</li>
-<li><strong>Lista negra de aplicaciones:</strong> Una lista de ejecutables de aplicaciones separada por comas donde los temas de audio deben desactivarse por completo. También puedes personalizar qué categorías de sonido específicas se suprimen en estas aplicaciones.</li>
-<li><strong>Sonidos de escritura:</strong> Habilita sonidos de máquina de escribir o teclado mecánico. Las opciones incluyen escritura espacial (simulando posiciones de teclado físico), asignación espacial inteligente, restricción de sonidos a cuadros de edición, selección de paquetes de sonidos y ajuste de volumen.</li>
-<li><strong>Gestión de configuración:</strong> Busca actualizaciones, incluye versiones beta y Exporta/Importa toda tu configuración (incluyendo temas, reglas y sonidos) a un único archivo <code>.atcfg</code>.</li>
+<li><strong>Atajo:</strong> <code>NVDA+Win+N</code></li>
+<li><strong>Descripción:</strong> Un entorno de navegación altamente optimizado y aislado diseñado para acelerar la lectura de textos y la navegación web. Una vez activado, te liberas de mantener presionadas las teclas modificadoras como <code>Alt</code> o <code>Shift</code>. Puedes navegar sin esfuerzo utilizando solo las teclas de flecha, reduciendo la fatiga de los dedos.</li>
+<li><strong>Cómo usar (mientras estás en la capa):</strong></li>
+<li><strong>Flechas Izquierda / Derecha:</strong> Alterna entre <strong>27 modos de navegación diferentes</strong> (Carácter, Palabra, Línea, Oración, Párrafo y elementos web como Encabezados, Enlaces, Botones, Campos de edición, Tablas, Listas, Gráficos, Regiones, etc.).</li>
+<li><strong>Flechas Arriba / Abajo:</strong> Salta al elemento anterior o siguiente basándose en el modo seleccionado actualmente.</li>
+<li><strong>Presiona <code>C</code>:</strong> Copia instantáneamente el texto de la unidad actual al portapapeles.</li>
+<li><strong>Presiona <code>S</code>:</strong> Deletrea el texto de la unidad actual.</li>
+<li><strong>Presiona <code>Escape</code>:</strong> Sale de la capa y vuelve al funcionamiento normal.</li>
+<li><strong>Funciones Inteligentes y Personalización:</strong></li>
+<li><strong>Salida Automática (Timeout):</strong> Si se deja inactiva durante 10 segundos, la capa se cierra automáticamente con un suave aviso de audio para que nunca te quedes atrapado dentro.</li>
+<li><strong>Paso de Teclas (Pass-through):</strong> Presionar cualquier tecla no vinculada a la capa saldrá inmediatamente de la misma y pasará la pulsación al sistema operativo sin problemas.</li>
+<li><strong>Personalización Completa (Pestaña de Configuración 6):</strong> Puedes activar o desactivar cualquiera de los 27 modos para mantener tu ciclo de modos libre de desorden, ajustar el tiempo de espera de la capa y configurar los sonidos de acción.</li>
 </ul>
-<h4>2. Pestaña Motor de Audio</h4>
+<h3>2. Pestaña Motor de Audio</h3>
 <ul>
 <li><strong>Normalización inteligente de volumen:</strong> Ajusta dinámicamente sonidos silenciosos y fuertes a un nivel constante.</li>
 <li><strong>Envolvente suave:</strong> Aplica micro desvanecimientos (fade-ins y fade-outs) para evitar chasquidos o clics en el audio.</li>
@@ -324,6 +320,26 @@ Para utilizar esta función:
 <td><strong>NVDA+Win+N</strong></td>
 <td>Alternar la Capa de Navegación (navegación rápida sin modificadores).</td>
 </tr>
+<tr>
+<td><strong>Ctrl+C / X / V</strong></td>
+<td>Copiar, Cortar y Pegar con anuncios de audio.</td>
+</tr>
+<tr>
+<td><strong>Ctrl+A</strong></td>
+<td>Seleccionar todo con anuncio de audio.</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Z / Y</strong></td>
+<td>Deshacer y Rehacer con anuncios de audio.</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+V</strong></td>
+<td>Pegar texto sin formato con anuncio de audio.</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+Z</strong></td>
+<td>Rehacer alternativo con anuncio de audio.</td>
+</tr>
 </tbody>
 </table>
 <h2>Compatibility &amp; Requirements</h2>
@@ -406,6 +422,26 @@ Para utilizar esta función:
 <li><strong>Ruso:</strong> Valentin Kupriyanov</li>
 <li><strong>Chino:</strong> Cary-rowen, Jerry</li>
 <li><strong>Alemán:</strong> René L</li>
+</ul>
+<h3>Versión 9.21 - 9.22</h3>
+<ul>
+<li><strong>Mejoras de Importación:</strong> Se agregó soporte para importar carpetas sin comprimir como temas, y un diálogo para elegir entre importar una carpeta o un archivo ZIP/.atp.</li>
+<li><strong>Actualización automática y Pre-lanzamiento:</strong> Se agregaron casillas en la pestaña General para manejar actualizaciones automáticas y optar por versiones beta.</li>
+</ul>
+<h3>Versión 9.20</h3>
+<ul>
+<li><strong>Optimización de la Interfaz de Configuración:</strong> Importantes mejoras de rendimiento en el diálogo de configuración. Se reemplazaron las cuadrículas lentas por ListCtrls rápidos y se implementó la carga diferida para las pestañas pesadas.</li>
+<li><strong>Caché de Temas:</strong> Almacenamiento en caché de temas instalados para reducir la entrada/salida de archivos al inicio.</li>
+</ul>
+<h3>Versión 9.11 - 9.13</h3>
+<ul>
+<li><strong>Detección de Conflictos:</strong> Se agregó un diálogo de inicio inteligente que detecta complementos de NVDA conflictivos (como plugins de temas de audio más antiguos) y permite al usuario deshabilitarlos o desinstalarlos de manera segura.</li>
+</ul>
+<h3>Versión 9.4 - 9.10</h3>
+<ul>
+<li><strong>Decodificación MP3 Nativa:</strong> Se integró libmpg123 para una decodificación MP3 nativa y rápida sin depender completamente de FFmpeg.</li>
+<li><strong>Tubería de Procesamiento de Audio:</strong> Se agregó almacenamiento en caché RAM para OGG, soporte para WAV de 24 bits, y se migraron completamente las características de DSP de audio (SmartVolume, Envelope, TrimSilence).</li>
+<li><strong>Traducciones:</strong> Se completó el 100% de la localización para Árabe, Español, Italiano, Ruso, Alemán y Chino.</li>
 </ul>
 </body>
 </html>
