@@ -1479,12 +1479,12 @@ class BrowserNavMixin:
                                 return
                             else:
                                 # Something else found in clipboard - likely user has already copied something there. So just exit without restoring state
-                                log.error(f"asdf something else in clipboard!")
+                                log.error(f"something else in clipboard!")
                                 log.error(f"text='{text}'")
                                 log.error(f"newText='{newText}'")
                                 log.error(f"firstChar='{firstChar}'")
                                 return
-                        log.error(f"asdf Timeout")
+                        log.error(f"Timeout")
                     utils.executeAsynchronously(watchAndRestoreClipboard())
                     
               # Step 4: send the original keystroke, e.g. Control+Enter

@@ -38,7 +38,7 @@ Empower your workflow with groundbreaking features:
 Step beyond traditional screen reading and unleash a breathtaking auditory dimension to your daily tasks!
 """),
 	# version
-	"addon_version": "9.34",
+	"addon_version": "9.35",
 	# Author(s)
 	"addon_author": u"Hassan AlBarshoumy, Ahmed Sami, Musharraf Omer, Tony Malykh, Austin Hicks, Bryan Smart",
 	# URL for the add-on documentation support
@@ -51,7 +51,7 @@ Step beyond traditional screen reading and unleash a breathtaking auditory dimen
 	"addon_minimumNVDAVersion": "2024.1.0",
 	# Last NVDA version supported/tested
 	# (e.g. "2018.4", ideally more recent than minimum version)
-	"addon_lastTestedNVDAVersion": "2026.1.0",
+	"addon_lastTestedNVDAVersion": "2026.2.0",
 	# Add-on update channel (default is stable or None)
 	"addon_updateChannel": "beta",
 	# Add-on license such as GPL 2

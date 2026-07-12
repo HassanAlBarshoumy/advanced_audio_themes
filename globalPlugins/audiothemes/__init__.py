@@ -238,7 +238,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         from logHandler import log
-        log.info("Starting Advanced Audio Themes version 9.34")
+        log.info("Starting Advanced Audio Themes version 9.35")
         from . import utils
         utils.threadPool.restart()
         self.handler = AudioThemesHandler()
@@ -630,8 +630,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         """Check if the navigator object changed (e.g. arrow keys in browse mode)."""
         try:
             current_nav = api.getNavigatorObject()
-            if current_nav.treeInterceptor and not current_nav.treeInterceptor.passThrough:
-                if current_nav and current_nav != getattr(self, "_last_navigator_object", None):
+            if current_nav and current_nav.treeInterceptor and not current_nav.treeInterceptor.passThrough:
+                if current_nav != getattr(self, "_last_navigator_object", None):
                     self._last_navigator_object = current_nav
                     # Debounce: skip if last dispatch was < 80ms ago.
                     import time

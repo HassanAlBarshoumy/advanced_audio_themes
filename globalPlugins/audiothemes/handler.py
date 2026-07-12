@@ -1020,6 +1020,8 @@ class AudioThemesHandler:
                     return False
 
         theme = self.get_theme_for_app(foreground_app)
+        if not theme:
+            return False
 
         if not any(sound_name.endswith('.' + ext) for ext in SUPPORTED_FILE_TYPES):
             sound_name += '.wav'
