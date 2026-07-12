@@ -90,6 +90,8 @@ class Worker(Thread):
                 func(*args, **kargs)
             except Exception:
                 log.exception("Error in audio_themes_NG ThreadPool worker")
+            except BaseException:
+                log.exception("CRITICAL: Unhandled BaseException in audio_themes_NG ThreadPool worker")
             finally:
                 self.is_busy = False
                 self.tasks.task_done()
@@ -175,7 +177,7 @@ class ThreadPool:
                 w = Worker(self.tasks)
                 self._workers.append(w)
 
-threadPool = ThreadPool(3)   # 3 workers is sufficient for audio playback tasks.
+threadPool = ThreadPool(4)   # 4 workers for audio playback tasks.
 
 phoneticPunctuationConfigKey = "phoneticpunctuation"
 def getConfig(key):

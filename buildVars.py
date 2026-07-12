@@ -38,7 +38,7 @@ Empower your workflow with groundbreaking features:
 Step beyond traditional screen reading and unleash a breathtaking auditory dimension to your daily tasks!
 """),
 	# version
-	"addon_version": "9.35",
+	"addon_version": "9.36",
 	# Author(s)
 	"addon_author": u"Hassan AlBarshoumy, Ahmed Sami, Musharraf Omer, Tony Malykh, Austin Hicks, Bryan Smart",
 	# URL for the add-on documentation support

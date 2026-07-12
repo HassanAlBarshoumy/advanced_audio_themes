@@ -830,6 +830,7 @@ class AudioThemesHandler:
                 self.active_theme.deactivate()
             self.enabled = user_config["enable_audio_themes"]
             self.active_theme = self.get_active_theme()
+            log.debug(f"configure: enabled={self.enabled} active_theme={'present' if self.active_theme else 'None'}")
         
         # global _typing_dir_cache
         _typing_dir_cache.clear()
@@ -938,7 +939,7 @@ class AudioThemesHandler:
 
         foreground_app = obj_info.get("foreground_app") if isinstance(obj_info, dict) else None
         theme = self.get_theme_for_app(foreground_app)
-        if not theme and force_3d:
+        if not theme:
             theme = self.active_theme
 
         if not theme:

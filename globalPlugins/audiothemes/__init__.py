@@ -238,7 +238,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         from logHandler import log
-        log.info("Starting Advanced Audio Themes version 9.35")
+        log.info("Starting Advanced Audio Themes version 9.36")
         from . import utils
         utils.threadPool.restart()
         self.handler = AudioThemesHandler()
@@ -716,7 +716,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self._last_navigator_object = obj
         # Cache foreground app name on handler (avoids COM calls in keyboard hook)
         try:
-            self.handler._current_app_name = obj.appModule.appName if obj.appModule else None
+            app_name = obj.appModule.appName if obj.appModule else None
+            self.handler._current_app_name = app_name
+            log.debug(f"event_gainFocus app={app_name} active_theme={self.handler.active_theme.folder if self.handler.active_theme else None}")
         except Exception:
             self.handler._current_app_name = None
         try:
@@ -1120,6 +1122,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
             foreground_app = obj_info.get("foreground_app")
             theme = self.handler.get_theme_for_app(foreground_app)
+            from logHandler import log
+            log.debug(f"playObject app={foreground_app} theme={'present' if theme else 'None'} role={obj_info.get('role', 0)}")
 
             current_states = obj_info.get("states", frozenset())
 
