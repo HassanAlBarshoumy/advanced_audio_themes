@@ -202,8 +202,11 @@ class SteamAudio:
 		output_buffer_ptr = POINTER(ctypes.c_int16)()
 		output_length = c_int()
 
-		# Call the DLL function
-		with _steam_audio_mutex:
+		# Call the DLL function with timeout to prevent worker deadlocks
+		if not _steam_audio_mutex.acquire(timeout=5):
+			log.error("Steam Audio mutex timeout (process_sound)")
+			return None
+		try:
 			success = self.dll.process_sound(
 				input_ptr,
 				input_length,
@@ -212,6 +215,8 @@ class SteamAudio:
 				byref(output_buffer_ptr),
 				byref(output_length),
 			)
+		finally:
+			_steam_audio_mutex.release()
 
 		if not success or not output_buffer_ptr:
 			log.error("Failed to process sound")
@@ -225,19 +230,27 @@ class SteamAudio:
 				result = ctypes.string_at(output_buffer_ptr, output_samples * 2)
 
 				# Free the output buffer
-				with _steam_audio_mutex:
-					self.dll.free_output_sound(output_buffer_ptr)
+				if not _steam_audio_mutex.acquire(timeout=5):
+					log.error("Steam Audio mutex timeout (free_output_sound)")
+				else:
+					try:
+						self.dll.free_output_sound(output_buffer_ptr)
+					finally:
+						_steam_audio_mutex.release()
 
 				return result
 			else:
 				return b""
 
-		except Exception as e:
+		except (OSError, MemoryError, ValueError) as e:
 			log.error(f"Error processing output buffer: {e}")
 			# Make sure to free the buffer even if there's an error
 			if output_buffer_ptr:
-				with _steam_audio_mutex:
-					self.dll.free_output_sound(output_buffer_ptr)
+				if _steam_audio_mutex.acquire(timeout=5):
+					try:
+						self.dll.free_output_sound(output_buffer_ptr)
+					finally:
+						_steam_audio_mutex.release()
 			return None
 
 	def apply_reverb(self, input_buffer):
@@ -263,11 +276,16 @@ class SteamAudio:
 		output_buffer_ptr = POINTER(ctypes.c_int16)()
 		output_length = c_int()
 
-		# Call the DLL function
-		with _steam_audio_mutex:
+		# Call the DLL function with timeout to prevent worker deadlocks
+		if not _steam_audio_mutex.acquire(timeout=5):
+			log.error("Steam Audio mutex timeout (apply_reverb)")
+			return None
+		try:
 			success = self.dll.apply_reverb(
 				input_ptr, input_length, byref(output_buffer_ptr), byref(output_length)
 			)
+		finally:
+			_steam_audio_mutex.release()
 
 		if not success or not output_buffer_ptr:
 			log.error("Failed to apply reverb")
@@ -281,19 +299,27 @@ class SteamAudio:
 				result = ctypes.string_at(output_buffer_ptr, output_samples * 2)
 
 				# Free the output buffer
-				with _steam_audio_mutex:
-					self.dll.free_output_sound(output_buffer_ptr)
+				if not _steam_audio_mutex.acquire(timeout=5):
+					log.error("Steam Audio mutex timeout (free_output_sound reverb)")
+				else:
+					try:
+						self.dll.free_output_sound(output_buffer_ptr)
+					finally:
+						_steam_audio_mutex.release()
 
 				return result
 			else:
 				return b""
 
-		except Exception as e:
+		except (OSError, MemoryError, ValueError) as e:
 			log.error(f"Error processing reverb output buffer: {e}")
 			# Make sure to free the buffer even if there's an error
 			if output_buffer_ptr:
-				with _steam_audio_mutex:
-					self.dll.free_output_sound(output_buffer_ptr)
+				if _steam_audio_mutex.acquire(timeout=5):
+					try:
+						self.dll.free_output_sound(output_buffer_ptr)
+					finally:
+						_steam_audio_mutex.release()
 			return None
 
 	def __del__(self):

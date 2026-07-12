@@ -799,12 +799,14 @@ class AudioThemesHandler:
 
     def get_active_theme(self):
         if not config.conf["audiothemes"]["enable_audio_themes"]:
+            log.debug("get_active_theme: themes disabled")
             return
         theme = self.get_theme_from_folder(config.conf["audiothemes"]["active_theme"])
         if not theme:
             config.conf["audiothemes"]["active_theme"] = "Default"
             theme = self.get_theme_from_folder("Default")
         if not theme:
+            log.debug("get_active_theme: no theme found")
             return
         if theme.exists():
             theme.load(self.player)
@@ -996,7 +998,7 @@ class AudioThemesHandler:
             app_name = app_name.lower()
             profile = self._app_profiles_cache.get(app_name)
             target_folder = profile.get("theme") if isinstance(profile, dict) else profile
-            if target_folder:
+            if target_folder and self.active_theme is not None:
                 if target_folder == self.active_theme.folder:
                     return self.active_theme
                 if target_folder in self._theme_cache:
@@ -1120,7 +1122,7 @@ class AudioThemesHandler:
 
         import random
         # 1. Check if the active theme has its own typingSounds folder
-        theme_typing_dir = os.path.join(theme.directory, "typingSounds")
+        theme_typing_dir = os.path.join(theme.directory, "typingSounds") if theme else None
         typing_dir = None
         
         if os.path.isdir(theme_typing_dir):

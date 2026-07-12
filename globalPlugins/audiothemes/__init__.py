@@ -238,7 +238,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         from logHandler import log
-        log.info("Starting Advanced Audio Themes version 9.36")
+        log.info("Starting Advanced Audio Themes version 9.37")
         from . import utils
         utils.threadPool.restart()
         self.handler = AudioThemesHandler()
@@ -723,15 +723,16 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self.handler._current_app_name = None
         try:
             nextHandler()
-        except UnboundLocalError:
-            pass
         except StopIteration:
             raise
         except Exception as e:
             log.debugWarning(f"event_gainFocus nextHandler: {e}")
-        obj_info = self._snapshot_obj(obj)
-        utils.threadPool.add_task(self.playObject, obj_info)
-        utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
+        try:
+            obj_info = self._snapshot_obj(obj)
+            utils.threadPool.add_task(self.playObject, obj_info)
+            utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
+        except Exception as e:
+            log.debugWarning(f"event_gainFocus snapshot/dispatch: {e}")
 
     def _play_beacon_sonar(self, obj_info):
         if not self._audio_beacon_location or not self.handler.active_theme:
@@ -835,9 +836,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self._last_navigator_object = api.getNavigatorObject()
         except Exception:
             self._last_navigator_object = obj
-        obj_info = self._snapshot_obj(obj)
-        utils.threadPool.add_task(self.playObject, obj_info)
-        utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
+        try:
+            obj_info = self._snapshot_obj(obj)
+            utils.threadPool.add_task(self.playObject, obj_info)
+            utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
+        except Exception as e:
+            log.debugWarning(f"event_becomeNavigatorObject snapshot/dispatch: {e}")
 
     def event_valueChange(self, obj, nextHandler):
         from logHandler import log
