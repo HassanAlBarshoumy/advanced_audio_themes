@@ -1125,7 +1125,7 @@ class AudioThemesHandler:
         theme_typing_dir = os.path.join(theme.directory, "typingSounds") if theme else None
         typing_dir = None
         
-        if os.path.isdir(theme_typing_dir):
+        if theme_typing_dir and os.path.isdir(theme_typing_dir):
             typing_dir = theme_typing_dir
         else:
             # 2. Fall back to the globally selected typing pack or app-specific pack

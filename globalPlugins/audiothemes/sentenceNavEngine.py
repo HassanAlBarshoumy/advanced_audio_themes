@@ -543,11 +543,8 @@ class SentenceNavMixin:
         formatField = textInfos.FormatField()
         formatConfig = config.conf['documentFormatting']
         for field in info.getTextWithFields(formatConfig):
-            try:
+            if isinstance(field, textInfos.FieldCommand):
                 formatField.update(field.field)
-            except Exception as e:
-                import logging
-                logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
         result = [formatField.get(fieldName, None) for fieldName in self.styleFields]
         return tuple(result)
 
