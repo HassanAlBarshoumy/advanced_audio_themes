@@ -2,6 +2,7 @@
 
 # This file is covered by the GNU General Public License.
 
+import json
 import wx
 import config
 import ui
@@ -63,7 +64,6 @@ class ClipboardManager:
         if speak:
             custom_texts = {}
             try:
-                import json
                 raw = conf.get("clipboard_custom_texts", "{}")
                 custom_texts = json.loads(raw) if isinstance(raw, str) else raw
             except Exception:

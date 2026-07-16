@@ -91,12 +91,10 @@ def decode_mp3_to_float(path):
 
         if channels.value == 2:
             n = len(arr) // 2
-            float_samples = array.array('f', [0.0]) * n
-            for i in range(n):
-                float_samples[i] = (arr[i * 2] + arr[i * 2 + 1]) / 65536.0
+            float_samples = array.array('f', ((arr[i * 2] + arr[i * 2 + 1]) / 65536.0 for i in range(n)))
             return (float_samples, rate.value, 1)
         else:
-            float_samples = array.array('f', [s / 32768.0 for s in arr])
+            float_samples = array.array('f', (s / 32768.0 for s in arr))
             return (float_samples, rate.value, channels.value)
 
     except Exception as e:

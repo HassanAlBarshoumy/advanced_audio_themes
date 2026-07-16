@@ -4,6 +4,7 @@
 #This file is covered by the GNU General Public License.
 #See the file COPYING.txt for more details.
 
+import array
 import config
 from ctypes import create_string_buffer
 import nvwave
@@ -58,7 +59,6 @@ def _apply_ducking(pcm_bytes, df):
         return frenzy.apply_ducking_to_pcm(pcm_bytes, df)
     except Exception:
         pass
-    import array
     arr = array.array('h')
     arr.frombytes(pcm_bytes)
     for i in range(len(arr)):

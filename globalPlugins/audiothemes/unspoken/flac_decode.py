@@ -49,11 +49,11 @@ _flac.FLAC__stream_decoder_get_bits_per_sample.argtypes = [ctypes.c_void_p]
 
 
 class _WriteContext:
-    def __init__(self):
-        self.all_pcm = []
-        self.channels = 0
-        self.bits_per_sample = 0
-        self.sample_rate = 0
+	def __init__(self):
+		self.all_pcm = array.array('i')
+		self.channels = 0
+		self.bits_per_sample = 0
+		self.sample_rate = 0
 
 
 WRITE_CALLBACK = ctypes.CFUNCTYPE(
@@ -74,20 +74,23 @@ ERROR_CALLBACK = ctypes.CFUNCTYPE(
 
 
 def _make_write_callback(ctx):
-    @WRITE_CALLBACK
-    def _write_cb(decoder, frame, buffer, client_data):
-        blocksize = _flac.FLAC__stream_decoder_get_blocksize(decoder)
-        channels = _flac.FLAC__stream_decoder_get_channels(decoder)
-        if not ctx.channels:
-            ctx.channels = channels
-            ctx.bits_per_sample = _flac.FLAC__stream_decoder_get_bits_per_sample(decoder)
-            ctx.sample_rate = _flac.FLAC__stream_decoder_get_sample_rate(decoder)
-        buf_array = ctypes.cast(buffer, ctypes.POINTER(ctypes.POINTER(ctypes.c_int32)))
-        for sample_idx in range(blocksize):
-            for ch in range(channels):
-                ctx.all_pcm.append(buf_array[ch][sample_idx])
-        return FLAC__STREAM_DECODER_WRITE_CONTINUE
-    return _write_cb
+	@WRITE_CALLBACK
+	def _write_cb(decoder, frame, buffer, client_data):
+		blocksize = _flac.FLAC__stream_decoder_get_blocksize(decoder)
+		channels = _flac.FLAC__stream_decoder_get_channels(decoder)
+		if not ctx.channels:
+			ctx.channels = channels
+			ctx.bits_per_sample = _flac.FLAC__stream_decoder_get_bits_per_sample(decoder)
+			ctx.sample_rate = _flac.FLAC__stream_decoder_get_sample_rate(decoder)
+		buf_array = ctypes.cast(buffer, ctypes.POINTER(ctypes.POINTER(ctypes.c_int32)))
+		flat = (ctypes.c_int32 * (blocksize * channels))()
+		for ch in range(channels):
+			src = buf_array[ch]
+			for i in range(blocksize):
+				flat[i * channels + ch] = src[i]
+		ctx.all_pcm.frombytes(bytes(flat))
+		return FLAC__STREAM_DECODER_WRITE_CONTINUE
+	return _write_cb
 
 
 def _make_metadata_callback(ctx):
@@ -142,12 +145,10 @@ def decode_flac_to_float(path):
         channels = ctx.channels
 
         scale = 1.0 / (1 << (ctx.bits_per_sample - 1))
-        float_samples = array.array('f', [s * scale for s in ctx.all_pcm])
+        float_samples = array.array('f', (s * scale for s in ctx.all_pcm))
         if channels == 2:
             n = len(float_samples) // 2
-            mono = array.array('f', [0.0]) * n
-            for i in range(n):
-                mono[i] = (float_samples[i * 2] + float_samples[i * 2 + 1]) * 0.5
+            mono = array.array('f', ((float_samples[i * 2] + float_samples[i * 2 + 1]) * 0.5 for i in range(n)))
             return (mono, rate, 1)
         else:
             return (float_samples, rate, channels)

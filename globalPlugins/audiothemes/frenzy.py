@@ -7,6 +7,12 @@
 
 import addonHandler
 import api
+from array import array
+try:
+    import audioop
+    _HAS_AUDIOOP = True
+except ImportError:
+    _HAS_AUDIOOP = False
 import bisect
 import characterProcessing
 import config
@@ -64,7 +70,6 @@ def _get_blacklisted_roles():
                 return val
             return [19]
         if isinstance(val, str):
-            import json
             parsed = json.loads(val)
             if isinstance(parsed, list) and all(isinstance(r, int) for r in parsed):
                 return parsed
@@ -75,7 +80,6 @@ def _get_blacklisted_roles():
 
 original_getObjectPropertiesSpeech = None
 
-import json
 def new_getObjectPropertiesSpeech(
         obj,
         reason = controlTypes.OutputReason.QUERY,
@@ -87,8 +91,6 @@ def new_getObjectPropertiesSpeech(
             obj,reason , _prefixSpeechCommand , **allowedProperties
         )
 
-    import config
-    import json
     global_fmt = config.conf["audiothemes"].get("announceFormat", "0")
     
     # Load per-role overrides
@@ -113,7 +115,6 @@ def new_getObjectPropertiesSpeech(
         patchedProps = props.copy()
         
         if props.get('role', False):
-            import config
             if not config.conf["audiothemes"].get("speak_roles", True):
                 patchedProps['role'] = False
 
@@ -135,7 +136,6 @@ def new_getObjectPropertiesSpeech(
         except (Exception, __import__('_ctypes').COMError):
             orig_res = []
         
-        import re
         cleaned_orig_res = []
         for item in orig_res:
             if isinstance(item, str):
@@ -320,7 +320,6 @@ def _load_ducking_categories():
             return
         _ducking_categories_json = raw
         if raw:
-            import json
             _ducking_categories_dict = json.loads(raw)
         else:
             _ducking_categories_dict = {}
@@ -352,22 +351,37 @@ def get_ducking_factor(category="theme_sounds"):
 def apply_ducking_to_pcm(pcm_bytes, df, sample_width=2):
     if df >= 1.0:
         return pcm_bytes
-    import array
+    if _HAS_AUDIOOP and sample_width != 1:
+        return audioop.mul(pcm_bytes, sample_width, df)
     if sample_width == 2:
-        arr = array.array('h')
+        arr = array('h')
         arr.frombytes(pcm_bytes)
         for i in range(len(arr)):
             arr[i] = int(arr[i] * df)
         return arr.tobytes()
     elif sample_width == 1:
-        arr = array.array('b')
+        arr = array('b')
         arr.frombytes(pcm_bytes)
         for i in range(len(arr)):
             val = int((arr[i] - 128) * df)
             arr[i] = max(0, min(255, val + 128))
         return arr.tobytes()
+    elif sample_width == 3:
+        count = len(pcm_bytes) // 3
+        result = bytearray(len(pcm_bytes))
+        for i in range(count):
+            offset = i * 3
+            sample = pcm_bytes[offset] | (pcm_bytes[offset + 1] << 8) | (pcm_bytes[offset + 2] << 16)
+            if sample & 0x800000:
+                sample |= ~0xFFFFFF
+            sample = int(sample * df)
+            sample = max(-8388608, min(8388607, sample))
+            result[offset] = sample & 0xFF
+            result[offset + 1] = (sample >> 8) & 0xFF
+            result[offset + 2] = (sample >> 16) & 0xFF
+        return bytes(result)
     elif sample_width == 4:
-        arr = array.array('i')
+        arr = array('i')
         arr.frombytes(pcm_bytes)
         for i in range(len(arr)):
             arr[i] = int(arr[i] * df)
@@ -1037,29 +1051,6 @@ def new_getTextInfoSpeech(
             start, end = item
             fakeTextInfo.setStartAndEnd(start, end)
             effectiveSuppressBlanks=True if i < lastIntervalIndex or not isBlankSoFar else suppressBlanks
-            if not effectiveSuppressBlanks:
-                # We are not suppressing the blanks
-                # 1. back up cache
-                # 2. Get the sequence with blanks suppressed, so that we can compare it later and decide whether blank is to be spoken
-                # 3. Restore the cache if applicable
-                if isinstance(useCache, speech.speech.SpeakTextInfoState):
-                    useCacheBackup = useCache.copy()
-                elif useCache:
-                    speakTextInfoStateBackup = speech.speech.SpeakTextInfoState(info.obj)
-                suppressedSequences = list(original_getTextInfoSpeech(
-                    fakeTextInfo,
-                    useCache ,
-                    formatConfig,
-                    unit ,
-                    reason ,
-                    _prefixSpeechCommand,
-                    onlyInitialFields,
-                    suppressBlanks=True,
-                ))
-                if isinstance(useCache, speech.speech.SpeakTextInfoState):
-                    useCache = useCacheBackup
-                elif useCache:
-                    speakTextInfoStateBackup.updateObj()
             sequences = list(original_getTextInfoSpeech(
                 fakeTextInfo,
                 useCache ,
@@ -1070,6 +1061,11 @@ def new_getTextInfoSpeech(
                 onlyInitialFields,
                 suppressBlanks=effectiveSuppressBlanks,
             ))
+            if not effectiveSuppressBlanks:
+                suppressedSequences = []
+                for subseq in sequences:
+                    new_subseq = [cmd for cmd in subseq if not (isinstance(cmd, str) and not cmd.strip())]
+                    suppressedSequences.append(new_subseq)
             if not effectiveSuppressBlanks:
                 blankRule = getActiveRuleContext(otherRules.get(OtherRule.BLANK, []), appName, windowTitle, url)
                 if blankRule is not None:
@@ -1122,11 +1118,6 @@ def new_getPropertiesSpeech(
     reason: OutputReason = OutputReason.QUERY,
     **propertyValues,
 ):
-    import config
-    import json
-    from . import common
-    from . import utils
-    
     if not isPhoneticPunctuationEnabled() or ignore_get_properties_hook:
         return original_getPropertiesSpeech(reason, **propertyValues)
         
@@ -1346,11 +1337,9 @@ def new_getControlFieldSpeech(
     extraDetail = False,
     reason = None,
 ):
-    import controlTypes
     if not isPhoneticPunctuationEnabled():
         try:
             if fieldType == "start" or getattr(fieldType, "value", fieldType) == "start":
-                import globalPluginHandler
                 for plugin in globalPluginHandler.runningPlugins:
                     if plugin.__module__ == "globalPlugins.audiothemes":
                         role = attrs.get('role')
@@ -1378,7 +1367,6 @@ def new_getControlFieldSpeech(
             pass
         return original_getControlFieldSpeech(attrs, ancestorAttrs, fieldType, formatConfig, extraDetail, reason)
         
-    import config
     global ignore_get_properties_hook
     appName, windowTitle, url = utils.getCurrentContext()
     

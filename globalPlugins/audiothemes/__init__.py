@@ -22,6 +22,7 @@ from functools import lru_cache
 import ctypes
 import _ctypes
 import time
+import tones
 import wx
 import config
 import globalPluginHandler
@@ -52,8 +53,10 @@ from .clipboard import ClipboardManager
 # Import the SentenceNav engine (Alt+Arrow sentence/phrase navigation)
 from .sentenceNavEngine import SentenceNavMixin, initSentenceNavConfiguration
 
-# Import the BrowserNav engine (NVDA+Alt+Arrow browser navigation, QuickJump, etc.)
+ # Import the BrowserNav engine (NVDA+Alt+Arrow browser navigation, QuickJump, etc.)
 from .browserNavEngine import BrowserNavMixin
+
+_cached_desktop_location = None
 
 import api
 
@@ -108,19 +111,23 @@ def _text_contains_emoji(text):
             return True
     return False
 
+import weakref
+_snapshot_cache = weakref.WeakKeyDictionary()
+
 class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPluginHandler.GlobalPlugin):
 
     scriptCategory = "Advanced Audio Themes"
 
     # -- COM-safety: extract everything on the main thread ---------------
     @staticmethod
-    def _snapshot_obj(obj, extra_snd=None):
-        """
-        Build a plain dict from a live NVDAObject.  MUST be called on the
-        NVDA main thread (i.e. inside an event handler) where COM access
-        is legal.  The returned dict is safe to pass to any thread.
-        """
-        import config as _cfg
+    def _snapshot_obj(obj, extra_snd=None, foreground_app=None):
+        """Build a plain dict from a live NVDAObject."""
+        try:
+            cached = _snapshot_cache.get(obj)
+            if cached is not None and cached.get("_extra_snd") == extra_snd and cached.get("_fg") == foreground_app:
+                return cached.copy()
+        except Exception:
+            pass
         info = {}
         try:
             info["role"] = obj.role
@@ -166,9 +173,11 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             info["windowClassName"] = obj.windowClassName or ""
         except Exception:
             info["windowClassName"] = ""
+        handler = GlobalPlugin._instance_handler if hasattr(GlobalPlugin, '_instance_handler') else None
+        fl_cfg = getattr(handler, '_fl_config', None) or {}
         # --- getOrder data (parent / previous / next roles) ---
         # Now collected for ALL roles to support universal first/last detection.
-        if _cfg.conf["audiothemes"]["enable_audio_themes"]:
+        if config.conf["audiothemes"]["enable_audio_themes"]:
             try:
                 info["parent_role"] = obj.parent.role if obj.parent else None
             except Exception:
@@ -182,7 +191,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             except Exception:
                 info["next_role"] = None
             # Multi-hop traversal for same-role sibling detection
-            fl_mode = _cfg.conf["audiothemes"].get("fl_detection_mode", "smart")
+            fl_mode = fl_cfg.get("fl_detection_mode", "smart")
             if fl_mode in ("strict", "smart"):
                 _role = info.get("role")
                 # Walk back up to 3 levels to find a same-role sibling
@@ -221,25 +230,33 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # Carry forward a custom snd override (e.g. SpecialProps.notify).
         info["snd"] = extra_snd
         # Desktop dimensions for 3D audio (avoids COM call on worker thread).
+        global _cached_desktop_location
+        if _cached_desktop_location is None:
+            try:
+                desktop = NVDAObjects.api.getDesktopObject()
+                _cached_desktop_location = tuple(desktop.location) if desktop and desktop.location else None
+            except Exception:
+                _cached_desktop_location = None
+        info["desktop_location"] = _cached_desktop_location
+        if foreground_app is None:
+            try:
+                appName, _, _ = utils.getCurrentContext()
+                info["foreground_app"] = appName
+            except Exception:
+                info["foreground_app"] = None
+        else:
+            info["foreground_app"] = foreground_app
         try:
-            desktop = NVDAObjects.api.getDesktopObject()
-            info["desktop_location"] = tuple(desktop.location) if desktop and desktop.location else None
+            info["_extra_snd"] = extra_snd
+            info["_fg"] = foreground_app
+            _snapshot_cache[obj] = info
         except Exception:
-            info["desktop_location"] = None
-        # Foreground app name for disabled-apps filtering (avoids COM on worker thread).
-        try:
-            from . import utils
-            appName, _, _ = utils.getCurrentContext()
-            info["foreground_app"] = appName
-        except Exception:
-            info["foreground_app"] = None
+            pass
         return info
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        from logHandler import log
         log.info("Starting Advanced Audio Themes version 9.37")
-        from . import utils
         utils.threadPool.restart()
         self.handler = AudioThemesHandler()
         GlobalPlugin._instance_handler = self.handler
@@ -274,7 +291,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # event_becomeNavigatorObject during virtual-buffer caret moves.
         self._navigation_timer = wx.Timer()
         self._navigation_timer.Bind(wx.EVT_TIMER, self._onNavigationTimer)
-        self._navigation_timer.Start(180)
+        self._navigation_timer.Start(250)
 
         # Phonetic Punctuation Initialization
         self.injectMonkeyPatches()
@@ -290,18 +307,13 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 self.orig_caretMovementScriptHelper = speech._caretMovementScriptHelper
                 speech._caretMovementScriptHelper = self._hook_caretMovementScriptHelper
         except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
+            log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
         # ── BrowserNav initialization ──
         # Wire up all BrowserNav monkey patches, browse-mode keystrokes,
         # QuickJump system, and URL tracking.
         try:
             self.initBrowserNav()
         except Exception:
-            from logHandler import log
             log.exception("Failed to initialize BrowserNav engine")
 
         self.toggling = False
@@ -398,23 +410,16 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         if self.orig_caretMovementScriptHelper:
             self.orig_caretMovementScriptHelper(extraDetail, unit, direction, posConstant, *args, **kwargs)
         try:
-            import api
-            import time
             current_nav = api.getNavigatorObject()
             if current_nav and getattr(current_nav, 'treeInterceptor', None) and not current_nav.treeInterceptor.passThrough:
                 if current_nav != getattr(self, "_last_navigator_object", None):
                     self._last_navigator_object = current_nav
                     self._last_play_time = time.monotonic()
                     obj_info = self._snapshot_obj(current_nav)
-                    from . import utils
                     utils.threadPool.add_task(self.playObject, obj_info)
                     utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
+            log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
     def _rebindInstanceGestures(self):
         # ── SentenceNav & TextNav Initialization ──
         # Bind gestures explicitly to ensure NVDA's ScriptableObject metaclass 
@@ -440,14 +445,13 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         from .utils import is_sound_suppressed
         if is_sound_suppressed("ui_beeps"):
             return
-        import tones
         try:
             from . import frenzy
             df = frenzy.get_ducking_factor("ui_beeps")
             if df < 1.0:
                 tones.beep(200, 40, left=int(25*df), right=int(25*df))
             else:
-                tones.beep(200, 40)
+                tones.beep(200, 40, left=25, right=25)
         except Exception:
             tones.beep(200, 40)
 
@@ -490,14 +494,13 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         from .utils import is_sound_suppressed
         if is_sound_suppressed("ui_beeps"):
             return
-        import tones
         try:
             from . import frenzy
             df = frenzy.get_ducking_factor("ui_beeps")
             if df < 1.0:
                 tones.beep(420, 40, left=int(25*df), right=int(25*df))
             else:
-                tones.beep(420, 40)
+                tones.beep(420, 40, left=25, right=25)
         except Exception:
             tones.beep(420, 40)
 
@@ -634,7 +637,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 if current_nav != getattr(self, "_last_navigator_object", None):
                     self._last_navigator_object = current_nav
                     # Debounce: skip if last dispatch was < 80ms ago.
-                    import time
                     now = time.monotonic()
                     if now - getattr(self, "_last_play_time", 0) < 0.08:
                         return
@@ -642,15 +644,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                         return
                     self._last_play_time = now
                     obj_info = self._snapshot_obj(current_nav)
-                    from . import utils
                     utils.threadPool.add_task(self.playObject, obj_info)
                     utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
+            log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
     def on_studio_item_clicked(self, event):
         if self._studioDialog is not None:
             try:
@@ -673,9 +670,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 else:
                     gui.mainFrame._popupSettingsDialog(AudioThemesSettingsPanel)
             except Exception as e:
-                from logHandler import log
                 log.error(f"Failed to open Audio Themes settings: {e}", exc_info=True)
-                import ui
                 ui.message(_("Failed to open settings. Please open through NVDA Preferences."))
         wx.CallAfter(do_open)
 
@@ -698,7 +693,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         globalCommands.commands.script_reportCurrentFocus(gesture)
 
     def event_gainFocus(self, obj, nextHandler):
-        from logHandler import log
         """
         Snapshot all COM properties on the main thread, then dispatch the
         plain dict to a background worker.  This eliminates the COMError
@@ -728,7 +722,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception as e:
             log.debugWarning(f"event_gainFocus nextHandler: {e}")
         try:
-            obj_info = self._snapshot_obj(obj)
+            obj_info = self._snapshot_obj(obj, foreground_app=self.handler._current_app_name)
             utils.threadPool.add_task(self.playObject, obj_info)
             utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
@@ -778,7 +772,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             left = int(volume * (1.0 - max(0.0, pan)))
             right = int(volume * (1.0 - max(0.0, -pan)))
 
-            import tones
             try:
                 from . import frenzy
                 df = frenzy.get_ducking_factor("ui_beeps")
@@ -789,13 +782,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             except Exception:
                 tones.beep(pitch, 30, left=left, right=right)
         except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
+            log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
     def event_becomeNavigatorObject(self, obj, nextHandler, isFocus=False):
-        from logHandler import log
         """
         Snapshot on main thread, dispatch dict to worker.
         isFocus=True means gainFocus already dispatched -- skip double-play.
@@ -806,12 +794,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         try:
             self.handler._current_app_name = obj.appModule.appName if obj.appModule else None
             self.handler._current_window_title = getattr(obj, 'name', None)
-            from .utils import getCurrentURLSafe
-            self.handler._current_url = getCurrentURLSafe()
         except Exception:
             self.handler._current_app_name = None
             self.handler._current_window_title = None
-            self.handler._current_url = None
+        self.handler._current_url = None
         if isFocus:
             try:
                 nextHandler()
@@ -837,14 +823,13 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception:
             self._last_navigator_object = obj
         try:
-            obj_info = self._snapshot_obj(obj)
+            obj_info = self._snapshot_obj(obj, foreground_app=self.handler._current_app_name)
             utils.threadPool.add_task(self.playObject, obj_info)
             utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
             log.debugWarning(f"event_becomeNavigatorObject snapshot/dispatch: {e}")
 
     def event_valueChange(self, obj, nextHandler):
-        from logHandler import log
         try:
             if obj.role == controlTypes.Role.PROGRESSBAR:
                 if config.conf["audiothemes"]["enable_audio_themes"] and self.handler.active_theme:
@@ -906,7 +891,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             return
         import keyboardHandler
         import winInputHook
-        from logHandler import log
         self._original_keyDownEvent = keyboardHandler.internal_keyDownEvent
         keyboardHandler.internal_keyDownEvent = self._new_keyDownEvent
         try:
@@ -921,7 +905,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             return
         import keyboardHandler
         import winInputHook
-        from logHandler import log
         keyboardHandler.internal_keyDownEvent = self._original_keyDownEvent
         try:
             winInputHook.setCallbacks(keyDown=keyboardHandler.internal_keyDownEvent, keyUp=keyboardHandler.internal_keyUpEvent)
@@ -931,7 +914,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self._keyboard_hooked = False
 
     def _new_keyDownEvent(self, vkCode, scanCode, extended, injected):
-        from logHandler import log
         # Only record last vkCode/extended if it is not injected, and not a modifier key
         if not injected and vkCode not in (16, 17, 18, 20, 91, 92, 144, 160, 161, 162, 163, 164, 165):
             self._last_vkCode = vkCode
@@ -954,11 +936,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     # We don't catch them here to avoid double playing, except if we want to bypass event_typedCharacter completely.
                     # Actually event_typedCharacter is safer for letters.
         except Exception as e:
-            try:
-                from logHandler import log
-                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-            except:
-                pass
+            log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
         # Clipboard shortcut detection
         if not injected:
             try:
@@ -985,7 +963,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         return True
 
     def event_typedCharacter(self, obj, nextHandler, ch):
-        from logHandler import log
         try:
             if not hasattr(self, 'handler'):
                 nextHandler()
@@ -1066,11 +1043,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     script_toggleAudioThemes.__doc__ = _("Pressing it once toggles audio themes on and off. Pressing twice toggles typing sounds.")
 
     def event_mouseMove(self, obj, nextHandler, x, y):
-        from logHandler import log
         if obj is not self._previous_mouse_object:
             self._previous_mouse_object = obj
             try:
-                obj_info = self._snapshot_obj(obj)
+                obj_info = self._snapshot_obj(obj, foreground_app=self.handler._current_app_name)
                 utils.threadPool.add_task(self.playObject, obj_info)
             except Exception as e:
                 log.debugWarning(f"event_mouseMove snapshot: {e}")
@@ -1081,11 +1057,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception as e:
             log.debugWarning(f"event_mouseMove nextHandler: {e}")
     def event_show(self, obj, nextHandler):
-        from logHandler import log
         try:
             if getattr(obj, "role", None) == controlTypes.Role.HELPBALLOON:
-                obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.notify)
-                self.playObject(obj_info)
+                obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.notify, foreground_app=self.handler._current_app_name)
+                utils.threadPool.add_task(self.playObject, obj_info)
         except Exception as e:
             log.debugWarning(f"event_show: {e}")
         try:
@@ -1101,7 +1076,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception:
             self.handler._current_app_name = None
         try:
-            obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.loaded)
+            obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.loaded, foreground_app=self.handler._current_app_name)
             utils.threadPool.add_task(self.playObject, obj_info)
         except Exception as e:
             log.debug(f"AudioThemes event_documentLoadComplete: {e}")
@@ -1126,35 +1101,35 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
             foreground_app = obj_info.get("foreground_app")
             theme = self.handler.get_theme_for_app(foreground_app)
-            from logHandler import log
             log.debug(f"playObject app={foreground_app} theme={'present' if theme else 'None'} role={obj_info.get('role', 0)}")
 
             current_states = obj_info.get("states", frozenset())
 
-            suppress_role = config.conf["audiothemes"].get("state_sounds_suppress_role", False)
+            fl_cfg = getattr(self.handler, '_fl_config', None)
+            suppress_role = fl_cfg["state_sounds_suppress_role"] if fl_cfg else config.conf["audiothemes"].get("state_sounds_suppress_role", False)
 
             # --- State-based sound ------------------------------------------
             if theme and current_states:
                 if suppress_role:
                     # Old behavior: first matching state sound breaks, role sound skipped
+                    theme_sounds = theme.sounds
                     for state in current_states:
                         state_snd = state + STATE_OFFSET
-                        with theme._lock:
-                            has_state_snd = state_snd in theme.sounds
+                        has_state_snd = state_snd in theme_sounds
                         if has_state_snd:
-                            self.handler.play(obj_info, state_snd)
+                            self.handler.play(obj_info, state_snd, _pre_resolved_theme=theme)
                             break
                 else:
                     # New behavior: play ALL matching state sounds, then role sound
+                    theme_sounds = theme.sounds
                     for state in current_states:
                         state_snd = state + STATE_OFFSET
-                        with theme._lock:
-                            has_state_snd = state_snd in theme.sounds
+                        has_state_snd = state_snd in theme_sounds
                         if has_state_snd:
-                            self.handler.play(obj_info, state_snd)
+                            self.handler.play(obj_info, state_snd, _pre_resolved_theme=theme)
 
             # --- Emoji role sound suppression ---
-            emoji_suppress = config.conf["audiothemes"].get("emoji_suppress_role_sound", False)
+            emoji_suppress = fl_cfg["emoji_suppress_role_sound"] if fl_cfg else config.conf["audiothemes"].get("emoji_suppress_role_sound", False)
             if emoji_suppress and (
                 obj_info.get("suppress_role_sound") or
                 _text_contains_emoji(obj_info.get("name", ""))
@@ -1177,7 +1152,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     if not snd and not obj_info.get("force_3d", False):
                         return
 
-            self.handler.play(obj_info, snd)
+            self.handler.play(obj_info, snd, _pre_resolved_theme=theme)
 
         except Exception as e:
             log.debugWarning(f"playObject failed: {e}")
@@ -1187,7 +1162,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         """Play a sound for a role encountered during speech output."""
         try:
             from .handler import STATE_OFFSET
-            from . import utils
             from .phoneticPunctuation import is_emoji_suppress_role_flag_set
             # Route heading level 7-9 to SpecialProps heading7/8/9
             if heading_level is not None and heading_level >= 7:
@@ -1223,8 +1197,14 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         if not role:
             return None
 
+        # Cache FL config once per object (snapshot from last configure())
+        try:
+            fl_cfg = self.handler._fl_config
+        except Exception:
+            fl_cfg = config.conf["audiothemes"]
+
         # Legacy mode: only LISTITEM / TREEVIEWITEM
-        if not config.conf["audiothemes"].get("universal_fl_enabled", True):
+        if not fl_cfg.get("universal_fl_enabled", True):
             if parrole is None:
                 if role == controlTypes.Role.TREEVIEWITEM:
                     parrole = controlTypes.Role.TREEVIEW.value
@@ -1250,24 +1230,17 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
         # --- Universal mode ------------------------------------------------
         # Check role filter – which roles are enabled for FL detection?
-        fl_roles_raw = config.conf["audiothemes"].get("fl_enabled_roles")
-        if fl_roles_raw is None:
-            fl_roles_raw = "all"
-        if fl_roles_raw != "all":
-            try:
-                import json
-                enabled = json.loads(fl_roles_raw)
-                r_name = role_int_to_name.get(role)
-                if r_name and r_name not in enabled:
-                    return None
-            except Exception:
-                pass
+        fl_enabled_set = fl_cfg.get("fl_enabled_roles_set")
+        if fl_enabled_set is not None:
+            r_name = role_int_to_name.get(role)
+            if r_name and r_name not in fl_enabled_set:
+                return None
 
         prev_role = obj_info.get("previous_role")
         next_role = obj_info.get("next_role")
         prev_same_role = obj_info.get("prev_same_role")
         next_same_role = obj_info.get("next_same_role")
-        fl_mode = config.conf["audiothemes"].get("fl_detection_mode", "smart")
+        fl_mode = fl_cfg.get("fl_detection_mode", "smart")
 
         # Determine is_first / is_last based on detection mode
         if fl_mode == "strict":
@@ -1297,7 +1270,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # Solo items: no siblings at all (regardless of mode)
         has_any_adjacent = prev_role is not None or next_role is not None
         if is_first and is_last and not has_any_adjacent:
-            solo = config.conf["audiothemes"].get("fl_solo_behavior", "first")
+            solo = fl_cfg.get("fl_solo_behavior", "first")
             if solo == "first":
                 return SpecialProps.first
             elif solo == "last":
@@ -1456,7 +1429,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         from .utils import is_sound_suppressed
         if is_sound_suppressed("ui_beeps"):
             return
-        import tones
         try:
             from . import frenzy
             df = frenzy.get_ducking_factor("ui_beeps")
@@ -1486,11 +1458,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                         children.append(child)
                     collect_children(child, depth + 1)
             except Exception as e:
-                try:
-                    from logHandler import log
-                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-                except:
-                    pass
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
         collect_children(obj)
         # sort by X coordinate
         children.sort(key=lambda c: c.location[0] if c.location else 0)
@@ -1509,23 +1477,14 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     obj_info["progress_angle"] = nx * 90.0 # -45 to 45
                 snapshots.append(obj_info)
             except Exception as e:
-                try:
-                    from logHandler import log
-                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-                except:
-                    pass
+                log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
         def sweep():
-            import time
             for obj_info in snapshots:
                 try:
                     self.playObject(obj_info)
                     time.sleep(0.04)
                 except Exception as e:
-                    try:
-                        from logHandler import log
-                        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-                    except:
-                        pass
+                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
         utils.threadPool.add_task(sweep)
 
     @script(description=_("Toggles audio ducking on and off."))
@@ -1599,7 +1558,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 else:
                     mainFrame._popupSettingsDialog(AudioThemesSettingsPanel)
             except Exception as e:
-                from logHandler import log
                 log.error(f"Failed to open Audio Themes settings: {e}", exc_info=True)
                 ui.message(_("Failed to open settings. Please open through NVDA Preferences."))
         wx.CallAfter(do_open)
@@ -1615,7 +1573,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     @script(description=_("Reports current system power status (battery and AC)."))
     def script_reportSystemStatus(self, gesture):
         try:
-            import ctypes
             class SYSTEM_POWER_STATUS(ctypes.Structure):
                 _fields_ = [
                     ("ACLineStatus", ctypes.c_byte),

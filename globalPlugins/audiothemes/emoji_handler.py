@@ -147,23 +147,36 @@ def _get_emoji_category(emoji_str):
     return _fallback_category(emoji_str)
 
 
+_EMOJI_RANGES = [
+    (EMOJI_CATEGORY_SMILEYS, [(0x1F600, 0x1F64F), (0x2639, 0x263A), (0x2763, 0x2764)]),
+    (EMOJI_CATEGORY_PEOPLE, [(0x1F468, 0x1F487), (0x1F44A, 0x1F450), (0x1F440, 0x1F445), (0x1F9B0, 0x1F9FF)]),
+    (EMOJI_CATEGORY_ANIMALS, [(0x1F400, 0x1F43E), (0x1F980, 0x1F9AA), (0x1FAB0, 0x1FAC5)]),
+    (EMOJI_CATEGORY_FOOD, [(0x1F32D, 0x1F37F), (0x1F9C0, 0x1F9CA), (0x1FAD0, 0x1FAD6)]),
+    (EMOJI_CATEGORY_TRAVEL, [(0x1F680, 0x1F6C5), (0x1F30B, 0x1F31F), (0x26C4, 0x26C5), (0x26F0, 0x26F5)]),
+    (EMOJI_CATEGORY_ACTIVITIES, [(0x1F3A0, 0x1F3F0), (0x26BD, 0x26BE), (0x1F9E9, 0x1F9FB)]),
+    (EMOJI_CATEGORY_OBJECTS, [(0x1F4A1, 0x1F53D), (0x1F550, 0x1F567), (0x1F5A5, 0x1F5FF), (0x231A, 0x231B), (0x23E9, 0x23F3)]),
+    (EMOJI_CATEGORY_SYMBOLS, [(0x2600, 0x27BF), (0x2934, 0x2935), (0x2B05, 0x2B55), (0x00A9, 0x00AE), (0x2122, 0x2139)]),
+    (EMOJI_CATEGORY_FLAGS, [(0x1F3F3, 0x1F3F4), (0x1F1E6, 0x1F1FF)]),
+]
+
+_CATEGORY_CONFIG_KEYS = {
+    EMOJI_CATEGORY_SMILEYS: "emoji_cat_smileys",
+    EMOJI_CATEGORY_PEOPLE: "emoji_cat_people",
+    EMOJI_CATEGORY_ANIMALS: "emoji_cat_animals",
+    EMOJI_CATEGORY_FOOD: "emoji_cat_food",
+    EMOJI_CATEGORY_TRAVEL: "emoji_cat_travel",
+    EMOJI_CATEGORY_ACTIVITIES: "emoji_cat_activities",
+    EMOJI_CATEGORY_OBJECTS: "emoji_cat_objects",
+    EMOJI_CATEGORY_SYMBOLS: "emoji_cat_symbols",
+    EMOJI_CATEGORY_FLAGS: "emoji_cat_flags",
+}
+
 def _fallback_category(emoji_str):
     """Fallback category detection for emoji not in CLDR data."""
     if FLAGS_REGIONAL_INDICATOR.match(emoji_str):
         return EMOJI_CATEGORY_FLAGS
     cp = ord(emoji_str[0])
-    emoji_ranges = [
-        (EMOJI_CATEGORY_SMILEYS, [(0x1F600, 0x1F64F), (0x2639, 0x263A), (0x2763, 0x2764)]),
-        (EMOJI_CATEGORY_PEOPLE, [(0x1F468, 0x1F487), (0x1F44A, 0x1F450), (0x1F440, 0x1F445), (0x1F9B0, 0x1F9FF)]),
-        (EMOJI_CATEGORY_ANIMALS, [(0x1F400, 0x1F43E), (0x1F980, 0x1F9AA), (0x1FAB0, 0x1FAC5)]),
-        (EMOJI_CATEGORY_FOOD, [(0x1F32D, 0x1F37F), (0x1F9C0, 0x1F9CA), (0x1FAD0, 0x1FAD6)]),
-        (EMOJI_CATEGORY_TRAVEL, [(0x1F680, 0x1F6C5), (0x1F30B, 0x1F31F), (0x26C4, 0x26C5), (0x26F0, 0x26F5)]),
-        (EMOJI_CATEGORY_ACTIVITIES, [(0x1F3A0, 0x1F3F0), (0x26BD, 0x26BE), (0x1F9E9, 0x1F9FB)]),
-        (EMOJI_CATEGORY_OBJECTS, [(0x1F4A1, 0x1F53D), (0x1F550, 0x1F567), (0x1F5A5, 0x1F5FF), (0x231A, 0x231B), (0x23E9, 0x23F3)]),
-        (EMOJI_CATEGORY_SYMBOLS, [(0x2600, 0x27BF), (0x2934, 0x2935), (0x2B05, 0x2B55), (0x00A9, 0x00AE), (0x2122, 0x2139)]),
-        (EMOJI_CATEGORY_FLAGS, [(0x1F3F3, 0x1F3F4), (0x1F1E6, 0x1F1FF)]),
-    ]
-    for cat, ranges in emoji_ranges:
+    for cat, ranges in _EMOJI_RANGES:
         for lo, hi in ranges:
             if lo <= cp <= hi:
                 return cat
@@ -187,14 +200,18 @@ def _ensure_cldr_index():
     for lst in _cldr_index.values():
         lst.sort(key=len, reverse=True)
 
+_has_cldr_data = None
 def find_emojis(text):
+    global _has_cldr_data
     matches = []
     for m in _emoji_re.finditer(text):
         emoji = m.group(0)
         cat = _get_emoji_category(emoji)
         matches.append((emoji, cat, m.start(), m.end()))
-    all_cldr = emoji_cldr_data.get_all_emoji()
-    if not all_cldr:
+    if _has_cldr_data is None:
+        all_cldr = emoji_cldr_data.get_all_emoji()
+        _has_cldr_data = bool(all_cldr)
+    if not _has_cldr_data:
         return matches
     covered = bytearray(len(text))
     for _, _, start, end in matches:
@@ -350,17 +367,7 @@ def get_emoji_custom_description(emoji_char):
 
 
 def is_category_enabled(cat):
-    key = {
-        EMOJI_CATEGORY_SMILEYS: "emoji_cat_smileys",
-        EMOJI_CATEGORY_PEOPLE: "emoji_cat_people",
-        EMOJI_CATEGORY_ANIMALS: "emoji_cat_animals",
-        EMOJI_CATEGORY_FOOD: "emoji_cat_food",
-        EMOJI_CATEGORY_TRAVEL: "emoji_cat_travel",
-        EMOJI_CATEGORY_ACTIVITIES: "emoji_cat_activities",
-        EMOJI_CATEGORY_OBJECTS: "emoji_cat_objects",
-        EMOJI_CATEGORY_SYMBOLS: "emoji_cat_symbols",
-        EMOJI_CATEGORY_FLAGS: "emoji_cat_flags",
-    }.get(cat)
+    key = _CATEGORY_CONFIG_KEYS.get(cat)
     if key is None:
         return True
     return config.conf["audiothemes"].get(key, True)

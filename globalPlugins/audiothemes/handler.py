@@ -8,12 +8,15 @@ from collections import OrderedDict
 from dataclasses import dataclass, field, asdict
 from zipfile import ZipFile, ZIP_DEFLATED
 from uuid import uuid4
+import api
 import os
 import ctypes
+import random
 import shutil
 import copy
 import json
 import threading
+import time
 import config
 import controlTypes
 import extensionPoints
@@ -222,21 +225,28 @@ audiothemes_config_defaults = {
 CONFIG_VERSION = 1
 
 
+_blacklisted_roles_cache = None
+_blacklisted_roles_cache_raw = None
+
 def _get_blacklisted_roles():
-    try:
-        val = config.conf["audiothemes"].get("blacklisted_roles", "[19]")
-        if isinstance(val, list):
-            if all(isinstance(r, int) for r in val):
-                return val
-            return [19]
-        if isinstance(val, str):
-            import json
-            parsed = json.loads(val)
-            if isinstance(parsed, list) and all(isinstance(r, int) for r in parsed):
-                return parsed
-    except Exception:
-        pass
-    return [19]
+    global _blacklisted_roles_cache, _blacklisted_roles_cache_raw
+    raw = config.conf["audiothemes"].get("blacklisted_roles", "[19]")
+    if raw == _blacklisted_roles_cache_raw:
+        return _blacklisted_roles_cache
+    if isinstance(raw, list):
+        result = raw if all(isinstance(r, int) for r in raw) else [19]
+    elif isinstance(raw, str):
+        try:
+            parsed = json.loads(raw)
+            result = parsed if isinstance(parsed, list) and all(isinstance(r, int) for r in parsed) else [19]
+            return result
+        except Exception:
+            result = [19]
+    else:
+        result = [19]
+    _blacklisted_roles_cache = result
+    _blacklisted_roles_cache_raw = raw
+    return result
 
 
 class SpecialProps(IntEnum):
@@ -478,7 +488,6 @@ class AudioTheme:
             name = role_int_to_name.get(target_role, str(target_role.value if hasattr(target_role, 'value') else target_role))
             dst = os.path.join(self.directory, f"{name}{ext}")
             try:
-                import shutil
                 shutil.copy2(src_path, dst)
             except Exception:
                 continue
@@ -489,8 +498,6 @@ class AudioTheme:
 
     def load(self, player):
         with self._lock:
-            if self.sounds:
-                self.sounds.clear()
             if hasattr(self, 'available_files'):
                 self.available_files.clear()
             else:
@@ -512,7 +519,7 @@ class AudioTheme:
 
     def unload(self):
         with self._lock:
-            self.sounds.clear()
+            self.sounds = {}
 
     def deactivate(self):
         """Deactivate this theme"""
@@ -568,96 +575,96 @@ CONFLICT_PENDING_FILE = os.path.join(THEMES_DIR, ".pending_conflict.json")
 
 
 def showPendingConflicts():
-	if config.conf["audiothemes"].get("dont_show_conflicts", False):
-		return
-	conflicting_ids = {
-		"navSounds": "Navigation Sound Effects",
-		"SentenceNav": "SentenceNav",
-		"browserNav": "BrowserNav",
-		"phoneticPunctuation": "Earcons and Speech Rules",
-		"audiothemes": "Audio Themes (legacy)",
-		"audio_themes_NG": "Audio Themes NG (legacy)",
-	}
-	try:
-		found = [
-			addon.name for addon in addonHandler.getAvailableAddons()
-			if addon.name in conflicting_ids and not addon.isPendingRemove
-		]
-		if found:
-			with open(CONFLICT_PENDING_FILE, "w") as f:
-				json.dump(found, f)
-	except Exception:
-		log.exception("Failed to check for conflicting add-ons")
-	try:
-		with open(CONFLICT_PENDING_FILE, "r") as f:
-			found_ids = json.load(f)
-		os.remove(CONFLICT_PENDING_FILE)
-	except FileNotFoundError:
-		return
-	except Exception:
-		log.exception("Failed to read pending conflicts file")
-		return
-	display_names = [conflicting_ids.get(n, n) for n in found_ids]
-	import gui
-	import wx
-	try:
-		addonHandler.initTranslation()
-	except Exception:
-		pass
-	gui.mainFrame.prePopup()
-	try:
-		dlg = wx.Dialog(gui.mainFrame, title=_("Conflicting Add-ons"))
-		dlg.Name = _("Conflicting Add-ons")
-		sizer = wx.BoxSizer(wx.VERTICAL)
-		label = wx.StaticText(dlg, label=_(
-			"The following add-ons are now included in Advanced Audio Themes.\n"
-			"Select the ones you want to remove to prevent conflicts:"
-		))
-		label.Name = _("The following add-ons are now included in Advanced Audio Themes. Select the ones you want to remove to prevent conflicts:")
-		sizer.Add(label, flag=wx.ALL | wx.EXPAND, border=10)
-		conflict_list = wx.ListView(dlg, style=wx.LC_REPORT | wx.LC_NO_HEADER, name=_("Conflicting add-ons"))
-		conflict_list.EnableCheckBoxes(True)
-		conflict_list.InsertColumn(0, _("Conflicting add-ons"), width=460)
-		for display in display_names:
-			idx = conflict_list.GetItemCount()
-			conflict_list.InsertItem(idx, display)
-		sizer.Add(conflict_list, proportion=1, flag=wx.ALL | wx.EXPAND, border=10)
-		dont_show = wx.CheckBox(dlg, label=_("Don't show this dialog again"))
-		dont_show.Name = _("Don't show this dialog again")
-		sizer.Add(dont_show, flag=wx.ALL | wx.EXPAND, border=10)
-		btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
-		ok_btn = wx.Button(dlg, wx.ID_OK, _("Remove selected"))
-		ok_btn.Name = _("Remove selected")
-		cancel_btn = wx.Button(dlg, wx.ID_CANCEL, _("Skip"))
-		cancel_btn.Name = _("Skip")
-		btn_sizer.Add(ok_btn, flag=wx.ALL, border=5)
-		btn_sizer.Add(cancel_btn, flag=wx.ALL, border=5)
-		sizer.Add(btn_sizer, flag=wx.ALIGN_CENTER | wx.ALL, border=10)
-		dlg.SetSizer(sizer)
-		dlg.SetSize((500, 400))
-		dlg.CenterOnScreen()
-		dlg.Raise()
-		if dlg.ShowModal() == wx.ID_OK:
-			if dont_show.IsChecked():
-				config.conf["audiothemes"]["dont_show_conflicts"] = True
-			removed = 0
-			for i, name in enumerate(found_ids):
-				if conflict_list.IsItemChecked(i):
-					for addon in addonHandler.getAvailableAddons():
-						if addon.name == name and not addon.isPendingRemove:
-							addon.requestRemove()
-							removed += 1
-			if removed:
-				wx.MessageBox(
-					_("The selected conflicting add-ons will be removed after you restart NVDA."),
-					_("Restart Required"),
-					wx.OK | wx.ICON_INFORMATION
-				)
-		dlg.Destroy()
-	except Exception:
-		log.exception("Failed to process conflicting add-ons dialog")
-	finally:
-		gui.mainFrame.postPopup()
+    if config.conf["audiothemes"].get("dont_show_conflicts", False):
+        return
+    conflicting_ids = {
+        "navSounds": "Navigation Sound Effects",
+        "SentenceNav": "SentenceNav",
+        "browserNav": "BrowserNav",
+        "phoneticPunctuation": "Earcons and Speech Rules",
+        "audiothemes": "Audio Themes (legacy)",
+        "audio_themes_NG": "Audio Themes NG (legacy)",
+    }
+    try:
+        found = [
+            addon.name for addon in addonHandler.getAvailableAddons()
+            if addon.name in conflicting_ids and not addon.isPendingRemove
+        ]
+        if found:
+            with open(CONFLICT_PENDING_FILE, "w") as f:
+                json.dump(found, f)
+    except Exception:
+        log.exception("Failed to check for conflicting add-ons")
+    try:
+        with open(CONFLICT_PENDING_FILE, "r") as f:
+            found_ids = json.load(f)
+        os.remove(CONFLICT_PENDING_FILE)
+    except FileNotFoundError:
+        return
+    except Exception:
+        log.exception("Failed to read pending conflicts file")
+        return
+    display_names = [conflicting_ids.get(n, n) for n in found_ids]
+    import gui
+    import wx
+    try:
+        addonHandler.initTranslation()
+    except Exception:
+        pass
+    gui.mainFrame.prePopup()
+    try:
+        dlg = wx.Dialog(gui.mainFrame, title=_("Conflicting Add-ons"))
+        dlg.Name = _("Conflicting Add-ons")
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        label = wx.StaticText(dlg, label=_(
+            "The following add-ons are now included in Advanced Audio Themes.\n"
+            "Select the ones you want to remove to prevent conflicts:"
+        ))
+        label.Name = _("The following add-ons are now included in Advanced Audio Themes. Select the ones you want to remove to prevent conflicts:")
+        sizer.Add(label, flag=wx.ALL | wx.EXPAND, border=10)
+        conflict_list = wx.ListView(dlg, style=wx.LC_REPORT | wx.LC_NO_HEADER, name=_("Conflicting add-ons"))
+        conflict_list.EnableCheckBoxes(True)
+        conflict_list.InsertColumn(0, _("Conflicting add-ons"), width=460)
+        for display in display_names:
+            idx = conflict_list.GetItemCount()
+            conflict_list.InsertItem(idx, display)
+        sizer.Add(conflict_list, proportion=1, flag=wx.ALL | wx.EXPAND, border=10)
+        dont_show = wx.CheckBox(dlg, label=_("Don't show this dialog again"))
+        dont_show.Name = _("Don't show this dialog again")
+        sizer.Add(dont_show, flag=wx.ALL | wx.EXPAND, border=10)
+        btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        ok_btn = wx.Button(dlg, wx.ID_OK, _("Remove selected"))
+        ok_btn.Name = _("Remove selected")
+        cancel_btn = wx.Button(dlg, wx.ID_CANCEL, _("Skip"))
+        cancel_btn.Name = _("Skip")
+        btn_sizer.Add(ok_btn, flag=wx.ALL, border=5)
+        btn_sizer.Add(cancel_btn, flag=wx.ALL, border=5)
+        sizer.Add(btn_sizer, flag=wx.ALIGN_CENTER | wx.ALL, border=10)
+        dlg.SetSizer(sizer)
+        dlg.SetSize((500, 400))
+        dlg.CenterOnScreen()
+        dlg.Raise()
+        if dlg.ShowModal() == wx.ID_OK:
+            if dont_show.IsChecked():
+                config.conf["audiothemes"]["dont_show_conflicts"] = True
+            removed = 0
+            for i, name in enumerate(found_ids):
+                if conflict_list.IsItemChecked(i):
+                    for addon in addonHandler.getAvailableAddons():
+                        if addon.name == name and not addon.isPendingRemove:
+                            addon.requestRemove()
+                            removed += 1
+            if removed:
+                wx.MessageBox(
+                    _("The selected conflicting add-ons will be removed after you restart NVDA."),
+                    _("Restart Required"),
+                    wx.OK | wx.ICON_INFORMATION
+                )
+        dlg.Destroy()
+    except Exception:
+        log.exception("Failed to process conflicting add-ons dialog")
+    finally:
+        gui.mainFrame.postPopup()
 
 
 _typing_dir_cache = {}
@@ -720,8 +727,7 @@ class AudioThemesHandler:
                         if rule is not None and getattr(rule, 'speechBehavior', 2) == 0:
                             suppress = False
                 except Exception as e:
-                    import logging
-                    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
+                    log.error(f"AudioThemes Error: {e}", exc_info=True)
             if self.player.use_in_say_all and SayAllHandler.isRunning():
                 suppress = False
                 
@@ -828,16 +834,25 @@ class AudioThemesHandler:
         self._migrate_config()
         with self._config_lock:
             user_config = config.conf["audiothemes"]
-            if self.active_theme is not None:
-                self.active_theme.deactivate()
-            self.enabled = user_config["enable_audio_themes"]
-            self.active_theme = self.get_active_theme()
-            log.debug(f"configure: enabled={self.enabled} active_theme={'present' if self.active_theme else 'None'}")
-        
-        # global _typing_dir_cache
-        _typing_dir_cache.clear()
-        # _theme_sound_existence_cache removed completely for performance
-        self._theme_cache = {}
+            new_enabled = user_config["enable_audio_themes"]
+            new_theme_folder = user_config["active_theme"] if new_enabled else None
+            old_theme_folder = self.active_theme.folder if self.active_theme else None
+            theme_changed = (
+                new_enabled != self.enabled or
+                new_theme_folder != old_theme_folder
+            )
+            if theme_changed:
+                if self.active_theme is not None:
+                    self.active_theme.deactivate()
+                self.enabled = new_enabled
+                self.active_theme = self.get_active_theme()
+                _typing_dir_cache.clear()
+                self._theme_cache = {}
+                log.debug(f"configure: enabled={self.enabled} active_theme={'present' if self.active_theme else 'None'}")
+            else:
+                self.enabled = new_enabled
+
+        # Always re-parse app profiles (they may have changed independently)
         try:
             raw_profiles = json.loads(user_config.get("app_profiles", "{}"))
             self._app_profiles_cache = {}
@@ -871,6 +886,28 @@ class AudioThemesHandler:
                 p = p.strip().lower().removesuffix('.exe')
                 if p:
                     self.disabled_apps.append(p)
+        # Cache frequently-read config values for playObject/getOrder
+        fl_roles_raw = user_config.get("fl_enabled_roles")
+        fl_enabled_roles_set = None
+        if fl_roles_raw and fl_roles_raw != "all":
+            try:
+                fl_enabled_roles_set = set(json.loads(fl_roles_raw))
+            except Exception:
+                fl_enabled_roles_set = None
+        self._fl_config = {
+            "universal_fl_enabled": user_config.get("universal_fl_enabled", True),
+            "fl_enabled_roles": fl_roles_raw,
+            "fl_enabled_roles_set": fl_enabled_roles_set,
+            "fl_detection_mode": user_config.get("fl_detection_mode", "smart"),
+            "fl_solo_behavior": user_config.get("fl_solo_behavior", "first"),
+            "state_sounds_suppress_role": user_config.get("state_sounds_suppress_role", False),
+            "emoji_suppress_role_sound": user_config.get("emoji_suppress_role_sound", False),
+            "firstlast_fallback": user_config.get("firstlast_fallback", "role"),
+            "first_fallback_role_name": user_config.get("first_fallback_role_name", "listitem"),
+            "last_fallback_role_name": user_config.get("last_fallback_role_name", "listitem"),
+            "general_fallback": user_config.get("general_fallback", "role"),
+            "general_fallback_role_name": user_config.get("general_fallback_role_name", "listitem"),
+        }
 
     def _start_system_status_monitoring(self):
         try:
@@ -879,6 +916,15 @@ class AudioThemesHandler:
             self._system_monitor.start()
         except Exception as e:
             log.debugWarning(f"Failed to start system status monitor: {e}")
+
+    def _is_app_disabled_for_category(self, category):
+        app_name = getattr(self, '_current_app_name', None)
+        if not app_name or not self.disabled_apps:
+            return False
+        if not any(p in app_name.lower() for p in self.disabled_apps):
+            return False
+        from .utils import is_sound_suppressed
+        return is_sound_suppressed(category)
 
     def _play_system_sound(self, sound_key):
         if not config.conf["audiothemes"]["sys_status_enabled"]:
@@ -904,89 +950,76 @@ class AudioThemesHandler:
         elif sound_key in (SpecialProps.sys_wake, SpecialProps.sys_sleep):
             if not user_config["sys_wake_enabled"]:
                 return
-        foreground_app = getattr(self, '_current_app_name', None)
-        if foreground_app:
-            app_l = foreground_app.lower()
-            if any(p in app_l for p in self.disabled_apps):
-                from .utils import is_sound_suppressed
-                if is_sound_suppressed("theme_sounds"):
-                    return
-        theme = self.get_theme_for_app(foreground_app)
+        if self._is_app_disabled_for_category("theme_sounds"):
+            return
+        theme = self.get_theme_for_app(getattr(self, '_current_app_name', None))
         if not theme:
             return
-        with theme._lock:
-            sound_obj = theme.sounds.get(sound_key)
-            if sound_obj is None:
-                return
+        sounds = theme.sounds
+        sound_obj = sounds.get(sound_key)
+        if sound_obj is None:
+            return
         self.player.play({"name": str(sound_key.value), "role": 0, "system_sound": True, "volume_override": user_config["sys_status_volume"] / 100.0}, sound_obj)
 
-    def play(self, obj_info, sound):
+    def play(self, obj_info, sound, _pre_resolved_theme=None):
         """
         Play a themed sound.  obj_info is a plain dict (no COM object).
+        _pre_resolved_theme may be passed from playObject() to skip a redundant lookup.
         """
         force_3d = obj_info.get("force_3d", False) if isinstance(obj_info, dict) else False
         if not force_3d and (not self.enabled or (self.active_theme is None)):
             return
 
-        # Check suppression via _current_app_name (always up to date,
-        # unlike the snapshot's foreground_app which may be stale from the queue).
-        if not force_3d:
-            cur_app = getattr(self, '_current_app_name', None)
-            if cur_app:
-                app_l = cur_app.lower()
-                if any(p in app_l for p in self.disabled_apps):
-                    from .utils import is_sound_suppressed
-                    if is_sound_suppressed("theme_sounds"):
-                        return
+        if not force_3d and self._is_app_disabled_for_category("theme_sounds"):
+            return
 
-        foreground_app = obj_info.get("foreground_app") if isinstance(obj_info, dict) else None
-        theme = self.get_theme_for_app(foreground_app)
-        if not theme:
-            theme = self.active_theme
+        if _pre_resolved_theme is not None:
+            theme = _pre_resolved_theme
+        else:
+            app = obj_info.get("foreground_app") if isinstance(obj_info, dict) else getattr(self, '_current_app_name', None)
+            theme = self.get_theme_for_app(app)
+            if not theme:
+                theme = self.active_theme
 
         if not theme:
             return
 
-        with theme._lock:
-            sound_obj = theme.sounds.get(sound)
-            # System sounds must not fall back to any other sound
-            if sound_obj is None and isinstance(obj_info, dict) and obj_info.get("system_sound"):
-                return
-            if sound_obj is None and isinstance(obj_info, dict):
-                role = obj_info.get("role", 0)
-                if role and sound in (SpecialProps.first, SpecialProps.last):
-                    fb = config.conf["audiothemes"].get("firstlast_fallback", "role")
-                    if fb == "role":
-                        sound_obj = theme.sounds.get(role)
-                    elif fb == "first_available" and theme.sounds:
-                        sound_obj = next(iter(theme.sounds.values()))
-                    elif fb == "custom_role":
-                        if sound == SpecialProps.first:
-                            name = config.conf["audiothemes"].get("first_fallback_role_name", "listitem")
-                        else:
-                            name = config.conf["audiothemes"].get("last_fallback_role_name", "listitem")
-                        target = role_name_to_int.get(name)
-                        if target is not None:
-                            sound_obj = theme.sounds.get(target)
-            if sound_obj is None and force_3d:
-                import controlTypes
-                sound_obj = theme.sounds.get(controlTypes.Role.BUTTON)
-                if sound_obj is None and theme.sounds:
-                    sound_obj = next(iter(theme.sounds.values()))
-            if sound_obj is None and theme.sounds:
-                fb = config.conf["audiothemes"].get("general_fallback", "role")
+        sounds = theme.sounds
+        sound_obj = sounds.get(sound)
+        # System sounds must not fall back to any other sound
+        if sound_obj is None and isinstance(obj_info, dict) and obj_info.get("system_sound"):
+            return
+        fl_cfg = self._fl_config
+        if sound_obj is None and isinstance(obj_info, dict):
+            role = obj_info.get("role", 0)
+            if role and sound in (SpecialProps.first, SpecialProps.last):
+                fb = fl_cfg["firstlast_fallback"]
                 if fb == "role":
-                    snd_role = obj_info.get("role", 0) if isinstance(obj_info, dict) else 0
-                    if snd_role:
-                        sound_obj = theme.sounds.get(snd_role)
-                if sound_obj is None and fb in ("role", "first_available"):
-                    sound_obj = next(iter(theme.sounds.values()))
+                    sound_obj = sounds.get(role)
+                elif fb == "first_available" and sounds:
+                    sound_obj = next(iter(sounds.values()))
                 elif fb == "custom_role":
-                    name = config.conf["audiothemes"].get("general_fallback_role_name", "listitem")
+                    name = fl_cfg["first_fallback_role_name" if sound == SpecialProps.first else "last_fallback_role_name"]
                     target = role_name_to_int.get(name)
                     if target is not None:
-                        sound_obj = theme.sounds.get(target)
-                    
+                        sound_obj = sounds.get(target)
+        if sound_obj is None and force_3d:
+            sound_obj = sounds.get(controlTypes.Role.BUTTON)
+            if sound_obj is None and sounds:
+                sound_obj = next(iter(sounds.values()))
+        if sound_obj is None and sounds:
+            fb = fl_cfg["general_fallback"]
+            if fb == "role":
+                snd_role = obj_info.get("role", 0) if isinstance(obj_info, dict) else 0
+                if snd_role:
+                    sound_obj = sounds.get(snd_role)
+            if sound_obj is None and fb in ("role", "first_available"):
+                sound_obj = next(iter(sounds.values()))
+            elif fb == "custom_role":
+                name = fl_cfg["general_fallback_role_name"]
+                target = role_name_to_int.get(name)
+                if target is not None:
+                    sound_obj = sounds.get(target)
         if sound_obj is None:
             return
         self.player.play(obj_info, sound_obj)
@@ -1003,26 +1036,27 @@ class AudioThemesHandler:
                     return self.active_theme
                 if target_folder in self._theme_cache:
                     return self._theme_cache[target_folder]
-                theme = self.get_theme_from_folder(target_folder)
-                if theme and theme.exists():
-                    theme.load(self.player)
+            else:
+                return self.active_theme
+        # Lock released before disk I/O / theme.load
+        theme = self.get_theme_from_folder(target_folder)
+        if theme and theme.exists():
+            theme.load(self.player)
+            with self._config_lock:
+                # Re-check cache (another thread may have loaded it)
+                if target_folder not in self._theme_cache:
                     self._theme_cache[target_folder] = theme
-                    return theme
-            return self.active_theme
+            return theme
+        return self.active_theme
 
     def play_theme_sound(self, sound_name, angle_x=0, angle_y=0):
         if not self.enabled or (self.active_theme is None):
             return False
             
-        foreground_app = getattr(self, '_current_app_name', None)
-        if foreground_app:
-            app_l = foreground_app.lower()
-            if any(p in app_l for p in self.disabled_apps):
-                from .utils import is_sound_suppressed
-                if is_sound_suppressed("theme_sounds"):
-                    return False
+        if self._is_app_disabled_for_category("theme_sounds"):
+            return False
 
-        theme = self.get_theme_for_app(foreground_app)
+        theme = self.get_theme_for_app(getattr(self, '_current_app_name', None))
         if not theme:
             return False
 
@@ -1045,7 +1079,6 @@ class AudioThemesHandler:
 
     def get_earcon_angles(self):
         try:
-            import api
             focus = api.getFocusObject()
             obj = focus
             location = getattr(obj, 'location', None)
@@ -1069,8 +1102,7 @@ class AudioThemesHandler:
         if not self.enabled or self.active_theme is None:
             return False
         theme = self.active_theme
-        with theme._lock:
-            sound_obj = theme.sounds.get(special_prop)
+        sound_obj = theme.sounds.get(special_prop)
         if sound_obj is None:
             return False
         vol = (volume if volume is not None
@@ -1102,7 +1134,6 @@ class AudioThemesHandler:
             return
             
         # Debounce: prevent same key sound from playing twice rapidly (keyDown + typedCharacter overlap)
-        import time
         now = time.monotonic()
         if hasattr(self, "_last_typing_time") and (now - self._last_typing_time) < 0.05:
             if getattr(self, "_last_typing_vk", None) == vkCode:
@@ -1111,16 +1142,11 @@ class AudioThemesHandler:
         self._last_typing_vk = vkCode
             
         foreground_app = getattr(self, '_current_app_name', None)
-        if foreground_app:
-            app_l = foreground_app.lower()
-            if any(p in app_l for p in self.disabled_apps):
-                from .utils import is_sound_suppressed
-                if is_sound_suppressed("typing_sounds"):
-                    return
+        if self._is_app_disabled_for_category("typing_sounds"):
+            return
 
         theme = self.get_theme_for_app(foreground_app)
 
-        import random
         # 1. Check if the active theme has its own typingSounds folder
         theme_typing_dir = os.path.join(theme.directory, "typingSounds") if theme else None
         typing_dir = None
@@ -1261,7 +1287,6 @@ class AudioThemesHandler:
 
     @classmethod
     def install_typing_soundPackage(cls, pack_path):
-        import json
         pack_name = "Imported_" + uuid4().hex[:8]
         with ZipFile(pack_path, "r") as pack:
             if "info.json" in pack.namelist():
@@ -1333,7 +1358,6 @@ class AudioThemesHandler:
 
 
 def get_typing_sound_packs():
-    import os
     typingSoundsDir = os.path.join(os.path.dirname(__file__), "typingSounds")
     if os.path.isdir(typingSoundsDir):
         packs = [d for d in os.listdir(typingSoundsDir) if os.path.isdir(os.path.join(typingSoundsDir, d))]

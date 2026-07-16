@@ -5,9 +5,14 @@
 #See the file COPYING.txt for more details.
 
 import api
+import array
 import config
+import ctypes
+import fnmatch
 import json
 import os
+import queue
+import time
 from queue import Queue
 from logHandler import log
 import speech
@@ -27,27 +32,15 @@ def myAssert(condition):
         raise RuntimeError("Assertion failed")
 
 def ensure_mono(audio_bytes, channels, sample_rate):
-	"""Downmix stereo PCM to mono when mono output mode is active.
-
-	When mono mode is enabled, stereo interleaved 16-bit PCM is downmixed
-	to (L+R)/2 and duplicated to both channels. This preserves the existing
-	2-channel WavePlayer configuration while achieving true mono output.
-	Returns the original bytes unchanged when stereo mode is active.
-	"""
 	if channels != 2:
 		return audio_bytes
 	out_mode = config.conf.get("audiothemes", {}).get("output_mode", "stereo")
 	if out_mode != "mono":
 		return audio_bytes
-	import array
 	arr = array.array('h')
 	arr.frombytes(audio_bytes)
 	n = len(arr) // 2
-	result = array.array('h', [0]) * (n * 2)
-	for i in range(n):
-		mono = int((arr[i * 2] + arr[i * 2 + 1]) * 0.5)
-		result[i * 2] = mono
-		result[i * 2 + 1] = mono
+	result = array.array('h', (int((arr[i * 2] + arr[i * 2 + 1]) * 0.5) for i in range(n) for _ in range(2)))
 	return result.tobytes()
 
 
@@ -69,17 +62,13 @@ class Worker(Thread):
         self.start()
 
     def run(self):
-        import time
-        import ctypes
         try:
-            THREAD_PRIORITY_ABOVE_NORMAL = 1
-            ctypes.windll.kernel32.SetThreadPriority(ctypes.windll.kernel32.GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL)
+            THREAD_PRIORITY_NORMAL = 0
+            ctypes.windll.kernel32.SetThreadPriority(ctypes.windll.kernel32.GetCurrentThread(), THREAD_PRIORITY_NORMAL)
         except Exception as e:
-            import logging
-            logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
+            log.error(f"AudioThemes Error: {e}", exc_info=True)
         while True:
             item = self.tasks.get()
-            # Shutdown sentinel received — exit the loop.
             if item is _WORKER_STOP:
                 self.tasks.task_done()
                 break
@@ -126,7 +115,6 @@ class ThreadPool:
         Fix 1 (COM caching) prevents the main deadlock cause.  They
         will recover naturally once unblocked.
         """
-        import time
         current_time = time.time()
         for i, w in enumerate(self._workers):
             if not w.is_alive():
@@ -138,8 +126,6 @@ class ThreadPool:
     def add_task(self, func, *args, **kargs):
         """Enqueue a task.  Returns immediately; never blocks the caller."""
         # Throttled watchdog: only check workers every 5 seconds
-        import time
-        import queue
         now = time.monotonic()
         if now - self._last_watchdog_time > 5.0:
             self._last_watchdog_time = now
@@ -224,7 +210,6 @@ def isAppBlacklisted():
     if app_lower in _cached_blacklist_set:
         return True
         
-    import fnmatch
     for pattern in _cached_blacklist_set:
         if fnmatch.fnmatch(app_lower, pattern):
             return True
@@ -241,20 +226,28 @@ def isURLResolutionAvailable():
     except AttributeError:
         return False
 
+_last_url = ""
+_last_url_time = 0
+_URL_CACHE_TTL = 0.5
 def getCurrentURLSafe():
-    try:
-        return api.getCurrentURL()
-    except AttributeError:
-        return ""
-
-
+    global _last_url, _last_url_time
+    now = time.time()
+    if now - _last_url_time > _URL_CACHE_TTL:
+        try:
+            _last_url = api.getCurrentURL()
+        except Exception:
+            _last_url = ""
+        _last_url_time = now
+    return _last_url
 
 def getCurrentContext():
     try:
         handler = _handler_ref
         appName = getattr(handler, '_current_app_name', "")
         windowTitle = getattr(handler, '_current_window_title', "")
-        url = getattr(handler, '_current_url', "")
+        url = getattr(handler, '_current_url', None)
+        if url is None:
+            url = getCurrentURLSafe()
     except Exception:
         appName, windowTitle, url = "", "", ""
         

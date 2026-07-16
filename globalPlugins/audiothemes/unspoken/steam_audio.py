@@ -3,6 +3,7 @@ Python ctypes binding for Steam Audio DLL
 Provides 3D audio positioning, reverb, and 16-bit sample output
 """
 
+import array
 import ctypes
 import os
 import platform
@@ -191,7 +192,6 @@ class SteamAudio:
 		# (avoids Python argument-unpacking overhead for 44100+ samples)
 		input_length = len(input_buffer)
 		if input_length > 0:
-			import array
 			float_arr = array.array('f', input_buffer)
 			input_array = (c_float * input_length).from_buffer(float_arr)
 		else:
@@ -203,7 +203,7 @@ class SteamAudio:
 		output_length = c_int()
 
 		# Call the DLL function with timeout to prevent worker deadlocks
-		if not _steam_audio_mutex.acquire(timeout=5):
+		if not _steam_audio_mutex.acquire(timeout=2):
 			log.error("Steam Audio mutex timeout (process_sound)")
 			return None
 		try:
@@ -230,7 +230,7 @@ class SteamAudio:
 				result = ctypes.string_at(output_buffer_ptr, output_samples * 2)
 
 				# Free the output buffer
-				if not _steam_audio_mutex.acquire(timeout=5):
+				if not _steam_audio_mutex.acquire(timeout=2):
 					log.error("Steam Audio mutex timeout (free_output_sound)")
 				else:
 					try:
@@ -246,7 +246,7 @@ class SteamAudio:
 			log.error(f"Error processing output buffer: {e}")
 			# Make sure to free the buffer even if there's an error
 			if output_buffer_ptr:
-				if _steam_audio_mutex.acquire(timeout=5):
+				if _steam_audio_mutex.acquire(timeout=2):
 					try:
 						self.dll.free_output_sound(output_buffer_ptr)
 					finally:
@@ -277,7 +277,7 @@ class SteamAudio:
 		output_length = c_int()
 
 		# Call the DLL function with timeout to prevent worker deadlocks
-		if not _steam_audio_mutex.acquire(timeout=5):
+		if not _steam_audio_mutex.acquire(timeout=2):
 			log.error("Steam Audio mutex timeout (apply_reverb)")
 			return None
 		try:
@@ -299,7 +299,7 @@ class SteamAudio:
 				result = ctypes.string_at(output_buffer_ptr, output_samples * 2)
 
 				# Free the output buffer
-				if not _steam_audio_mutex.acquire(timeout=5):
+				if not _steam_audio_mutex.acquire(timeout=2):
 					log.error("Steam Audio mutex timeout (free_output_sound reverb)")
 				else:
 					try:
@@ -315,7 +315,7 @@ class SteamAudio:
 			log.error(f"Error processing reverb output buffer: {e}")
 			# Make sure to free the buffer even if there's an error
 			if output_buffer_ptr:
-				if _steam_audio_mutex.acquire(timeout=5):
+				if _steam_audio_mutex.acquire(timeout=2):
 					try:
 						self.dll.free_output_sound(output_buffer_ptr)
 					finally:

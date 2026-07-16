@@ -4,12 +4,15 @@
 
 import os
 import os.path
+import random
 import time
 import threading
 import queue
 import wave
 from array import array
-import struct as _struct_mod
+from collections import OrderedDict
+import struct
+import ctypes
 import config
 import speech
 from speech.sayAll import SayAllHandler
@@ -180,8 +183,7 @@ def clamp(my_value, min_value, max_value):
 	return max(min(my_value, max_value), min_value)
 
 def floats_to_pcm_bytes(float_samples):
-	"""Convert float samples to 16-bit PCM bytes. Uses fast integer math."""
-	return array('h', [max(-32768, min(32767, int(s * 32767.0))) for s in float_samples]).tobytes()
+	return array('h', (max(-32768, min(32767, int(s * 32767.0))) for s in float_samples)).tobytes()
 
 def _apply_volume(float_samples, volume):
 	"""Multiply all samples by volume factor. Returns new array."""
@@ -244,14 +246,15 @@ class UnspokenPlayer:
 		self.create_wave_player()
 		self._last_played_object = None
 		self._last_played_time = 0
+		self._last_played_lock = threading.Lock()
 		self._last_navigator_object = None
 
 		self._audio_queue = queue.Queue()
 		self._generation = 0
 		self._generation_lock = threading.Lock()
-		self._play_cache = {}
+		self._play_cache = OrderedDict()
 		self._play_cache_lock = threading.Lock()
-		self._play_file_cache = {}
+		self._play_file_cache = OrderedDict()
 		self._cache_lock = threading.Lock()
 		self._last_typing_time = 0.0
 		self._audio_worker_thread = threading.Thread(target=self._audio_worker, daemon=True)
@@ -384,10 +387,57 @@ class UnspokenPlayer:
 			) for _ in range(5)
 		]
 		self._typing_player_index = 0
+		self._typing_player_lock = threading.Lock()
+
+	def _ensure_processed(self, sound_data):
+		if sound_data.get("_processed"):
+			return sound_data
+		float_samples = sound_data["raw_data"]
+		sample_rate = sound_data["sample_rate"]
+		if config.conf["unspoken"].get("TrimSilence", True):
+			threshold = float(config.conf["unspoken"].get("TrimSilenceThreshold", 0.01))
+			float_samples = trim_silence_array(float_samples, threshold=threshold)
+		if not float_samples:
+			float_samples = array('f', [0.0]) * 1024
+		if config.conf["unspoken"].get("SmartVolume", True):
+			if float_samples:
+				peak = max((abs(s) for s in float_samples), default=0.0)
+				if peak > 0.01:
+					target_peak = 0.8
+					ratio = target_peak / peak
+					float_samples = array('f', [s * ratio for s in float_samples])
+		if config.conf["unspoken"].get("SmoothEnvelope", False):
+			fade_samples = int(sample_rate * 0.01)
+			num_samples = len(float_samples)
+			fade_samples = min(fade_samples, num_samples // 2)
+			for i in range(fade_samples):
+				multiplier = i / float(fade_samples)
+				float_samples[i] *= multiplier
+				float_samples[num_samples - 1 - i] *= multiplier
+		if config.conf["unspoken"].get("NoiseGate", False):
+			from . import audio_filters
+			threshold = float(config.conf["unspoken"].get("NoiseGateThreshold", 0.02))
+			attack_ms = int(config.conf["unspoken"].get("NoiseGateAttack", 5))
+			release_ms = int(config.conf["unspoken"].get("NoiseGateRelease", 50))
+			float_samples = array('f', audio_filters.apply_noise_gate(
+				float_samples, threshold=threshold,
+				attack_ms=attack_ms, release_ms=release_ms,
+				sample_rate=sample_rate))
+		if config.conf["unspoken"].get("BassBoost", False):
+			from . import audio_filters
+			gain_db = float(config.conf["unspoken"].get("BassBoostGain", 3))
+			cutoff_hz = float(config.conf["unspoken"].get("BassBoostCutoff", 200))
+			float_samples = array('f', audio_filters.apply_bass_boost(
+				float_samples, gain_db=gain_db,
+				cutoff_hz=cutoff_hz, sample_rate=sample_rate))
+		remainder = len(float_samples) % 1024
+		if remainder != 0:
+			float_samples.extend(array('f', [0.0]) * (1024 - remainder))
+		sound_data["data"] = float_samples
+		sound_data["_processed"] = True
+		return sound_data
 
 	def make_sound_object(self, path):
-		"""Load sound files for Steam Audio processing with Caching and Normalization."""
-		# LRU Cache logic
 		use_cache = config.conf["unspoken"].get("AudioCache", True)
 		with sounds_lock:
 			if use_cache and path in sounds:
@@ -406,12 +456,6 @@ class UnspokenPlayer:
 				loaded = ogg_vorbis.decode_ogg_to_float(path)
 			except Exception as e:
 				log.error(f"OGG decode failed for {path}: {e}")
-			if loaded is None:
-				result = {"path": path, "is_ogg": True}
-				if use_cache:
-					with sounds_lock:
-						sounds[path] = result
-				return result
 		elif ext == 'flac':
 			try:
 				from . import flac_decode
@@ -440,7 +484,6 @@ class UnspokenPlayer:
 						float_samples = array('f', [(s - 128) / 128.0 for s in frames])
 						loaded = (float_samples, sample_rate, channels)
 					elif sample_width == 3:
-						import struct
 						count = len(frames) // 3
 						float_samples = array('f', [0.0]) * count
 						for i in range(count):
@@ -472,56 +515,9 @@ class UnspokenPlayer:
 
 		float_samples, sample_rate, channels = loaded
 
-		# Common processing for all PCM float data
-		# Note: mono downmix is NOT done here — it happens at playback time
-		# based on active 3D/mono mode, so cached data preserves original channels
-
-		if config.conf["unspoken"].get("TrimSilence", True):
-			threshold = float(config.conf["unspoken"].get("TrimSilenceThreshold", 0.01))
-			float_samples = trim_silence_array(float_samples, threshold=threshold)
-		if not float_samples:
-			float_samples = array('f', [0.0]) * 1024
-
-		if config.conf["unspoken"].get("SmartVolume", True):
-			if float_samples:
-				peak = max((abs(s) for s in float_samples), default=0.0)
-				if peak > 0.01:
-					target_peak = 0.8
-					ratio = target_peak / peak
-					float_samples = array('f', [s * ratio for s in float_samples])
-
-		if config.conf["unspoken"].get("SmoothEnvelope", False):
-			fade_samples = int(sample_rate * 0.01)
-			num_samples = len(float_samples)
-			fade_samples = min(fade_samples, num_samples // 2)
-			for i in range(fade_samples):
-				multiplier = i / float(fade_samples)
-				float_samples[i] *= multiplier
-				float_samples[num_samples - 1 - i] *= multiplier
-
-		if config.conf["unspoken"].get("NoiseGate", False):
-			from . import audio_filters
-			threshold = float(config.conf["unspoken"].get("NoiseGateThreshold", 0.02))
-			attack_ms = int(config.conf["unspoken"].get("NoiseGateAttack", 5))
-			release_ms = int(config.conf["unspoken"].get("NoiseGateRelease", 50))
-			float_samples = array('f', audio_filters.apply_noise_gate(
-				float_samples, threshold=threshold,
-				attack_ms=attack_ms, release_ms=release_ms,
-				sample_rate=sample_rate))
-
-		if config.conf["unspoken"].get("BassBoost", False):
-			from . import audio_filters
-			gain_db = float(config.conf["unspoken"].get("BassBoostGain", 3))
-			cutoff_hz = float(config.conf["unspoken"].get("BassBoostCutoff", 200))
-			float_samples = array('f', audio_filters.apply_bass_boost(
-				float_samples, gain_db=gain_db,
-				cutoff_hz=cutoff_hz, sample_rate=sample_rate))
-
-		remainder = len(float_samples) % 1024
-		if remainder != 0:
-			float_samples.extend(array('f', [0.0]) * (1024 - remainder))
-
-		result = {"data": float_samples, "sample_rate": sample_rate, "path": path, "channels": channels}
+		# Store raw float data; optional processing (trim, normalize, etc.)
+		# is deferred to first play via _ensure_processed().
+		result = {"raw_data": float_samples, "sample_rate": sample_rate, "path": path, "channels": channels, "_processed": False}
 
 		if use_cache:
 			with sounds_lock:
@@ -569,39 +565,16 @@ class UnspokenPlayer:
 		if not obj_info.get("system_sound") and getattr(self, "use_in_say_all", False) and SayAllHandler.isRunning():
 			return
 
-		if sound.get("is_ogg"):
-			path = sound.get("path")
-			try:
-				import wave as _wave_module
-				with _wave_module.open(path, "rb") as wf:
-					frames = wf.readframes(wf.getnframes())
-					sw = wf.getsampwidth()
-					ch = wf.getnchannels()
-					sr = wf.getframerate()
-				from .. import frenzy
-				df = frenzy.get_ducking_factor("theme_sounds")
-				frames = frenzy.apply_ducking_to_pcm(frames, df, sw)
-				player = nvwave.WavePlayer(channels=ch, samplesPerSec=sr, bitsPerSample=sw*8, wantDucking=False)
-				player.feed(frames)
-				player.idle()
-			except Exception:
-				try:
-					nvwave.playWaveFile(path, asynchronous=True)
-				except Exception as e:
-					import logging
-					logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
-			return
-		if "data" not in sound:
-			return
 		curtime = time.time()
 		# De-duplicate: skip if same name played < 50ms ago, unless it's a progress bar updating
 		obj_name = obj_info.get("name", "") if isinstance(obj_info, dict) else ""
 		is_progress = "progress_angle" in obj_info if isinstance(obj_info, dict) else False
 		is_system = obj_info.get("system_sound") if isinstance(obj_info, dict) else False
-		if not is_progress and self._last_played_object and (curtime - self._last_played_time < 0.05 and obj_name == self._last_played_object.get("name", "")):
-			return
-		self._last_played_object = obj_info
-		self._last_played_time = curtime
+		with self._last_played_lock:
+			if not is_progress and self._last_played_object and (curtime - self._last_played_time < 0.05 and obj_name == self._last_played_object.get("name", "")):
+				return
+			self._last_played_object = obj_info
+			self._last_played_time = curtime
 		obj_location = obj_info.get("location") if isinstance(obj_info, dict) else None
 		desktop_loc = obj_info.get("desktop_location") if isinstance(obj_info, dict) else None
 		force_3d = obj_info.get("force_3d", False) if isinstance(obj_info, dict) else False
@@ -692,10 +665,11 @@ class UnspokenPlayer:
 		final_audio = None
 		with self._play_cache_lock:
 			if cache_key in self._play_cache:
-				final_audio = self._play_cache.pop(cache_key)
-				self._play_cache[cache_key] = final_audio
+				final_audio = self._play_cache[cache_key]
+				self._play_cache.move_to_end(cache_key)
 
 		if final_audio is None:
+			sound_data = self._ensure_processed(sound_data)
 			audio_data = sound_data["data"]
 			if pitch_factor != 1.0:
 				audio_data = pitch_shift(audio_data, pitch_factor)
@@ -706,19 +680,13 @@ class UnspokenPlayer:
 			# Downmix stereo to mono when needed: spatialization or mono output mode
 			if sound_data.get("channels", 1) == 2 and (needs_spatial or is_mono):
 				n = len(adjusted_audio) // 2
-				mono = array('f', [0.0]) * n
-				for i in range(n):
-					mono[i] = (adjusted_audio[i * 2] + adjusted_audio[i * 2 + 1]) * 0.5
-				adjusted_audio = mono
+				adjusted_audio = array('f', ((adjusted_audio[i * 2] + adjusted_audio[i * 2 + 1]) * 0.5 for i in range(n)))
 
 			if sound_data.get("channels", 1) == 2 and not needs_spatial and not is_mono:
 				# Bypass Steam Audio to preserve original stereo separation
 				final_audio = floats_to_pcm_bytes(adjusted_audio)
 			elif is_mono and (not reverb_on or not self.steam_audio_active):
-				# True Mono Bypass: bypass Steam Audio, duplicate mono to L/R
-				import itertools
-				stereo_audio = list(itertools.chain.from_iterable(zip(adjusted_audio, adjusted_audio)))
-				final_audio = floats_to_pcm_bytes(stereo_audio)
+				final_audio = array('h', (max(-32768, min(32767, int(s * 32767.0))) for s in adjusted_audio for _ in range(2))).tobytes()
 			else:
 				# Process with Steam Audio for 3D positioning
 				processed_audio = self.steam_audio.process_sound(
@@ -736,7 +704,7 @@ class UnspokenPlayer:
 					
 			with self._play_cache_lock:
 				if len(self._play_cache) > 200:
-					self._play_cache.pop(next(iter(self._play_cache)))
+					self._play_cache.popitem(last=False)
 				self._play_cache[cache_key] = final_audio
 
 		# Play the final audio
@@ -751,7 +719,6 @@ class UnspokenPlayer:
 			base_vol = clamp(volume / 100.0, 0.0, 1.0)
 			
 			# Dynamic typing velocity simulation
-			import time
 			now = time.monotonic()
 			dt = now - self._last_typing_time
 			self._last_typing_time = now
@@ -802,11 +769,12 @@ class UnspokenPlayer:
 					if vkCode is not None:
 						vk = vkCode
 					else:
-						import ctypes
-						hwnd = ctypes.windll.user32.GetForegroundWindow()
-						tid = ctypes.windll.user32.GetWindowThreadProcessId(hwnd, 0)
-						hkl = ctypes.windll.user32.GetKeyboardLayout(tid)
-						vk = ctypes.windll.user32.VkKeyScanExW(ord(ch), hkl) & 0xFF
+						cur_tid = ctypes.windll.user32.GetWindowThreadProcessId(
+							ctypes.windll.user32.GetForegroundWindow(), 0)
+						if cur_tid != getattr(self, "_last_kbd_tid", None):
+							self._last_kbd_tid = cur_tid
+							self._last_kbd_layout = ctypes.windll.user32.GetKeyboardLayout(cur_tid)
+						vk = ctypes.windll.user32.VkKeyScanExW(ord(ch), self._last_kbd_layout) & 0xFF
 					if extended is not None:
 						pos = KEY_POS_MAP.get((vk, extended))
 					else:
@@ -816,7 +784,6 @@ class UnspokenPlayer:
 					if pos:
 						angle_x, angle_y = pos
 				else:
-					import random
 					angle_x = random.uniform(-10.0, 10.0)
 					
 		cache_key = (path, round(final_volume, 2), audio3d, reverb_enabled, is_typing_sound, round(angle_x, 1), round(angle_y, 1), out_mode)
@@ -824,13 +791,14 @@ class UnspokenPlayer:
 		final_audio = None
 		with self._cache_lock:
 			if cache_key in self._play_file_cache:
-				final_audio = self._play_file_cache.pop(cache_key)
-				self._play_file_cache[cache_key] = final_audio
+				final_audio = self._play_file_cache[cache_key]
+				self._play_file_cache.move_to_end(cache_key)
 
 		if final_audio is not None:
 			if is_typing_sound:
-				player = self.typing_players[self._typing_player_index]
-				self._typing_player_index = (self._typing_player_index + 1) % len(self.typing_players)
+				with self._typing_player_lock:
+					player = self.typing_players[self._typing_player_index]
+					self._typing_player_index = (self._typing_player_index + 1) % len(self.typing_players)
 				player.stop()
 				self._play_typing_audio(player, final_audio)
 			else:
@@ -841,42 +809,15 @@ class UnspokenPlayer:
 		sound = self.make_sound_object(path)
 		if not sound:
 			return
-		if sound.get("is_ogg") and "data" not in sound:
-			import nvwave
-			category = "typing_sounds" if is_typing_sound else "theme_sounds"
-			try:
-				import wave as _wave_module
-				with _wave_module.open(path, "rb") as wf:
-					frames = wf.readframes(wf.getnframes())
-					sw = wf.getsampwidth()
-					ch = wf.getnchannels()
-					sr = wf.getframerate()
-				from .. import frenzy
-				df = frenzy.get_ducking_factor(category)
-				frames = frenzy.apply_ducking_to_pcm(frames, df, sw)
-				player = nvwave.WavePlayer(channels=ch, samplesPerSec=sr, bitsPerSample=sw*8, wantDucking=False)
-				player.feed(frames)
-				player.idle()
-			except Exception:
-				try:
-					nvwave.playWaveFile(path, asynchronous=True)
-				except Exception as e:
-				    import logging
-				    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
-			return
-		
+		sound = self._ensure_processed(sound)
 		adjusted_audio = _apply_volume(sound["data"], final_volume)
 
 		# Determine if spatial or mono processing is needed
 		needs_spatial = audio3d or (is_typing_sound and not is_mono and (angle_x != 0 or angle_y != 0))
 		# Downmix stereo to mono when needed: spatialization or mono output mode
 		if sound.get("channels", 1) == 2 and (needs_spatial or is_mono):
-			# Mix stereo to mono
 			n = len(adjusted_audio) // 2
-			mono = [0.0] * n
-			for i in range(n):
-				mono[i] = (adjusted_audio[i * 2] + adjusted_audio[i * 2 + 1]) * 0.5
-			adjusted_audio = mono
+			adjusted_audio = array('f', ((adjusted_audio[i * 2] + adjusted_audio[i * 2 + 1]) * 0.5 for i in range(n)))
 			if needs_spatial:
 				processed_audio = self.steam_audio.process_sound(adjusted_audio, angle_x, angle_y)
 				if not processed_audio:
@@ -887,14 +828,7 @@ class UnspokenPlayer:
 					if reverb_audio:
 						final_audio = reverb_audio
 			elif is_mono and not reverb_enabled:
-				# True Mono Bypass: duplicate mono to L/R
-				n = len(adjusted_audio)
-				stereo_audio = [0.0] * (n * 2)
-				for i in range(n):
-					s = adjusted_audio[i]
-					stereo_audio[i * 2] = s
-					stereo_audio[i * 2 + 1] = s
-				final_audio = floats_to_pcm_bytes(stereo_audio)
+				final_audio = array('h', (max(-32768, min(32767, int(s * 32767.0))) for s in adjusted_audio for _ in range(2))).tobytes()
 			else:
 				# Mono file with reverb or other case
 				processed_audio = self.steam_audio.process_sound(adjusted_audio, angle_x, angle_y)
@@ -930,12 +864,13 @@ class UnspokenPlayer:
 
 		with self._cache_lock:
 			if len(self._play_file_cache) > 50:
-				self._play_file_cache.pop(next(iter(self._play_file_cache)))
+				self._play_file_cache.popitem(last=False)
 			self._play_file_cache[cache_key] = final_audio
 
 		if is_typing_sound:
-			player = self.typing_players[self._typing_player_index]
-			self._typing_player_index = (self._typing_player_index + 1) % len(self.typing_players)
+			with self._typing_player_lock:
+				player = self.typing_players[self._typing_player_index]
+				self._typing_player_index = (self._typing_player_index + 1) % len(self.typing_players)
 			player.stop()
 			self._play_typing_audio(player, final_audio)
 		else:
@@ -960,15 +895,13 @@ class UnspokenPlayer:
 			try:
 				self.wave_player.close()
 			except Exception as e:
-			    import logging
-			    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
+			    log.error(f"AudioThemes Error: {e}", exc_info=True)
 		if hasattr(self, "typing_players"):
 			for p in self.typing_players:
 				try:
 					p.close()
 				except Exception as e:
-				    import logging
-				    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
+				    log.error(f"AudioThemes Error: {e}", exc_info=True)
 		# Cleanup Steam Audio
 		if hasattr(self, "steam_audio"):
 			self.steam_audio.cleanup()
@@ -988,6 +921,5 @@ class UnspokenPlayer:
 			for p in self.typing_players:
 				try: p.close()
 				except Exception as e:
-				    import logging
-				    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
+				    log.error(f"AudioThemes Error: {e}", exc_info=True)
 		self.create_wave_player()
