@@ -40,12 +40,13 @@ import textInfos
 import logHandler
 log = logHandler.log
 
-from .handler import AudioThemesHandler, SpecialProps, role_int_to_name, showPendingConflicts
+from .handler import AudioThemesHandler, SpecialProps, role_int_to_name, showPendingConflicts, STATE_OFFSET
 from .settings import AudioThemesSettingsPanel
 from .studio import AudioThemesStudioStartupDialog
 from .update_checker import check_for_updates_auto
 
 from . import phoneticPunctuation as pp
+from .phoneticPunctuation import is_emoji_suppress_role_flag_set
 from . import utils
 from . import frenzy
 from .clipboard import ClipboardManager
@@ -174,7 +175,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception:
             info["windowClassName"] = ""
         handler = GlobalPlugin._instance_handler if hasattr(GlobalPlugin, '_instance_handler') else None
-        fl_cfg = getattr(handler, '_fl_config', None) or {}
+        fl_cfg = getattr(handler, '_cached_config', None) or {}
         # --- getOrder data (parent / previous / next roles) ---
         # Now collected for ALL roles to support universal first/last detection.
         if config.conf["audiothemes"]["enable_audio_themes"]:
@@ -712,7 +713,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         try:
             app_name = obj.appModule.appName if obj.appModule else None
             self.handler._current_app_name = app_name
-            log.debug(f"event_gainFocus app={app_name} active_theme={self.handler.active_theme.folder if self.handler.active_theme else None}")
+            if log.isEnabledFor(log.DEBUG):
+                log.debug(f"event_gainFocus app={app_name} active_theme={self.handler.active_theme.folder if self.handler.active_theme else None}")
         except Exception:
             self.handler._current_app_name = None
         try:
@@ -1097,15 +1099,14 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         NO COM access occurs here -- everything was pre-extracted.
         """
         try:
-            from .handler import STATE_OFFSET
-
             foreground_app = obj_info.get("foreground_app")
             theme = self.handler.get_theme_for_app(foreground_app)
-            log.debug(f"playObject app={foreground_app} theme={'present' if theme else 'None'} role={obj_info.get('role', 0)}")
+            if log.isEnabledFor(log.DEBUG):
+                log.debug(f"playObject app={foreground_app} theme={'present' if theme else 'None'} role={obj_info.get('role', 0)}")
 
             current_states = obj_info.get("states", frozenset())
 
-            fl_cfg = getattr(self.handler, '_fl_config', None)
+            fl_cfg = getattr(self.handler, '_cached_config', None)
             suppress_role = fl_cfg["state_sounds_suppress_role"] if fl_cfg else config.conf["audiothemes"].get("state_sounds_suppress_role", False)
 
             # --- State-based sound ------------------------------------------
@@ -1161,8 +1162,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     def _unspoken_play_role(self, role_val, states, heading_level=None):
         """Play a sound for a role encountered during speech output."""
         try:
-            from .handler import STATE_OFFSET
-            from .phoneticPunctuation import is_emoji_suppress_role_flag_set
             # Route heading level 7-9 to SpecialProps heading7/8/9
             if heading_level is not None and heading_level >= 7:
                 h_key = {
@@ -1199,7 +1198,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
         # Cache FL config once per object (snapshot from last configure())
         try:
-            fl_cfg = self.handler._fl_config
+            fl_cfg = self.handler._cached_config
         except Exception:
             fl_cfg = config.conf["audiothemes"]
 

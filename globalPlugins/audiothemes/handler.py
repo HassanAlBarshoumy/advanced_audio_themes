@@ -682,6 +682,10 @@ class AudioThemesHandler:
         # Cache updated on main thread by GlobalPlugin events (avoids COM in hook)
         self._current_app_name = None
         self._current_url = None
+        # Initialize debounce state to avoid hasattr in hot paths
+        self._last_typing_time = 0.0
+        self._last_typing_vk = 0
+        self._cached_config = {}  # populated by configure()
         self.ensure_themes_dir()
         self.migrate_all_themes_to_named_files()
         self.configure()
@@ -879,6 +883,18 @@ class AudioThemesHandler:
         self.player.wet_level = unspoken_config["WetLevel"]
         self.player.dry_level = unspoken_config["DryLevel"]
         self.player.width = unspoken_config["Width"]
+        # Cache processing config on the player to avoid config.conf reads in _ensure_processed
+        self.player._trim_silence = unspoken_config.get("TrimSilence", True)
+        self.player._trim_silence_threshold = float(unspoken_config.get("TrimSilenceThreshold", 0.01))
+        self.player._smart_volume = unspoken_config.get("SmartVolume", True)
+        self.player._smooth_envelope = unspoken_config.get("SmoothEnvelope", False)
+        self.player._noise_gate = unspoken_config.get("NoiseGate", False)
+        self.player._noise_gate_threshold = float(unspoken_config.get("NoiseGateThreshold", 0.02))
+        self.player._noise_gate_attack = int(unspoken_config.get("NoiseGateAttack", 5))
+        self.player._noise_gate_release = int(unspoken_config.get("NoiseGateRelease", 50))
+        self.player._bass_boost = unspoken_config.get("BassBoost", False)
+        self.player._bass_boost_gain = float(unspoken_config.get("BassBoostGain", 3))
+        self.player._bass_boost_cutoff = float(unspoken_config.get("BassBoostCutoff", 200))
         self.disabled_apps = []
         raw_disabled = user_config["disabled_apps"]
         if raw_disabled:
@@ -886,7 +902,8 @@ class AudioThemesHandler:
                 p = p.strip().lower().removesuffix('.exe')
                 if p:
                     self.disabled_apps.append(p)
-        # Cache frequently-read config values for playObject/getOrder
+        # Cache ALL hot-path config values to avoid ~15-20 config.conf lookups per event cycle.
+        # Refreshed on every configure() call (post_configSave, post_configProfileSwitch, etc.).
         fl_roles_raw = user_config.get("fl_enabled_roles")
         fl_enabled_roles_set = None
         if fl_roles_raw and fl_roles_raw != "all":
@@ -894,7 +911,9 @@ class AudioThemesHandler:
                 fl_enabled_roles_set = set(json.loads(fl_roles_raw))
             except Exception:
                 fl_enabled_roles_set = None
-        self._fl_config = {
+        unspoken_cfg = config.conf["unspoken"]
+        self._cached_config = {
+            # First/Last detection
             "universal_fl_enabled": user_config.get("universal_fl_enabled", True),
             "fl_enabled_roles": fl_roles_raw,
             "fl_enabled_roles_set": fl_enabled_roles_set,
@@ -907,7 +926,48 @@ class AudioThemesHandler:
             "last_fallback_role_name": user_config.get("last_fallback_role_name", "listitem"),
             "general_fallback": user_config.get("general_fallback", "role"),
             "general_fallback_role_name": user_config.get("general_fallback_role_name", "listitem"),
+            # Theme/app hot-path config
+            "volume": user_config["volume"],
+            "typing_sounds": user_config.get("typing_sounds", True),
+            "typing_sounds_volume": user_config.get("typing_sounds_volume", 10),
+            "typing_sound_pack": user_config.get("typing_sound_pack", "1blueSwitch"),
+            "app_profiles_enabled": user_config.get("app_profiles_enabled", False),
+            "clipboard_volume": user_config.get("clipboard_volume", 20),
+            # System sounds
+            "sys_status_enabled": user_config.get("sys_status_enabled", True),
+            "sys_ac_enabled": user_config.get("sys_ac_enabled", True),
+            "sys_battery_enabled": user_config.get("sys_battery_enabled", True),
+            "sys_usb_enabled": user_config.get("sys_usb_enabled", True),
+            "sys_volume_enabled": user_config.get("sys_volume_enabled", True),
+            "sys_network_enabled": user_config.get("sys_network_enabled", True),
+            "sys_wake_enabled": user_config.get("sys_wake_enabled", True),
+            "sys_status_volume": user_config.get("sys_status_volume", 20),
+            "enable_audio_themes": user_config.get("enable_audio_themes", True),
+            # unspoken player config (rarely changes mid-session)
+            "output_mode": user_config.get("output_mode", "stereo"),
+            "typing_sounds_spatial": user_config.get("typing_sounds_spatial", True),
+            "typing_sounds_spatial_smart": user_config.get("typing_sounds_spatial_smart", True),
+            "UnspokenReverb": unspoken_cfg.get("Reverb", False),
+            "SmoothPanning": unspoken_cfg.get("SmoothPanning", True),
+            "noSounds": unspoken_cfg.get("noSounds", False),
+            "TrimSilence": unspoken_cfg.get("TrimSilence", False),
+            "TrimSilenceThreshold": unspoken_cfg.get("TrimSilenceThreshold", -50),
+            "SmartVolume": unspoken_cfg.get("SmartVolume", False),
+            "SmartVolumePeak": unspoken_cfg.get("SmartVolumePeak", 0.8),
+            "SmoothEnvelope": unspoken_cfg.get("SmoothEnvelope", False),
+            "SmoothEnvelopeAttack": unspoken_cfg.get("SmoothEnvelopeAttack", 5),
+            "SmoothEnvelopeRelease": unspoken_cfg.get("SmoothEnvelopeRelease", 50),
+            "NoiseGate": unspoken_cfg.get("NoiseGate", False),
+            "NoiseGateThreshold": unspoken_cfg.get("NoiseGateThreshold", -60),
+            "NoiseGateAttack": unspoken_cfg.get("NoiseGateAttack", 0.01),
+            "NoiseGateRelease": unspoken_cfg.get("NoiseGateRelease", 0.1),
+            "BassBoost": unspoken_cfg.get("BassBoost", False),
+            "BassBoostGain": unspoken_cfg.get("BassBoostGain", 6),
+            "BassBoostCutoff": unspoken_cfg.get("BassBoostCutoff", 150),
+            "HRTF": unspoken_cfg.get("HRTF", False),
+            "AudioCache": unspoken_cfg.get("AudioCache", True),
         }
+        self.player._cached_config = self._cached_config
 
     def _start_system_status_monitoring(self):
         try:
@@ -927,28 +987,28 @@ class AudioThemesHandler:
         return is_sound_suppressed(category)
 
     def _play_system_sound(self, sound_key):
-        if not config.conf["audiothemes"]["sys_status_enabled"]:
+        if not self._cached_config.get("sys_status_enabled", True):
             return
         if not self.enabled or self.active_theme is None:
             return
-        user_config = config.conf["audiothemes"]
+        cfg = self._cached_config
         if sound_key == SpecialProps.sys_ac_plug or sound_key == SpecialProps.sys_ac_unplug:
-            if not user_config["sys_ac_enabled"]:
+            if not cfg.get("sys_ac_enabled", True):
                 return
         elif sound_key in (SpecialProps.sys_battery_low, SpecialProps.sys_battery_critical, SpecialProps.sys_battery_full):
-            if not user_config["sys_battery_enabled"]:
+            if not cfg.get("sys_battery_enabled", True):
                 return
         elif sound_key in (SpecialProps.sys_usb_plug, SpecialProps.sys_usb_unplug):
-            if not user_config["sys_usb_enabled"]:
+            if not cfg.get("sys_usb_enabled", True):
                 return
         elif sound_key in (SpecialProps.sys_volume_plug, SpecialProps.sys_volume_unplug):
-            if not user_config["sys_volume_enabled"]:
+            if not cfg.get("sys_volume_enabled", True):
                 return
         elif sound_key in (SpecialProps.sys_network_connect, SpecialProps.sys_network_disconnect):
-            if not user_config["sys_network_enabled"]:
+            if not cfg.get("sys_network_enabled", True):
                 return
         elif sound_key in (SpecialProps.sys_wake, SpecialProps.sys_sleep):
-            if not user_config["sys_wake_enabled"]:
+            if not cfg.get("sys_wake_enabled", True):
                 return
         if self._is_app_disabled_for_category("theme_sounds"):
             return
@@ -959,7 +1019,7 @@ class AudioThemesHandler:
         sound_obj = sounds.get(sound_key)
         if sound_obj is None:
             return
-        self.player.play({"name": str(sound_key.value), "role": 0, "system_sound": True, "volume_override": user_config["sys_status_volume"] / 100.0}, sound_obj)
+        self.player.play({"name": str(sound_key.value), "role": 0, "system_sound": True, "volume_override": cfg.get("sys_status_volume", 20) / 100.0}, sound_obj)
 
     def play(self, obj_info, sound, _pre_resolved_theme=None):
         """
@@ -989,7 +1049,7 @@ class AudioThemesHandler:
         # System sounds must not fall back to any other sound
         if sound_obj is None and isinstance(obj_info, dict) and obj_info.get("system_sound"):
             return
-        fl_cfg = self._fl_config
+        fl_cfg = self._cached_config
         if sound_obj is None and isinstance(obj_info, dict):
             role = obj_info.get("role", 0)
             if role and sound in (SpecialProps.first, SpecialProps.last):
@@ -1026,7 +1086,7 @@ class AudioThemesHandler:
 
     def get_theme_for_app(self, app_name):
         with self._config_lock:
-            if not app_name or not config.conf["audiothemes"]["app_profiles_enabled"]:
+            if not app_name or not self._cached_config.get("app_profiles_enabled", False):
                 return self.active_theme
             app_name = app_name.lower()
             profile = self._app_profiles_cache.get(app_name)
@@ -1069,7 +1129,7 @@ class AudioThemesHandler:
         if sound_name.lower() in getattr(theme, 'available_files', set()):
             self.player.play_file(
                 sound_path,
-                volume=config.conf["audiothemes"]["volume"],
+                volume=self._cached_config.get("volume", 50),
                 audio3d=bool(angle_x or angle_y),
                 angle_x=angle_x,
                 angle_y=angle_y
@@ -1106,7 +1166,7 @@ class AudioThemesHandler:
         if sound_obj is None:
             return False
         vol = (volume if volume is not None
-               else config.conf["audiothemes"].get("clipboard_volume", 20))
+               else self._cached_config.get("clipboard_volume", 20))
         self.player.play(
             {"name": str(special_prop.value), "role": 0, "system_sound": True,
              "volume_override": vol / 100.0},
@@ -1116,8 +1176,8 @@ class AudioThemesHandler:
 
     def get_typing_pack_for_app(self, app_name):
         with self._config_lock:
-            global_pack = config.conf["audiothemes"].get("typing_sound_pack", "1blueSwitch")
-            if not app_name or not config.conf["audiothemes"]["app_profiles_enabled"]:
+            global_pack = self._cached_config.get("typing_sound_pack", "1blueSwitch")
+            if not app_name or not self._cached_config.get("app_profiles_enabled", False):
                 return global_pack
             app_name = app_name.lower()
             profile = self._app_profiles_cache.get(app_name)
@@ -1128,16 +1188,15 @@ class AudioThemesHandler:
             return global_pack
 
     def play_typing_sound(self, ch=None, vkCode=None, extended=None):
-        if not config.conf["audiothemes"]["typing_sounds"]:
+        if not self._cached_config.get("typing_sounds", True):
             return
         if not self.enabled or (self.active_theme is None):
             return
             
         # Debounce: prevent same key sound from playing twice rapidly (keyDown + typedCharacter overlap)
         now = time.monotonic()
-        if hasattr(self, "_last_typing_time") and (now - self._last_typing_time) < 0.05:
-            if getattr(self, "_last_typing_vk", None) == vkCode:
-                return
+        if (now - self._last_typing_time) < 0.05 and self._last_typing_vk == vkCode:
+            return
         self._last_typing_time = now
         self._last_typing_vk = vkCode
             
@@ -1192,7 +1251,7 @@ class AudioThemesHandler:
         if sound_path:
             self.player.play_file(
                 sound_path,
-                volume=config.conf["audiothemes"]["typing_sounds_volume"],
+                volume=self._cached_config.get("typing_sounds_volume", 10),
                 audio3d=False,
                 ch=ch,
                 vkCode=vkCode,

@@ -257,6 +257,19 @@ class UnspokenPlayer:
 		self._play_file_cache = OrderedDict()
 		self._cache_lock = threading.Lock()
 		self._last_typing_time = 0.0
+		self._cached_config = {}  # overwritten by handler.configure()
+		# Processing config defaults; overwritten by handler.configure()
+		self._trim_silence = True
+		self._trim_silence_threshold = 0.01
+		self._smart_volume = True
+		self._smooth_envelope = False
+		self._noise_gate = False
+		self._noise_gate_threshold = 0.02
+		self._noise_gate_attack = 5
+		self._noise_gate_release = 50
+		self._bass_boost = False
+		self._bass_boost_gain = 3.0
+		self._bass_boost_cutoff = 200.0
 		self._audio_worker_thread = threading.Thread(target=self._audio_worker, daemon=True)
 		self._audio_worker_thread.start()
 
@@ -392,21 +405,21 @@ class UnspokenPlayer:
 	def _ensure_processed(self, sound_data):
 		if sound_data.get("_processed"):
 			return sound_data
+		from . import audio_filters as _audio_filters
 		float_samples = sound_data["raw_data"]
 		sample_rate = sound_data["sample_rate"]
-		if config.conf["unspoken"].get("TrimSilence", True):
-			threshold = float(config.conf["unspoken"].get("TrimSilenceThreshold", 0.01))
-			float_samples = trim_silence_array(float_samples, threshold=threshold)
+		if self._trim_silence:
+			float_samples = trim_silence_array(float_samples, threshold=self._trim_silence_threshold)
 		if not float_samples:
 			float_samples = array('f', [0.0]) * 1024
-		if config.conf["unspoken"].get("SmartVolume", True):
+		if self._smart_volume:
 			if float_samples:
 				peak = max((abs(s) for s in float_samples), default=0.0)
 				if peak > 0.01:
 					target_peak = 0.8
 					ratio = target_peak / peak
 					float_samples = array('f', [s * ratio for s in float_samples])
-		if config.conf["unspoken"].get("SmoothEnvelope", False):
+		if self._smooth_envelope:
 			fade_samples = int(sample_rate * 0.01)
 			num_samples = len(float_samples)
 			fade_samples = min(fade_samples, num_samples // 2)
@@ -414,22 +427,15 @@ class UnspokenPlayer:
 				multiplier = i / float(fade_samples)
 				float_samples[i] *= multiplier
 				float_samples[num_samples - 1 - i] *= multiplier
-		if config.conf["unspoken"].get("NoiseGate", False):
-			from . import audio_filters
-			threshold = float(config.conf["unspoken"].get("NoiseGateThreshold", 0.02))
-			attack_ms = int(config.conf["unspoken"].get("NoiseGateAttack", 5))
-			release_ms = int(config.conf["unspoken"].get("NoiseGateRelease", 50))
-			float_samples = array('f', audio_filters.apply_noise_gate(
-				float_samples, threshold=threshold,
-				attack_ms=attack_ms, release_ms=release_ms,
+		if self._noise_gate:
+			float_samples = array('f', _audio_filters.apply_noise_gate(
+				float_samples, threshold=self._noise_gate_threshold,
+				attack_ms=self._noise_gate_attack, release_ms=self._noise_gate_release,
 				sample_rate=sample_rate))
-		if config.conf["unspoken"].get("BassBoost", False):
-			from . import audio_filters
-			gain_db = float(config.conf["unspoken"].get("BassBoostGain", 3))
-			cutoff_hz = float(config.conf["unspoken"].get("BassBoostCutoff", 200))
-			float_samples = array('f', audio_filters.apply_bass_boost(
-				float_samples, gain_db=gain_db,
-				cutoff_hz=cutoff_hz, sample_rate=sample_rate))
+		if self._bass_boost:
+			float_samples = array('f', _audio_filters.apply_bass_boost(
+				float_samples, gain_db=self._bass_boost_gain,
+				cutoff_hz=self._bass_boost_cutoff, sample_rate=sample_rate))
 		remainder = len(float_samples) % 1024
 		if remainder != 0:
 			float_samples.extend(array('f', [0.0]) * (1024 - remainder))
@@ -438,7 +444,7 @@ class UnspokenPlayer:
 		return sound_data
 
 	def make_sound_object(self, path):
-		use_cache = config.conf["unspoken"].get("AudioCache", True)
+		use_cache = self._cached_config.get("AudioCache", True)
 		with sounds_lock:
 			if use_cache and path in sounds:
 				sound = sounds.pop(path)
@@ -529,19 +535,19 @@ class UnspokenPlayer:
 	def _compute_volume(self, volume_override=None):
 		if volume_override is not None:
 			return clamp(volume_override, 0.0, 1.5)
+		from .. import frenzy as _frenzy
 		if not self.use_synth_volume:
 			base_vol = self.volume / 100.0
 		else:
 			driver = speech.speech.getSynth()
 			base_vol = getattr(driver, "volume", 100) / 100.0  # nvda reports as percent.
 			base_vol = clamp(base_vol, 0.0, 1.0)
-			if config.conf["unspoken"]["HRTF"]:
+			if self._cached_config.get("HRTF", False):
 				base_vol += 0.25
 				
 		# Apply Audio Ducking if NVDA recently spoke
 		try:
-			from .. import frenzy
-			base_vol *= frenzy.get_ducking_factor("theme_sounds")
+			base_vol *= _frenzy.get_ducking_factor("theme_sounds")
 		except Exception:
 			pass
 		return clamp(base_vol, 0.0, 1.5)
@@ -558,9 +564,10 @@ class UnspokenPlayer:
 		obj_info is a plain dict with keys: name, role, location, etc.
 		No COM objects are accessed here -- everything was pre-extracted.
 		"""
-		if not config.conf["audiothemes"]["enable_audio_themes"]:
+		cfg = self._cached_config
+		if not cfg.get("enable_audio_themes", True):
 			return
-		if config.conf["unspoken"].get("noSounds", False):
+		if cfg.get("noSounds", False):
 			return
 		if not obj_info.get("system_sound") and getattr(self, "use_in_say_all", False) and SayAllHandler.isRunning():
 			return
@@ -613,7 +620,7 @@ class UnspokenPlayer:
 			if "progress_angle" in obj_info:
 				angle_x = obj_info["progress_angle"]
 				angle_y = 0.0
-			elif config.conf["unspoken"].get("SmoothPanning", True) and hasattr(self, '_last_angle_x'):
+			elif cfg.get("SmoothPanning", True) and hasattr(self, '_last_angle_x'):
 				dx = abs(angle_x - self._last_angle_x)
 				dy = abs(angle_y - self._last_angle_y)
 				if max(dx, dy) < 30.0:
@@ -627,7 +634,7 @@ class UnspokenPlayer:
 			angle_y = 0
 
 		# Cache output mode once for this call
-		out_mode = config.conf.get("audiothemes", {}).get("output_mode", "stereo")
+		out_mode = cfg.get("output_mode", "stereo")
 		# 3D audio overrides mono mode — spatialization requires stereo output
 		is_mono = out_mode == "mono" and not force_3d and not self.audio3d
 		if is_mono:
@@ -648,8 +655,7 @@ class UnspokenPlayer:
 				percent = clamp(obj_info["progress_percent"], 0.0, 1.0)
 				pitch_factor = 1.0 + percent
 
-		# Cache reverb setting
-		reverb_on = config.conf["unspoken"]["Reverb"]
+		reverb_on = cfg.get("UnspokenReverb", False)
 
 		# Use an LRU cache for processed audio to reduce Steam Audio overhead
 		cache_key = (
@@ -714,6 +720,8 @@ class UnspokenPlayer:
 
 
 	def play_file(self, path, volume=None, audio3d=False, ch=None, vkCode=None, angle_x=0, angle_y=0, extended=None):
+		cfg = self._cached_config
+		from .. import frenzy as _frenzy
 		if volume is not None:
 			# Typing sounds use absolute volume
 			base_vol = clamp(volume / 100.0, 0.0, 1.0)
@@ -741,16 +749,15 @@ class UnspokenPlayer:
 			
 			# Apply Audio Ducking to typing sounds
 			try:
-				from .. import frenzy
-				final_volume *= frenzy.get_ducking_factor("typing_sounds")
+				final_volume *= _frenzy.get_ducking_factor("typing_sounds")
 			except Exception:
 				pass
 		else:
 			final_volume = self._compute_volume()
 			is_typing_sound = False
 
-		reverb_enabled = config.conf["unspoken"]["Reverb"]
-		out_mode = config.conf.get("audiothemes", {}).get("output_mode", "stereo")
+		reverb_enabled = cfg.get("UnspokenReverb", False)
+		out_mode = cfg.get("output_mode", "stereo")
 		# audio3d overrides mono mode — spatialization requires stereo output
 		is_mono = out_mode == "mono" and not audio3d
 		
@@ -762,8 +769,8 @@ class UnspokenPlayer:
 			angle_x = 0
 			angle_y = 0
 		if is_typing_sound and not is_mono:
-			is_spatial = config.conf.get("audiothemes", {}).get("typing_sounds_spatial", True)
-			is_smart = config.conf.get("audiothemes", {}).get("typing_sounds_spatial_smart", True)
+			is_spatial = cfg.get("typing_sounds_spatial", True)
+			is_smart = cfg.get("typing_sounds_spatial_smart", True)
 			if is_spatial:
 				if is_smart and (ch or vkCode is not None):
 					if vkCode is not None:
@@ -923,3 +930,5 @@ class UnspokenPlayer:
 				except Exception as e:
 				    log.error(f"AudioThemes Error: {e}", exc_info=True)
 		self.create_wave_player()
+
+
