@@ -421,6 +421,26 @@ def onPostNvdaStartup():
     # Load CLDR emoji data in background (lazy, will use cache or download)
     import threading
     threading.Thread(target=_load_cldr_emoji_data, daemon=True).start()
+    # Patch NVDAExtensionGlobalPlugin's speech paths if present
+    import sys
+    for mod_name in list(sys.modules.keys()):
+        if 'NVDAExtensionGlobalPlugin' in mod_name and 'speechEx' in mod_name:
+            try:
+                speechEx = sys.modules[mod_name]
+                from speech import sayAll
+                original_myGet = speechEx._myGetTextInfoSpeech
+                def _patched_myGet(info, useCache=True, formatConfig=None, unit=None, reason=None, _prefixSpeechCommand=None, onlyInitialFields=False, suppressBlanks=False):
+                    if reason is None:
+                        reason = controlTypes.OutputReason.QUERY
+                    yield from frenzy.new_getTextInfoSpeech(info, useCache, formatConfig, unit, reason, _prefixSpeechCommand, onlyInitialFields, suppressBlanks)
+                speechEx._myGetTextInfoSpeech = _patched_myGet
+                # Also patch SayAllHandler._getTextInfoSpeech, which received a direct
+                # reference to the original _myGetTextInfoSpeech at initialize() time.
+                sayAll.SayAllHandler._getTextInfoSpeech = _patched_myGet
+                log.warning("Patched NVDAExtensionGlobalPlugin's _myGetTextInfoSpeech and SayAllHandler._getTextInfoSpeech")
+            except Exception as e:
+                log.warning(f"Failed to patch NVDAExtensionGlobalPlugin's speech paths: {e}")
+            break
 
 
 def _load_cldr_emoji_data():

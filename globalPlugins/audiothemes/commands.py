@@ -392,8 +392,16 @@ class PpWaveFileCommand(PpSynchronousCommand):
 
         fileWavePlayer = self.fileWavePlayer
         fileWavePlayer.stop()
-        fileWavePlayer.feed(_apply_ducking(audio_bytes, _ducking_factor))
-        fileWavePlayer.idle()
+        try:
+            fileWavePlayer.feed(_apply_ducking(audio_bytes, _ducking_factor))
+        except Exception as e:
+            from logHandler import log
+            log.error(f"PpWaveFileCommand.run() feed ERROR: {e}", exc_info=True)
+        try:
+            fileWavePlayer.idle()
+        except Exception as e:
+            from logHandler import log
+            log.error(f"PpWaveFileCommand.run() idle ERROR: {e}", exc_info=True)
 
     def getDuration(self):
         self._ensureLoaded()

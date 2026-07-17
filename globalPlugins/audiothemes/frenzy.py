@@ -1051,50 +1051,73 @@ def new_getTextInfoSpeech(
             start, end = item
             fakeTextInfo.setStartAndEnd(start, end)
             effectiveSuppressBlanks=True if i < lastIntervalIndex or not isBlankSoFar else suppressBlanks
-            sequences = list(original_getTextInfoSpeech(
-                fakeTextInfo,
-                useCache ,
-                formatConfig,
-                unit ,
-                reason ,
-                _prefixSpeechCommand,
-                onlyInitialFields,
-                suppressBlanks=effectiveSuppressBlanks,
-            ))
-            if not effectiveSuppressBlanks:
-                suppressedSequences = []
-                for subseq in sequences:
-                    new_subseq = [cmd for cmd in subseq if not (isinstance(cmd, str) and not cmd.strip())]
-                    suppressedSequences.append(new_subseq)
-            if not effectiveSuppressBlanks:
-                blankRule = getActiveRuleContext(otherRules.get(OtherRule.BLANK, []), appName, windowTitle, url)
-                if blankRule is not None:
-                    # only compare string commands
-                    sequenceStrings = [s for ss in sequences for s in ss if isinstance(s, str)]
-                    suppressedSequenceStrings = [s for ss in suppressedSequences for s in ss if isinstance(s, str)]
-                    if len(sequenceStrings) == 1 + len(suppressedSequenceStrings) and sequenceStrings[:-1] == suppressedSequenceStrings:
-                        # Blank detected!
-                        blankString = sequenceStrings[-1]
-                        blankCommand = blankRule.speechCommand
-                        speechBehavior = getattr(blankRule, 'speechBehavior', 0)
-                        customText = getattr(blankRule, 'customSpeechText', "")
+            blankRule = getActiveRuleContext(otherRules.get(OtherRule.BLANK, []), appName, windowTitle, url)
+            if blankRule is not None:
+                if isinstance(useCache, speech.speech.SpeakTextInfoState):
+                    useCacheBackup = useCache.copy()
+                elif useCache:
+                    speakTextInfoStateBackup = speech.speech.SpeakTextInfoState(info.obj)
+                suppressedSequences = list(original_getTextInfoSpeech(
+                    fakeTextInfo,
+                    useCache,
+                    formatConfig,
+                    unit,
+                    reason,
+                    _prefixSpeechCommand,
+                    onlyInitialFields,
+                    suppressBlanks=True,
+                ))
+                if isinstance(useCache, speech.speech.SpeakTextInfoState):
+                    useCache = useCacheBackup
+                elif useCache:
+                    speakTextInfoStateBackup.updateObj()
+                sequences = list(original_getTextInfoSpeech(
+                    fakeTextInfo,
+                    useCache,
+                    formatConfig,
+                    unit,
+                    reason,
+                    _prefixSpeechCommand,
+                    onlyInitialFields,
+                    suppressBlanks=False,
+                ))
+                sequenceStrings = [s for ss in sequences for s in ss if isinstance(s, str)]
+                suppressedSequenceStrings = [s for ss in suppressedSequences for s in ss if isinstance(s, str)]
+                match = len(sequenceStrings) == 1 + len(suppressedSequenceStrings) and sequenceStrings[:-1] == suppressedSequenceStrings
+                
+                if match:
+                    blankString = sequenceStrings[-1]
+                    blankCommand = blankRule.speechCommand
+                    speechBehavior = getattr(blankRule, 'speechBehavior', 0)
+                    customText = getattr(blankRule, 'customSpeechText', "")
+                    
+                    replacement = []
+                    if blankCommand:
+                        replacement.append(blankCommand)
+                    if speechBehavior == 1:
+                        replacement.append(blankString)
+                    elif speechBehavior == 2 and customText:
+                        replacement.append(customText)
                         
-                        replacement = []
-                        if blankCommand:
-                            replacement.append(blankCommand)
-                        if speechBehavior == 1:
-                            replacement.append(blankString)
-                        elif speechBehavior == 2 and customText:
-                            replacement.append(customText)
-                            
-                        for idx, subsequence in enumerate(sequences):
-                            new_subseq = []
-                            for command in subsequence:
-                                if command == blankString:
-                                    new_subseq.extend(replacement)
-                                else:
-                                    new_subseq.append(command)
-                            sequences[idx] = new_subseq
+                    for idx, subsequence in enumerate(sequences):
+                        new_subseq = []
+                        for command in subsequence:
+                            if command == blankString:
+                                new_subseq.extend(replacement)
+                            else:
+                                new_subseq.append(command)
+                        sequences[idx] = new_subseq
+            else:
+                sequences = list(original_getTextInfoSpeech(
+                    fakeTextInfo,
+                    useCache,
+                    formatConfig,
+                    unit,
+                    reason,
+                    _prefixSpeechCommand,
+                    onlyInitialFields,
+                    suppressBlanks=effectiveSuppressBlanks,
+                ))
             isBlank = isBlankSequence(sequences)
             if not isBlank:
                 isBlankSoFar = False
