@@ -367,6 +367,12 @@ jupyterUpdateInProgress = False
 originalExecuteGesture = None
 blockBeeper = Beeper()
 blockKeysUntil = 0
+def _installExecuteGesturePatch():
+    global originalExecuteGesture
+    originalExecuteGesture = inputCore.InputManager.executeGesture
+    inputCore.InputManager.executeGesture = preExecuteGesture
+core.postNvdaStartup.register(_installExecuteGesturePatch)
+
 def preExecuteGesture(selfself, gesture, *args, **kwargs):
     now = time.time()
     if now < blockKeysUntil:
@@ -760,9 +766,7 @@ class BrowserNavMixin:
         _activeAudioThemesPlugin = self
         self.injectBrowseModeKeystrokes()
         self.lastJupyterText = ""
-        global originalExecuteGesture, originalCaretMovementScriptHelper, originalQuickNavScript, originalTableScriptHelper, original_set_selection
-        originalExecuteGesture = inputCore.InputManager.executeGesture
-        inputCore.InputManager.executeGesture = preExecuteGesture
+        global originalCaretMovementScriptHelper, originalQuickNavScript, originalTableScriptHelper, original_set_selection
         originalCaretMovementScriptHelper = cursorManager.CursorManager._caretMovementScriptHelper
         cursorManager.CursorManager._caretMovementScriptHelper = preCaretMovementScriptHelper
         originalQuickNavScript = browseMode.BrowseModeTreeInterceptor._quickNavScript

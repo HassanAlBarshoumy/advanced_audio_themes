@@ -1768,7 +1768,12 @@ def caretMovementWithAutoSkip(self, gesture,unit, direction=None,posConstant=tex
     speech.speakTextInfo(infoToSpeak, unit=unit, reason=REASON_CARET)
     if not oldInfo.isCollapsed:
         speech.speakSelectionChange(oldInfo, selection)
-    self.selection = selection
+    try:
+        self.selection = selection
+    except RuntimeError:
+        from logHandler import log
+        log.debugWarning("caretMovementWithAutoSkip: invalid selection after skip")
+        return
     if skipped:
         skippedParagraphChime()
 
