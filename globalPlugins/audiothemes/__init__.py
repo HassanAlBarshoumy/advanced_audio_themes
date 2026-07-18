@@ -1492,7 +1492,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         config.conf["audiothemes"]["audio_ducking_enabled"] = enabled
         ui.message(_("Audio ducking enabled") if enabled else _("Audio ducking disabled"))
 
-    @script(description=_("Toggles emoji enhancement sounds on and off."))
+    @script(description=_("Toggles emoji enhancement sounds on and off."), gestures=['kb:NVDA+alt+e'])
     def script_toggleEmojiSounds(self, gesture):
         enabled = not config.conf["audiothemes"]["emoji_enabled"]
         config.conf["audiothemes"]["emoji_enabled"] = enabled
@@ -1511,7 +1511,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self.handler.configure()
         ui.message(_("3D audio enabled") if enabled else _("3D audio disabled"))
 
-    @script(description=_("Toggles clipboard announcement sounds on and off."))
+    @script(description=_("Toggles clipboard announcement sounds on and off."), gestures=['kb:NVDA+alt+c'])
     def script_toggleClipboard(self, gesture):
         enabled = not config.conf["audiothemes"]["clipboard_enabled"]
         config.conf["audiothemes"]["clipboard_enabled"] = enabled
