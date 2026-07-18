@@ -91,11 +91,13 @@ def new_getObjectPropertiesSpeech(
             obj,reason , _prefixSpeechCommand , **allowedProperties
         )
 
-    global_fmt = config.conf["audiothemes"].get("announceFormat", "0")
+    ac = config.conf["audiothemes"]
+    global_fmt = ac.get("announceFormat", "0")
+    speak_roles = ac.get("speak_roles", True)
     
     # Load per-role overrides
     try:
-        roleFormatsJson = config.conf["audiothemes"].get("roleAnnounceFormats", "{}")
+        roleFormatsJson = ac.get("roleAnnounceFormats", "{}")
         if not hasattr(utils, '_cachedRoleFormatsJson') or utils._cachedRoleFormatsJson != roleFormatsJson:
             utils._cachedRoleFormatsJson = roleFormatsJson
             utils._cachedRoleFormatsDict = json.loads(roleFormatsJson)
@@ -115,7 +117,7 @@ def new_getObjectPropertiesSpeech(
         patchedProps = props.copy()
         
         if props.get('role', False):
-            if not config.conf["audiothemes"].get("speak_roles", True):
+            if not speak_roles:
                 patchedProps['role'] = False
 
         if props.get('role', False) and isPhoneticPunctuationEnabled():
@@ -1158,13 +1160,24 @@ def new_getPropertiesSpeech(
 ):
     if not isPhoneticPunctuationEnabled() or ignore_get_properties_hook:
         return original_getPropertiesSpeech(reason, **propertyValues)
+
+    ac = config.conf["audiothemes"]
+    speak_roles = ac.get("speak_roles", True)
+    global_fmt = ac.get("announceFormat", "0")
+    try:
+        roleFormatsJson = ac.get("roleAnnounceFormats", "{}")
+        if not hasattr(utils, '_cachedRoleFormatsJson') or utils._cachedRoleFormatsJson != roleFormatsJson:
+            utils._cachedRoleFormatsJson = roleFormatsJson
+            utils._cachedRoleFormatsDict = json.loads(roleFormatsJson)
+        roleFormatsDict = utils._cachedRoleFormatsDict
+    except Exception:
+        roleFormatsDict = {}
         
     role = propertyValues.get('role', None)
     
     earcon_signature = None
     customText = None
     speechBehavior = 0
-    speak_roles = config.conf["audiothemes"].get("speak_roles", True)
     
     pre_numeric_cmd = None
     post_numeric_cmd = None
@@ -1207,16 +1220,6 @@ def new_getPropertiesSpeech(
                 if speechBehavior == 2:
                     customText = getattr(rule, 'customSpeechText', "")
 
-    global_fmt = config.conf["audiothemes"].get("announceFormat", "0")
-    try:
-        roleFormatsJson = config.conf["audiothemes"].get("roleAnnounceFormats", "{}")
-        if not hasattr(utils, '_cachedRoleFormatsJson') or utils._cachedRoleFormatsJson != roleFormatsJson:
-            utils._cachedRoleFormatsJson = roleFormatsJson
-            utils._cachedRoleFormatsDict = json.loads(roleFormatsJson)
-        roleFormatsDict = utils._cachedRoleFormatsDict
-    except Exception:
-        roleFormatsDict = {}
-
     fmt = "0"
     if role is not None:
         role_key = str(role.value) if hasattr(role, 'value') else str(role)
@@ -1254,8 +1257,6 @@ def new_getPropertiesSpeech(
         if 'role' in propertyValues and len(result) == 1:
             result = [f"{PROPERTY_SPEECH_SIGNATURE2}{result[0]}{PROPERTY_SPEECH_SIGNATURE2}"]
         return result
-
-    speak_roles = config.conf["audiothemes"].get("speak_roles", True)
 
     if fmt == "0":
         role_output = []

@@ -834,7 +834,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     def event_valueChange(self, obj, nextHandler):
         try:
             if obj.role == controlTypes.Role.PROGRESSBAR:
-                if config.conf["audiothemes"]["enable_audio_themes"] and self.handler.active_theme:
+                cfg = self.handler._cached_config if hasattr(self, 'handler') else {}
+                if cfg.get("enable_audio_themes", True) and self.handler.active_theme:
                     val = obj.value
                     if val is not None:
                         try:
@@ -847,9 +848,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                                 percent = val_float / 100.0
                             percent = max(0.0, min(1.0, percent))
 
-                            pan_mode = config.conf["audiothemes"].get("progress_pan_mode", "progress")
-                            pan_range = config.conf["audiothemes"].get("progress_pan_range", 180)
-                            pitch_shift = config.conf["audiothemes"].get("progress_pitch_shift", True)
+                            pan_mode = cfg.get("progress_pan_mode", "progress")
+                            pan_range = cfg.get("progress_pan_range", 180)
+                            pitch_shift = cfg.get("progress_pitch_shift", True)
 
                             obj_info = self._snapshot_obj(obj)
 
@@ -922,10 +923,11 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self._last_extended = extended
         # Play advanced typing sounds for non-characters
         try:
-            if not injected and config.conf["audiothemes"]["typing_sounds"]:
+            cfg = self.handler._cached_config if hasattr(self, 'handler') else {}
+            if not injected and cfg.get("typing_sounds", True):
                 # Check edit only
                 play = True
-                if config.conf["audiothemes"]["typing_sounds_edit_only"]:
+                if cfg.get("typing_sounds_edit_only", False):
                     play = getattr(self, "_last_focus_is_editable", True)
                 
                 if play:
@@ -942,7 +944,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # Clipboard shortcut detection
         if not injected:
             try:
-                if config.conf["audiothemes"]["clipboard_enabled"]:
+                if cfg.get("clipboard_enabled", True):
                     import winUser
                     if winUser.getAsyncKeyState(winUser.VK_CONTROL) & 0x8000:
                         shift = winUser.getAsyncKeyState(winUser.VK_SHIFT) & 0x8000
@@ -969,10 +971,11 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             if not hasattr(self, 'handler'):
                 nextHandler()
                 return
-            if config.conf["audiothemes"]["typing_sounds"]:
+            cfg = self.handler._cached_config if hasattr(self, 'handler') else {}
+            if cfg.get("typing_sounds", True):
                 vk = getattr(self, "_last_vkCode", None)
                 ext = getattr(self, "_last_extended", None)
-                if config.conf["audiothemes"]["typing_sounds_edit_only"]:
+                if cfg.get("typing_sounds_edit_only", False):
                     if getattr(self, "_last_focus_is_editable", True):
                         self.handler.play_typing_sound(ch=ch, vkCode=vk, extended=ext)
                 else:

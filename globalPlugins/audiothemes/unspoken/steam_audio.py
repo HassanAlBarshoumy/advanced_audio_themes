@@ -330,13 +330,16 @@ class SteamAudio:
 
 # Global instance for easy access
 _steam_audio_instance = None
+_steam_audio_lock = threading.Lock()
 
 
 def get_steam_audio():
 	"""Get the global Steam Audio instance"""
 	global _steam_audio_instance
 	if _steam_audio_instance is None:
-		_steam_audio_instance = SteamAudio()
+		with _steam_audio_lock:
+			if _steam_audio_instance is None:
+				_steam_audio_instance = SteamAudio()
 	return _steam_audio_instance
 
 
@@ -349,6 +352,7 @@ def initialize_steam_audio(sample_rate=44100, frame_size=1024):
 def cleanup_steam_audio():
 	"""Cleanup the global Steam Audio instance"""
 	global _steam_audio_instance
-	if _steam_audio_instance:
-		_steam_audio_instance.cleanup()
-		_steam_audio_instance = None
+	with _steam_audio_lock:
+		if _steam_audio_instance:
+			_steam_audio_instance.cleanup()
+			_steam_audio_instance = None

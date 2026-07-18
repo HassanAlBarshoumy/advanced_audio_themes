@@ -936,10 +936,12 @@ class AudioThemesHandler:
             # Theme/app hot-path config
             "volume": user_config["volume"],
             "typing_sounds": user_config.get("typing_sounds", True),
+            "typing_sounds_edit_only": user_config.get("typing_sounds_edit_only", False),
             "typing_sounds_volume": user_config.get("typing_sounds_volume", 10),
             "typing_sound_pack": user_config.get("typing_sound_pack", "1blueSwitch"),
             "app_profiles_enabled": user_config.get("app_profiles_enabled", False),
             "clipboard_volume": user_config.get("clipboard_volume", 20),
+            "clipboard_enabled": user_config.get("clipboard_enabled", True),
             # System sounds
             "sys_status_enabled": user_config.get("sys_status_enabled", True),
             "sys_ac_enabled": user_config.get("sys_ac_enabled", True),
@@ -950,6 +952,9 @@ class AudioThemesHandler:
             "sys_wake_enabled": user_config.get("sys_wake_enabled", True),
             "sys_status_volume": user_config.get("sys_status_volume", 20),
             "enable_audio_themes": user_config.get("enable_audio_themes", True),
+            "progress_pan_mode": user_config.get("progress_pan_mode", "progress"),
+            "progress_pan_range": user_config.get("progress_pan_range", 180),
+            "progress_pitch_shift": user_config.get("progress_pitch_shift", True),
             # Audio ducking config
             "audio_ducking_enabled": user_config.get("audio_ducking_enabled", True),
             "audio_ducking_volume": user_config.get("audio_ducking_volume", 30),
@@ -979,6 +984,10 @@ class AudioThemesHandler:
             "AudioCache": unspoken_cfg.get("AudioCache", True),
         }
         self.player._cached_config = self._cached_config
+        from .emoji_handler import refreshCachedConfig as _refreshEmojiConfig
+        _refreshEmojiConfig()
+        from .phoneticPunctuation import refreshCachedConfig as _refreshPpConfig
+        _refreshPpConfig()
 
     def _start_system_status_monitoring(self):
         try:
