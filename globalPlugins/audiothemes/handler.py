@@ -943,6 +943,10 @@ class AudioThemesHandler:
             "sys_wake_enabled": user_config.get("sys_wake_enabled", True),
             "sys_status_volume": user_config.get("sys_status_volume", 20),
             "enable_audio_themes": user_config.get("enable_audio_themes", True),
+            # Audio ducking config
+            "audio_ducking_enabled": user_config.get("audio_ducking_enabled", True),
+            "audio_ducking_volume": user_config.get("audio_ducking_volume", 30),
+            "ducking_categories": user_config.get("ducking_categories", ""),
             # unspoken player config (rarely changes mid-session)
             "output_mode": user_config.get("output_mode", "stereo"),
             "typing_sounds_spatial": user_config.get("typing_sounds_spatial", True),

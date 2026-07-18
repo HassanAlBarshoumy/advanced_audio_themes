@@ -336,14 +336,29 @@ def _tracking_speak(sequence):
     if _original_speak:
         _original_speak(sequence)
 
-def get_ducking_factor(category="theme_sounds"):
+def get_ducking_factor(category="theme_sounds", cached_config=None):
     try:
-        if config.conf.get("audiothemes", {}).get("audio_ducking_enabled", True):
-            _load_ducking_categories()
+        if cached_config is not None:
+            if not cached_config.get("audio_ducking_enabled", True):
+                return 1.0
+            dc_raw = cached_config.get("ducking_categories", "")
+            if dc_raw != _ducking_categories_json:
+                _ducking_categories_json = dc_raw
+                try:
+                    _ducking_categories_dict = json.loads(dc_raw) if dc_raw else {}
+                except Exception:
+                    _ducking_categories_dict = {}
             if not _ducking_categories_dict.get(category, True):
                 return 1.0
             if time.time() - last_speech_time < 1.0:
-                return config.conf.get("audiothemes", {}).get("audio_ducking_volume", 30) / 100.0
+                return cached_config.get("audio_ducking_volume", 30) / 100.0
+        else:
+            if config.conf.get("audiothemes", {}).get("audio_ducking_enabled", True):
+                _load_ducking_categories()
+                if not _ducking_categories_dict.get(category, True):
+                    return 1.0
+                if time.time() - last_speech_time < 1.0:
+                    return config.conf.get("audiothemes", {}).get("audio_ducking_volume", 30) / 100.0
     except Exception:
         pass
     return 1.0

@@ -381,10 +381,7 @@ class UnspokenPlayer:
 		)
 
 	def create_wave_player(self):
-		try:
-			outputDevice = config.conf["speech"]["outputDevice"]
-		except KeyError:
-			outputDevice = config.conf["audio"]["outputDevice"]
+		outputDevice = config.conf["speech"].get("outputDevice") or config.conf["audio"].get("outputDevice", None)
 		self.wave_player = nvwave.WavePlayer(
 			channels=2,
 			samplesPerSec=44100,
@@ -547,7 +544,7 @@ class UnspokenPlayer:
 				
 		# Apply Audio Ducking if NVDA recently spoke
 		try:
-			base_vol *= _frenzy.get_ducking_factor("theme_sounds")
+			base_vol *= _frenzy.get_ducking_factor("theme_sounds", self._cached_config)
 		except Exception:
 			pass
 		return clamp(base_vol, 0.0, 1.5)
@@ -749,7 +746,7 @@ class UnspokenPlayer:
 			
 			# Apply Audio Ducking to typing sounds
 			try:
-				final_volume *= _frenzy.get_ducking_factor("typing_sounds")
+				final_volume *= _frenzy.get_ducking_factor("typing_sounds", self._cached_config)
 			except Exception:
 				pass
 		else:

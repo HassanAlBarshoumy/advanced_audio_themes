@@ -178,7 +178,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         fl_cfg = getattr(handler, '_cached_config', None) or {}
         # --- getOrder data (parent / previous / next roles) ---
         # Now collected for ALL roles to support universal first/last detection.
-        if config.conf["audiothemes"]["enable_audio_themes"]:
+        if fl_cfg.get("enable_audio_themes", True):
             try:
                 info["parent_role"] = obj.parent.role if obj.parent else None
             except Exception:
@@ -776,7 +776,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
             try:
                 from . import frenzy
-                df = frenzy.get_ducking_factor("ui_beeps")
+                df = frenzy.get_ducking_factor("ui_beeps", self.handler._cached_config)
                 if df < 1.0:
                     tones.beep(pitch, 30, left=int(left * df), right=int(right * df))
                 else:
