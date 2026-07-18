@@ -121,9 +121,10 @@ KEY_POS_MAP_GEN = {
 	0x6E: (get_x(21.5), -40),	# Numpad .
 	(0x0D, 1): (get_x(22.5), -31),	# Numpad Enter (midpoint of row 4 and 5)
 }
-
-import pprint
-with open("C:/Users/d/AppData/Roaming/nvda/addons/advanced_audio_themes/globalPlugins/audiothemes/unspoken/new_map.py", "w") as f:
-    f.write("KEY_POS_MAP = \\\n")
-    f.write(pprint.pformat(KEY_POS_MAP_GEN, sort_dicts=False))
-    f.write("\n")
+# The line below was a development artifact writing to a hardcoded path.
+# if __name__ == "__main__":
+#     import pprint
+#     with open("new_map.py", "w") as f:
+#         f.write("KEY_POS_MAP = \\\n")
+#         f.write(pprint.pformat(KEY_POS_MAP_GEN, sort_dicts=False))
+#         f.write("\n")

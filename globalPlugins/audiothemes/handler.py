@@ -689,12 +689,13 @@ class AudioThemesHandler:
         self.ensure_themes_dir()
         self.migrate_all_themes_to_named_files()
         self.configure()
-        for action in (
+        self._registered_actions = (
             post_configSave,
             post_configReset,
             post_configProfileSwitch,
             audiotheme_changed,
-        ):
+        )
+        for action in self._registered_actions:
             action.register(self.configure)
         self._NVDA_getPropertiesSpeech = speech.speech.getPropertiesSpeech
         speech.speech.getPropertiesSpeech = self._hook_getSpeechTextForProperties
@@ -792,6 +793,12 @@ class AudioThemesHandler:
             self._system_monitor = None
         speech.speech.getPropertiesSpeech = self._NVDA_getPropertiesSpeech
         speech.getPropertiesSpeech = self._NVDA_getPropertiesSpeech
+        for action in self._registered_actions:
+            try:
+                action.unregister(self.configure)
+            except (ValueError, AttributeError):
+                pass
+        self._theme_cache.clear()
 
     def shouldNukeRoleSpeech(self):
         if self.player.use_in_say_all and SayAllHandler.isRunning():
@@ -1109,6 +1116,8 @@ class AudioThemesHandler:
             with self._config_lock:
                 # Re-check cache (another thread may have loaded it)
                 if target_folder not in self._theme_cache:
+                    if len(self._theme_cache) >= 64:
+                        self._theme_cache.pop(next(iter(self._theme_cache)))
                     self._theme_cache[target_folder] = theme
             return theme
         return self.active_theme

@@ -355,7 +355,6 @@ def is_emoji_suppress_role_sound():
     return config.conf["audiothemes"].get("emoji_suppress_role_sound", False)
 
 
-@lru_cache(maxsize=128)
 def is_emoji_blacklisted(emoji_char):
     raw = config.conf["audiothemes"].get("emoji_blacklist", "")
     return emoji_char in raw

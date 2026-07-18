@@ -27,6 +27,8 @@ ppSynchronousPlayer = nvwave.WavePlayer(channels=2, samplesPerSec=int(tones.SAMP
 _wave_player_pool = {}
 _wave_player_pool_lock = threading.Lock()
 
+_WAVE_PLAYER_POOL_MAX = 16
+
 def get_pooled_player(channels, sample_rate, ducking=False):
     # global _wave_player_pool
     key = (channels, sample_rate, ducking)
@@ -44,6 +46,8 @@ def get_pooled_player(channels, sample_rate, ducking=False):
                 wantDucking=ducking,
                 purpose=nvwave.AudioPurpose.SOUNDS
             )
+            if len(_wave_player_pool) > _WAVE_PLAYER_POOL_MAX:
+                _wave_player_pool.pop(next(iter(_wave_player_pool)))
         return _wave_player_pool[key]
 
 # Cache for reverbed audio (capped at 50 entries to prevent unbounded growth)

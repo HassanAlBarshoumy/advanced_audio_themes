@@ -833,7 +833,7 @@ def injectMonkeyPatches():
     # Register reloadRules to config profile switch instead of monkey patching tones.initialize
     import config
     try:
-        config.post_configProfileSwitch.register(lambda: reloadRules())
+        config.post_configProfileSwitch.register(reloadRules)
     except AttributeError:
         pass # Not available in older NVDA versions
     
@@ -869,6 +869,12 @@ def  restoreMonkeyPatches():
     characterProcessing.processSpeechSymbol = original_processSpeechSymbol
     speech.speech.getIndentationSpeech = original_getIndentationSpeech
     speech.speech._getSelectionMessageSpeech = original_getSelectionMessageSpeech
+    
+    try:
+        import config
+        config.post_configProfileSwitch.unregister(reloadRules)
+    except (AttributeError, ValueError):
+        pass
     
     #monkeyUnpatchRestoreProsodyInAllHighLevelSpeakFunctions()
 
