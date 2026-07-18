@@ -267,7 +267,6 @@ class NavLayerMixin:
             return
             
         self._navLayerActive = False
-        self._suppressAllGestures = True
         try:
             from .browserNavEngine import originalExecuteGesture
             originalExecuteGesture(inputCore.manager, gest)
@@ -276,7 +275,6 @@ class NavLayerMixin:
         finally:
             from speech.sayAll import SayAllHandler
             SayAllHandler.stop()
-            self._suppressAllGestures = False
             self._navLayerActive = True
 
     def _sendVKKey(self, vk, shift=False):
@@ -289,7 +287,6 @@ class NavLayerMixin:
         gest = keyboardHandler.KeyboardInputGesture(modifiers, vk, 0, False)
         
         self._navLayerActive = False
-        self._suppressAllGestures = True
         try:
             from .browserNavEngine import originalExecuteGesture
             originalExecuteGesture(inputCore.manager, gest)
@@ -298,7 +295,6 @@ class NavLayerMixin:
         finally:
             from speech.sayAll import SayAllHandler
             SayAllHandler.stop()
-            self._suppressAllGestures = False
             self._navLayerActive = True
 
     def _performNavAction(self, direction):
