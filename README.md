@@ -356,6 +356,14 @@ You can view the source code, report issues, or contribute to the project on Git
 
 ## Change Log
 
+### Version 9.38
+- **NVDAExtensionGlobalPlugin Compatibility:** Resolved the "inputCore.manager.executeGesture manager has also been patched" warning by deferring the `executeGesture` patch to `postNVDAStartup`, so both add-ons coexist without conflict. Also patched `NVDAExtensionGlobalPlugin.speechEx._myGetTextInfoSpeech` and `SayAllHandler._getTextInfoSpeech` for blank detection during arrow-key and SayAll navigation.
+- **Blank Rule Fix:** Fixed the BLANK announcement rule (`OtherRule.BLANK` with `builtInWave`) to work during arrow-key text navigation in addition to Tab navigation. The comparison-based blank detection now properly identifies blank lines via `suppressBlanks=True/False` comparison instead of simple string stripping.
+- **Navigation Layer Sentence Fix:** Fixed the up-arrow in sentence navigation mode — `_suppressAllGestures` was blocking `getScript` from finding the sentence movement script during `_sendNormalKey`.
+- **BrowserNav Crash Guard:** Wrapped the `self.selection = selection` call in `caretMovementWithAutoSkip` in a `try/except RuntimeError` to prevent crashes when the underlying IAccessible object becomes invalid during DOM updates.
+- **Input Gestures:** Added direct keyboard shortcuts for Emoji toggle (`NVDA+Alt+E`) and Clipboard toggle (`NVDA+Alt+C`) — previously only accessible through the Audio Themes Command Layer.
+- **Performance:** Removed all debug logging from `commands.py` (PpWaveFileCommand/PpChainCommand) and `frenzy.py` (blank detection), eliminating WARNING-level spam from the NVDA log during normal usage.
+
 ### Version 9.34
 - **Critical Bug Fix — Gesture Binding Corruption:** Fixed a severe issue where all addon and user-assigned keyboard shortcuts (e.g. `NVDA+Alt+P` from NVDAExtensionGlobalPlugin) would break and disappear from the Input Gestures dialog after opening and closing either the Audio Themes Command Layer (`NVDA+Shift+A`) or the Navigation Layer (`NVDA+Win+N`). The root cause was `clearGestureBindings()` + `_rebindInstanceGestures()` being called on every layer deactivation, which wiped all entries from NVDA's internal `boundGestures` map. Replaced with targeted `removeGestureBinding()` calls per-layer and a suppression flag for gesture execution — `boundGestures` is never touched during layer open/close cycles.
 - **Navigation Layer Documentation:** Expanded the Navigation Layer section in this readme to include a complete reference table of all layer controls and a detailed list of all 27 navigation modes with descriptions.
