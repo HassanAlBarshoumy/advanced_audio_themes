@@ -1060,7 +1060,7 @@ def diffAndExtractInterestingLines(s1, s2):
             yield line
 
 def playBiw(bookmark=None, earcon=None, volume=None):
-    thread = threading.Thread(target=lambda: playBiwInThread(bookmark, earcon, volume))
+    thread = threading.Thread(target=lambda: playBiwInThread(bookmark, earcon, volume), daemon=True)
     thread.start()
 
 def playBiwInThread(bookmark=None, earcon=None, volume=None):

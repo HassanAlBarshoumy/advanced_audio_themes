@@ -10,6 +10,7 @@ import _ctypes
 from enum import Enum
 import IAccessibleHandler
 import os
+import queue
 from queue import Queue
 import speech
 import textInfos
@@ -105,12 +106,15 @@ class Worker(Thread):
 class ThreadPool:
     """ Pool of threads consuming tasks from a queue """
     def __init__(self, num_threads):
-        self.tasks = Queue(num_threads)
+        self.tasks = Queue(maxsize=30)
         for _ in range(num_threads):
             Worker(self.tasks)
     def add_task(self, func, *args, **kargs):
         """ Add a task to the queue """
-        self.tasks.put((func, args, kargs))
+        try:
+            self.tasks.put_nowait((func, args, kargs))
+        except queue.Full:
+            pass
     def map(self, func, args_list):
         """ Add a list of tasks to the queue """
         for args in args_list:

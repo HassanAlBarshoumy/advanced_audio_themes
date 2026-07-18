@@ -470,7 +470,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
                     _time.sleep(0.12)
             except Exception:
                 log.debug("Preview playback interrupted")
-        threading.Thread(target=play_preview).start()
+        threading.Thread(target=play_preview, daemon=True).start()
 
     def onTelegram(self, event):
         import webbrowser
@@ -2751,7 +2751,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             except Exception as e:
                 import logging
                 logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
-        threading.Thread(target=play_preview).start()
+        threading.Thread(target=play_preview, daemon=True).start()
 
     def onAbout(self, event):
         theme_dict = self.selected_theme.todict()
