@@ -258,52 +258,48 @@ class PpWaveFileCommand(PpSynchronousCommand):
                 self._loaded = True
                 return
 
-        self.f = wave.open(self.fileName, "r")
-        f = self.f
-        if self.f is None:
-            raise RuntimeError("can not open file %s" % self.fileName)
-        if f.getsampwidth() != 2:
-            bits = f.getsampwidth() * 8
-            raise RuntimeError(f"We only support 16-bit encoded wav files. '{self.fileName}' is encoded with {bits} bits per sample.")
-        buf = f.readframes(f.getnframes())
-        import array
-        arr = array.array('h')
-        arr.frombytes(buf)
-        n = len(arr)
-        
-        # Apply volume
-        if self.volume != 100:
-            vol_mult = self.volume / 100.0
-            for i in range(n):
-                arr[i] = int(arr[i] * vol_mult)
-        
-        if self.startAdjustment > 0:
-            pos = self.startAdjustment * f.getframerate() // 1000
-            pos *= f.getnchannels()
-            arr = arr[pos:]
+        f = wave.open(self.fileName, "r")
+        self.f = f
+        try:
+            if self.f is None:
+                raise RuntimeError("can not open file %s" % self.fileName)
+            if f.getsampwidth() != 2:
+                bits = f.getsampwidth() * 8
+                raise RuntimeError(f"We only support 16-bit encoded wav files. '{self.fileName}' is encoded with {bits} bits per sample.")
+            buf = f.readframes(f.getnframes())
+            import array
+            arr = array.array('h')
+            arr.frombytes(buf)
             n = len(arr)
             
-        self.buf = arr.tobytes()
-        self._channels = f.getnchannels()
-        self._sample_rate = f.getframerate()
-        self.fileWavePlayer = get_pooled_player(
-            channels=self._channels,
-            sample_rate=self._sample_rate,
-            ducking=False
-        )
-        frames = self.f.getnframes()
-        rate = self.f.getframerate()
-        wavMillis = int(1000 * frames / rate)
-        result = wavMillis - self.startAdjustment - self.endAdjustment
-        self._duration = max(0, result)
-        
-        # Close the file handle — we've read all data into self.buf
-        try:
-            self.f.close()
-        except Exception as e:
-            import logging
-            logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
-        self.f = None
+            # Apply volume
+            if self.volume != 100:
+                vol_mult = self.volume / 100.0
+                for i in range(n):
+                    arr[i] = int(arr[i] * vol_mult)
+            
+            if self.startAdjustment > 0:
+                pos = self.startAdjustment * f.getframerate() // 1000
+                pos *= f.getnchannels()
+                arr = arr[pos:]
+                n = len(arr)
+                
+            self.buf = arr.tobytes()
+            self._channels = f.getnchannels()
+            self._sample_rate = f.getframerate()
+            self.fileWavePlayer = get_pooled_player(
+                channels=self._channels,
+                sample_rate=self._sample_rate,
+                ducking=False
+            )
+            frames = self.f.getnframes()
+            rate = self.f.getframerate()
+            wavMillis = int(1000 * frames / rate)
+            result = wavMillis - self.startAdjustment - self.endAdjustment
+            self._duration = max(0, result)
+        finally:
+            f.close()
+            self.f = None
         
         with self._cache_lock:
             if len(self._wave_cache) > 100:
