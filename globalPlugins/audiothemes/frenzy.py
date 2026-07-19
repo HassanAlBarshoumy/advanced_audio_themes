@@ -346,6 +346,7 @@ _speech_time_handler = None
 _original_speak = None
 _ducking_categories_json = ""
 _ducking_categories_dict = {}
+_ducking_categories_lock = threading.Lock()
 
 _DEFAULT_DUCKING_CATEGORIES = {
     "theme_sounds": True,
@@ -388,14 +389,15 @@ def get_ducking_factor(category="theme_sounds", cached_config=None):
         if not cached_config.get("audio_ducking_enabled", True):
             return 1.0
         dc_raw = cached_config.get("ducking_categories", "")
-        if dc_raw != _ducking_categories_json:
-            _ducking_categories_json = dc_raw
-            try:
-                _ducking_categories_dict = json.loads(dc_raw) if dc_raw else {}
-            except Exception:
-                _ducking_categories_dict = {}
-        if not _ducking_categories_dict.get(category, True):
-            return 1.0
+        with _ducking_categories_lock:
+            if dc_raw != _ducking_categories_json:
+                _ducking_categories_json = dc_raw
+                try:
+                    _ducking_categories_dict = json.loads(dc_raw) if dc_raw else {}
+                except Exception:
+                    _ducking_categories_dict = {}
+            if not _ducking_categories_dict.get(category, True):
+                return 1.0
         if time.time() - last_speech_time < 1.0:
             return cached_config.get("audio_ducking_volume", 30) / 100.0
     except Exception:

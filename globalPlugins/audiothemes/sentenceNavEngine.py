@@ -37,12 +37,23 @@ import wx
 from logHandler import log
 
 _cached_doc_formatting = {}
+_sn_cached_chime_volume = 10
+_sn_cached_paragraph_chime_volume = 10
+
 def _refresh_doc_formatting():
-    global _cached_doc_formatting
+    global _cached_doc_formatting, _sn_cached_chime_volume, _sn_cached_paragraph_chime_volume
     try:
         _cached_doc_formatting = config.conf["documentFormatting"]
     except Exception:
         _cached_doc_formatting = {}
+    try:
+        _sn_cached_chime_volume = config.conf["sentencenav"]["noNextSentenceChimeVolume"]
+    except Exception:
+        _sn_cached_chime_volume = 10
+    try:
+        _sn_cached_paragraph_chime_volume = config.conf["sentencenav"]["paragraphChimeVolume"]
+    except Exception:
+        _sn_cached_paragraph_chime_volume = 10
 
 # --- Compatibility shims for NVDA 2024+ / 2026+ ---
 try:
@@ -630,8 +641,7 @@ class SentenceNavMixin:
         if handler and handler.play_theme_sound("no_next_sentence"):
             pass
         else:
-            volume = config.conf["sentencenav"]["noNextSentenceChimeVolume"]
-            self._sn_fancyBeep("HF", 100, volume, volume)
+            self._sn_fancyBeep("HF", 100, _sn_cached_chime_volume, _sn_cached_chime_volume)
             
         if getSNConfig("noNextSentenceMessage"):
             ui.message(errorMsg)
@@ -642,8 +652,7 @@ class SentenceNavMixin:
         if handler and handler.play_theme_sound("paragraph_chime"):
             return
             
-        volume = config.conf["sentencenav"]["paragraphChimeVolume"]
-        self._sn_fancyBeep("AC#EG#", 30, volume, volume)
+        self._sn_fancyBeep("AC#EG#", 30, _sn_cached_paragraph_chime_volume, _sn_cached_paragraph_chime_volume)
 
     # --- Beep helpers ---
     NOTES = "A,B,H,C,C#,D,D#,E,F,F#,G,G#".split(",")

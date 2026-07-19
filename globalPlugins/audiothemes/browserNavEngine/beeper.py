@@ -23,6 +23,17 @@ import wave
 from . addonConfig import *
 from ..utils import ensure_mono, is_sound_suppressed
 
+_beeper_output_device = None
+
+def _get_beeper_output_device():
+    global _beeper_output_device
+    if _beeper_output_device is None:
+        try:
+            _beeper_output_device = config.conf["speech"]["outputDevice"]
+        except KeyError:
+            _beeper_output_device = config.conf["audio"]["outputDevice"]
+    return _beeper_output_device
+
 class Beeper:
     BASE_FREQ = speech.IDT_BASE_FREQUENCY
     def getPitch(self, indent):
@@ -35,10 +46,7 @@ class Beeper:
     MAX_BEEP_COUNT = 40 # Corresponds to about 500 paragraphs with the log formula
 
     def __init__(self):
-        try:
-            outputDevice=config.conf["speech"]["outputDevice"]
-        except KeyError:
-            outputDevice=config.conf["audio"]["outputDevice"]
+        outputDevice = _get_beeper_output_device()
         self.player = nvwave.WavePlayer(
             channels=2,
             samplesPerSec=int(tones.SAMPLE_RATE),
@@ -201,10 +209,7 @@ def skippedParagraphChime():
         else:
             spcFile = wave.open(getSoundsPath() + "\\classic\\on.wav","r")
             spcChannels = spcFile.getnchannels()
-            try:
-                outputDevice=config.conf["speech"]["outputDevice"]
-            except KeyError:
-                outputDevice=config.conf["audio"]["outputDevice"]
+            outputDevice=_get_beeper_output_device()
             spcPlayer = nvwave.WavePlayer(
                 channels=spcChannels,
                 samplesPerSec=spcFile.getframerate(),

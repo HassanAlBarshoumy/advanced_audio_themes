@@ -716,7 +716,7 @@ class AudioThemesHandler:
             if not self.player.speak_roles:
                 suppress = True
             
-            blacklisted_roles = _get_blacklisted_roles()
+            blacklisted_roles = self._cached_config.get("blacklisted_roles", [19])
             if role in blacklisted_roles:
                 suppress = True
                 
@@ -861,7 +861,8 @@ class AudioThemesHandler:
                     self.active_theme.deactivate()
                 self.enabled = new_enabled
                 self.active_theme = self.get_active_theme()
-                _typing_dir_cache.clear()
+                with _typing_dir_cache_lock:
+                    _typing_dir_cache.clear()
                 self._theme_cache = {}
                 log.debug(f"configure: enabled={self.enabled} active_theme={'present' if self.active_theme else 'None'}")
             else:
@@ -922,6 +923,17 @@ class AudioThemesHandler:
                 fl_enabled_roles_set = set(json.loads(fl_roles_raw))
             except Exception:
                 fl_enabled_roles_set = None
+        blr = user_config.get("blacklisted_roles", "[19]")
+        if isinstance(blr, list):
+            blr_parsed = blr if all(isinstance(r, int) for r in blr) else [19]
+        elif isinstance(blr, str):
+            try:
+                blr_parsed_tmp = json.loads(blr)
+                blr_parsed = blr_parsed_tmp if isinstance(blr_parsed_tmp, list) and all(isinstance(r, int) for r in blr_parsed_tmp) else [19]
+            except Exception:
+                blr_parsed = [19]
+        else:
+            blr_parsed = [19]
         unspoken_cfg = config.conf["unspoken"]
         self._cached_config = {
             # First/Last detection
@@ -937,6 +949,7 @@ class AudioThemesHandler:
             "last_fallback_role_name": user_config.get("last_fallback_role_name", "listitem"),
             "general_fallback": user_config.get("general_fallback", "role"),
             "general_fallback_role_name": user_config.get("general_fallback_role_name", "listitem"),
+            "blacklisted_roles": blr_parsed,
             # Theme/app hot-path config
             "volume": user_config["volume"],
             "typing_sounds": user_config.get("typing_sounds", True),
@@ -944,6 +957,7 @@ class AudioThemesHandler:
             "typing_sounds_volume": user_config.get("typing_sounds_volume", 10),
             "typing_sound_pack": user_config.get("typing_sound_pack", "1blueSwitch"),
             "app_profiles_enabled": user_config.get("app_profiles_enabled", False),
+            "disabled_apps_suppress_categories": user_config.get("disabled_apps_suppress_categories", "{}"),
             "clipboard_volume": user_config.get("clipboard_volume", 20),
             "clipboard_enabled": user_config.get("clipboard_enabled", True),
             # System sounds
@@ -1252,12 +1266,14 @@ class AudioThemesHandler:
         
         if theme_typing_dir:
             _tc_key = ("isdir", theme_typing_dir)
-            _tcached = _typing_dir_cache.get(_tc_key)
+            with _typing_dir_cache_lock:
+                _tcached = _typing_dir_cache.get(_tc_key)
             if _tcached is None:
                 _tcached = os.path.isdir(theme_typing_dir)
-                if len(_typing_dir_cache) > 32:
-                    _typing_dir_cache.pop(next(iter(_typing_dir_cache)))
-                _typing_dir_cache[_tc_key] = _tcached
+                with _typing_dir_cache_lock:
+                    if len(_typing_dir_cache) > 32:
+                        _typing_dir_cache.pop(next(iter(_typing_dir_cache)))
+                    _typing_dir_cache[_tc_key] = _tcached
             if _tcached:
                 typing_dir = theme_typing_dir
         
@@ -1268,17 +1284,18 @@ class AudioThemesHandler:
         
         sound_path = None
         if typing_dir:
-            # global _typing_dir_cache
-            cache = _typing_dir_cache.get(typing_dir)
+            with _typing_dir_cache_lock:
+                cache = _typing_dir_cache.get(typing_dir)
             if cache is None:
                 if os.path.isdir(typing_dir):
                     files = [f for f in os.listdir(typing_dir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
                     cache = {'files': files}
                 else:
                     cache = {'files': []}
-                if len(_typing_dir_cache) > 32:
-                    _typing_dir_cache.pop(next(iter(_typing_dir_cache)))
-                _typing_dir_cache[typing_dir] = cache
+                with _typing_dir_cache_lock:
+                    if len(_typing_dir_cache) > 32:
+                        _typing_dir_cache.pop(next(iter(_typing_dir_cache)))
+                    _typing_dir_cache[typing_dir] = cache
             
             if cache['files']:
                 if vkCode is not None:

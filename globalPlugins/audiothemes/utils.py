@@ -284,20 +284,25 @@ def _set_handler_ref(handler):
 
 _suppressed_categories_json = ""
 _suppressed_categories_dict = {}
+_suppressed_categories_lock = threading.Lock()
 
 def _load_suppressed_categories():
     global _suppressed_categories_json, _suppressed_categories_dict
     try:
-        raw = config.conf.get("audiothemes", {}).get("disabled_apps_suppress_categories", "")
-        if raw == _suppressed_categories_json:
-            return
-        _suppressed_categories_json = raw
-        if raw:
-            _suppressed_categories_dict = json.loads(raw)
-        else:
-            _suppressed_categories_dict = {}
+        handler = _handler_ref
+        cc = getattr(handler, '_cached_config', None) if handler else None
+        raw = cc.get("disabled_apps_suppress_categories", "") if cc else ""
+        with _suppressed_categories_lock:
+            if raw == _suppressed_categories_json:
+                return
+            _suppressed_categories_json = raw
+            if raw:
+                _suppressed_categories_dict = json.loads(raw)
+            else:
+                _suppressed_categories_dict = {}
     except Exception:
-        _suppressed_categories_dict = {}
+        with _suppressed_categories_lock:
+            _suppressed_categories_dict = {}
 
 def is_sound_suppressed(category):
     """Return True if the given sound category should be suppressed

@@ -58,14 +58,26 @@ All known issues fixed (rounds 1–11, 13A). No known remaining issues.
 - `sentenceNavEngine.py:414-416` — added `_sentence_nav_registrations` + `_unregister_sentence_nav_hooks()` to clean up `post_configSave/Reset/ProfileSwitch` registrations (were never unregistered).
 - `browserNavEngine/__init__.py` — `terminateBrowserNav()` now restores `api.getCurrentURL`, `api.postFocusOrURLChange`, `editableText.EditableText.script_editInBrowserNav`, and `_EditableText__gestures['kb:NVDA+E']` (were never cleaned up).
 
-### Round 13A: AggregatedSection isinstance(dict) false negatives
-- `frenzy.py:90-93`, `sentenceNavEngine.py:42-45`, `browserNavEngine/__init__.py:64-67` — removed `isinstance(src, dict)` guard that **silently rejected** `AggregatedSection` (which does not inherit from `dict`), leaving `_cached_doc_formatting` as `{}`.
-  - **Result**: `_cached_doc_formatting` now stores the `AggregatedSection` directly, providing spec‑default fallback for keys like `detectFormatAfterCursor` and `reportLineIndentation`.
-  - **Impact**: Fixed `KeyError: 'detectFormatAfterCursor'` in `FakeTextInfo.__init__` (line 546) and `KeyError: 'reportLineIndentation'` in `original_getTextInfoSpeech` (line 1123) — both caused by passing a bare plain‑dict `formatConfig` (from `Section.copy()` → `dict`) to NVDA natives that expect ConfigObj‑default resolution.
-- `utils.py:179-180` — removed the same `isinstance(section, dict)` check in `refreshPpConfigCache()` so `_pp_config_cache` is populated from the `AggregatedSection` on first refresh instead of remaining empty until the first `KeyError` fallback in `getConfig()`.
+### Round 13A (committed): AggregatedSection isinstance(dict) false negatives
+- `frenzy.py:90-93`, `sentenceNavEngine.py:42-45`, `browserNavEngine/__init__.py:64-67` — removed `isinstance(src, dict)` guard that **silently rejected** `AggregatedSection` (does not inherit from `dict`), leaving `_cached_doc_formatting` as `{}`.
+  - Fixed `KeyError: 'detectFormatAfterCursor'` and `KeyError: 'reportLineIndentation'` when NVDAExtensionGlobalPlugin is active.
+- `utils.py:179-180` — same `isinstance` fix for `_pp_config_cache`.
 
-## Files verified safe (no config.conf reads in hot paths)
+### Round 14 (uncommitted): audit‑driven hot‑path + thread‑safety fixes
+- **handler.py `_get_blacklisted_roles()`** — `blacklisted_roles` JSON is parsed once in `configure()` and stored in `_cached_config["blacklisted_roles"]` (list of ints). `_hook_getSpeechTextForProperties` reads from `_cached_config` instead of calling the module‑level function, avoiding a `config.conf["audiothemes"]` proxy lookup on every speech event.
+- **handler.py `_typing_dir_cache` locking** — `play_typing_sound()` and `configure()` now hold `_typing_dir_cache_lock` for all reads/writes to `_typing_dir_cache` (was a data race — keyboard hook can fire from background threads).
+- **handler.py `_cached_config`** — added `"blacklisted_roles"` (parsed int list) and `"disabled_apps_suppress_categories"` (raw JSON string) keys.
+- **utils.py `_load_suppressed_categories()`** — reads from `handler._cached_config` instead of `config.conf` on every sound play. Added `_suppressed_categories_lock` for thread‑safe globals mutation.
+- **frenzy.py `get_ducking_factor()`** — globals `_ducking_categories_json`/`_ducking_categories_dict` mutation now protected by `_ducking_categories_lock` (was a data race on background threads).
+- **browserNavEngine/beeper.py** — `Beeper.__init__` uses cached `_get_beeper_output_device()` (module‑level, set once on first access) instead of reading `config.conf` per instantiation. Same for `skippedParagraphChime()` lazy init.
+- **sentenceNavEngine.py** — `noNextSentenceChimeVolume` and `paragraphChimeVolume` cached in `_sn_cached_chime_volume` / `_sn_cached_paragraph_chime_volume`, refreshed in `_refresh_doc_formatting()` (called from `configure()`).
+- **`quicknav.py` thread‑safety** — verified `originalQuickNavScript` chains correctly: `initBrowserNav()` saves quicknav's `patched_quick_nav_script` as `originalQuickNavScript` and `preQuickNavScript` calls through to it at line 588. No functional overlap.
+- **`systemStatus.py`** — verified: no `config.conf` reads present (false positive in earlier audit).
+- **`_beeps.py`** — does not exist (false positive in earlier audit).
+
+## Files verified safe (hot paths use cached config)
 - `settings.py`, `emoji_cldr_data.py`, `decoders/*.py`, `systemStatus.py`, `update_checker.py`, `studio/`, `phoneticPunctuationGui.py`
-- All files in `globalPlugins/audiothemes/` now use `_cached_config` dicts or module-level caches for hot-path reads.
+- `quicknav.py`, `navLayer.py`, `clipboard.py`, `commands.py`, `emoji_handler.py`, `phoneticPunctuation.py`
+- `handler.py`, `utils.py`, `frenzy.py`, `sentenceNavEngine.py`, `browserNavEngine/__init__.py`, `browserNavEngine/quickJump.py`, `browserNavEngine/beeper.py`
 
 ## No known remaining issues
