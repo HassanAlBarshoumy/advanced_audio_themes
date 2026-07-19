@@ -144,16 +144,18 @@ def new_getObjectPropertiesSpeech(
 
         if props.get('role', False) and isPhoneticPunctuationEnabled():
             role = obj.role
-            if role in roleRules and roleRules[role].enabled:
-                rule = roleRules[role]
-                speechBehavior = getattr(rule, 'speechBehavior', 0)
-                if speechBehavior != 1:
-                    patchedProps['role']=False
-                command = rule.speechCommand
-                if command:
-                    res.append(command)
-                if speechBehavior == 2 and getattr(rule, 'customSpeechText', ""):
-                    res.append(rule.customSpeechText)
+            ruleList = roleRules.get(role, [])
+            if ruleList:
+                rule = getActiveRuleContext(ruleList, *utils.getCurrentContext())
+                if rule is not None:
+                    speechBehavior = getattr(rule, 'speechBehavior', 0)
+                    if speechBehavior != 1:
+                        patchedProps['role']=False
+                    command = rule.speechCommand
+                    if command:
+                        res.append(command)
+                    if speechBehavior == 2 and getattr(rule, 'customSpeechText', ""):
+                        res.append(rule.customSpeechText)
                     
         try:
             orig_res = original_getObjectPropertiesSpeech(obj, reason=reason, _prefixSpeechCommand=None, **patchedProps)
@@ -1006,8 +1008,11 @@ def new_getTextInfoSpeech(
         TextFormat.STRIKETHROUGH,
     ]:
         try:
-            fRule = formatRules[textFormatting]
+            fList = formatRules[textFormatting]
         except KeyError:
+            continue
+        fRule = getActiveRuleContext(fList, appName, windowTitle, url)
+        if fRule is None:
             continue
         for begin, end in findAllFormatFieldBrackets(fields):
             value = fields[begin].field.get(textFormatting.value, None)

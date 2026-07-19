@@ -1130,8 +1130,11 @@ def new_getIndentationSpeech(indentation, formatConfig):
             indentSequence.append(speech.commands.BeepCommand(speech.speech.IDT_BASE_FREQUENCY, speech.speech.getIndentToneDuration()))
         if speechIndentConfig:
             # mltony change
-            noIndentRule = frenzy.otherRules.get(OtherRule.NO_INDENT, None)
-            if noIndentRule is not None:
+            noIndentList = frenzy.otherRules.get(OtherRule.NO_INDENT, None)
+            if noIndentList:
+                noIndentRule = frenzy.getActiveRuleContext(noIndentList, *_utils_mod.getCurrentContext())
+                if noIndentRule is None:
+                    noIndentRule = noIndentList[0]
                 cmd = noIndentRule.getSpeechCommand()[0]
                 speechBehavior = getattr(noIndentRule, 'speechBehavior', 0)
                 customText = getattr(noIndentRule, 'customSpeechText', "")
