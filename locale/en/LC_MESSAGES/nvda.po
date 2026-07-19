@@ -2599,3 +2599,15 @@ msgstr ""
 
 msgid "Read All"
 msgstr ""
+
+msgid "Command layer. Press h for commands list, F1 for help."
+msgstr ""
+
+msgid "Opens the add-on help file for your language."
+msgstr ""
+
+msgid "Open Help File"
+msgstr ""
+
+msgid "Help file not found."
+msgstr ""

@@ -3656,3 +3656,15 @@ msgstr "نسخ الوحدة الحالية"
 
 msgid "Read All"
 msgstr "قراءة الكل"
+
+msgid "Command layer. Press h for commands list, F1 for help."
+msgstr "طبقة الأوامر. اضغط h لقائمة الأوامر، F1 للمساعدة."
+
+msgid "Opens the add-on help file for your language."
+msgstr "يفتح ملف مساعدة الإضافة بلغتك."
+
+msgid "Open Help File"
+msgstr "فتح ملف المساعدة"
+
+msgid "Help file not found."
+msgstr "ملف المساعدة غير موجود."

@@ -319,6 +319,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
         self.toggling = False
         self._audioThemesLayerGestures = {
+            "kb:F1": "openHelp",
+            "kb:h": "audioThemesHelp",
             "kb:t": "toggleAudioThemes",
             "kb:p": "togglePp",
             "kb:n": "nextAudioTheme",
@@ -346,7 +348,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             "kb:v": "openSettings",
             "kb:x": "toggleOutputMode",
             "kb:z": "reportSystemStatus",
-            "kb:h": "audioThemesHelp",
         }
         self._helpDialog = None
         self._helpPending = False
@@ -444,17 +445,17 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self.bindGestures(self._audioThemesLayerGestures)
         self.toggling = True
         from .utils import is_sound_suppressed
-        if is_sound_suppressed("ui_beeps"):
-            return
-        try:
-            from . import frenzy
-            df = frenzy.get_ducking_factor("ui_beeps")
-            if df < 1.0:
-                tones.beep(200, 40, left=int(25*df), right=int(25*df))
-            else:
-                tones.beep(200, 40, left=25, right=25)
-        except Exception:
-            tones.beep(200, 40)
+        if not is_sound_suppressed("ui_beeps"):
+            try:
+                from . import frenzy
+                df = frenzy.get_ducking_factor("ui_beeps")
+                if df < 1.0:
+                    tones.beep(200, 40, left=int(25*df), right=int(25*df))
+                else:
+                    tones.beep(200, 40, left=25, right=25)
+            except Exception:
+                tones.beep(200, 40)
+        ui.message(_("Command layer. Press h for commands list, F1 for help."))
 
     def getScript(self, gesture):
         from keyboardHandler import KeyboardInputGesture
@@ -505,9 +506,30 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception:
             tones.beep(420, 40)
 
+    @script(description=_("Opens the add-on help file for your language."), gestures=[])
+    def script_openHelp(self, gesture):
+        import os
+        import languageHandler
+        import addonHandler
+        lang = languageHandler.getLanguage()
+        addonDir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        docPath = os.path.join(addonDir, "doc", lang, "readme.html")
+        if not os.path.isfile(docPath):
+            docPath = os.path.join(addonDir, "doc", "en", "readme.html")
+        if os.path.isfile(docPath):
+            os.startfile(docPath)
+        else:
+            ui.message(_("Help file not found."))
+
     @script(description=_("Shows audio themes commands help."), gestures=[])
     def script_audioThemesHelp(self, gesture):
         if self._helpDialog is not None:
+            try:
+                self._helpDialog.Raise()
+                return
+            except Exception:
+                self._helpDialog = None
+        if self._helpPending:
             try:
                 self._helpDialog.Raise()
                 return
@@ -525,6 +547,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 _("Select an audio themes command to execute:"),
                 _("Audio Themes Commands"),
                 [
+                    "F1: " + _("Open Help File"),
                     "t: " + _("Toggle Audio Themes"),
                     "p: " + _("Toggle Earcons and Speech Rules"),
                     "n: " + _("Next Audio Theme"),
@@ -559,6 +582,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             if dlg.ShowModal() == wx.ID_OK:
                 sel = dlg.GetSelection()
                 cmds = [
+                    self.script_openHelp,
                     self.script_toggleAudioThemes,
                     self.script_togglePp,
                     self.script_nextAudioTheme,

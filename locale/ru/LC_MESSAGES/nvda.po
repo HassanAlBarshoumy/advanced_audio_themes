@@ -3371,3 +3371,15 @@ msgstr "Копировать текущую единицу"
 
 msgid "Read All"
 msgstr "Читать всё"
+
+msgid "Command layer. Press h for commands list, F1 for help."
+msgstr "Слой команд. Нажмите h для списка команд, F1 для справки."
+
+msgid "Opens the add-on help file for your language."
+msgstr "Открывает файл справки дополнения на вашем языке."
+
+msgid "Open Help File"
+msgstr "Открыть файл справки"
+
+msgid "Help file not found."
+msgstr "Файл справки не найден."

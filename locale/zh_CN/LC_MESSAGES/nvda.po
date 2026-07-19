@@ -3330,3 +3330,15 @@ msgstr "复制当前单元"
 
 msgid "Read All"
 msgstr "朗读全部"
+
+msgid "Command layer. Press h for commands list, F1 for help."
+msgstr "命令层。按 h 查看命令列表，F1 获取帮助。"
+
+msgid "Opens the add-on help file for your language."
+msgstr "以您的语言打开插件的帮助文件。"
+
+msgid "Open Help File"
+msgstr "打开帮助文件"
+
+msgid "Help file not found."
+msgstr "未找到帮助文件。"

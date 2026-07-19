@@ -3423,3 +3423,15 @@ msgstr "Copiar la unidad actual"
 
 msgid "Read All"
 msgstr "Leer todo"
+
+msgid "Command layer. Press h for commands list, F1 for help."
+msgstr "Capa de comandos. Pulse h para la lista de comandos, F1 para ayuda."
+
+msgid "Opens the add-on help file for your language."
+msgstr "Abre el archivo de ayuda del complemento en su idioma."
+
+msgid "Open Help File"
+msgstr "Abrir archivo de ayuda"
+
+msgid "Help file not found."
+msgstr "Archivo de ayuda no encontrado."
