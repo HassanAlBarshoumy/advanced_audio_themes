@@ -668,6 +668,7 @@ def showPendingConflicts():
 
 
 _typing_dir_cache = {}
+_typing_dir_cache_lock = threading.Lock()
 
 class AudioThemesHandler:
     """Query and manage audio themes."""
@@ -798,8 +799,10 @@ class AudioThemesHandler:
                 action.unregister(self.configure)
             except (ValueError, AttributeError):
                 pass
-        self._theme_cache.clear()
-        _typing_dir_cache.clear()
+        with self._config_lock:
+            self._theme_cache.clear()
+        with _typing_dir_cache_lock:
+            _typing_dir_cache.clear()
 
     def shouldNukeRoleSpeech(self):
         if self.player.use_in_say_all and SayAllHandler.isRunning():
@@ -983,6 +986,7 @@ class AudioThemesHandler:
             "BassBoostCutoff": unspoken_cfg.get("BassBoostCutoff", 150),
             "HRTF": unspoken_cfg.get("HRTF", False),
             "AudioCache": unspoken_cfg.get("AudioCache", True),
+            "enable_ffmpeg": user_config.get("enable_ffmpeg", False),
         }
         self.player._cached_config = self._cached_config
         from .emoji_handler import refreshCachedConfig as _refreshEmojiConfig
@@ -993,6 +997,15 @@ class AudioThemesHandler:
         refreshFrenzyCachedConfig()
         from .commands import refreshCommandsCachedConfig
         refreshCommandsCachedConfig()
+        from . import utils
+        utils._set_cached_output_mode(self._cached_config.get("output_mode", "stereo"))
+        utils.refreshPpConfigCache()
+        from . import sentenceNavEngine
+        sentenceNavEngine._refresh_doc_formatting()
+        from .browserNavEngine import _bne_refresh_doc_formatting
+        _bne_refresh_doc_formatting()
+        from .browserNavEngine.addonConfig import refreshBNEConfigCache
+        refreshBNEConfigCache()
 
     def _start_system_status_monitoring(self):
         try:

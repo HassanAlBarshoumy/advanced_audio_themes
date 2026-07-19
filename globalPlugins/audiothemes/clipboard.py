@@ -38,8 +38,11 @@ class ClipboardManager:
     def __init__(self, handler):
         self._handler = handler
 
+    def _clip_conf(self):
+        return getattr(self._handler, '_cached_config', None) or {}
+
     def announce(self, action_id):
-        conf = config.conf["audiothemes"]
+        conf = self._clip_conf()
         if not conf.get("clipboard_enabled", False):
             return
         entry = ACTION_MAP.get(action_id)
@@ -55,7 +58,7 @@ class ClipboardManager:
             self._do_announce(action_id, special_prop, config_key, default_speech)
 
     def _do_announce(self, action_id, special_prop, config_key, default_speech):
-        conf = config.conf["audiothemes"]
+        conf = self._clip_conf()
         mode = conf.get("clipboard_announce_mode", "both")
         play_sound = mode in ("sound", "both") and conf.get(config_key + "_sound", True)
         speak = mode in ("speech", "both") and conf.get(config_key + "_speech", True)

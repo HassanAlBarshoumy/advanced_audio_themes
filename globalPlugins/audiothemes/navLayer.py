@@ -22,9 +22,11 @@ class NavLayerMixin:
     Mixin to provide a navigation layer for cycling through various modes.
     """
     
+    def _get_nl_cache(self):
+        return getattr(getattr(self, 'handler', None), '_cached_config', None) or {}
+
     def _playNavTone(self, pitch, duration):
-        import config
-        nlConf = config.conf.get("audiothemes", {})
+        nlConf = self._get_nl_cache()
         if nlConf.get("navLayerPlaySounds", True):
             import tones
             tones.beep(pitch, duration)
@@ -78,7 +80,7 @@ class NavLayerMixin:
         }
 
     def _loadActiveModes(self):
-        nlConf = config.conf.get("audiothemes", {})
+        nlConf = self._get_nl_cache()
         import json
         try:
             enabled_ids = json.loads(nlConf.get("navLayerEnabledModes", "[]"))
@@ -97,7 +99,7 @@ class NavLayerMixin:
             return None
         if self._navLayerActive:
             script_func = super().getScript(gesture)
-            nlConf = config.conf.get("audiothemes", {})
+            nlConf = self._get_nl_cache()
             passThrough = nlConf.get("navLayerPassThrough", True)
             
             if not script_func or not getattr(script_func, "__name__", "").startswith("script_navLayer"):
@@ -115,7 +117,7 @@ class NavLayerMixin:
         return super().getScript(gesture)
 
     def _resetNavLayerTimer(self):
-        nlConf = config.conf.get("audiothemes", {})
+        nlConf = self._get_nl_cache()
         timeoutEnabled = nlConf.get("navLayerTimeout", True)
         
         if self._navLayerTimer:

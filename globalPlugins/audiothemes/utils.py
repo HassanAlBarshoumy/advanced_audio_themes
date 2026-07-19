@@ -31,11 +31,16 @@ def myAssert(condition):
     if not condition:
         raise RuntimeError("Assertion failed")
 
+_cached_output_mode = "stereo"
+
+def _set_cached_output_mode(mode):
+    global _cached_output_mode
+    _cached_output_mode = mode
+
 def ensure_mono(audio_bytes, channels, sample_rate):
 	if channels != 2:
 		return audio_bytes
-	out_mode = config.conf.get("audiothemes", {}).get("output_mode", "stereo")
-	if out_mode != "mono":
+	if _cached_output_mode != "mono":
 		return audio_bytes
 	arr = array.array('h')
 	arr.frombytes(audio_bytes)
@@ -166,11 +171,27 @@ class ThreadPool:
 threadPool = ThreadPool(4)   # 4 workers for audio playback tasks.
 
 phoneticPunctuationConfigKey = "phoneticpunctuation"
+_pp_config_cache = {}
+
+def refreshPpConfigCache():
+    global _pp_config_cache
+    try:
+        section = config.conf.get(phoneticPunctuationConfigKey, {})
+        _pp_config_cache = dict(section)
+    except Exception:
+        _pp_config_cache = {}
+
 def getConfig(key):
-    return config.conf[phoneticPunctuationConfigKey][key]
+    try:
+        return _pp_config_cache[key]
+    except KeyError:
+        val = config.conf[phoneticPunctuationConfigKey].get(key)
+        _pp_config_cache[key] = val
+        return val
 
 def setConfig(key, value):
     config.conf[phoneticPunctuationConfigKey][key] = value
+    _pp_config_cache[key] = value
 
 def initConfiguration():
     confspec = {
@@ -180,6 +201,7 @@ def initConfiguration():
         "stateVerbose" : "boolean( default=True)",
     }
     config.conf.spec[phoneticPunctuationConfigKey] = confspec
+    refreshPpConfigCache()
 
 def getSoundsPath():
     globalPluginPath = os.path.abspath(os.path.dirname(__file__))

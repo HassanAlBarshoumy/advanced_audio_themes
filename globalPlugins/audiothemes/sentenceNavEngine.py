@@ -36,6 +36,14 @@ import ui
 import wx
 from logHandler import log
 
+_cached_doc_formatting = {}
+def _refresh_doc_formatting():
+    global _cached_doc_formatting
+    try:
+        _cached_doc_formatting = config.conf["documentFormatting"]
+    except Exception:
+        _cached_doc_formatting = {}
+
 # --- Compatibility shims for NVDA 2024+ / 2026+ ---
 try:
     REASON_CARET = controlTypes.REASON_CARET
@@ -399,13 +407,25 @@ def clearRegexCaches():
     regexCache.clear()
     phraseRegex = None
 
+_sentence_nav_registrations = []
 try:
     from config import post_configSave, post_configReset, post_configProfileSwitch
-    post_configSave.register(clearRegexCaches)
-    post_configReset.register(clearRegexCaches)
-    post_configProfileSwitch.register(clearRegexCaches)
+    _sentence_nav_registrations.append(post_configSave.register(clearRegexCaches))
+    _sentence_nav_registrations.append(post_configReset.register(clearRegexCaches))
+    _sentence_nav_registrations.append(post_configProfileSwitch.register(clearRegexCaches))
 except ImportError:
     pass
+
+def _unregister_sentence_nav_hooks():
+    try:
+        from config import post_configSave, post_configReset, post_configProfileSwitch
+        for action in (post_configSave, post_configReset, post_configProfileSwitch):
+            try:
+                action.unregister(clearRegexCaches)
+            except (ValueError, AttributeError):
+                pass
+    except ImportError:
+        pass
 
 
 # ──────────────────────────────────────────────
@@ -541,7 +561,7 @@ class SentenceNavMixin:
 
     def getParagraphStyle(self, info):
         formatField = textInfos.FormatField()
-        formatConfig = config.conf['documentFormatting']
+        formatConfig = _cached_doc_formatting
         for field in info.getTextWithFields(formatConfig):
             if isinstance(field, textInfos.FieldCommand):
                 formatField.update(field.field)

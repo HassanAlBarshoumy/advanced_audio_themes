@@ -57,7 +57,14 @@ import wave
 import weakref
 import winUser
 import wx
-from wx.stc import StyledTextCtrl
+
+_bne_cached_doc_formatting = {}
+def _bne_refresh_doc_formatting():
+    global _bne_cached_doc_formatting
+    try:
+        _bne_cached_doc_formatting = config.conf["documentFormatting"]
+    except Exception:
+        _bne_cached_doc_formatting = {}
 
 # Reference to the active Audio Themes GlobalPlugin for layer interception
 _activeAudioThemesPlugin = None
@@ -447,7 +454,7 @@ def extractRoles(textInfo):
     return result
 
 def isRolePresent(textInfo, roles):
-    formatConfig=config.conf['documentFormatting']
+    formatConfig=_bne_cached_doc_formatting
     fields = textInfo.getTextWithFields(formatConfig)
     for field in fields:
         try:
@@ -459,7 +466,7 @@ def isRolePresent(textInfo, roles):
     return False
 def getFormatting(info):
     formatField=textInfos.FormatField()
-    formatConfig=config.conf['documentFormatting']
+    formatConfig=_bne_cached_doc_formatting
     for field in info.getTextWithFields(formatConfig):
         #if isinstance(field,textInfos.FieldCommand): and isinstance(field.field,textInfos.FormatField):
         try:
@@ -717,6 +724,7 @@ def getCurrentURL():
     return globalVars.currentURL
 
 
+_original_api_getCurrentURL = getattr(api, 'getCurrentURL', None)
 api.getCurrentURL = getCurrentURL
 api.postFocusOrURLChange = extensionPoints.Action()
 updateURLLock = threading.Lock()
@@ -762,11 +770,13 @@ class BrowserNavMixin:
 
     def initBrowserNav(self):
         """Call from the main GlobalPlugin.__init__ to wire up BrowserNav."""
+        from .addonConfig import refreshBNEConfigCache
+        refreshBNEConfigCache()
         global _activeAudioThemesPlugin
         _activeAudioThemesPlugin = self
         self.injectBrowseModeKeystrokes()
         self.lastJupyterText = ""
-        global originalCaretMovementScriptHelper, originalQuickNavScript, originalTableScriptHelper, original_set_selection
+        global originalCaretMovementScriptHelper, originalQuickNavScript, originalTableScriptHelper, original_set_selection, _original_editInBrowserNav
         originalCaretMovementScriptHelper = cursorManager.CursorManager._caretMovementScriptHelper
         cursorManager.CursorManager._caretMovementScriptHelper = preCaretMovementScriptHelper
         originalQuickNavScript = browseMode.BrowseModeTreeInterceptor._quickNavScript
@@ -775,6 +785,7 @@ class BrowserNavMixin:
         documentBase.DocumentWithTableNavigation._tableMovementScriptHelper = preTableScriptHelper
         original_set_selection = cursorManager.CursorManager._set_selection
         cursorManager.CursorManager._set_selection = pre_set_selection
+        _original_editInBrowserNav = getattr(editableText.EditableText, 'script_editInBrowserNav', None)
         editableText.EditableText.script_editInBrowserNav = lambda selfself, gesture: self.script_editJupyter(gesture, selfself)
         editableText.EditableText._EditableText__gestures['kb:NVDA+E'] = 'editInBrowserNav'
         quickJump.original_event_gainFocus = browseMode.BrowseModeDocumentTreeInterceptor.event_gainFocus
@@ -823,6 +834,30 @@ class BrowserNavMixin:
         
         virtualBuffers.VirtualBuffer._handleUpdate = originalVirtualBufferHandleUpdate
         speech.speakTextInfo = originalSpeakTextInfo
+        # Restore api module patches
+        if _original_api_getCurrentURL is not None:
+            api.getCurrentURL = _original_api_getCurrentURL
+        else:
+            try:
+                del api.getCurrentURL
+            except AttributeError:
+                pass
+        try:
+            del api.postFocusOrURLChange
+        except AttributeError:
+            pass
+        # Restore editableText class patches
+        if _original_editInBrowserNav is not None:
+            editableText.EditableText.script_editInBrowserNav = _original_editInBrowserNav
+        else:
+            try:
+                del editableText.EditableText.script_editInBrowserNav
+            except AttributeError:
+                pass
+        try:
+            del editableText.EditableText._EditableText__gestures['kb:NVDA+E']
+        except KeyError:
+            pass
         
 
     def maybeAdjustOperator(self, op):
@@ -1056,7 +1091,7 @@ class BrowserNavMixin:
         textInfo = paragraphInfo.copy()
         paragraphInfo.collapse()
         textInfo.setEndPoint(caretInfo, 'startToStart' if direction > 0 else "endToEnd")
-        formatConfig=config.conf['documentFormatting']
+        formatConfig=_bne_cached_doc_formatting
         formatInfo = caretInfo.copy()
         formatInfo.move(textInfos.UNIT_CHARACTER, 1, endPoint="end")
         fields = formatInfo.getTextWithFields(formatConfig)

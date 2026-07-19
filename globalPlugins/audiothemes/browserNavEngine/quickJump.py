@@ -38,6 +38,21 @@ import weakref
 import wx
 import addonHandler
 from .addonConfig import getConfig
+
+_qj_output_device = None
+
+def _qj_get_output_device():
+    global _qj_output_device
+    if _qj_output_device is None:
+        try:
+            _qj_output_device = config.conf["speech"]["outputDevice"]
+        except KeyError:
+            _qj_output_device = config.conf["audio"]["outputDevice"]
+    return _qj_output_device
+
+def _qj_clear_output_device_cache():
+    global _qj_output_device
+    _qj_output_device = None
 import uuid
 import requests
 import scriptHandler
@@ -1095,10 +1110,7 @@ def playBiwInThread(bookmark=None, earcon=None, volume=None):
                 buf = frenzy.apply_ducking_to_pcm(buf, df, 2)
         except Exception:
             pass
-        try:
-            outputDevice=config.conf["speech"]["outputDevice"]
-        except KeyError:
-            outputDevice=config.conf["audio"]["outputDevice"]
+        outputDevice=_qj_get_output_device()
         fileWavePlayer = nvwave.WavePlayer(
             channels=f.getnchannels(),
             samplesPerSec=f.getframerate(),

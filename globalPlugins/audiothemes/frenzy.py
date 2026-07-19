@@ -73,29 +73,48 @@ _DEFAULT_FRENZY_CONFIG = {
 }
 
 _frenzy_cached_config = dict(_DEFAULT_FRENZY_CONFIG)
+_frenzy_config_version = 0
+_cached_blacklisted_roles = [19]
+_cached_blacklisted_roles_version = -1
+_cached_delayed_char_descriptions = False
+_cached_doc_formatting = {}
 
 def refreshFrenzyCachedConfig():
-    global _frenzy_cached_config
+    global _frenzy_cached_config, _frenzy_config_version, _cached_delayed_char_descriptions, _cached_doc_formatting
     _frenzy_cached_config = dict(_DEFAULT_FRENZY_CONFIG)
     ac = config.conf["audiothemes"]
     for key in _frenzy_cached_config:
         _frenzy_cached_config[key] = ac.get(key, _frenzy_cached_config[key])
+    _frenzy_config_version += 1
+    _cached_delayed_char_descriptions = config.conf["speech"].get("delayedCharacterDescriptions", False)
+    try:
+        _cached_doc_formatting = config.conf["documentFormatting"]
+    except Exception:
+        _cached_doc_formatting = {}
 
 def _get_blacklisted_roles():
+    global _cached_blacklisted_roles, _cached_blacklisted_roles_version
+    if _cached_blacklisted_roles_version == _frenzy_config_version:
+        return _cached_blacklisted_roles
     fc = _frenzy_cached_config
     val = fc.get("blacklisted_roles", "[19]")
     try:
         if isinstance(val, list):
             if all(isinstance(r, int) for r in val):
-                return val
-            return [19]
+                _cached_blacklisted_roles = val
+                _cached_blacklisted_roles_version = _frenzy_config_version
+                return _cached_blacklisted_roles
         if isinstance(val, str):
             parsed = json.loads(val)
             if isinstance(parsed, list) and all(isinstance(r, int) for r in parsed):
-                return parsed
+                _cached_blacklisted_roles = parsed
+                _cached_blacklisted_roles_version = _frenzy_config_version
+                return _cached_blacklisted_roles
     except Exception:
         pass
-    return [19]
+    _cached_blacklisted_roles = [19]
+    _cached_blacklisted_roles_version = _frenzy_config_version
+    return _cached_blacklisted_roles
 
 
 original_getObjectPropertiesSpeech = None
@@ -364,27 +383,21 @@ def _tracking_speak(sequence):
 
 def get_ducking_factor(category="theme_sounds", cached_config=None):
     try:
-        if cached_config is not None:
-            if not cached_config.get("audio_ducking_enabled", True):
-                return 1.0
-            dc_raw = cached_config.get("ducking_categories", "")
-            if dc_raw != _ducking_categories_json:
-                _ducking_categories_json = dc_raw
-                try:
-                    _ducking_categories_dict = json.loads(dc_raw) if dc_raw else {}
-                except Exception:
-                    _ducking_categories_dict = {}
-            if not _ducking_categories_dict.get(category, True):
-                return 1.0
-            if time.time() - last_speech_time < 1.0:
-                return cached_config.get("audio_ducking_volume", 30) / 100.0
-        else:
-            if config.conf.get("audiothemes", {}).get("audio_ducking_enabled", True):
-                _load_ducking_categories()
-                if not _ducking_categories_dict.get(category, True):
-                    return 1.0
-                if time.time() - last_speech_time < 1.0:
-                    return config.conf.get("audiothemes", {}).get("audio_ducking_volume", 30) / 100.0
+        if cached_config is None:
+            cached_config = _frenzy_cached_config
+        if not cached_config.get("audio_ducking_enabled", True):
+            return 1.0
+        dc_raw = cached_config.get("ducking_categories", "")
+        if dc_raw != _ducking_categories_json:
+            _ducking_categories_json = dc_raw
+            try:
+                _ducking_categories_dict = json.loads(dc_raw) if dc_raw else {}
+            except Exception:
+                _ducking_categories_dict = {}
+        if not _ducking_categories_dict.get(category, True):
+            return 1.0
+        if time.time() - last_speech_time < 1.0:
+            return cached_config.get("audio_ducking_volume", 30) / 100.0
     except Exception:
         pass
     return 1.0
@@ -767,7 +780,7 @@ def new_getTextInfoSpeech(
         # Computing formatConfig - identical to logic in the original function
         extraDetail = unit in (textInfos.UNIT_CHARACTER, textInfos.UNIT_WORD)
         if not formatConfig:
-            formatConfig = config.conf["documentFormatting"]
+            formatConfig = _cached_doc_formatting
         formatConfig = formatConfig.copy()
         if extraDetail:
             formatConfig["extraDetail"] = True
@@ -1472,22 +1485,16 @@ def new_getControlFieldSpeech(
         if has_active_rule:
             if r == controlTypes.Role.HEADING:
                 heading_has_rule = True
-            original_format[key] = config.conf["documentFormatting"].get(key, False)
-            config.conf["documentFormatting"][key] = True
             if formatConfig is not None:
                 original_formatConfig_values[key] = formatConfig.get(key, False)
                 formatConfig[key] = True
 
     if getActiveRuleContext(stateRules.get(controlTypes.State.CLICKABLE, []), appName, windowTitle, url) is not None:
-        original_format["reportClickable"] = config.conf["documentFormatting"].get("reportClickable", False)
-        config.conf["documentFormatting"]["reportClickable"] = True
         if formatConfig is not None:
             original_formatConfig_values["reportClickable"] = formatConfig.get("reportClickable", False)
             formatConfig["reportClickable"] = True
 
     if getActiveRuleContext(stateRules.get(controlTypes.State.VISITED, []), appName, windowTitle, url) is not None:
-        original_format["reportLinks"] = config.conf["documentFormatting"].get("reportLinks", False)
-        config.conf["documentFormatting"]["reportLinks"] = True
         if formatConfig is not None:
             original_formatConfig_values["reportLinks"] = formatConfig.get("reportLinks", False)
             formatConfig["reportLinks"] = True
@@ -1505,8 +1512,6 @@ def new_getControlFieldSpeech(
     finally:
         if level_popped:
             attrs['level'] = popped_level_val
-        for k, v in original_format.items():
-            config.conf["documentFormatting"][k] = v
         if formatConfig is not None:
             for k, v in original_formatConfig_values.items():
                 formatConfig[k] = v
@@ -1756,7 +1761,7 @@ def new_getTextInfoSpeech_considerSpelling(
         if (
             reason == OutputReason.CARET
             and unit == textInfos.UNIT_CHARACTER
-            and config.conf["speech"]["delayedCharacterDescriptions"]
+            and _cached_delayed_char_descriptions
         ):
             descriptionSequence = list(
                 speech.speech.getSingleCharDescription(

@@ -3,6 +3,7 @@ import subprocess
 import tempfile
 import shutil
 import array
+import time
 from logHandler import log
 
 FFMPEG_DOWNLOAD_URL = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
@@ -34,8 +35,8 @@ def get_ffmpeg_path():
 
 def decode_with_ffmpeg(path):
     """Decode any audio file to float32 PCM using FFmpeg only.
-    No processing filters applied here — TrimSilence, SmartVolume,
-    SmoothEnvelope, and padding are handled in Python.
+    Runs FFmpeg via Popen with a polling loop that yields to wx events,
+    preventing main-thread freeze. Timeout is 5 seconds.
     Returns (float_array, sample_rate, channels) or None on failure.
     """
     ffmpeg = get_ffmpeg_path()
@@ -44,10 +45,30 @@ def decode_with_ffmpeg(path):
     try:
         cmd = [ffmpeg, "-y", "-i", path,
                "-f", "wav", "-acodec", "pcm_s16le",
-               "-ar", "44100", "-ac", "1"]
-        cmd.append("pipe:1")
-        result = subprocess.run(cmd, capture_output=True, check=True, timeout=30)
-        wav_data = result.stdout
+               "-ar", "44100", "-ac", "1", "pipe:1"]
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        start = time.time()
+        timeout = 5
+        while time.time() - start < timeout:
+            if proc.poll() is not None:
+                break
+            time.sleep(0.05)
+            try:
+                import wx
+                wx.YieldIfNeeded()
+            except Exception:
+                pass
+        else:
+            proc.kill()
+            proc.wait()
+            log.error(f"FFmpeg decode timed out (>={timeout}s) for {path}")
+            return None
+        stdout, stderr = proc.communicate()
+        if proc.returncode != 0:
+            err_text = stderr.decode('utf-8', errors='replace')[:200] if stderr else "unknown error"
+            log.error(f"FFmpeg decode failed for {path}: {err_text}")
+            return None
+        wav_data = stdout
         if not wav_data:
             return None
         import wave, io
@@ -59,10 +80,6 @@ def decode_with_ffmpeg(path):
             arr.frombytes(frames)
             float_samples = array.array('f', [s / 32768.0 for s in arr])
             return (float_samples, sample_rate, channels)
-    except subprocess.TimeoutExpired:
-        log.error(f"FFmpeg decode timed out for {path}")
-    except subprocess.CalledProcessError as e:
-        log.error(f"FFmpeg decode failed for {path}: {e.stderr.decode('utf-8', errors='replace')[:200]}")
     except Exception as e:
         log.error(f"FFmpeg decode error for {path}: {e}")
     return None

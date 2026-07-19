@@ -76,9 +76,9 @@ class BrowseModeQuickNavInterceptor:
         played = False
         
         # 1. First check Audio Themes
-        import config
         import time
-        if config.conf["audiothemes"]["enable_audio_themes"] and self.handler.active_theme:
+        cfg = getattr(self.handler, '_cached_config', None) or {}
+        if cfg.get("enable_audio_themes", True) and self.handler.active_theme:
             self.handler.last_quicknav_time = time.monotonic()
             role = None
             if itemType.startswith("heading"):

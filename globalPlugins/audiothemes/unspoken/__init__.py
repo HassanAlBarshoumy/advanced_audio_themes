@@ -499,16 +499,16 @@ class UnspokenPlayer:
 							s = struct.unpack('<i', padded)[0]
 							float_samples[i] = s / 8388608.0
 						loaded = (float_samples, sample_rate, channels)
+			except wave.Error:
+				pass  # compressed WAV — FFmpeg fallback if enabled
 			except Exception as e:
 				log.error(f"Failed to load {path}: {e}")
 
-		# Fall back to FFmpeg if native decode failed
-		if loaded is None:
+		# Fall back to FFmpeg if native decode failed (only if enabled)
+		if loaded is None and self._cached_config.get("enable_ffmpeg", False):
 			try:
 				from . import ffmpeg_utils
 				loaded = ffmpeg_utils.decode_with_ffmpeg(path)
-				if loaded is not None:
-					ffmpeg_used = True
 			except Exception as e:
 				log.error(f"FFmpeg fallback decode failed for {path}: {e}")
 

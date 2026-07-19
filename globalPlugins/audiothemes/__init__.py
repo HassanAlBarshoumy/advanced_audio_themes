@@ -635,6 +635,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self.quicknav_interceptor.terminate()
             self.handler.close()
             self._navigation_timer.Stop()
+            # Unregister sentenceNav config hooks
+            from .sentenceNavEngine import _unregister_sentence_nav_hooks
+            _unregister_sentence_nav_hooks()
             # Shut down the shared thread pool cleanly so worker threads do not
             # linger after the add-on is unloaded.
             utils.threadPool.shutdown(wait=False)

@@ -17,11 +17,16 @@ import wave
 
 from .utils import *
 
-try:
-    outputDevice=config.conf["speech"]["outputDevice"]
-except KeyError:
-    outputDevice=config.conf["audio"]["outputDevice"]
-ppSynchronousPlayer = nvwave.WavePlayer(channels=2, samplesPerSec=int(tones.SAMPLE_RATE), bitsPerSample=16, outputDevice=outputDevice,wantDucking=True, purpose=nvwave.AudioPurpose.SOUNDS,)
+def _get_synchronous_player():
+    return nvwave.WavePlayer(channels=2, samplesPerSec=int(tones.SAMPLE_RATE), bitsPerSample=16, outputDevice=_get_output_device(), wantDucking=True, purpose=nvwave.AudioPurpose.SOUNDS)
+
+_pp_sync_player = None
+
+def _get_pp_player():
+    global _pp_sync_player
+    if _pp_sync_player is None:
+        _pp_sync_player = _get_synchronous_player()
+    return _pp_sync_player
 
 # Global pool for WavePlayers keyed by (channels, sample_rate, ducking)
 _wave_player_pool = {}
@@ -45,15 +50,22 @@ def refreshCommandsCachedConfig():
 
 _WAVE_PLAYER_POOL_MAX = 16
 
+_cached_output_device = None
+def _get_output_device():
+    global _cached_output_device
+    if _cached_output_device is None:
+        try:
+            _cached_output_device = config.conf["speech"]["outputDevice"]
+        except KeyError:
+            _cached_output_device = config.conf["audio"]["outputDevice"]
+    return _cached_output_device
+
 def get_pooled_player(channels, sample_rate, ducking=False):
     # global _wave_player_pool
     key = (channels, sample_rate, ducking)
     with _wave_player_pool_lock:
         if key not in _wave_player_pool:
-            try:
-                od = config.conf["speech"]["outputDevice"]
-            except KeyError:
-                od = config.conf["audio"]["outputDevice"]
+            od = _get_output_device()
             _wave_player_pool[key] = nvwave.WavePlayer(
                 channels=channels,
                 samplesPerSec=sample_rate,
@@ -204,9 +216,10 @@ class PpBeepCommand(PpSynchronousCommand):
         if not _spatialized:
             audio_bytes = ensure_mono(audio_bytes, cur_channels, cur_sample_rate)
 
-        ppSynchronousPlayer.stop()
-        ppSynchronousPlayer.feed(audio_bytes)
-        ppSynchronousPlayer.idle()
+        p = _get_pp_player()
+        p.stop()
+        p.feed(audio_bytes)
+        p.idle()
 
     def getDuration(self):
         return self.length
@@ -219,7 +232,7 @@ class PpBeepCommand(PpSynchronousCommand):
         if self.reverbPlayer is not None:
             self.reverbPlayer.stop()
         else:
-            ppSynchronousPlayer.stop()
+            _get_pp_player().stop()
 
 class PpWaveFileCommand(PpSynchronousCommand):
     _wave_cache = {}

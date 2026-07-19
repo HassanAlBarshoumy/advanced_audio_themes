@@ -404,7 +404,7 @@ def reloadRules():
     frenzy.updateRules()
 
 def onPostNvdaStartup():
-    if any([len(rule.urlRegex) > 0 for rule in rulesByFrenzy[FrenzyType.TEXT]]) and not isURLResolutionAvailable():
+    if rulesByFrenzy and any([len(rule.urlRegex) > 0 for rule in rulesByFrenzy.get(FrenzyType.TEXT, [])]) and not isURLResolutionAvailable():
         wx.CallAfter(
             gui.messageBox,
             _(
