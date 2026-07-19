@@ -27,6 +27,22 @@ ppSynchronousPlayer = nvwave.WavePlayer(channels=2, samplesPerSec=int(tones.SAMP
 _wave_player_pool = {}
 _wave_player_pool_lock = threading.Lock()
 
+_DEFAULT_COMMANDS_CONFIG = {
+    "audio3d": False,
+    "reverb": False,
+}
+
+_commands_cached_config = dict(_DEFAULT_COMMANDS_CONFIG)
+
+def refreshCommandsCachedConfig():
+    global _commands_cached_config
+    ac = config.conf.get("audiothemes", {})
+    us = config.conf.get("unspoken", {})
+    _commands_cached_config = {
+        "audio3d": ac.get("audio3d", _DEFAULT_COMMANDS_CONFIG["audio3d"]),
+        "reverb": us.get("Reverb", _DEFAULT_COMMANDS_CONFIG["reverb"]),
+    }
+
 _WAVE_PLAYER_POOL_MAX = 16
 
 def get_pooled_player(channels, sample_rate, ducking=False):
@@ -110,7 +126,7 @@ class PpBeepCommand(PpSynchronousCommand):
             pass
 
         _angle_x, _angle_y = 0, 0
-        _audio3d = config.conf.get("audiothemes", {}).get("audio3d", False)
+        _audio3d = _commands_cached_config.get("audio3d", False)
         _handler = None
         if _audio3d:
             import globalPlugins.audiothemes as at
@@ -119,7 +135,7 @@ class PpBeepCommand(PpSynchronousCommand):
                 _angle_x, _angle_y = _handler.get_earcon_angles()
 
         try:
-            reverb_enabled = config.conf.get("unspoken", {}).get("Reverb", False)
+            reverb_enabled = _commands_cached_config.get("reverb", False)
             if reverb_enabled:
                 cache_key = ("beep", hz, length, left, right)
                 reverbed = None
@@ -317,7 +333,7 @@ class PpWaveFileCommand(PpSynchronousCommand):
             pass
 
         _angle_x, _angle_y = 0, 0
-        _audio3d = config.conf.get("audiothemes", {}).get("audio3d", False)
+        _audio3d = _commands_cached_config.get("audio3d", False)
         _handler = None
         if _audio3d:
             import globalPlugins.audiothemes as at
@@ -326,7 +342,7 @@ class PpWaveFileCommand(PpSynchronousCommand):
                 _angle_x, _angle_y = _handler.get_earcon_angles()
 
         try:
-            reverb_enabled = config.conf.get("unspoken", {}).get("Reverb", False)
+            reverb_enabled = _commands_cached_config.get("reverb", False)
             if reverb_enabled:
                 cache_key = ("wave", self.fileName, self.volume, self.startAdjustment)
                 packed = None

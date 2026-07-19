@@ -62,9 +62,29 @@ from controlTypes import OutputReason
 from config.configFlags import ReportLineIndentation
 
 
+_DEFAULT_FRENZY_CONFIG = {
+    "speak_roles": True,
+    "announceFormat": "0",
+    "roleAnnounceFormats": "{}",
+    "blacklisted_roles": "[19]",
+    "audio_ducking_enabled": True,
+    "audio_ducking_volume": 30,
+    "ducking_categories": "",
+}
+
+_frenzy_cached_config = dict(_DEFAULT_FRENZY_CONFIG)
+
+def refreshFrenzyCachedConfig():
+    global _frenzy_cached_config
+    _frenzy_cached_config = dict(_DEFAULT_FRENZY_CONFIG)
+    ac = config.conf["audiothemes"]
+    for key in _frenzy_cached_config:
+        _frenzy_cached_config[key] = ac.get(key, _frenzy_cached_config[key])
+
 def _get_blacklisted_roles():
+    fc = _frenzy_cached_config
+    val = fc.get("blacklisted_roles", "[19]")
     try:
-        val = config.conf["audiothemes"].get("blacklisted_roles", "[19]")
         if isinstance(val, list):
             if all(isinstance(r, int) for r in val):
                 return val
@@ -87,17 +107,19 @@ def new_getObjectPropertiesSpeech(
         **allowedProperties
 ):
     if obj is None:
-        return original_getObjectPropertiesSpeech(
-            obj,reason , _prefixSpeechCommand , **allowedProperties
-        )
+        if original_getObjectPropertiesSpeech is not None:
+            return original_getObjectPropertiesSpeech(
+                obj, reason, _prefixSpeechCommand, **allowedProperties
+            )
+        return
 
-    ac = config.conf["audiothemes"]
-    global_fmt = ac.get("announceFormat", "0")
-    speak_roles = ac.get("speak_roles", True)
+    fc = _frenzy_cached_config
+    global_fmt = fc.get("announceFormat", "0")
+    speak_roles = fc.get("speak_roles", True)
     
     # Load per-role overrides
     try:
-        roleFormatsJson = ac.get("roleAnnounceFormats", "{}")
+        roleFormatsJson = fc.get("roleAnnounceFormats", "{}")
         if not hasattr(utils, '_cachedRoleFormatsJson') or utils._cachedRoleFormatsJson != roleFormatsJson:
             utils._cachedRoleFormatsJson = roleFormatsJson
             utils._cachedRoleFormatsDict = json.loads(roleFormatsJson)
@@ -727,16 +749,17 @@ def new_getTextInfoSpeech(
         suppressBlanks = False
 ):
     if not isPhoneticPunctuationEnabled():
-        yield from original_getTextInfoSpeech(
-            info,
-            useCache ,
-            formatConfig,
-            unit ,
-            reason ,
-            _prefixSpeechCommand,
-            onlyInitialFields,
-            suppressBlanks,
-        )
+        if original_getTextInfoSpeech is not None:
+            yield from original_getTextInfoSpeech(
+                info,
+                useCache,
+                formatConfig,
+                unit,
+                reason,
+                _prefixSpeechCommand,
+                onlyInitialFields,
+                suppressBlanks,
+            )
         return
     if True:
         # Computing formatConfig - identical to logic in the original function
@@ -1159,13 +1182,15 @@ def new_getPropertiesSpeech(
     **propertyValues,
 ):
     if not isPhoneticPunctuationEnabled() or ignore_get_properties_hook:
-        return original_getPropertiesSpeech(reason, **propertyValues)
+        if original_getPropertiesSpeech is not None:
+            return original_getPropertiesSpeech(reason, **propertyValues)
+        return
 
-    ac = config.conf["audiothemes"]
-    speak_roles = ac.get("speak_roles", True)
-    global_fmt = ac.get("announceFormat", "0")
+    fc = _frenzy_cached_config
+    speak_roles = fc.get("speak_roles", True)
+    global_fmt = fc.get("announceFormat", "0")
     try:
-        roleFormatsJson = ac.get("roleAnnounceFormats", "{}")
+        roleFormatsJson = fc.get("roleAnnounceFormats", "{}")
         if not hasattr(utils, '_cachedRoleFormatsJson') or utils._cachedRoleFormatsJson != roleFormatsJson:
             utils._cachedRoleFormatsJson = roleFormatsJson
             utils._cachedRoleFormatsDict = json.loads(roleFormatsJson)

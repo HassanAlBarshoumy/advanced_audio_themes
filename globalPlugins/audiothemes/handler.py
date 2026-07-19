@@ -988,6 +988,10 @@ class AudioThemesHandler:
         _refreshEmojiConfig()
         from .phoneticPunctuation import refreshCachedConfig as _refreshPpConfig
         _refreshPpConfig()
+        from .frenzy import refreshFrenzyCachedConfig
+        refreshFrenzyCachedConfig()
+        from .commands import refreshCommandsCachedConfig
+        refreshCommandsCachedConfig()
 
     def _start_system_status_monitoring(self):
         try:

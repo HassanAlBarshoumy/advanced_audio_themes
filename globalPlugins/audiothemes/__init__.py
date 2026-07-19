@@ -1109,8 +1109,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
             current_states = obj_info.get("states", frozenset())
 
-            fl_cfg = getattr(self.handler, '_cached_config', None)
-            suppress_role = fl_cfg["state_sounds_suppress_role"] if fl_cfg else config.conf["audiothemes"].get("state_sounds_suppress_role", False)
+            fl_cfg = getattr(self.handler, '_cached_config', None) or {}
+            suppress_role = fl_cfg.get("state_sounds_suppress_role", False)
 
             # --- State-based sound ------------------------------------------
             if theme and current_states:
@@ -1133,7 +1133,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                             self.handler.play(obj_info, state_snd, _pre_resolved_theme=theme)
 
             # --- Emoji role sound suppression ---
-            emoji_suppress = fl_cfg["emoji_suppress_role_sound"] if fl_cfg else config.conf["audiothemes"].get("emoji_suppress_role_sound", False)
+            emoji_suppress = fl_cfg.get("emoji_suppress_role_sound", False)
             if emoji_suppress and (
                 obj_info.get("suppress_role_sound") or
                 _text_contains_emoji(obj_info.get("name", ""))
@@ -1203,7 +1203,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         try:
             fl_cfg = self.handler._cached_config
         except Exception:
-            fl_cfg = config.conf["audiothemes"]
+            fl_cfg = {}
 
         # Legacy mode: only LISTITEM / TREEVIEWITEM
         if not fl_cfg.get("universal_fl_enabled", True):

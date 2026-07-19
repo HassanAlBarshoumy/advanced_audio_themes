@@ -453,20 +453,20 @@ originalSpeechSpeechSpeak = None
 originalSpeechCancel = None
 originalProcessSpeechSymbols = None
 
-_cached_speech_symbolLevel = None
+_cached_speech_symbolLevel = 100
 
 def refreshCachedConfig():
     global _cached_speech_symbolLevel
     try:
         _cached_speech_symbolLevel = config.conf["speech"]["symbolLevel"]
     except Exception:
-        _cached_speech_symbolLevel = None
+        _cached_speech_symbolLevel = 100
 
 def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
     global speechCancelledFlag
     if isPhoneticPunctuationEnabled():
         if symbolLevel is None:
-            symbolLevel = _cached_speech_symbolLevel if _cached_speech_symbolLevel is not None else config.conf["speech"]["symbolLevel"]
+            symbolLevel = _cached_speech_symbolLevel
         newSequence = speechSequence
         appName, windowTitle, url = getCurrentContext()
         with _rules_lock:
@@ -1077,7 +1077,7 @@ def new_processSpeechSymbol(locale, symbol):
             # would do with this symbol at the current level.
             # If NVDA would keep it unchanged (i.e., below the level threshold)
             # or produce empty output, we should NOT fire the earcon either.
-            currentLevel = _cached_speech_symbolLevel if _cached_speech_symbolLevel is not None else config.conf["speech"]["symbolLevel"]
+            currentLevel = _cached_speech_symbolLevel
             try:
                 nativeOut = _cached_native_symbol(locale, symbol, currentLevel)
                 if nativeOut == symbol or not nativeOut.strip():

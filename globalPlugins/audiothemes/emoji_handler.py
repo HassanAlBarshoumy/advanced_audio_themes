@@ -6,28 +6,57 @@ from functools import lru_cache
 from .handler import SpecialProps
 from . import emoji_cldr_data
 
-_cached_emoji_config = {}
+_DEFAULT_EMOJI_CONFIG = {
+    "emoji_enabled": True,
+    "emoji_sound": True,
+    "emoji_prefix": True,
+    "emoji_prefix_text": "emoji",
+    "emoji_suffix_text": "emoji",
+    "emoji_volume": 20,
+    "emoji_position": "before",
+    "emoji_sound_position": "before",
+    "emoji_repeat": "per_emoji",
+    "emoji_sound_repeat": "per_emoji",
+    "emoji_prefix_repeat": "per_emoji",
+    "emoji_delay_before": 0,
+    "emoji_delay_after": 0,
+    "emoji_suppress_role_sound": False,
+    "emoji_blacklist": "",
+    "emoji_sound_cat_smileys": True,
+    "emoji_sound_cat_people": True,
+    "emoji_sound_cat_animals": True,
+    "emoji_sound_cat_food": True,
+    "emoji_sound_cat_travel": True,
+    "emoji_sound_cat_activities": True,
+    "emoji_sound_cat_objects": True,
+    "emoji_sound_cat_symbols": True,
+    "emoji_sound_cat_flags": True,
+    "emoji_cat_smileys": True,
+    "emoji_cat_people": True,
+    "emoji_cat_animals": True,
+    "emoji_cat_food": True,
+    "emoji_cat_travel": True,
+    "emoji_cat_activities": True,
+    "emoji_cat_objects": True,
+    "emoji_cat_symbols": True,
+    "emoji_cat_flags": True,
+    "emoji_prefix_text_per_category": "{}",
+    "emoji_suffix_text_per_category": "{}",
+    "emoji_volume_per_category": "{}",
+    "emoji_sound_position_per_category": "{}",
+    "emoji_custom_descriptions": "{}",
+}
+
+_cached_emoji_config = dict(_DEFAULT_EMOJI_CONFIG)
 
 def refreshCachedConfig():
     global _cached_emoji_config
+    _cached_emoji_config = dict(_DEFAULT_EMOJI_CONFIG)
     ac = config.conf["audiothemes"]
-    _cached_emoji_config = {
-        "emoji_enabled": ac.get("emoji_enabled", True),
-        "emoji_sound": ac.get("emoji_sound", True),
-        "emoji_prefix": ac.get("emoji_prefix", True),
-        "emoji_prefix_text": ac.get("emoji_prefix_text", "emoji"),
-        "emoji_suffix_text": ac.get("emoji_suffix_text", "emoji"),
-        "emoji_volume": ac.get("emoji_volume", 20),
-        "emoji_position": ac.get("emoji_position", "before"),
-        "emoji_sound_position": ac.get("emoji_sound_position", "before"),
-        "emoji_repeat": ac.get("emoji_repeat", "per_emoji"),
-        "emoji_sound_repeat": ac.get("emoji_sound_repeat", "per_emoji"),
-        "emoji_prefix_repeat": ac.get("emoji_prefix_repeat", "per_emoji"),
-        "emoji_delay_before": int(ac.get("emoji_delay_before", 0)),
-        "emoji_delay_after": int(ac.get("emoji_delay_after", 0)),
-        "emoji_suppress_role_sound": ac.get("emoji_suppress_role_sound", False),
-        "emoji_blacklist": ac.get("emoji_blacklist", ""),
-    }
+    for key in _cached_emoji_config:
+        _cached_emoji_config[key] = ac.get(key, _cached_emoji_config[key])
+    _cached_emoji_config["emoji_delay_before"] = int(_cached_emoji_config["emoji_delay_before"])
+    _cached_emoji_config["emoji_delay_after"] = int(_cached_emoji_config["emoji_delay_after"])
 
 EMOJI_CATEGORY_SMILEYS = 0
 EMOJI_CATEGORY_PEOPLE = 1
@@ -273,39 +302,39 @@ def process_emoji_in_text(text):
 
 
 def is_emoji_enabled():
-    return _cached_emoji_config["emoji_enabled"] if _cached_emoji_config else config.conf["audiothemes"].get("emoji_enabled", True)
+    return _cached_emoji_config["emoji_enabled"]
 
 
 def is_emoji_sound_enabled():
-    return _cached_emoji_config["emoji_sound"] if _cached_emoji_config else config.conf["audiothemes"].get("emoji_sound", True)
+    return _cached_emoji_config["emoji_sound"]
 
 
 def is_emoji_prefix_enabled():
-    return _cached_emoji_config["emoji_prefix"] if _cached_emoji_config else config.conf["audiothemes"].get("emoji_prefix", True)
+    return _cached_emoji_config["emoji_prefix"]
 
 
 def get_emoji_prefix_text():
-    return _cached_emoji_config["emoji_prefix_text"] if _cached_emoji_config else config.conf["audiothemes"].get("emoji_prefix_text", "emoji")
+    return _cached_emoji_config["emoji_prefix_text"]
 
 
 def get_emoji_suffix_text():
-    return _cached_emoji_config["emoji_suffix_text"] if _cached_emoji_config else config.conf["audiothemes"].get("emoji_suffix_text", "emoji")
+    return _cached_emoji_config["emoji_suffix_text"]
 
 
 def get_emoji_volume():
-    return _cached_emoji_config["emoji_volume"] if _cached_emoji_config else config.conf["audiothemes"].get("emoji_volume", 20)
+    return _cached_emoji_config["emoji_volume"]
 
 
 def get_emoji_position():
-    return _cached_emoji_config["emoji_position"] if _cached_emoji_config else config.conf["audiothemes"].get("emoji_position", "before")
+    return _cached_emoji_config["emoji_position"]
 
 
 def get_emoji_sound_position():
-    return _cached_emoji_config["emoji_sound_position"] if _cached_emoji_config else config.conf["audiothemes"].get("emoji_sound_position", "before")
+    return _cached_emoji_config["emoji_sound_position"]
 
 
 def get_emoji_repeat():
-    return _cached_emoji_config["emoji_repeat"] if _cached_emoji_config else config.conf["audiothemes"].get("emoji_repeat", "per_emoji")
+    return _cached_emoji_config["emoji_repeat"]
 
 
 CATEGORY_TO_PROP = {
@@ -326,22 +355,22 @@ def get_special_prop_for_category(cat):
 
 
 def get_emoji_sound_repeat():
-    return _cached_emoji_config["emoji_sound_repeat"] if _cached_emoji_config else config.conf["audiothemes"].get("emoji_sound_repeat", "per_emoji")
+    return _cached_emoji_config["emoji_sound_repeat"]
 
 
 def get_emoji_prefix_repeat():
-    return _cached_emoji_config["emoji_prefix_repeat"] if _cached_emoji_config else config.conf["audiothemes"].get("emoji_prefix_repeat", "per_emoji")
+    return _cached_emoji_config["emoji_prefix_repeat"]
 
 
 def is_emoji_sound_category_enabled(cat):
     key = "emoji_sound_cat_" + CATEGORY_NAMES.get(cat, "smileys")
-    return config.conf["audiothemes"].get(key, True)
+    return _cached_emoji_config.get(key, True)
 
 
 def _get_json_config(key, default="{}"):
-    raw = config.conf["audiothemes"].get(key, default)
+    val = _cached_emoji_config.get(key, default)
     try:
-        return json.loads(raw) if isinstance(raw, str) else raw
+        return json.loads(val) if isinstance(val, str) else val
     except (json.JSONDecodeError, TypeError):
         return {}
 
@@ -367,19 +396,19 @@ def get_emoji_sound_position_for_category(cat):
 
 
 def get_emoji_delay_before():
-    return _cached_emoji_config["emoji_delay_before"] if _cached_emoji_config else int(config.conf["audiothemes"].get("emoji_delay_before", 0))
+    return _cached_emoji_config["emoji_delay_before"]
 
 
 def get_emoji_delay_after():
-    return _cached_emoji_config["emoji_delay_after"] if _cached_emoji_config else int(config.conf["audiothemes"].get("emoji_delay_after", 0))
+    return _cached_emoji_config["emoji_delay_after"]
 
 
 def is_emoji_suppress_role_sound():
-    return _cached_emoji_config["emoji_suppress_role_sound"] if _cached_emoji_config else config.conf["audiothemes"].get("emoji_suppress_role_sound", False)
+    return _cached_emoji_config["emoji_suppress_role_sound"]
 
 
 def is_emoji_blacklisted(emoji_char):
-    raw = _cached_emoji_config["emoji_blacklist"] if _cached_emoji_config else config.conf["audiothemes"].get("emoji_blacklist", "")
+    raw = _cached_emoji_config["emoji_blacklist"]
     return emoji_char in raw
 
 
@@ -392,4 +421,4 @@ def is_category_enabled(cat):
     key = _CATEGORY_CONFIG_KEYS.get(cat)
     if key is None:
         return True
-    return config.conf["audiothemes"].get(key, True)
+    return _cached_emoji_config.get(key, True)

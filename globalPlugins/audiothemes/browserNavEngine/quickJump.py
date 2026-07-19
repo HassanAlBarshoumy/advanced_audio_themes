@@ -1074,42 +1074,42 @@ def playBiwInThread(bookmark=None, earcon=None, volume=None):
         utils.getSoundsPath(),
         earcon or bookmark.builtInWavFile,
     )
-    f = wave.open(absPath,"r")
-    if f.getsampwidth() != 2:
-        bits = f.getsampwidth() * 8
-        raise RuntimeError(f"We only support 16-bit encoded wav files. '{fileName}' is encoded with {bits} bits per sample.")
-    buf =  f.readframes(f.getnframes())
-    bufSize = len(buf)
-    n = bufSize//2
-    unpacked = struct.unpack(f"<{n}h", buf)
-    unpacked = list(unpacked)
-    for i in range(n):
-        unpacked[i] = int(unpacked[i] * volume/100)
-    packed = struct.pack(f"<{n}h", *unpacked)
-    buf = ensure_mono(packed, f.getnchannels(), f.getframerate())
-    # Apply audio ducking
-    try:
-        from .. import frenzy
-        df = frenzy.get_ducking_factor("browsernav")
-        if df < 1.0:
-            buf = frenzy.apply_ducking_to_pcm(buf, df, 2)
-    except Exception:
-        pass
-    try:
-        outputDevice=config.conf["speech"]["outputDevice"]
-    except KeyError:
-        outputDevice=config.conf["audio"]["outputDevice"]
-    fileWavePlayer = nvwave.WavePlayer(
-        channels=f.getnchannels(),
-        samplesPerSec=f.getframerate(),
-        bitsPerSample=f.getsampwidth()*8,
-        outputDevice=outputDevice,
-        wantDucking=False,
-        purpose=nvwave.AudioPurpose.SOUNDS,
-    )
-    fileWavePlayer.stop()
-    fileWavePlayer.feed(buf)
-    fileWavePlayer.idle()
+    with wave.open(absPath,"r") as f:
+        if f.getsampwidth() != 2:
+            bits = f.getsampwidth() * 8
+            raise RuntimeError(f"We only support 16-bit encoded wav files. '{fileName}' is encoded with {bits} bits per sample.")
+        buf =  f.readframes(f.getnframes())
+        bufSize = len(buf)
+        n = bufSize//2
+        unpacked = struct.unpack(f"<{n}h", buf)
+        unpacked = list(unpacked)
+        for i in range(n):
+            unpacked[i] = int(unpacked[i] * volume/100)
+        packed = struct.pack(f"<{n}h", *unpacked)
+        buf = ensure_mono(packed, f.getnchannels(), f.getframerate())
+        # Apply audio ducking
+        try:
+            from .. import frenzy
+            df = frenzy.get_ducking_factor("browsernav")
+            if df < 1.0:
+                buf = frenzy.apply_ducking_to_pcm(buf, df, 2)
+        except Exception:
+            pass
+        try:
+            outputDevice=config.conf["speech"]["outputDevice"]
+        except KeyError:
+            outputDevice=config.conf["audio"]["outputDevice"]
+        fileWavePlayer = nvwave.WavePlayer(
+            channels=f.getnchannels(),
+            samplesPerSec=f.getframerate(),
+            bitsPerSample=f.getsampwidth()*8,
+            outputDevice=outputDevice,
+            wantDucking=False,
+            purpose=nvwave.AudioPurpose.SOUNDS,
+        )
+        fileWavePlayer.stop()
+        fileWavePlayer.feed(buf)
+        fileWavePlayer.idle()
 
 def getTextFast(info):
     fields = info.getTextWithFields()

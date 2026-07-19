@@ -187,6 +187,7 @@ spcFile=None
 spcPlayer=None
 spcBuf = None
 spcChannels = 2
+_spc_lock = threading.Lock()
 def skippedParagraphChime():
     import globalPlugins.audiothemes as at
     handler = getattr(at.GlobalPlugin, "_instance_handler", None)
@@ -194,25 +195,28 @@ def skippedParagraphChime():
         return
         
     global spcFile, spcPlayer, spcBuf, spcChannels
-    if spcPlayer is  None:
-        spcFile = wave.open(getSoundsPath() + "\\classic\\on.wav","r")
-        spcChannels = spcFile.getnchannels()
-        try:
-            outputDevice=config.conf["speech"]["outputDevice"]
-        except KeyError:
-            outputDevice=config.conf["audio"]["outputDevice"]
-        spcPlayer = nvwave.WavePlayer(
-            channels=spcChannels,
-            samplesPerSec=spcFile.getframerate(),
-            bitsPerSample=spcFile.getsampwidth()*8,
-            outputDevice=outputDevice,
-            wantDucking=False,
-            purpose=nvwave.AudioPurpose.SOUNDS,
-        )
-        spcFile.rewind()
-        spcFile.setpos(100 *         spcFile.getframerate() // 1000)
-        spcBuf = spcFile.readframes(spcFile.getnframes())
-        spcFile.close()
+    with _spc_lock:
+        if spcPlayer is not None:
+            pass
+        else:
+            spcFile = wave.open(getSoundsPath() + "\\classic\\on.wav","r")
+            spcChannels = spcFile.getnchannels()
+            try:
+                outputDevice=config.conf["speech"]["outputDevice"]
+            except KeyError:
+                outputDevice=config.conf["audio"]["outputDevice"]
+            spcPlayer = nvwave.WavePlayer(
+                channels=spcChannels,
+                samplesPerSec=spcFile.getframerate(),
+                bitsPerSample=spcFile.getsampwidth()*8,
+                outputDevice=outputDevice,
+                wantDucking=False,
+                purpose=nvwave.AudioPurpose.SOUNDS,
+            )
+            spcFile.rewind()
+            spcFile.setpos(100 *         spcFile.getframerate() // 1000)
+            spcBuf = spcFile.readframes(spcFile.getnframes())
+            spcFile.close()
     def playSkipParagraphChime():
         spcPlayer.stop()
         # Apply audio ducking

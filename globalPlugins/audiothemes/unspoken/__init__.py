@@ -249,7 +249,7 @@ class UnspokenPlayer:
 		self._last_played_lock = threading.Lock()
 		self._last_navigator_object = None
 
-		self._audio_queue = queue.Queue()
+		self._audio_queue = queue.Queue(maxsize=32)
 		self._generation = 0
 		self._generation_lock = threading.Lock()
 		self._play_cache = OrderedDict()
@@ -553,7 +553,10 @@ class UnspokenPlayer:
 		"""Queue processed audio data for the persistent worker thread"""
 		with self._generation_lock:
 			gen = self._generation
-		self._audio_queue.put((self.wave_player, audio_bytes, gen))
+		try:
+			self._audio_queue.put_nowait((self.wave_player, audio_bytes, gen))
+		except queue.Full:
+			pass
 
 	def play(self, obj_info, sound):
 		"""
@@ -885,7 +888,10 @@ class UnspokenPlayer:
 		"""Queue typing audio data for the persistent worker thread"""
 		with self._generation_lock:
 			gen = self._generation
-		self._audio_queue.put((player, audio_bytes, gen))
+		try:
+			self._audio_queue.put_nowait((player, audio_bytes, gen))
+		except queue.Full:
+			pass
 
 	def terminate(self):
 		# Stop worker thread
