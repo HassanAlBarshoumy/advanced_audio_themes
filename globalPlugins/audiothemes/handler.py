@@ -799,6 +799,7 @@ class AudioThemesHandler:
             except (ValueError, AttributeError):
                 pass
         self._theme_cache.clear()
+        _typing_dir_cache.clear()
 
     def shouldNukeRoleSpeech(self):
         if self.player.use_in_say_all and SayAllHandler.isRunning():
@@ -1232,13 +1233,22 @@ class AudioThemesHandler:
 
         theme = self.get_theme_for_app(foreground_app)
 
-        # 1. Check if the active theme has its own typingSounds folder
+        # 1. Check if the active theme has its own typingSounds folder (cached)
         theme_typing_dir = os.path.join(theme.directory, "typingSounds") if theme else None
         typing_dir = None
         
-        if theme_typing_dir and os.path.isdir(theme_typing_dir):
-            typing_dir = theme_typing_dir
-        else:
+        if theme_typing_dir:
+            _tc_key = ("isdir", theme_typing_dir)
+            _tcached = _typing_dir_cache.get(_tc_key)
+            if _tcached is None:
+                _tcached = os.path.isdir(theme_typing_dir)
+                if len(_typing_dir_cache) > 32:
+                    _typing_dir_cache.pop(next(iter(_typing_dir_cache)))
+                _typing_dir_cache[_tc_key] = _tcached
+            if _tcached:
+                typing_dir = theme_typing_dir
+        
+        if typing_dir is None:
             # 2. Fall back to the globally selected typing pack or app-specific pack
             typing_pack = self.get_typing_pack_for_app(foreground_app)
             typing_dir = os.path.join(os.path.dirname(__file__), "typingSounds", typing_pack)
@@ -1249,10 +1259,12 @@ class AudioThemesHandler:
             cache = _typing_dir_cache.get(typing_dir)
             if cache is None:
                 if os.path.isdir(typing_dir):
-                    files = [f for f in os.listdir(typing_dir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]  # typing packs are bundled as WAV/OGG/MP3 only
+                    files = [f for f in os.listdir(typing_dir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
                     cache = {'files': files}
                 else:
                     cache = {'files': []}
+                if len(_typing_dir_cache) > 32:
+                    _typing_dir_cache.pop(next(iter(_typing_dir_cache)))
                 _typing_dir_cache[typing_dir] = cache
             
             if cache['files']:
