@@ -447,7 +447,7 @@ def _load_cldr_emoji_data():
     from . import emoji_cldr_data
     emoji_cldr_data.load()
 
-core.postNvdaStartup.register(onPostNvdaStartup)
+_pp_post_startup_handler = core.postNvdaStartup.register(onPostNvdaStartup)
 
 originalSpeechSpeechSpeak = None
 originalSpeechCancel = None
@@ -865,7 +865,7 @@ def injectMonkeyPatches():
     
     #monkeyPatchRestoreProsodyInAllHighLevelSpeakFunctions()
 
-def  restoreMonkeyPatches():
+def restoreMonkeyPatches():
     # global originalSpeechSpeechSpeak, originalSpeechCancel
     speech.speech.speak = originalSpeechSpeechSpeak
     speech.speak = speech.speech.speak
@@ -884,8 +884,11 @@ def  restoreMonkeyPatches():
         config.post_configProfileSwitch.unregister(reloadRules)
     except (AttributeError, ValueError):
         pass
-    
-    #monkeyUnpatchRestoreProsodyInAllHighLevelSpeakFunctions()
+    from core import postNvdaStartup
+    try:
+        postNvdaStartup.unregister(onPostNvdaStartup)
+    except (AttributeError, ValueError):
+        pass
 
 
 def processRule(speechSequence, rule, symbolLevel):

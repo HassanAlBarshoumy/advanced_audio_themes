@@ -358,20 +358,6 @@ _DEFAULT_DUCKING_CATEGORIES = {
     "ui_beeps": True,
 }
 
-def _load_ducking_categories():
-    global _ducking_categories_json, _ducking_categories_dict
-    try:
-        raw = config.conf.get("audiothemes", {}).get("ducking_categories", "")
-        if raw == _ducking_categories_json:
-            return
-        _ducking_categories_json = raw
-        if raw:
-            _ducking_categories_dict = json.loads(raw)
-        else:
-            _ducking_categories_dict = {}
-    except Exception:
-        _ducking_categories_dict = {}
-
 def _track_speech_time():
     global last_speech_time
     last_speech_time = time.time()

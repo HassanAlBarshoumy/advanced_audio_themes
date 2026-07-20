@@ -687,6 +687,7 @@ class AudioThemesHandler:
         self._last_typing_time = 0.0
         self._last_typing_vk = 0
         self._cached_config = {}  # populated by configure()
+        self._system_monitor = None
         self.ensure_themes_dir()
         self.migrate_all_themes_to_named_files()
         self.configure()
@@ -1003,6 +1004,8 @@ class AudioThemesHandler:
             "enable_ffmpeg": user_config.get("enable_ffmpeg", False),
         }
         self.player._cached_config = self._cached_config
+        if self._system_monitor is not None:
+            self._system_monitor._cached_config = self._cached_config
         from .emoji_handler import refreshCachedConfig as _refreshEmojiConfig
         _refreshEmojiConfig()
         from .phoneticPunctuation import refreshCachedConfig as _refreshPpConfig
@@ -1024,7 +1027,7 @@ class AudioThemesHandler:
     def _start_system_status_monitoring(self):
         try:
             from .systemStatus import SystemStatusMonitor
-            self._system_monitor = SystemStatusMonitor(self._play_system_sound)
+            self._system_monitor = SystemStatusMonitor(self._play_system_sound, self._cached_config)
             self._system_monitor.start()
         except Exception as e:
             log.debugWarning(f"Failed to start system status monitor: {e}")

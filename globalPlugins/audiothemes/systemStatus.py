@@ -126,8 +126,9 @@ class SystemStatusMonitor:
     _battery_timer_id = 1
     _network_timer_id = 2
 
-    def __init__(self, callback):
+    def __init__(self, callback, cached_config=None):
         self._callback = lambda *args: wx.CallAfter(callback, *args)
+        self._cached_config = cached_config or {}
         self._running = False
         self._thread = None
         self._hwnd = None
@@ -212,10 +213,9 @@ class SystemStatusMonitor:
     def _register_device_notifications(self):
         try:
             from .handler import SpecialProps
-            from config import conf
         except Exception:
             return
-        use_all_usb = conf["audiothemes"].get("sys_all_usb", True)
+        use_all_usb = self._cached_config.get("sys_all_usb", True)
 
         # Register for USB device interface notifications (all USB devices)
         if use_all_usb:
@@ -340,7 +340,6 @@ class SystemStatusMonitor:
     def _check_battery_level(self):
         try:
             from .handler import SpecialProps
-            from config import conf
         except Exception:
             return
         try:
@@ -351,8 +350,8 @@ class SystemStatusMonitor:
             percent = sps.BatteryLifePercent
             if percent == 255:
                 return
-            low_threshold = int(conf["audiothemes"].get("sys_battery_low_threshold", 20))
-            critical_threshold = int(conf["audiothemes"].get("sys_battery_critical_threshold", 10))
+            low_threshold = int(self._cached_config.get("sys_battery_low_threshold", 20))
+            critical_threshold = int(self._cached_config.get("sys_battery_critical_threshold", 10))
 
             if self._last_battery_percent is not None:
                 if percent <= critical_threshold < self._last_battery_percent:

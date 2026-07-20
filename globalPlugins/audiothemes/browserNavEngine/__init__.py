@@ -374,11 +374,12 @@ jupyterUpdateInProgress = False
 originalExecuteGesture = None
 blockBeeper = Beeper()
 blockKeysUntil = 0
+_post_startup_handler = None
 def _installExecuteGesturePatch():
     global originalExecuteGesture
     originalExecuteGesture = inputCore.InputManager.executeGesture
     inputCore.InputManager.executeGesture = preExecuteGesture
-core.postNvdaStartup.register(_installExecuteGesturePatch)
+_post_startup_handler = core.postNvdaStartup.register(_installExecuteGesturePatch)
 
 def preExecuteGesture(selfself, gesture, *args, **kwargs):
     now = time.time()
@@ -858,7 +859,11 @@ class BrowserNavMixin:
             del editableText.EditableText._EditableText__gestures['kb:NVDA+E']
         except KeyError:
             pass
-        
+        from core import postNvdaStartup
+        try:
+            postNvdaStartup.unregister(_installExecuteGesturePatch)
+        except (ValueError, AttributeError):
+            pass
 
     def maybeAdjustOperator(self, op):
         mode = getConfig("browserMode")
