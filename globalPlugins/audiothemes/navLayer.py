@@ -59,9 +59,6 @@ class NavLayerMixin:
         {"id": "object", "name": _("Objects") if "_" in globals() else "Objects", "type": "vk", "vk": ord('O')},
         {"id": "textBlock", "name": _("text blocks") if "_" in globals() else "text blocks", "type": "vk", "vk": ord('N')},
         {"id": "search", "name": _("Searches") if "_" in globals() else "Searches", "type": "vk", "vk": 114}, # VK_F3
-        {"id": "tableCell", "name": _("Table cells") if "_" in globals() else "Table cells", "type": "table"},
-        {"id": "tableColumn", "name": _("Table columns") if "_" in globals() else "Table columns", "type": "table"},
-        {"id": "smart", "name": _("Smart") if "_" in globals() else "Smart", "type": "smart"},
     ]
 
     def __init__(self, *args, **kwargs):
@@ -81,36 +78,6 @@ class NavLayerMixin:
             "kb:c": "navLayerCopy",
             "kb:s": "navLayerSpell",
         }
-
-    _smart_nav_cache = {}
-    _smart_nav_cache_lock = threading.Lock()
-
-    def _detect_nav_context(self):
-        """Detect navigation context: 'table', 'browse', or 'default'. Cached per focus object."""
-        focus = api.getFocusObject()
-        focus_id = id(focus)
-        with NavLayerMixin._smart_nav_cache_lock:
-            if focus_id in NavLayerMixin._smart_nav_cache:
-                return NavLayerMixin._smart_nav_cache[focus_id]
-        result = "default"
-        try:
-            import documentBase
-            ti = getattr(focus, "treeInterceptor", None)
-            if ti and isinstance(ti, documentBase.DocumentWithTableNavigation) and not ti.passThrough:
-                try:
-                    ti._getTableCellCoords(ti.selection)
-                    result = "table"
-                except (LookupError, Exception):
-                    pass
-            if result == "default" and ti and hasattr(ti, "passThrough") and not ti.passThrough:
-                result = "browse"
-        except Exception:
-            pass
-        with NavLayerMixin._smart_nav_cache_lock:
-            if len(NavLayerMixin._smart_nav_cache) > 100:
-                NavLayerMixin._smart_nav_cache.clear()
-            NavLayerMixin._smart_nav_cache[focus_id] = result
-        return result
 
     def _loadActiveModes(self):
         nlConf = self._get_nl_cache()
@@ -355,42 +322,3 @@ class NavLayerMixin:
             vk = mode["vk"]
             shift = (direction == -1)
             self._sendVKKey(vk, shift=shift)
-
-        elif mode["type"] == "table":
-            focus = api.getFocusObject()
-            ti = getattr(focus, "treeInterceptor", None)
-            try:
-                import documentBase
-                table_ok = (
-                    isinstance(ti, documentBase.DocumentWithTableNavigation)
-                    and not ti.passThrough
-                )
-            except Exception:
-                table_ok = False
-            if not table_ok:
-                self._playNavTone(300, 100)
-                ui.message(_("Not in a table") if "_" in globals() else "Not in a table")
-                return
-            try:
-                ti._getTableCellCoords(ti.selection)
-            except (LookupError, Exception):
-                self._playNavTone(300, 100)
-                ui.message(_("Not in a table") if "_" in globals() else "Not in a table")
-                return
-            self._playNavTone(400, 20)
-            if mode["id"] == "tableCell":
-                key = "control+alt+upArrow" if direction == -1 else "control+alt+downArrow"
-                self._sendNormalKey(key)
-            elif mode["id"] == "tableColumn":
-                key = "control+alt+leftArrow" if direction == -1 else "control+alt+rightArrow"
-                self._sendNormalKey(key)
-
-        elif mode["type"] == "smart":
-            ctx = self._detect_nav_context()
-            self._playNavTone(400, 20)
-            if ctx == "table":
-                key = "control+alt+upArrow" if direction == -1 else "control+alt+downArrow"
-                self._sendNormalKey(key)
-            else:
-                key = "upArrow" if direction == -1 else "downArrow"
-                self._sendNormalKey(key)
