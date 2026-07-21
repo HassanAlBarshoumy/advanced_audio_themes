@@ -115,6 +115,27 @@ def _text_contains_emoji(text):
 import weakref
 _snapshot_cache = weakref.WeakKeyDictionary()
 
+
+class DoubleTapDetector:
+    """Detects double-tap gestures within a configurable time window."""
+
+    def __init__(self, window=0.5):
+        import threading as _threading
+        self._window = window
+        self._last_time = {}
+        self._lock = _threading.Lock()
+
+    def is_double_tap(self, gesture_name):
+        """Returns True if this gesture was pressed twice within the window."""
+        now = time.monotonic()
+        with self._lock:
+            last = self._last_time.get(gesture_name, 0)
+            if now - last < self._window:
+                self._last_time[gesture_name] = 0
+                return True
+            self._last_time[gesture_name] = now
+            return False
+
 class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPluginHandler.GlobalPlugin):
 
     scriptCategory = "Advanced Audio Themes"
@@ -352,6 +373,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self._helpDialog = None
         self._helpPending = False
         self._studioDialog = None
+        self._double_tap = DoubleTapDetector()
+        self._in_detailed_review = False
         self._clipboard_mgr = ClipboardManager(self.handler)
         self._rebindInstanceGestures()
         wx.CallAfter(showPendingConflicts)
@@ -727,6 +750,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         (-2147417842, RPC_E_WRONG_THREAD) that occurred when playObject()
         accessed obj.states / obj.role from a worker thread.
         """
+        self._in_detailed_review = False
         self._last_focused_obj = obj
         self._last_focus_time = time.monotonic()
         self._last_play_time = self._last_focus_time
@@ -1648,3 +1672,46 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     # Clipboard detection is handled via keyboard hook in _new_keyDownEvent
     # to avoid breaking NVDA's built-in clipboard handling.
     # ────────────────────────────────────────────────
+
+    # ── Smart Navigation: double-tap say commands ──────────────────────
+    # Single tap delegates to NVDA built-in. Double-tap sets
+    # _in_detailed_review = True (cleared on focus change) and reads
+    # with character descriptions.
+    @script(
+        description=_("Reports the character at the review cursor. Double-tap for detailed description."),
+        gestures=["kb:NVDA+numpad3", "kb(laptop):NVDA+."],
+        category="Audio Themes",
+    )
+    def script_smartSayCharacter(self, gesture):
+        count = scriptHandler.getLastScriptRepeatCount()
+        if count == 0:
+            globalCommands.commands.script_review_currentCharacter(gesture)
+        else:
+            self._in_detailed_review = True
+            globalCommands.commands.script_review_currentCharacter(gesture)
+
+    @script(
+        description=_("Reports the word at the review cursor. Double-tap for detailed spelling."),
+        gestures=["kb:NVDA+numpad2", "kb(laptop):NVDA+shift+."],
+        category="Audio Themes",
+    )
+    def script_smartSayWord(self, gesture):
+        count = scriptHandler.getLastScriptRepeatCount()
+        if count == 0:
+            globalCommands.commands.script_review_currentWord(gesture)
+        else:
+            self._in_detailed_review = True
+            globalCommands.commands.script_review_currentWord(gesture)
+
+    @script(
+        description=_("Reports the line at the review cursor. Double-tap for detailed spelling."),
+        gestures=["kb:NVDA+numpad1", "kb(laptop):NVDA+shift+l"],
+        category="Audio Themes",
+    )
+    def script_smartSayLine(self, gesture):
+        count = scriptHandler.getLastScriptRepeatCount()
+        if count == 0:
+            globalCommands.commands.script_review_currentLine(gesture)
+        else:
+            self._in_detailed_review = True
+            globalCommands.commands.script_review_currentLine(gesture)
