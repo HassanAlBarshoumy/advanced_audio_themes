@@ -62,6 +62,29 @@ from controlTypes import OutputReason
 from config.configFlags import ReportLineIndentation
 
 
+_ctypes_mod = __import__('_ctypes')
+
+ROLE_TO_FORMAT_KEY = {
+    controlTypes.Role.LINK: "reportLinks",
+    controlTypes.Role.HEADING: "reportHeadings",
+    controlTypes.Role.TABLE: "reportTables",
+    controlTypes.Role.LIST: "reportLists",
+    controlTypes.Role.BLOCKQUOTE: "reportBlockQuotes",
+    controlTypes.Role.FRAME: "reportFrames",
+    controlTypes.Role.LANDMARK: "reportLandmarks",
+    controlTypes.Role.ARTICLE: "reportArticles",
+    controlTypes.Role.COMMENT: "reportComments",
+}
+
+_IGNORED_ROLES = frozenset({
+    getattr(controlTypes.Role.DOCUMENT, "value", controlTypes.Role.DOCUMENT),
+    getattr(controlTypes.Role.PARAGRAPH, "value", controlTypes.Role.PARAGRAPH),
+    getattr(controlTypes.Role.SECTION, "value", controlTypes.Role.SECTION),
+    getattr(controlTypes.Role.TEXTFRAME, "value", controlTypes.Role.TEXTFRAME),
+    getattr(controlTypes.Role.PANE, "value", controlTypes.Role.PANE),
+    getattr(controlTypes.Role.WINDOW, "value", controlTypes.Role.WINDOW),
+})
+
 _DEFAULT_FRENZY_CONFIG = {
     "speak_roles": True,
     "announceFormat": "0",
@@ -182,7 +205,7 @@ def new_getObjectPropertiesSpeech(
                     
         try:
             orig_res = original_getObjectPropertiesSpeech(obj, reason=reason, _prefixSpeechCommand=None, **patchedProps)
-        except (Exception, __import__('_ctypes').COMError):
+        except (Exception, _ctypes_mod.COMError):
             orig_res = []
         
         cleaned_orig_res = []
@@ -373,6 +396,7 @@ def _tracking_speak(sequence):
         _original_speak(sequence)
 
 def get_ducking_factor(category="theme_sounds", cached_config=None):
+    global _ducking_categories_json, _ducking_categories_dict
     try:
         if cached_config is None:
             cached_config = _frenzy_cached_config
@@ -400,10 +424,7 @@ def apply_ducking_to_pcm(pcm_bytes, df, sample_width=2):
     if _HAS_AUDIOOP and sample_width != 1:
         return audioop.mul(pcm_bytes, sample_width, df)
     if sample_width == 2:
-        arr = array('h')
-        arr.frombytes(pcm_bytes)
-        for i in range(len(arr)):
-            arr[i] = int(arr[i] * df)
+        arr = array('h', (int(x * df) for x in array('h', pcm_bytes)))
         return arr.tobytes()
     elif sample_width == 1:
         arr = array('b')
@@ -792,18 +813,7 @@ def new_getTextInfoSpeech(
     processHeadings = True
     
     # Dynamically override formatConfig for roles/states that have active speech rules
-    role_to_format_key = {
-        controlTypes.Role.LINK: "reportLinks",
-        controlTypes.Role.HEADING: "reportHeadings",
-        controlTypes.Role.TABLE: "reportTables",
-        controlTypes.Role.LIST: "reportLists",
-        controlTypes.Role.BLOCKQUOTE: "reportBlockQuotes",
-        controlTypes.Role.FRAME: "reportFrames",
-        controlTypes.Role.LANDMARK: "reportLandmarks",
-        controlTypes.Role.ARTICLE: "reportArticles",
-        controlTypes.Role.COMMENT: "reportComments",
-    }
-    for r, key in role_to_format_key.items():
+    for r, key in ROLE_TO_FORMAT_KEY.items():
         if getActiveRuleContext(roleRules.get(r, []), appName, windowTitle, url) is not None:
             formatConfig[key] = True
 
@@ -1419,15 +1429,7 @@ def new_getControlFieldSpeech(
                         role = attrs.get('role')
                         if role is not None:
                             role_val = getattr(role, "value", role)
-                            ignored = {
-                                getattr(controlTypes.Role.DOCUMENT, "value", controlTypes.Role.DOCUMENT),
-                                getattr(controlTypes.Role.PARAGRAPH, "value", controlTypes.Role.PARAGRAPH),
-                                getattr(controlTypes.Role.SECTION, "value", controlTypes.Role.SECTION),
-                                getattr(controlTypes.Role.TEXTFRAME, "value", controlTypes.Role.TEXTFRAME),
-                                getattr(controlTypes.Role.PANE, "value", controlTypes.Role.PANE),
-                                getattr(controlTypes.Role.WINDOW, "value", controlTypes.Role.WINDOW)
-                            }
-                            if role_val not in ignored:
+                            if role_val not in _IGNORED_ROLES:
                                 # Play Audio Themes role sound during speech
                                 heading_level = None
                                 if role == controlTypes.Role.HEADING:
@@ -1446,19 +1448,7 @@ def new_getControlFieldSpeech(
     
     original_format = {}
     original_formatConfig_values = {}
-    role_to_format_key = {
-        controlTypes.Role.LINK: "reportLinks",
-        controlTypes.Role.HEADING: "reportHeadings",
-        controlTypes.Role.TABLE: "reportTables",
-        controlTypes.Role.LIST: "reportLists",
-        controlTypes.Role.BLOCKQUOTE: "reportBlockQuotes",
-        controlTypes.Role.FRAME: "reportFrames",
-        controlTypes.Role.LANDMARK: "reportLandmarks",
-        controlTypes.Role.ARTICLE: "reportArticles",
-        controlTypes.Role.COMMENT: "reportComments",
-    }
-    heading_has_rule = False
-    for r, key in role_to_format_key.items():
+    for r, key in ROLE_TO_FORMAT_KEY.items():
         has_active_rule = getActiveRuleContext(roleRules.get(r, []), appName, windowTitle, url) is not None
         
         if not has_active_rule and r == controlTypes.Role.HEADING:
@@ -1510,8 +1500,6 @@ def new_getControlFieldSpeech(
 
     result2 = []
     
-    appName, windowTitle, url = utils.getCurrentContext()
-    
     # Calculate heading level rules once
     headingLevelRules = {
         level: getActiveRuleContext(formatRules.get(getattr(TextFormat, f'HEADING{level}'), []), appName, windowTitle, url)
@@ -1522,7 +1510,7 @@ def new_getControlFieldSpeech(
     patched_attrs = attrs.copy()
     if 'role' in patched_attrs:
         patched_role = patched_attrs['role']
-        fmt_key = role_to_format_key.get(patched_role)
+        fmt_key = ROLE_TO_FORMAT_KEY.get(patched_role)
         if fmt_key and not original_format.get(fmt_key, True):
             patched_attrs.pop('role', None)
             patched_attrs.pop('level', None)

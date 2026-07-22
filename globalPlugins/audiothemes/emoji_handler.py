@@ -48,15 +48,25 @@ _DEFAULT_EMOJI_CONFIG = {
 }
 
 _cached_emoji_config = dict(_DEFAULT_EMOJI_CONFIG)
+_cached_json_configs = {}
 
 def refreshCachedConfig():
-    global _cached_emoji_config
+    global _cached_emoji_config, _cached_json_configs
     _cached_emoji_config = dict(_DEFAULT_EMOJI_CONFIG)
     ac = config.conf["audiothemes"]
     for key in _cached_emoji_config:
         _cached_emoji_config[key] = ac.get(key, _cached_emoji_config[key])
     _cached_emoji_config["emoji_delay_before"] = int(_cached_emoji_config["emoji_delay_before"])
     _cached_emoji_config["emoji_delay_after"] = int(_cached_emoji_config["emoji_delay_after"])
+    _cached_json_configs = {}
+    for key in ("emoji_prefix_text_per_category", "emoji_suffix_text_per_category",
+                "emoji_volume_per_category", "emoji_sound_position_per_category",
+                "emoji_custom_description_per_category"):
+        raw = _cached_emoji_config.get(key, "{}")
+        try:
+            _cached_json_configs[key] = json.loads(raw) if isinstance(raw, str) else raw
+        except (json.JSONDecodeError, TypeError):
+            _cached_json_configs[key] = {}
 
 EMOJI_CATEGORY_SMILEYS = 0
 EMOJI_CATEGORY_PEOPLE = 1
@@ -368,6 +378,9 @@ def is_emoji_sound_category_enabled(cat):
 
 
 def _get_json_config(key, default="{}"):
+    result = _cached_json_configs.get(key)
+    if result is not None:
+        return result
     val = _cached_emoji_config.get(key, default)
     try:
         return json.loads(val) if isinstance(val, str) else val

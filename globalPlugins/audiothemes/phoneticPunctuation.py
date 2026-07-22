@@ -537,10 +537,12 @@ class EmojiSoundCommand(speech.commands.BaseCallbackCommand):
 
 # Module-level flag for emoji role sound suppression
 _suppress_role_sound_flag = False
+_suppress_role_sound_lock = threading.Lock()
 
 def _processEmojiSequence(sequence):
     global _suppress_role_sound_flag
-    _suppress_role_sound_flag = False
+    with _suppress_role_sound_lock:
+        _suppress_role_sound_flag = False
     master_enabled = is_emoji_enabled()
     if not master_enabled:
         return sequence
@@ -571,10 +573,8 @@ def _processEmojiSequence(sequence):
             continue
 
         # Suppress role sound for this utterance if enabled
-        if suppress_role:
-            _suppress_role_sound_flag = True
-        else:
-            _suppress_role_sound_flag = False
+        with _suppress_role_sound_lock:
+            _suppress_role_sound_flag = suppress_role
 
         # Filter blacklisted emojis
         emojis = [(e, c, s, en) for e, c, s, en in emojis if not is_emoji_blacklisted(e)]
@@ -719,7 +719,8 @@ speechCancelledFlag = False
 
 def is_emoji_suppress_role_flag_set():
     """Check if the current utterance should suppress role sounds due to emoji presence."""
-    return _suppress_role_sound_flag
+    with _suppress_role_sound_lock:
+        return _suppress_role_sound_flag
 
 def preCancelSpeech(*args, **kwargs):
     global speechCancelledFlag
@@ -915,6 +916,7 @@ def postProcessSynchronousCommands(speechSequence, symbolLevel):
     language=speech.getCurrentLanguage()
     def isEmptyString(command):
         return isinstance(command, str) and speech.isBlank(speech.processText(language,command,symbolLevel))
+    hasNonEmptyString = False
     newSequence = []
     excludeIndices = set()
     for i, command in enumerate(speechSequence):
@@ -939,23 +941,31 @@ def postProcessSynchronousCommands(speechSequence, symbolLevel):
             # Removed BreakCommand to allow speech and audio to play simultaneously without delay
             # newSequence.append(speech.commands.BreakCommand(duration))
         elif not isEmptyString(command):
+            if isinstance(command, str):
+                hasNonEmptyString = True
             newSequence.append(command)
-    newSequence = eloquenceFix(newSequence, language, symbolLevel)
+    newSequence = eloquenceFix(newSequence, hasNonEmptyString)
     newSequence = unmaskMaskedStrings(newSequence)
     newSequence = fixProsodyCommands(newSequence)
     return newSequence
 
-def eloquenceFix(speechSequence, language, symbolLevel):
+def eloquenceFix(speechSequence, hasNonEmptyString=None):
     """
     With some versions of eloquence driver, when the entire utterance has been replaced with audio icons, and therefore there is nothing else to speak,
     the driver for some reason issues the callback command after the break command, not before.
     To work around this, we detect this case and remove break command completely.
     """
-    nonEmpty = [element for element in speechSequence
-        if  isinstance(element, str)
-        and not speech.isBlank(speech.processText(language,element,symbolLevel))
-    ]
-    if len(nonEmpty) > 0:
+    if hasNonEmptyString is not None:
+        hasNonEmpty = hasNonEmptyString
+    else:
+        language = speech.getCurrentLanguage()
+        symbolLevel = _cached_speech_symbolLevel
+        hasNonEmpty = any(
+            isinstance(element, str)
+            and not speech.isBlank(speech.processText(language, element, symbolLevel))
+            for element in speechSequence
+        )
+    if hasNonEmpty:
         return speechSequence
     indicesToRemove = []
     for i in range(1, len(speechSequence)):
@@ -1026,7 +1036,7 @@ def fixProsodyCommands(sequence):
             else:
                 prosodyStacks[cls].append(prosodyOffsets[cls])
                 prosodyOffsets[cls] += commandOffset
-            command = copy.deepcopy(command)
+            command = copy.copy(command)
             # Let's make sure the offset doesn't go beyond (0, 100) interval - otherwise synths will ignore this command.
             ps = findProsodySetting(cls)
             if ps is not None:

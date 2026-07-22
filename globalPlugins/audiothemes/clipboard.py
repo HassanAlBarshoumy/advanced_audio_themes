@@ -37,6 +37,8 @@ ACTION_MAP = {
 class ClipboardManager:
     def __init__(self, handler):
         self._handler = handler
+        self._cached_custom_texts = {}
+        self._cached_custom_texts_raw = None
 
     def _clip_conf(self):
         return getattr(self._handler, '_cached_config', None) or {}
@@ -65,11 +67,12 @@ class ClipboardManager:
         if play_sound:
             self._handler.play_clipboard_sound(special_prop)
         if speak:
-            custom_texts = {}
-            try:
-                raw = conf.get("clipboard_custom_texts", "{}")
-                custom_texts = json.loads(raw) if isinstance(raw, str) else raw
-            except Exception:
-                pass
-            text = custom_texts.get(action_id, _(default_speech))
+            raw = conf.get("clipboard_custom_texts", "{}")
+            if raw != self._cached_custom_texts_raw:
+                self._cached_custom_texts_raw = raw
+                try:
+                    self._cached_custom_texts = json.loads(raw) if isinstance(raw, str) else raw
+                except Exception:
+                    self._cached_custom_texts = {}
+            text = self._cached_custom_texts.get(action_id, _(default_speech))
             ui.message(text)

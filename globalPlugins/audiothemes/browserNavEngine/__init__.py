@@ -624,11 +624,12 @@ selectionHistoryLock = threading.Lock()
 def purgeSelectionHistory():
     # Purge expired entries
     global selectionHistory
-    selectionHistory = {
-        k:v
-        for k,v in selectionHistory.items()
-        if k() is not None
-    }
+    with selectionHistoryLock:
+        selectionHistory = {
+            k:v
+            for k,v in selectionHistory.items()
+            if k() is not None
+        }
 def pre_set_selection(self, info):
     try:
         sh = self.selectionHistory
@@ -871,11 +872,11 @@ class BrowserNavMixin:
         if mode != 0 or margin == 0:
             return op
         if op == operator.eq:
-            return margin_eq
+            return lambda x, y: abs(x - y) <= margin
         elif op == operator.lt:
-            return margin_lt
+            return lambda x, y: (y - x) > margin
         elif op == operator.gt:
-            return margin_gt
+            return lambda x, y: (x - y) > margin
         else:
             raise RuntimeError
 

@@ -37,11 +37,13 @@ import wx
 from logHandler import log
 
 _cached_doc_formatting = {}
+_cached_sentencenav_config = {}
 _sn_cached_chime_volume = 10
 _sn_cached_paragraph_chime_volume = 10
 
 def _refresh_doc_formatting():
     global _cached_doc_formatting, _sn_cached_chime_volume, _sn_cached_paragraph_chime_volume
+    global _cached_sentencenav_config
     try:
         _cached_doc_formatting = config.conf["documentFormatting"]
     except Exception:
@@ -54,6 +56,11 @@ def _refresh_doc_formatting():
         _sn_cached_paragraph_chime_volume = config.conf["sentencenav"]["paragraphChimeVolume"]
     except Exception:
         _sn_cached_paragraph_chime_volume = 10
+    try:
+        sn = config.conf["sentencenav"]
+        _cached_sentencenav_config = {k: sn[k] for k in sn}
+    except Exception:
+        _cached_sentencenav_config = {}
 
 # --- Compatibility shims for NVDA 2024+ / 2026+ ---
 try:
@@ -129,7 +136,7 @@ def initSentenceNavConfiguration():
 
 
 def getSNConfig(key, lang=None):
-    value = config.conf["sentencenav"][key]
+    value = _cached_sentencenav_config.get(key, config.conf["sentencenav"][key])
     if lang is None:
         return value
     try:

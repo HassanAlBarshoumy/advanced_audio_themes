@@ -8,6 +8,8 @@ import tones
 import config
 import threading
 import winUser
+import inputCore
+from speech.sayAll import SayAllHandler
 from scriptHandler import script
 from globalCommands import commands
 import addonHandler
@@ -28,7 +30,6 @@ class NavLayerMixin:
     def _playNavTone(self, pitch, duration):
         nlConf = self._get_nl_cache()
         if nlConf.get("navLayerPlaySounds", True):
-            import tones
             tones.beep(pitch, duration)
 
     _ALL_MODES = [
@@ -254,14 +255,12 @@ class NavLayerMixin:
             except (LookupError, ValueError):
                 pass
         
-        from speech.sayAll import SayAllHandler
         SayAllHandler.stop()
         self._playNavTone(800, 50)
         wx.CallAfter(wx.CallLater, 60, lambda: self._playNavTone(600, 50))
         ui.message(_("Exited navigation layer") if "_" in globals() else "Exited navigation layer")
 
     def _sendNormalKey(self, keyName):
-        import inputCore
         try:
             gest = keyboardHandler.KeyboardInputGesture.fromName(keyName)
         except LookupError:
@@ -275,13 +274,10 @@ class NavLayerMixin:
         except inputCore.NoInputGestureAction:
             self._playNavTone(300, 100)
         finally:
-            from speech.sayAll import SayAllHandler
             SayAllHandler.stop()
             self._navLayerActive = True
 
     def _sendVKKey(self, vk, shift=False):
-        import inputCore
-        import winUser
         modifiers = set()
         if shift:
             modifiers.add((winUser.VK_SHIFT, False))
@@ -295,7 +291,6 @@ class NavLayerMixin:
         except inputCore.NoInputGestureAction:
             self._playNavTone(300, 100)
         finally:
-            from speech.sayAll import SayAllHandler
             SayAllHandler.stop()
             self._navLayerActive = True
 

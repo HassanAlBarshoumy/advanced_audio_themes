@@ -65,6 +65,8 @@ NATIVE_FORMATS = {"ogg", "wav", "mp3", "flac"}
 # Formats that require FFmpeg
 FFMPEG_ONLY_FORMATS = {"m4a", "aac", "opus", "wma", "mp2", "ac3"}
 
+SPECIAL_TYPING_FILES = frozenset({"enter.wav", "backspace.wav", "space.wav", "shift.wav", "ctrl.wav", "alt.wav", "win.wav"})
+
 def get_active_file_types():
     try:
         from config import conf
@@ -1313,8 +1315,7 @@ class AudioThemesHandler:
                         sound_path = os.path.join(typing_dir, expected_file)
                 
                 if not sound_path:
-                    special_files = {"enter.wav", "backspace.wav", "space.wav", "shift.wav", "ctrl.wav", "alt.wav", "win.wav"}
-                    valid_choices = [f for f in cache['files'] if f not in special_files]
+                    valid_choices = [f for f in cache['files'] if f not in SPECIAL_TYPING_FILES]
                     if valid_choices:
                         sound_path = os.path.join(typing_dir, random.choice(valid_choices))
                     else:

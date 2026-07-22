@@ -203,17 +203,20 @@ def initConfiguration():
     config.conf.spec[phoneticPunctuationConfigKey] = confspec
     refreshPpConfigCache()
 
+_sounds_path_cache = os.path.join(
+    os.path.split(os.path.split(os.path.abspath(os.path.dirname(__file__)))[0])[0],
+    "sounds"
+)
+
 def getSoundsPath():
-    globalPluginPath = os.path.abspath(os.path.dirname(__file__))
-    addonPath = os.path.split(globalPluginPath)[0]
-    addonPath = os.path.split(addonPath)[0]
-    soundsPath = os.path.join(addonPath, "sounds")
-    return soundsPath
+    return _sounds_path_cache
 
 _cached_blacklist_string = None
 _cached_blacklist_set = set()
+_blacklist_lock = threading.Lock()
 
 def isAppBlacklisted():
+    global _cached_blacklist_string, _cached_blacklist_set
     try:
         handler = _handler_ref
         appName = getattr(handler, '_current_app_name', "")
@@ -222,11 +225,11 @@ def isAppBlacklisted():
     if not appName:
         return False
         
-    global _cached_blacklist_string, _cached_blacklist_set
     current_blacklist = getConfig("applicationsBlacklist")
-    if current_blacklist != _cached_blacklist_string:
-        _cached_blacklist_string = current_blacklist
-        _cached_blacklist_set = {app.strip().lower() for app in current_blacklist.split(",") if app.strip()}
+    with _blacklist_lock:
+        if current_blacklist != _cached_blacklist_string:
+            _cached_blacklist_string = current_blacklist
+            _cached_blacklist_set = {app.strip().lower() for app in current_blacklist.split(",") if app.strip()}
         
     app_lower = appName.lower()
     if app_lower in _cached_blacklist_set:

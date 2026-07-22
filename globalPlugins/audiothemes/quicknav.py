@@ -5,6 +5,8 @@ from inputCore import InputGesture
 import controlTypes
 from . import common
 from . import frenzy
+from . import utils
+from .handler import role_name_to_int
 
 class BrowseModeQuickNavInterceptor:
     def __init__(self, handler):
@@ -101,7 +103,6 @@ class BrowseModeQuickNavInterceptor:
                     
             if role is not None:
                 theme = self.handler.active_theme
-                from .handler import role_name_to_int
                 sound_key = role_name_to_int.get(itemType.lower())
                 if sound_key is None:
                     sound_key = role_name_to_int.get(itemType.upper(), role)
@@ -117,7 +118,6 @@ class BrowseModeQuickNavInterceptor:
                 if sound_obj is None:
                     return played
                 obj_info = {"role": role, "name": itemType, "is_quicknav": True}
-                from . import utils
                 utils.threadPool.add_task(self.handler.play, obj_info, sound_key)
                 played = True
 

@@ -21,12 +21,14 @@ def _get_synchronous_player():
     return nvwave.WavePlayer(channels=2, samplesPerSec=int(tones.SAMPLE_RATE), bitsPerSample=16, outputDevice=_get_output_device(), wantDucking=True, purpose=nvwave.AudioPurpose.SOUNDS)
 
 _pp_sync_player = None
+_pp_player_lock = threading.Lock()
 
 def _get_pp_player():
     global _pp_sync_player
-    if _pp_sync_player is None:
-        _pp_sync_player = _get_synchronous_player()
-    return _pp_sync_player
+    with _pp_player_lock:
+        if _pp_sync_player is None:
+            _pp_sync_player = _get_synchronous_player()
+        return _pp_sync_player
 
 # Global pool for WavePlayers keyed by (channels, sample_rate, ducking)
 _wave_player_pool = {}
@@ -91,10 +93,7 @@ def _apply_ducking(pcm_bytes, df):
         return frenzy.apply_ducking_to_pcm(pcm_bytes, df)
     except Exception:
         pass
-    arr = array.array('h')
-    arr.frombytes(pcm_bytes)
-    for i in range(len(arr)):
-        arr[i] = int(arr[i] * df)
+    arr = array.array('h', (int(x * df) for x in array.array('h', pcm_bytes)))
     return arr.tobytes()
 
 def _reverb_cache_put(key, value):
