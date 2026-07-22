@@ -147,7 +147,11 @@ def new_getObjectPropertiesSpeech(
         roleFormatsDict = {}
     
     # Determine format for this specific role
-    role_key = str(obj.role.value) if hasattr(obj.role, 'value') else str(obj.role)
+    try:
+        role_val = obj.role
+        role_key = str(role_val.value) if hasattr(role_val, 'value') else str(role_val)
+    except Exception:
+        role_key = ""
     fmt = roleFormatsDict.get(role_key, None)
     if fmt is None or fmt == "global":
         fmt = global_fmt
