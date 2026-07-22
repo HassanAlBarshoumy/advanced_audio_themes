@@ -136,7 +136,10 @@ def initSentenceNavConfiguration():
 
 
 def getSNConfig(key, lang=None):
-    value = _cached_sentencenav_config.get(key, config.conf["sentencenav"][key])
+    try:
+        value = _cached_sentencenav_config[key]
+    except KeyError:
+        value = config.conf["sentencenav"][key]
     if lang is None:
         return value
     try:

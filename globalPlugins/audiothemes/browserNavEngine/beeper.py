@@ -219,6 +219,7 @@ spcPlayer=None
 spcBuf = None
 spcChannels = 2
 _spc_lock = threading.Lock()
+_spc_play_lock = threading.Lock()
 def skippedParagraphChime():
     import globalPlugins.audiothemes as at
     handler = getattr(at.GlobalPlugin, "_instance_handler", None)
@@ -246,26 +247,27 @@ def skippedParagraphChime():
             spcBuf = spcFile.readframes(spcFile.getnframes())
             spcFile.close()
     def playSkipParagraphChime():
-        spcPlayer.stop()
-        # Apply audio ducking
-        buf = spcBuf
-        try:
-            from .. import frenzy
-            df = frenzy.get_ducking_factor("browsernav")
-            if df < 1.0:
-                buf = frenzy.apply_ducking_to_pcm(buf, df)
-        except Exception:
-            pass
-        spcPlayer.feed(
-            ensure_mono(
-                adjustVolume(
-                    buf,
-                    getConfig("skipChimeVolume")
-                ),
-                spcChannels,
-                0
+        with _spc_play_lock:
+            spcPlayer.stop()
+            # Apply audio ducking
+            buf = spcBuf
+            try:
+                from .. import frenzy
+                df = frenzy.get_ducking_factor("browsernav")
+                if df < 1.0:
+                    buf = frenzy.apply_ducking_to_pcm(buf, df)
+            except Exception:
+                pass
+            spcPlayer.feed(
+                ensure_mono(
+                    adjustVolume(
+                        buf,
+                        getConfig("skipChimeVolume")
+                    ),
+                    spcChannels,
+                    0
+                )
             )
-        )
-        spcPlayer.idle()
+            spcPlayer.idle()
     threading.Thread(target=playSkipParagraphChime, daemon=True).start()
 

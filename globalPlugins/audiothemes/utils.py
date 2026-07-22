@@ -172,26 +172,33 @@ threadPool = ThreadPool(4)   # 4 workers for audio playback tasks.
 
 phoneticPunctuationConfigKey = "phoneticpunctuation"
 _pp_config_cache = {}
+_pp_config_lock = threading.Lock()
 
 def refreshPpConfigCache():
     global _pp_config_cache
     try:
         section = config.conf.get(phoneticPunctuationConfigKey, {})
-        _pp_config_cache = dict(section)
+        new_cache = dict(section)
     except Exception:
-        _pp_config_cache = {}
+        new_cache = {}
+    with _pp_config_lock:
+        _pp_config_cache = new_cache
 
 def getConfig(key):
-    try:
-        return _pp_config_cache[key]
-    except KeyError:
-        val = config.conf[phoneticPunctuationConfigKey].get(key)
+    with _pp_config_lock:
+        try:
+            return _pp_config_cache[key]
+        except KeyError:
+            pass
+    val = config.conf[phoneticPunctuationConfigKey].get(key)
+    with _pp_config_lock:
         _pp_config_cache[key] = val
-        return val
+    return val
 
 def setConfig(key, value):
     config.conf[phoneticPunctuationConfigKey][key] = value
-    _pp_config_cache[key] = value
+    with _pp_config_lock:
+        _pp_config_cache[key] = value
 
 def initConfiguration():
     confspec = {

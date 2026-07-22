@@ -871,18 +871,18 @@ class AudioThemesHandler:
             else:
                 self.enabled = new_enabled
 
-        # Always re-parse app profiles (they may have changed independently)
-        try:
-            raw_profiles = json.loads(user_config.get("app_profiles", "{}"))
-            self._app_profiles_cache = {}
-            for k, v in raw_profiles.items():
-                if isinstance(v, str):
-                    self._app_profiles_cache[k] = {"theme": v, "typing_pack": ""}
-                else:
-                    self._app_profiles_cache[k] = v
-        except Exception as e:
-            log.debugWarning(f"Malformed app_profiles JSON: {e}")
-            self._app_profiles_cache = {}
+            # Always re-parse app profiles (they may have changed independently)
+            try:
+                raw_profiles = json.loads(user_config.get("app_profiles", "{}"))
+                self._app_profiles_cache = {}
+                for k, v in raw_profiles.items():
+                    if isinstance(v, str):
+                        self._app_profiles_cache[k] = {"theme": v, "typing_pack": ""}
+                    else:
+                        self._app_profiles_cache[k] = v
+            except Exception as e:
+                log.debugWarning(f"Malformed app_profiles JSON: {e}")
+                self._app_profiles_cache = {}
 
         if self.active_theme is None:
             return
