@@ -18,7 +18,7 @@
 """
 
 from contextlib import suppress
-from functools import lru_cache
+from functools import lru_cache, wraps
 import ctypes
 import _ctypes
 import time
@@ -26,6 +26,8 @@ import tones
 import wx
 import config
 import globalPluginHandler
+import keyboardHandler
+from keyboardHandler import KeyboardInputGesture
 
 import scriptHandler
 from scriptHandler import script
@@ -48,6 +50,7 @@ from .update_checker import check_for_updates_auto
 from . import phoneticPunctuation as pp
 from .phoneticPunctuation import is_emoji_suppress_role_flag_set
 from . import utils
+from .utils import is_sound_suppressed
 from . import frenzy
 from .clipboard import ClipboardManager
 
@@ -59,7 +62,14 @@ from .browserNavEngine import BrowserNavMixin
 
 _cached_desktop_location = None
 
+_HEADING_LEVEL_MAP = {
+    7: SpecialProps.heading7,
+    8: SpecialProps.heading8,
+    9: SpecialProps.heading9,
+}
+
 import api
+import winUser
 
 import addonHandler
 try:
@@ -151,11 +161,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 except Exception:
                     pass
             if heading_level is not None and heading_level >= 7:
-                h_key = {
-                    7: SpecialProps.heading7,
-                    8: SpecialProps.heading8,
-                    9: SpecialProps.heading9,
-                }.get(heading_level)
+                h_key = _HEADING_LEVEL_MAP.get(heading_level)
                 if h_key is not None:
                     info["role"] = h_key.value
         try:
@@ -238,6 +244,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 _cached_desktop_location = tuple(desktop.location) if desktop and desktop.location else None
             except Exception:
                 _cached_desktop_location = None
+
         info["desktop_location"] = _cached_desktop_location
         if foreground_app is None:
             try:
@@ -276,6 +283,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self._last_play_time = 0  # debounce: monotonic timestamp of last dispatch
         self._last_focused_obj = None   # for gainFocus / becomeNavigator dedup
         self._last_focus_time = 0.0
+        self._last_progress_times = {}  # debounce: {obj_id: timestamp} for progress bars
         self._audio_beacon_location = None
         self._audio_beacon_desktop = None
         self._last_focus_is_editable = False
@@ -363,7 +371,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         if hasattr(self, '_tray_toggle_item') and self._tray_toggle_item:
             self._tray_toggle_item.Check(state)
         if state:
-            import ui
             ui.message(_("Audio themes enabled"))
         else:
             import ui
@@ -458,7 +465,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         ui.message(_("Command layer. Press h for commands list, F1 for help."))
 
     def getScript(self, gesture):
-        from keyboardHandler import KeyboardInputGesture
         if not getattr(self, "toggling", False) or not isinstance(gesture, KeyboardInputGesture):
             return super().getScript(gesture)
         
@@ -472,7 +478,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         return self._finally(script, self.finish)
 
     def _finally(self, func, final):
-        from functools import wraps
         @wraps(func)
         def new(*args, **kwargs):
             try:
@@ -787,7 +792,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 return
 
             # Fallback: generate tone when theme has no beacon sound
-            from .utils import is_sound_suppressed
             if is_sound_suppressed("ui_beeps"):
                 return
 
@@ -802,7 +806,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             right = int(volume * (1.0 - max(0.0, -pan)))
 
             try:
-                from . import frenzy
                 df = frenzy.get_ducking_factor("ui_beeps", self.handler._cached_config)
                 if df < 1.0:
                     tones.beep(pitch, 30, left=int(left * df), right=int(right * df))
@@ -861,7 +864,15 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     def event_valueChange(self, obj, nextHandler):
         try:
             if obj.role == controlTypes.Role.PROGRESSBAR:
-                cfg = self.handler._cached_config if hasattr(self, 'handler') else {}
+                now = time.monotonic()
+                obj_id = id(obj)
+                last_t = self._last_progress_times.get(obj_id, 0)
+                if now - last_t < 0.5:
+                    return nextHandler()
+                self._last_progress_times[obj_id] = now
+                if len(self._last_progress_times) > 64:
+                    self._last_progress_times.clear()
+                cfg = self.handler._cached_config
                 if cfg.get("enable_audio_themes", True) and self.handler.active_theme:
                     val = obj.value
                     if val is not None:
@@ -972,7 +983,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         if not injected:
             try:
                 if cfg.get("clipboard_enabled", True):
-                    import winUser
                     if winUser.getAsyncKeyState(winUser.VK_CONTROL) & 0x8000:
                         shift = winUser.getAsyncKeyState(winUser.VK_SHIFT) & 0x8000
                         if vkCode == 0x43:  # C
@@ -1194,11 +1204,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         try:
             # Route heading level 7-9 to SpecialProps heading7/8/9
             if heading_level is not None and heading_level >= 7:
-                h_key = {
-                    7: SpecialProps.heading7,
-                    8: SpecialProps.heading8,
-                    9: SpecialProps.heading9,
-                }.get(heading_level)
+                h_key = _HEADING_LEVEL_MAP.get(heading_level)
                 if h_key is not None:
                     role_val = h_key.value
             foreground_app = utils.getCurrentContext()[0]

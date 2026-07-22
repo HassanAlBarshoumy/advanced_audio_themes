@@ -1092,7 +1092,7 @@ def playBiwInThread(bookmark=None, earcon=None, volume=None):
     with wave.open(absPath,"r") as f:
         if f.getsampwidth() != 2:
             bits = f.getsampwidth() * 8
-            raise RuntimeError(f"We only support 16-bit encoded wav files. '{fileName}' is encoded with {bits} bits per sample.")
+            raise RuntimeError(f"We only support 16-bit encoded wav files. '{absPath}' is encoded with {bits} bits per sample.")
         buf =  f.readframes(f.getnframes())
         bufSize = len(buf)
         n = bufSize//2
