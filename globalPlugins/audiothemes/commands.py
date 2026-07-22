@@ -288,8 +288,7 @@ class PpWaveFileCommand(PpSynchronousCommand):
             # Apply volume
             if self.volume != 100:
                 vol_mult = self.volume / 100.0
-                for i in range(n):
-                    arr[i] = int(arr[i] * vol_mult)
+                arr = array.array('h', (int(x * vol_mult) for x in arr))
             
             if self.startAdjustment > 0:
                 pos = self.startAdjustment * f.getframerate() // 1000
@@ -315,7 +314,7 @@ class PpWaveFileCommand(PpSynchronousCommand):
             self.f = None
         
         with self._cache_lock:
-            if len(self._wave_cache) > 100:
+            if len(self._wave_cache) > 50:
                 self._wave_cache.pop(next(iter(self._wave_cache)))
             self._wave_cache[cache_key] = {
                 "buf": self.buf, 

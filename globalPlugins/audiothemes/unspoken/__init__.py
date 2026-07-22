@@ -525,7 +525,7 @@ class UnspokenPlayer:
 		if use_cache:
 			with sounds_lock:
 				sounds[path] = result
-				if len(sounds) > 100:
+				if len(sounds) > 64:
 					sounds.pop(next(iter(sounds)))
 		return result
 
@@ -709,7 +709,7 @@ class UnspokenPlayer:
 						final_audio = reverb_audio
 					
 			with self._play_cache_lock:
-				if len(self._play_cache) > 200:
+				if len(self._play_cache) > 100:
 					self._play_cache.popitem(last=False)
 				self._play_cache[cache_key] = final_audio
 

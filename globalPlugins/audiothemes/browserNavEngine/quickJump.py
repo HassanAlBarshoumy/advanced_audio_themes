@@ -712,7 +712,7 @@ def saveConfig(config=None):
 globalConfig  = loadConfig()
 
 
-@functools.lru_cache()
+@functools.lru_cache(maxsize=256)
 def re_compile(s):
     return re.compile(s)
 
@@ -735,7 +735,7 @@ def getDomain(url):
     return domain
 
 
-@functools.lru_cache()
+@functools.lru_cache(maxsize=256)
 def isUrlMatch(url, site):
     if site.urlMatch == URLMatch.IGNORE:
         return True
@@ -765,7 +765,7 @@ def isUrlMatch(url, site):
     else:
         raise Exception("Impossible!")
 
-@functools.lru_cache()
+@functools.lru_cache(maxsize=256)
 def findSites(url, config):
     return [
         site
@@ -773,7 +773,7 @@ def findSites(url, config):
         if isUrlMatch(url, site)
     ]
 
-@functools.lru_cache()
+@functools.lru_cache(maxsize=256)
 def getFocusMode(url, config):
     sites = findSites(url, config)
     if len(sites) == 0:
@@ -860,7 +860,7 @@ def getSuppressTreeLevel(url, config):
 def getUrl(self=None, onlyFromCache=False):
     return api.getCurrentURL() or ""
 
-@functools.lru_cache()
+@functools.lru_cache(maxsize=256)
 def getBookmarksWithKeystrokesForUrl(url, config, keystroke, category=None):
     sites = findSites(url, config)
     result = []
@@ -870,7 +870,7 @@ def getBookmarksWithKeystrokesForUrl(url, config, keystroke, category=None):
                 result.append(bookmark)
     return result
 
-@functools.lru_cache()
+@functools.lru_cache(maxsize=256)
 def getBookmarksWithKeystrokesForSite(site):
     extractKeystrokeFunc = lambda b: b.keystroke or "default"
     return {
@@ -888,7 +888,7 @@ def getBookmarksWithKeystrokesForSite(site):
         )
     }
 
-@functools.lru_cache()
+@functools.lru_cache(maxsize=256)
 def getAutoSpeakBookmarksForUrl(url, config):
     sites = findSites(url, config)
     results = [
@@ -1289,7 +1289,7 @@ def postGetAlternativeScript(self,gesture,script):
     else:
         return result
 
-@functools.lru_cache()
+@functools.lru_cache(maxsize=256)
 def getRegexForBookmark(rule):
     if rule.patternMatch == PatternMatch.EXACT:
         return f"^{re.escape(rule.pattern)}$"
@@ -1302,7 +1302,7 @@ def getRegexForBookmark(rule):
 
 NAMED_REGEX_PREFIX = "QJ_"
 BookmarkMatch = namedtuple('BookmarkMatch', ['bookmark', 'text', 'start', 'end'])
-@functools.lru_cache()
+@functools.lru_cache(maxsize=256)
 def makeCompositeRegex(bookmarks):
     # Using named groups in regular expression to identify which bookmark has matched
     re_string = "|".join([
@@ -1378,7 +1378,7 @@ def matchTextAndAttributes(bookmarks, textInfo, distance=None):
         #mylog("Didn't match attributes")
     #mylog("Done matchTextAndAttributes")
 
-@functools.lru_cache()
+@functools.lru_cache(maxsize=256)
 def findApplicableBookmarks(
         config=None,
         url=None,
@@ -1409,7 +1409,7 @@ def findApplicableBookmarks(
         bookmarks = [b for b in bookmarks if b.keystroke is None]
     return tuple(bookmarks)
 
-@functools.lru_cache()
+@functools.lru_cache(maxsize=256)
 def findApplicableBookmarksOrderedByOffset(*args, **kwargs):
     bookmarks = findApplicableBookmarks(*args, **kwargs)
     result = {}

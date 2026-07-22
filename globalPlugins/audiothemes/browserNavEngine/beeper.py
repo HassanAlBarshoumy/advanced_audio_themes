@@ -12,6 +12,7 @@ import NVDAHelper
 import nvwave
 import operator
 import os
+import queue
 import re
 import speech
 import struct
@@ -55,6 +56,28 @@ class Beeper:
             wantDucking=False,
             purpose=nvwave.AudioPurpose.SOUNDS,
         )
+        self._beep_queue = queue.Queue(maxsize=8)
+        self._beep_worker = threading.Thread(target=self._beep_worker_loop, daemon=True)
+        self._beep_worker.start()
+
+    def _beep_worker_loop(self):
+        while True:
+            item = self._beep_queue.get()
+            if item is None:
+                self._beep_queue.task_done()
+                break
+            player, data = item
+            try:
+                player.feed(data)
+            except Exception:
+                pass
+            self._beep_queue.task_done()
+
+    def _feed_player(self, player, data):
+        try:
+            self._beep_queue.put_nowait((player, data))
+        except queue.Full:
+            pass
 
 
 
@@ -91,7 +114,7 @@ class Beeper:
                 self.getPitch(l), beepLen, volume, volume)
             bufPtr += pauseBufSize # add a short pause
         self.player.stop()
-        threading.Thread(target=lambda:self.player.feed(buf.raw), daemon=True).start()
+        self._feed_player(self.player, buf.raw)
 
     def simpleCrackle(self, n, volume, initialDelay=0, category="browsernav"):
         return self.fancyCrackle([0] * n, volume, initialDelay=initialDelay, category=category)
@@ -143,7 +166,7 @@ class Beeper:
         maxInt = 1 << (8 * intSize)
         result = map(lambda x : x %maxInt, result)
         packed = struct.pack("<%dQ" % (bufSize // intSize), *result)
-        threading.Thread(target=lambda:self.player.feed(packed), daemon=True).start()
+        self._feed_player(self.player, packed)
 
     def uniformSample(self, a, m):
         n = len(a)
@@ -181,7 +204,7 @@ def getSoundsPath():
     soundsPath = os.path.join(addonDir, "sounds", "browsernav")
     return soundsPath
 
-@functools.lru_cache(maxsize=128)
+@functools.lru_cache(maxsize=64)
 def adjustVolume(bb, volume):
     # Assuming bb is encoded 116 bits per value!
     n = len(bb) // 2
@@ -244,5 +267,5 @@ def skippedParagraphChime():
             )
         )
         spcPlayer.idle()
-    threading.Thread(target=playSkipParagraphChime).start()
+    threading.Thread(target=playSkipParagraphChime, daemon=True).start()
 
