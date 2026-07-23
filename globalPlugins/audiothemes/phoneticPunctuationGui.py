@@ -71,6 +71,8 @@ class AudioRuleDialog(wx.Dialog):
         frenzyType=None,
         disallowedFrenzyValues=None,
     ):
+        if disallowedFrenzyValues is None:
+            disallowedFrenzyValues = []
         self.frenzyType = frenzyType
         if frenzyType        == FrenzyType.ROLE:
             self.possibleFrenzyValues = [controlTypes.role._roleLabels[role] for role in controlTypes.Role]
@@ -325,7 +327,7 @@ class AudioRuleDialog(wx.Dialog):
             self.windowTitleRegexTextCtrl,
             self.urlRegexTextCtrl,
         ]:
-            textFilterTextCtrl.Enable(self.frenzyType in [FrenzyType.TEXT])
+            textFilterTextCtrl.Enable(True)
 
 
     def getType(self):
@@ -367,24 +369,26 @@ class AudioRuleDialog(wx.Dialog):
             self.frenzyValueCategory.control.SetSelection(idx)
 
         self.setType(rule.ruleType)
-        self.wavName.SetValue(rule.wavFile)
-        self.setBiw(rule.builtInWavFile)
-        self.volumeSlider.SetValue(rule.volume or 100)
+        if rule.wavFile is not None:
+            self.wavName.SetValue(rule.wavFile)
+        if rule.builtInWavFile is not None:
+            self.setBiw(rule.builtInWavFile)
+        self.volumeSlider.SetValue(rule.volume if rule.volume is not None else 100)
         if hasattr(rule, 'speechBehavior'):
             self.speechBehaviorRadioBox.SetSelection(rule.speechBehavior)
         if hasattr(rule, 'customSpeechText'):
             self.customSpeechTextCtrl.SetValue(rule.customSpeechText or "")
-        self.startAdjustmentTextCtrl.SetValue(str(rule.startAdjustment or 0))
-        self.endAdjustmentTextCtrl.SetValue(str(rule.endAdjustment or 0))
-        self.toneTextCtrl.SetValue(str(rule.tone or 500))
-        self.durationTextCtrl.SetValue(str(rule.duration or 50))
+        self.startAdjustmentTextCtrl.SetValue(str(rule.startAdjustment if rule.startAdjustment is not None else 0))
+        self.endAdjustmentTextCtrl.SetValue(str(rule.endAdjustment if rule.endAdjustment is not None else 0))
+        self.toneTextCtrl.SetValue(str(rule.tone if rule.tone is not None else 500))
+        self.durationTextCtrl.SetValue(str(rule.duration if rule.duration is not None else 50))
         self.enabledCheckBox.SetValue(rule.enabled)
         try:
             prosodyCategoryIndex = self.PROSODY_LABELS.index(rule.prosodyName)
         except ValueError:
             prosodyCategoryIndex = 0
         self.prosodyNameCategory.control.SetSelection(prosodyCategoryIndex)
-        self.prosodyOffsetTextCtrl.SetValue(str(rule.prosodyOffset or ""))
+        self.prosodyOffsetTextCtrl.SetValue(str(rule.prosodyOffset if rule.prosodyOffset is not None else ""))
         #self.caseSensitiveCheckBox.SetValue(rule.caseSensitive)
         self.passThroughCheckBox.SetValue(rule.passThrough)
         for name, control in self.numericProsodyControls.items():
@@ -405,7 +409,7 @@ class AudioRuleDialog(wx.Dialog):
                 return
             try:
                 r = re.compile(self.patternTextCtrl.GetValue())
-            except sre_constants.error:
+            except re.error:
                 # Translators: Invalid regular expression
                 gui.messageBox(_("Invalid regular expression."), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
                 self.patternTextCtrl.SetFocus()
@@ -415,33 +419,6 @@ class AudioRuleDialog(wx.Dialog):
                 self.patternTextCtrl.SetFocus()
                 return
             frenzyValue = None
-            
-            for textFilterTextCtrl in [
-                self.applicationFilterRegexTextCtrl,
-                self.windowTitleRegexTextCtrl,
-                self.urlRegexTextCtrl,
-            ]:
-                try:
-                    r = re.compile(textFilterTextCtrl.GetValue())
-                except sre_constants.error:
-                    # Translators: Invalid regular expression
-                    gui.messageBox(_("Invalid regular expression."), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
-                    textFilterTextCtrl.SetFocus()
-                    return
-            if len(self.urlRegexTextCtrl.GetValue()) > 0 and not isURLResolutionAvailable():
-                gui.messageBox(
-                    _(
-                        "Error: you have entered URL filter for this rule.\n"
-                        "URL detection feature requires BrowserNav v2.6.2 or later add-on to be installed.\n"
-                        "However it is either not installed, or failed to initialize.\n"
-                        "Please install the latest BrowserNav add-on from add-on store and restart NVDA.\n"
-                        "Alternatively, please clear URL regex field to enable this rule on all web sites.\n"
-                    ),
-                    _("Earcons and speech rules add-on Error"),
-                    wx.ICON_ERROR | wx.OK,
-                )
-                self.urlRegexTextCtrl.SetFocus()
-                return
         elif self.frenzyType == FrenzyType.CHARACTER:
             if not self.patternTextCtrl.GetValue():
                 # Translators: This is an error message to let the user know that the pattern field is not valid.
@@ -492,20 +469,61 @@ class AudioRuleDialog(wx.Dialog):
                 self.frenzyValueCategory.control.SetFocus()
                 return
 
+        for textFilterTextCtrl in [
+            self.applicationFilterRegexTextCtrl,
+            self.windowTitleRegexTextCtrl,
+            self.urlRegexTextCtrl,
+        ]:
+            if textFilterTextCtrl.GetValue():
+                try:
+                    re.compile(textFilterTextCtrl.GetValue())
+                except re.error:
+                    gui.messageBox(_("Invalid regular expression."), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
+                    textFilterTextCtrl.SetFocus()
+                    return
+        if len(self.urlRegexTextCtrl.GetValue()) > 0 and not isURLResolutionAvailable():
+            gui.messageBox(
+                _(
+                    "Error: you have entered URL filter for this rule.\n"
+                    "URL detection feature requires BrowserNav v2.6.2 or later add-on to be installed.\n"
+                    "However it is either not installed, or failed to initialize.\n"
+                    "Please install the latest BrowserNav add-on from add-on store and restart NVDA.\n"
+                    "Alternatively, please clear URL regex field to enable this rule on all web sites.\n"
+                ),
+                _("Earcons and speech rules add-on Error"),
+                wx.ICON_ERROR | wx.OK,
+            )
+            self.urlRegexTextCtrl.SetFocus()
+            return
 
         if self.getType() == audioRuleWave:
             if not self.wavName.GetValue() or not os.path.exists(self.wavName.GetValue()):
-                # Translators: wav file not found
-                gui.messageBox(_("Wav file not found."), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
+                gui.messageBox(_("Audio file not found."), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
                 self.wavName.SetFocus()
                 return
-            try:
-                wave.open(self.wavName.GetValue(), "r").close()
-            except wave.Error:
-                # Translators: Invalid wav file
-                gui.messageBox(_("Invalid wav file."), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
-                self.wavName.SetFocus()
-                return
+            wavPath = self.wavName.GetValue()
+            isWav = wavPath.lower().endswith('.wav')
+            if isWav:
+                try:
+                    wave.open(wavPath, "r").close()
+                except (wave.Error, OSError):
+                    gui.messageBox(_("Invalid WAV file."), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
+                    self.wavName.SetFocus()
+                    return
+            elif wavPath.lower().endswith(('.mp3', '.ogg', '.flac')):
+                pass
+            else:
+                from .unspoken import ffmpeg_utils
+                if not ffmpeg_utils.get_ffmpeg_path():
+                    ext = os.path.splitext(wavPath)[1]
+                    gui.messageBox(
+                        _("FFmpeg is required to play {ext} files but is not installed.\nPlease install FFmpeg from the Audio Themes settings, or convert the file to WAV/MP3/OGG/FLAC.").format(ext=ext),
+                        _("Dictionary Entry Error"),
+                        wx.OK|wx.ICON_WARNING,
+                        self,
+                    )
+                    self.wavName.SetFocus()
+                    return
         elif self.getType() == audioRuleTextSubstitution:
             if self.frenzyType == FrenzyType.NUMERIC_FORMAT:
                 sampleLevel = 1
@@ -602,7 +620,7 @@ class AudioRuleDialog(wx.Dialog):
                 prosodyName=self.PROSODY_LABELS[self.prosodyNameCategory.control.GetSelection()],
                 prosodyOffset=prosodyOffset,
                 prosodyMultiplier=None,
-                volume=self.volumeSlider.Value or 100,
+                volume=self.volumeSlider.Value,
                 passThrough=bool(self.passThroughCheckBox.GetValue()),
                 frenzyType=self.frenzyType,
                 frenzyValue=frenzyValue,
@@ -641,8 +659,8 @@ class AudioRuleDialog(wx.Dialog):
         p= 'c:'
         while True:
             # Translators: browse wav file message
-            fd = wx.FileDialog(self, message=_("Select wav file:"),
-                wildcard="*.wav",
+            fd = wx.FileDialog(self, message=_("Select audio file:"),
+                wildcard=_("Audio files")+"|*.wav;*.mp3;*.ogg;*.flac;*.m4a;*.aac|"+_("WAV files")+"|*.wav|"+_("All files")+"|*.*",
                 defaultDir=os.path.dirname(p), style=wx.FD_OPEN
             )
             if not fd.ShowModal() == wx.ID_OK: break
@@ -663,6 +681,8 @@ class AudioRuleDialog(wx.Dialog):
         preText = _("Hello")
         postText = _("world")
         preCommand, postCommand = rule.getSpeechCommand()
+        if preCommand is None and postCommand is None:
+            return
         if postCommand is not None:
             utterance = [preText, preCommand, postText, postCommand]
         elif not repeat:
@@ -682,7 +702,7 @@ class AudioRuleDialog(wx.Dialog):
         category = self.getBiwCategory()
         ext = ".wav"
         return [o for o in os.listdir(os.path.join(soundsPath, category))
-            if not os.path.isdir(os.path.join(soundsPath,o))
+            if not os.path.isdir(os.path.join(soundsPath, category, o))
                 and o.lower().endswith(ext)
         ]
 

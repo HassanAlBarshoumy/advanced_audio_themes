@@ -145,7 +145,7 @@ class AudioRule:
         self.customSpeechText = customSpeechText
         self.customLabel = customLabel
 
-        self.regexp = re.compile(self.pattern)
+        self.regexp = re.compile(self.pattern, 0 if self.caseSensitive else re.IGNORECASE)
         self._applicationFilterRegex = re.compile(applicationFilterRegex)
         self._windowTitleRegex = re.compile(windowTitleRegex)
         self._urlRegex = re.compile(urlRegex)
@@ -154,10 +154,12 @@ class AudioRule:
     def getDisplayName(self):
         if getattr(self, "customLabel", ""):
             return self.customLabel
-        if self.getFrenzyType() in [FrenzyType.TEXT, FrenzyType.CHARACTER]:
+        ft = self.getFrenzyType()
+        if ft in [FrenzyType.TEXT, FrenzyType.CHARACTER]:
             return self.comment or self.pattern
-        else:
-            return f"{FRENZY_NAMES_SINGULAR[self.getFrenzyType()]}:{self.getFrenzyValueStr()}"
+        if ft is None:
+            return self.comment or self.pattern
+        return f"{FRENZY_NAMES_SINGULAR[ft]}:{self.getFrenzyValueStr()}"
 
     def getReplacementDescription(self):
         if self.ruleType == audioRuleWave:
@@ -181,7 +183,7 @@ class AudioRule:
         return {k:v for k,v in self.__dict__.items() if k in self.jsonFields}
         
     def getFrenzyType(self):
-        if len(self.frenzyType) == 0:
+        if not self.frenzyType or len(self.frenzyType) == 0:
             return None
         return getattr(FrenzyType, self.frenzyType)
     
@@ -258,18 +260,22 @@ class AudioRule:
 
     def getNumericSpeechCommand(self, numericValue):
         if self.ruleType == audioRuleNumericProsody:
-            className = self.prosodyName
-            className = className[0].upper() + className[1:] + 'Command'
-            classClass = getattr(speech.commands, className)
             if (
+                self.prosodyName is None or
                 self.minNumericValue is None or
                 self.maxNumericValue is None or 
                 self.prosodyMinOffset is None or 
                 self.prosodyMaxOffset  is None
             ):
                 raise ValueError
+            className = self.prosodyName
+            className = className[0].upper() + className[1:] + 'Command'
+            classClass = getattr(speech.commands, className)
             numericValue = max(self.minNumericValue, min(self.maxNumericValue, numericValue))
-            offset = self.prosodyMinOffset + (self.prosodyMaxOffset - self.prosodyMinOffset) * (numericValue - self.minNumericValue) / (self.maxNumericValue - self.minNumericValue)
+            if self.maxNumericValue == self.minNumericValue:
+                offset = self.prosodyMinOffset
+            else:
+                offset = self.prosodyMinOffset + (self.prosodyMaxOffset - self.prosodyMinOffset) * (numericValue - self.minNumericValue) / (self.maxNumericValue - self.minNumericValue)
             if offset == 0:
                 offset = 0.001
             preCommand = classClass(offset=offset)
@@ -428,9 +434,9 @@ def onPostNvdaStartup():
             try:
                 speechEx = sys.modules[mod_name]
                 from speech import sayAll
+                global _original_ext_speechEx, _original_ext_sayAll
                 _original_ext_speechEx = speechEx._myGetTextInfoSpeech
                 _original_ext_sayAll = sayAll.SayAllHandler._getTextInfoSpeech
-                original_myGet = speechEx._myGetTextInfoSpeech
                 def _patched_myGet(info, useCache=True, formatConfig=None, unit=None, reason=None, _prefixSpeechCommand=None, onlyInitialFields=False, suppressBlanks=False):
                     if reason is None:
                         reason = controlTypes.OutputReason.QUERY
@@ -1090,7 +1096,7 @@ def resetProsodies(sequence):
     # global prosodyStacks, prosodyOffsets
     prosodyStacks.clear()
     prosodyOffsets.clear()
-    if len(allProsodies) == 0:
+    if not allProsodies or len(allProsodies) == 0:
         return sequence
     return [getProsodyClass(prosodyName)() for prosodyName in allProsodies] + sequence
 
@@ -1124,18 +1130,18 @@ def new_processSpeechSymbol(locale, symbol):
             customText = getattr(rule, 'customSpeechText', "")
             cmd = rule.getSpeechCommand()[0]
             
-            result = []
             if cmd is not None:
-                result.append(cmd)
-                
+                try:
+                    speech.speak([cmd])
+                except Exception:
+                    pass
+
             if speechBehavior == 1:
-                result.append(symbol)
+                return symbol
             elif speechBehavior == 2 and customText:
-                result.append(customText)
-                
-            if not result:
-                return ""
-            return result
+                return customText
+
+            return ""
             
     return original_processSpeechSymbol(locale, symbol)
 

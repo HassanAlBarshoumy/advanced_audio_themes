@@ -6,6 +6,7 @@
 
 import array
 import config
+import os
 from ctypes import create_string_buffer
 import nvwave
 import speech
@@ -243,17 +244,18 @@ class PpWaveFileCommand(PpSynchronousCommand):
         self.endAdjustment = endAdjustment
         self.volume = volume
         self._loaded = False
-        self.f = None
         self.buf = None
         self.fileWavePlayer = None
         self._duration = 0
+        self._channels = 1
+        self._sample_rate = 44100
 
     def _ensureLoaded(self):
         if self._loaded:
             return
             
         with self._cache_lock:
-            cache_key = (self.fileName, self.volume)
+            cache_key = (self.fileName, self.volume, self.startAdjustment, self.endAdjustment)
             if cache_key in self._wave_cache:
                 cached = self._wave_cache[cache_key]
                 self.buf = cached["buf"]
@@ -271,45 +273,99 @@ class PpWaveFileCommand(PpSynchronousCommand):
                 return
 
         f = None
+        decoded = None
         try:
             f = wave.open(self.fileName, "r")
-            if f.getsampwidth() != 2:
-                bits = f.getsampwidth() * 8
-                raise RuntimeError(f"We only support 16-bit encoded wav files. '{self.fileName}' is encoded with {bits} bits per sample.")
-            buf = f.readframes(f.getnframes())
-            import array
-            arr = array.array('h')
-            arr.frombytes(buf)
-            n = len(arr)
-            
-            # Apply volume
+            if f.getsampwidth() == 2:
+                buf = f.readframes(f.getnframes())
+                import array
+                arr = array.array('h')
+                arr.frombytes(buf)
+                
+                # Apply volume with clamping
+                if self.volume != 100:
+                    vol_mult = self.volume / 100.0
+                    arr = array.array('h', (max(-32768, min(32767, int(x * vol_mult))) for x in arr))
+                
+                if self.startAdjustment > 0:
+                    pos = self.startAdjustment * f.getframerate() // 1000
+                    pos *= f.getnchannels()
+                    arr = arr[pos:]
+                    
+                self.buf = arr.tobytes()
+                self._channels = f.getnchannels()
+                self._sample_rate = f.getframerate()
+                self.fileWavePlayer = get_pooled_player(
+                    channels=self._channels,
+                    sample_rate=self._sample_rate,
+                    ducking=False
+                )
+                frames = f.getnframes()
+                rate = f.getframerate()
+                wavMillis = int(1000 * frames / rate)
+                result = wavMillis - self.startAdjustment - self.endAdjustment
+                self._duration = max(0, result)
+        except (wave.Error, OSError):
+            pass
+        finally:
+            if f is not None:
+                f.close()
+
+        if self.buf is None:
+            ext = os.path.splitext(self.fileName)[1].lower()
+            try:
+                from logHandler import log
+                if ext == '.mp3':
+                    from .unspoken import mp3_decode
+                    decoded = mp3_decode.decode_mp3_to_float(self.fileName)
+                elif ext == '.ogg':
+                    from .unspoken import ogg_vorbis
+                    decoded = ogg_vorbis.decode_ogg_to_float(self.fileName)
+                elif ext == '.flac':
+                    from .unspoken import flac_decode
+                    decoded = flac_decode.decode_flac_to_float(self.fileName)
+            except Exception as e:
+                log.error(f"PpWaveFileCommand: native decode failed for {self.fileName}: {e}")
+
+        if self.buf is None and decoded is None:
+            try:
+                from config import conf
+                if not conf.get("audiothemes", {}).get("enable_ffmpeg", False):
+                    return
+                from logHandler import log
+                from .unspoken import ffmpeg_utils
+                decoded = ffmpeg_utils.decode_with_ffmpeg(self.fileName)
+                if decoded is None:
+                    log.error(f"PpWaveFileCommand: FFmpeg decode failed for {self.fileName}")
+                    return
+            except Exception as e:
+                log.error(f"PpWaveFileCommand: FFmpeg fallback error for {self.fileName}: {e}")
+                return
+
+        if decoded is not None:
+            float_samples, sample_rate, channels = decoded
+            import array as _array
+            int_arr = _array.array('h', (max(-32768, min(32767, int(s * 32767))) for s in float_samples))
             if self.volume != 100:
                 vol_mult = self.volume / 100.0
-                arr = array.array('h', (int(x * vol_mult) for x in arr))
-            
+                int_arr = _array.array('h', (max(-32768, min(32767, int(x * vol_mult))) for x in int_arr))
             if self.startAdjustment > 0:
-                pos = self.startAdjustment * f.getframerate() // 1000
-                pos *= f.getnchannels()
-                arr = arr[pos:]
-                n = len(arr)
-                
-            self.buf = arr.tobytes()
-            self._channels = f.getnchannels()
-            self._sample_rate = f.getframerate()
+                pos = self.startAdjustment * sample_rate // 1000
+                pos *= channels
+                int_arr = int_arr[pos:]
+            self.buf = int_arr.tobytes()
+            self._channels = channels
+            self._sample_rate = sample_rate
             self.fileWavePlayer = get_pooled_player(
                 channels=self._channels,
                 sample_rate=self._sample_rate,
                 ducking=False
             )
-            frames = self.f.getnframes()
-            rate = self.f.getframerate()
-            wavMillis = int(1000 * frames / rate)
+            total_samples = len(int_arr)
+            total_frames = total_samples // channels
+            wavMillis = int(1000 * total_frames / sample_rate)
             result = wavMillis - self.startAdjustment - self.endAdjustment
             self._duration = max(0, result)
-        finally:
-            if f is not None:
-                f.close()
-            self.f = None
         
         with self._cache_lock:
             if len(self._wave_cache) > 50:
@@ -327,6 +383,8 @@ class PpWaveFileCommand(PpSynchronousCommand):
         if is_sound_suppressed("earcons"):
             return
         self._ensureLoaded()
+        if not self._loaded:
+            return
         if self.startAdjustment < 0:
             time.sleep(-self.startAdjustment / 1000.0)
 
