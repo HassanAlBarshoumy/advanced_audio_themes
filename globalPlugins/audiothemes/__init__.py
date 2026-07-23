@@ -783,6 +783,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             desktop = self._audio_beacon_desktop
             if not desktop:
                 return
+            if desktop[2] == 0 or desktop[3] == 0:
+                return
 
             nx = dx / float(desktop[2])
             ny = dy / float(desktop[3])
@@ -797,7 +799,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
             distance = (dx * dx + dy * dy) ** 0.5
             max_dist = (desktop[2] * desktop[2] + desktop[3] * desktop[3]) ** 0.5
-            closeness = max(0.05, 1.0 - distance / max_dist)
+            if max_dist == 0:
+                closeness = 1.0
+            else:
+                closeness = max(0.05, 1.0 - distance / max_dist)
 
             pitch = int(300 + closeness * 900)
             volume = int(25 * closeness)
@@ -1004,22 +1009,20 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         return True
 
     def event_typedCharacter(self, obj, nextHandler, ch):
-        try:
-            if not hasattr(self, 'handler'):
-                nextHandler()
-                return
-            cfg = self.handler._cached_config if hasattr(self, 'handler') else {}
-            if cfg.get("typing_sounds", True):
-                vk = getattr(self, "_last_vkCode", None)
-                ext = getattr(self, "_last_extended", None)
-                if cfg.get("typing_sounds_edit_only", False):
-                    if getattr(self, "_last_focus_is_editable", True):
+        if hasattr(self, 'handler'):
+            try:
+                cfg = self.handler._cached_config
+                if cfg.get("typing_sounds", True):
+                    vk = getattr(self, "_last_vkCode", None)
+                    ext = getattr(self, "_last_extended", None)
+                    if cfg.get("typing_sounds_edit_only", False):
+                        if getattr(self, "_last_focus_is_editable", True):
+                            self.handler.play_typing_sound(ch=ch, vkCode=vk, extended=ext)
+                    else:
                         self.handler.play_typing_sound(ch=ch, vkCode=vk, extended=ext)
-                else:
-                    self.handler.play_typing_sound(ch=ch, vkCode=vk, extended=ext)
-            nextHandler()
-        except Exception as e:
-            log.debugWarning(f"event_typedCharacter: {e}")
+            except Exception as e:
+                log.debugWarning(f"event_typedCharacter: {e}")
+        nextHandler()
     @script(description=_("Switches to the next audio theme."), gestures=[])
     def script_nextAudioTheme(self, gesture):
         themes = self.handler.get_installed_themes()

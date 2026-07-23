@@ -1448,6 +1448,7 @@ def new_getControlFieldSpeech(
     
     original_format = {}
     original_formatConfig_values = {}
+    heading_has_rule = False
     for r, key in ROLE_TO_FORMAT_KEY.items():
         has_active_rule = getActiveRuleContext(roleRules.get(r, []), appName, windowTitle, url) is not None
         
@@ -1668,9 +1669,13 @@ def new_processAndLabelStates(
     reason,
     positiveStates= None,
     negativeStates=None,
-    positiveStateLabelDict={},
-    negativeStateLabelDict={},
+    positiveStateLabelDict=None,
+    negativeStateLabelDict=None,
 ):
+    if positiveStateLabelDict is None:
+        positiveStateLabelDict = {}
+    if negativeStateLabelDict is None:
+        negativeStateLabelDict = {}
     # Braille provides custom dictionaries for positive and negative states - we don't mess with Braille.
     # However when the dictionaries are empty, we provide our own custom dictionaries.
     if isPhoneticPunctuationEnabled() and len(positiveStateLabelDict) == 0 and len(negativeStateLabelDict) == 0:

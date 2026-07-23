@@ -718,7 +718,9 @@ class SentenceNavMixin:
     # --- Pass-through check ---
     def _sn_maybePassThrough(self, gesture):
         focus = api.getFocusObject()
-        appName = focus.appModule.appName
+        if not focus or not focus.appModule:
+            return False
+        appName = getattr(focus.appModule, 'appName', '') or ''
         if appName.lower() in getSNConfig("applicationsBlacklist").lower().strip().split(","):
             gesture.send()
             return True

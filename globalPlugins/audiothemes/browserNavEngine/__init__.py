@@ -1022,7 +1022,11 @@ class BrowserNavMixin:
             distance += 1
 
     def findByRole(self, direction, roles, errorMessage, newMethod=False):
-        focus = api.getFocusObject().treeInterceptor
+        focus_obj = api.getFocusObject()
+        if not focus_obj or not focus_obj.treeInterceptor:
+            endOfDocument(errorMessage)
+            return
+        focus = focus_obj.treeInterceptor
         textInfo = focus.makeTextInfo(textInfos.POSITION_CARET)
         textInfo.expand(textInfos.UNIT_PARAGRAPH)
         distance = 0
@@ -1049,7 +1053,10 @@ class BrowserNavMixin:
 
     def scrollToAll(self, direction, message):
         ui.message(message)
-        focus = api.getFocusObject().treeInterceptor
+        focus_obj = api.getFocusObject()
+        if not focus_obj or not focus_obj.treeInterceptor:
+            return
+        focus = focus_obj.treeInterceptor
         textInfo = focus.makeTextInfo(textInfos.POSITION_CARET)
         textInfo.expand(textInfos.UNIT_PARAGRAPH)
         textInfo.collapse()

@@ -428,6 +428,8 @@ def onPostNvdaStartup():
             try:
                 speechEx = sys.modules[mod_name]
                 from speech import sayAll
+                _original_ext_speechEx = speechEx._myGetTextInfoSpeech
+                _original_ext_sayAll = sayAll.SayAllHandler._getTextInfoSpeech
                 original_myGet = speechEx._myGetTextInfoSpeech
                 def _patched_myGet(info, useCache=True, formatConfig=None, unit=None, reason=None, _prefixSpeechCommand=None, onlyInitialFields=False, suppressBlanks=False):
                     if reason is None:
@@ -880,6 +882,24 @@ def restoreMonkeyPatches():
     speech.speech.getIndentationSpeech = original_getIndentationSpeech
     speech.speech._getSelectionMessageSpeech = original_getSelectionMessageSpeech
     
+    # Restore NVDAExtensionGlobalPlugin speech patches
+    if _original_ext_speechEx is not None:
+        try:
+            import sys
+            for mod_name in list(sys.modules.keys()):
+                if 'NVDAExtensionGlobalPlugin' in mod_name and 'speechEx' in mod_name:
+                    speechEx = sys.modules[mod_name]
+                    speechEx._myGetTextInfoSpeech = _original_ext_speechEx
+                    break
+        except Exception:
+            pass
+    if _original_ext_sayAll is not None:
+        try:
+            from speech import sayAll
+            sayAll.SayAllHandler._getTextInfoSpeech = _original_ext_sayAll
+        except Exception:
+            pass
+    
     try:
         import config
         config.post_configProfileSwitch.unregister(reloadRules)
@@ -1075,6 +1095,8 @@ def resetProsodies(sequence):
     return [getProsodyClass(prosodyName)() for prosodyName in allProsodies] + sequence
 
 original_processSpeechSymbol = None
+_original_ext_speechEx = None
+_original_ext_sayAll = None
 
 @lru_cache(maxsize=256)
 def _cached_native_symbol(locale, symbol, level):

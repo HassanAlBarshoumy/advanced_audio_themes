@@ -456,19 +456,35 @@ class AudioRuleDialog(wx.Dialog):
         else:
             frenzyValueStr = self.possibleFrenzyValues[self.frenzyValueCategory.control.GetSelection()]
             if self.frenzyType == FrenzyType.ROLE:
-                frenzyValue = [k for k, v in controlTypes.role._roleLabels.items() if v == frenzyValueStr][0]
+                frenzyValue = next((k for k, v in controlTypes.role._roleLabels.items() if v == frenzyValueStr), None)
+                if frenzyValue is None:
+                    gui.messageBox(_("Role not found."), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
+                    self.frenzyValueCategory.control.SetFocus()
+                    return
             elif self.frenzyType in [FrenzyType.STATE, FrenzyType.NEGATIVE_STATE]:
                 frenzyValue = self.possibleFrenzyObjects[self.frenzyValueCategory.control.GetSelection()]
             elif self.frenzyType == FrenzyType.FORMAT:
-                frenzyValue = [value for value, name in TEXT_FORMAT_NAMES.items() if name == frenzyValueStr][0]
+                frenzyValue = next((value for value, name in TEXT_FORMAT_NAMES.items() if name == frenzyValueStr), None)
+                if frenzyValue is None:
+                    gui.messageBox(_("Format not found."), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
+                    self.frenzyValueCategory.control.SetFocus()
+                    return
             elif self.frenzyType == FrenzyType.NUMERIC_FORMAT:
-                frenzyValue = [value for value, name in NUMERIC_TEXT_FORMAT_NAMES.items() if name == frenzyValueStr][0]
+                frenzyValue = next((value for value, name in NUMERIC_TEXT_FORMAT_NAMES.items() if name == frenzyValueStr), None)
+                if frenzyValue is None:
+                    gui.messageBox(_("Format not found."), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
+                    self.frenzyValueCategory.control.SetFocus()
+                    return
                 if self.numericProsodyControls['minNumericValue'].GetValue() >= self.numericProsodyControls['maxNumericValue'].GetValue():
                     gui.messageBox(_("Minimum numeric value must be strictly less than maximum numeric value."), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
                     self.numericProsodyControls['minNumericValue'].SetFocus()
                     return
             elif self.frenzyType == FrenzyType.OTHER_RULE:
-                frenzyValue = [value for value, name in OTHER_RULE_NAMES.items() if name == frenzyValueStr][0]
+                frenzyValue = next((value for value, name in OTHER_RULE_NAMES.items() if name == frenzyValueStr), None)
+                if frenzyValue is None:
+                    gui.messageBox(_("Rule not found."), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
+                    self.frenzyValueCategory.control.SetFocus()
+                    return
             else:
                 raise RuntimeError
             if frenzyValue in self.disallowedFrenzyValues:

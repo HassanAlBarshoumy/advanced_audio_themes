@@ -2184,20 +2184,20 @@ class AudioThemesSettingsPanel(SettingsPanel):
             self._populateRoleList()
         
         unspoken_conf = config.conf["unspoken"]
-        self.enableReverbCheckbox.SetValue(_b(unspoken_conf["Reverb"]))
-        self.roomSizeSlider.SetValue(_i(unspoken_conf["RoomSize"]))
-        self.dampingSlider.SetValue(_i(unspoken_conf["Damping"]))
-        self.wetLevelSlider.SetValue(_i(unspoken_conf["WetLevel"]))
-        self.dryLevelSlider.SetValue(_i(unspoken_conf["DryLevel"]))
-        self.widthSlider.SetValue(_i(unspoken_conf["Width"]))
-        self.onEnableReverbCheckboxChanged(DummyEvent(unspoken_conf["Reverb"]))
+        self.enableReverbCheckbox.SetValue(_b(unspoken_conf.get("Reverb", False)))
+        self.roomSizeSlider.SetValue(_i(unspoken_conf.get("RoomSize", 50)))
+        self.dampingSlider.SetValue(_i(unspoken_conf.get("Damping", 50)))
+        self.wetLevelSlider.SetValue(_i(unspoken_conf.get("WetLevel", 50)))
+        self.dryLevelSlider.SetValue(_i(unspoken_conf.get("DryLevel", 50)))
+        self.widthSlider.SetValue(_i(unspoken_conf.get("Width", 100)))
+        self.onEnableReverbCheckboxChanged(DummyEvent(unspoken_conf.get("Reverb", False)))
         # Miscellaneous tab — SentenceNav settings
         from .sentenceNavEngine import getSNConfig, getCurrentLanguage
         self.snLang = getCurrentLanguage()
         snConf = config.conf["sentencenav"]
-        self.paragraphChimeVolumeSlider.SetValue(_i(snConf["paragraphChimeVolume"]))
-        self.noNextSentenceChimeSlider.SetValue(_i(snConf["noNextSentenceChimeVolume"]))
-        self.speakFormattedCheckbox.SetValue(_b(snConf["speakFormatted"]))
+        self.paragraphChimeVolumeSlider.SetValue(_i(snConf.get("paragraphChimeVolume", 100)))
+        self.noNextSentenceChimeSlider.SetValue(_i(snConf.get("noNextSentenceChimeVolume", 100)))
+        self.speakFormattedCheckbox.SetValue(_b(snConf.get("speakFormatted", True)))
         self.enableInWordCheckbox.SetValue(_b(snConf.get("enableInWord", False)))
         self.breakOnWikiReferencesCheckbox.SetValue(_b(snConf.get("breakOnWikiReferences", True)))
         self.breakAtElementBoundariesCheckbox.SetValue(_b(snConf.get("breakAtElementBoundaries", True)))

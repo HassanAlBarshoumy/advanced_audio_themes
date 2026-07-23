@@ -270,11 +270,9 @@ class PpWaveFileCommand(PpSynchronousCommand):
                 self._loaded = True
                 return
 
-        f = wave.open(self.fileName, "r")
-        self.f = f
+        f = None
         try:
-            if self.f is None:
-                raise RuntimeError("can not open file %s" % self.fileName)
+            f = wave.open(self.fileName, "r")
             if f.getsampwidth() != 2:
                 bits = f.getsampwidth() * 8
                 raise RuntimeError(f"We only support 16-bit encoded wav files. '{self.fileName}' is encoded with {bits} bits per sample.")
@@ -309,7 +307,8 @@ class PpWaveFileCommand(PpSynchronousCommand):
             result = wavMillis - self.startAdjustment - self.endAdjustment
             self._duration = max(0, result)
         finally:
-            f.close()
+            if f is not None:
+                f.close()
             self.f = None
         
         with self._cache_lock:

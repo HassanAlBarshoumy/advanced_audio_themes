@@ -231,7 +231,10 @@ def skippedParagraphChime():
         if spcPlayer is not None:
             pass
         else:
-            spcFile = wave.open(getSoundsPath() + "\\classic\\on.wav","r")
+            try:
+                spcFile = wave.open(getSoundsPath() + "\\classic\\on.wav","r")
+            except Exception:
+                return
             spcChannels = spcFile.getnchannels()
             outputDevice=_get_beeper_output_device()
             spcPlayer = nvwave.WavePlayer(

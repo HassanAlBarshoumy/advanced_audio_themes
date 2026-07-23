@@ -241,7 +241,6 @@ def _get_blacklisted_roles():
         try:
             parsed = json.loads(raw)
             result = parsed if isinstance(parsed, list) and all(isinstance(r, int) for r in parsed) else [19]
-            return result
         except Exception:
             result = [19]
     else:
@@ -1208,6 +1207,8 @@ class AudioThemesHandler:
             desktop_max_y = desk_location[3] if desk_location else 1080
             obj_x = location[0] + (location[2] / 2.0)
             obj_y = location[1] + (location[3] / 2.0)
+            if desktop_max_x == 0 or desktop_max_y == 0:
+                return 0.0, 0.0
             angle_x = ((obj_x - desktop_max_x / 2.0) / desktop_max_x) * 180.0
             percent = (desktop_max_y - obj_y) / desktop_max_y
             angle_y = 50.0 * percent + (-40.0)
@@ -1372,7 +1373,10 @@ class AudioThemesHandler:
         cls._invalidate_themes_cache()
         identified_path = os.path.join(THEMES_DIR, uuid4().hex).lower()
         with ZipFile(theme_pack, "r") as pack:
-            if pack.infolist()[0].is_dir():
+            infolist = pack.infolist()
+            if not infolist:
+                return
+            if infolist[0].is_dir():
                 cls._install_legacy(pack, identified_path)
             else:
                 pack.extractall(path=identified_path)
@@ -1448,6 +1452,8 @@ class AudioThemesHandler:
     @classmethod
     def _install_legacy(cls, pack, final_dst):
         pack_infolist = pack.infolist()
+        if not pack_infolist:
+            return
         theme_name = pack_infolist[0].orig_filename.strip("/")
         os.mkdir(final_dst)
         for zinfo in pack_infolist[1:]:
