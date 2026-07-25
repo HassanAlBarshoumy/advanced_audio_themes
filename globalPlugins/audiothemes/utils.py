@@ -84,8 +84,8 @@ class Worker(Thread):
                 func(*args, **kargs)
             except Exception:
                 log.exception("Error in audio_themes_NG ThreadPool worker")
-            except BaseException:
-                log.exception("CRITICAL: Unhandled BaseException in audio_themes_NG ThreadPool worker")
+            except (KeyboardInterrupt, SystemExit):
+                raise
             finally:
                 self.is_busy = False
                 self.tasks.task_done()
@@ -154,7 +154,10 @@ class ThreadPool:
     def shutdown(self, wait=True):
         """Signal every worker to exit.  Call from addon.terminate()."""
         for _ in self._workers:
-            self.tasks.put_nowait(_WORKER_STOP)
+            try:
+                self.tasks.put(_WORKER_STOP, timeout=2.0)
+            except Exception:
+                pass
         if wait:
             for w in self._workers:
                 w.join(timeout=3.0)
@@ -305,11 +308,12 @@ def _load_suppressed_categories():
         with _suppressed_categories_lock:
             if raw == _suppressed_categories_json:
                 return
-            _suppressed_categories_json = raw
             if raw:
-                _suppressed_categories_dict = json.loads(raw)
+                parsed = json.loads(raw)
             else:
-                _suppressed_categories_dict = {}
+                parsed = {}
+            _suppressed_categories_json = raw
+            _suppressed_categories_dict = parsed
     except Exception:
         with _suppressed_categories_lock:
             _suppressed_categories_dict = {}

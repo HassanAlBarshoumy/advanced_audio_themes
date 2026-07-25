@@ -6,37 +6,23 @@
 
 import addonHandler
 import api
-import bisect
 import config
 import controlTypes
 import copy
 import core
-import ctypes
-from ctypes import create_string_buffer, byref
-import globalPluginHandler
-import globalVars
 import gui
 from gui import guiHelper, nvdaControls
 from gui.settingsDialogs import SettingsPanel
-import itertools
 import json
 from logHandler import log
-import NVDAHelper
-from NVDAObjects.window import winword
 import nvwave
-import operator
 import os
-from queue import Queue
 import re
-from scriptHandler import script, willSayAllResume
+import shutil
 import speech
 import speech.commands
-import struct
-import textInfos
 import threading
-from threading import Thread
 import time
-import tones
 import ui
 import wave
 import wx
@@ -140,6 +126,10 @@ class AudioRuleDialog(wx.Dialog):
         labelText = _("Pass raw text through to synth. Typically you want to enable this only for punctuation marks and disable for all other rules.")
         self.passThroughCheckBox=sHelper.addItem(wx.CheckBox(self,label=labelText))
         self.passThroughCheckBox.SetValue(False)
+      # Translators: label for case sensitive checkbox in add audio rule dialog.
+        caseSensitiveText = _("&Case sensitive pattern matching")
+        self.caseSensitiveCheckBox=sHelper.addItem(wx.CheckBox(self,label=caseSensitiveText))
+        self.caseSensitiveCheckBox.SetValue(True)
 
       # Translators:  label for type selector radio buttons in add audio rule dialog
         typeText = _("&Type")
@@ -320,6 +310,7 @@ class AudioRuleDialog(wx.Dialog):
         else:
             self.patternTextCtrl.Disable()
             self.passThroughCheckBox.Disable()
+            self.caseSensitiveCheckBox.Disable()
             self.frenzyValueCategory.control.SetFocus()
         self.suppressStateClutterCheckBox.Enable(self.frenzyType in [FrenzyType.STATE, FrenzyType.NEGATIVE_STATE])
         for textFilterTextCtrl in [
@@ -389,7 +380,7 @@ class AudioRuleDialog(wx.Dialog):
             prosodyCategoryIndex = 0
         self.prosodyNameCategory.control.SetSelection(prosodyCategoryIndex)
         self.prosodyOffsetTextCtrl.SetValue(str(rule.prosodyOffset if rule.prosodyOffset is not None else ""))
-        #self.caseSensitiveCheckBox.SetValue(rule.caseSensitive)
+        self.caseSensitiveCheckBox.SetValue(rule.caseSensitive)
         self.passThroughCheckBox.SetValue(rule.passThrough)
         for name, control in self.numericProsodyControls.items():
             control.SetValue(getattr(rule, name))
@@ -532,7 +523,7 @@ class AudioRuleDialog(wx.Dialog):
                     replacementPattern.format(sampleLevel)
                 except ValueError as e:
                     gui.messageBox(
-                        _("Invalid replacement pattern: {}\nPlesae use curly braces {} as a format placeholder; please don't use any other curly braces in replacement string.").format(str(e)), 
+                        _("Invalid replacement pattern: {}\nPlease use curly braces {} as a format placeholder; please don't use any other curly braces in replacement string.").format(str(e)), 
                         _("Dictionary Entry Error"), 
                         wx.OK|wx.ICON_WARNING, 
                         self,
@@ -617,6 +608,7 @@ class AudioRuleDialog(wx.Dialog):
                 tone=self.getInt(self.toneTextCtrl.GetValue()),
                 duration=self.getInt(self.durationTextCtrl.GetValue()),
                 enabled=bool(self.enabledCheckBox.GetValue()),
+                caseSensitive=bool(self.caseSensitiveCheckBox.GetValue()),
                 prosodyName=self.PROSODY_LABELS[self.prosodyNameCategory.control.GetSelection()],
                 prosodyOffset=prosodyOffset,
                 prosodyMultiplier=None,
@@ -682,6 +674,12 @@ class AudioRuleDialog(wx.Dialog):
         postText = _("world")
         preCommand, postCommand = rule.getSpeechCommand()
         if preCommand is None and postCommand is None:
+            gui.messageBox(
+                _("This rule type cannot be tested in isolation."),
+                _("Test Rule"),
+                wx.OK|wx.ICON_INFORMATION,
+                self,
+            )
             return
         if postCommand is not None:
             utterance = [preText, preCommand, postText, postCommand]
@@ -751,7 +749,7 @@ class AudioRuleDialog(wx.Dialog):
         [control.Disable() for (t,controls) in self.typeControls.items() for control in controls]
         ct = self.getType()
         [control.Enable() for control in self.typeControls[ct]]
-        if hasattr(self, "speechBehaviorRadioBox"):
+        if self.customSpeechTextCtrl.Enabled:
             self.onSpeechBehavior(None)
 
     def onSpeechBehavior(self, evt):
@@ -836,8 +834,14 @@ class RulesDialog(SettingsPanel):
         self.enableAllButton.Bind(wx.EVT_BUTTON, self.onEnableAllClick)
         self.disableAllButton = bHelper2.addButton(self, label=_("Disable A&ll"))
         self.disableAllButton.Bind(wx.EVT_BUTTON, self.onDisableAllClick)
+      # Export/Import buttons
+        bHelper3 = sHelper.addItem(guiHelper.ButtonHelper(orientation=wx.HORIZONTAL))
+        self.exportButton = bHelper3.addButton(self, label=_("&Export rules"))
+        self.exportButton.Bind(wx.EVT_BUTTON, self.onExportClick)
+        self.importButton = bHelper3.addButton(self, label=_("&Import rules"))
+        self.importButton.Bind(wx.EVT_BUTTON, self.onImportClick)
 
-        self.applicationsBlacklistEdit = sHelper.addLabeledControl(_("Disable PhoneticPuntuation in applications (comma-separated list)"), wx.TextCtrl)
+        self.applicationsBlacklistEdit = sHelper.addLabeledControl(_("Disable PhoneticPunctuation in applications (comma-separated list)"), wx.TextCtrl)
         self.applicationsBlacklistEdit.Value = getConfig("applicationsBlacklist")
         self._updateStats()
 
@@ -930,6 +934,72 @@ class RulesDialog(SettingsPanel):
             rule.enabled = False
         self._refreshList()
         core.callLater(100, lambda: ui.message(_("All rules disabled")))
+
+    def onExportClick(self, evt):
+        with wx.FileDialog(
+            self,
+            _("Export Earcons & Speech Rules"),
+            wildcard=_("JSON files (*.json)|*.json"),
+            style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
+            defaultFile=os.path.basename(rulesFileName),
+        ) as dlg:
+            if dlg.ShowModal() == wx.ID_CANCEL:
+                return
+            path = dlg.GetPath()
+            try:
+                shutil.copy2(rulesFileName, path)
+                core.callLater(100, lambda: ui.message(_("Rules exported to {}").format(path)))
+            except Exception as e:
+                log.error(f"Export rules failed: {e}", exc_info=True)
+                gui.messageBox(
+                    _("Failed to export rules: {}").format(str(e)),
+                    _("Export Error"),
+                    wx.OK | wx.ICON_ERROR,
+                    self,
+                )
+
+    def onImportClick(self, evt):
+        with wx.FileDialog(
+            self,
+            _("Import Earcons & Speech Rules"),
+            wildcard=_("JSON files (*.json)|*.json"),
+            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
+        ) as dlg:
+            if dlg.ShowModal() == wx.ID_CANCEL:
+                return
+            path = dlg.GetPath()
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    imported = json.load(f)
+                if not isinstance(imported, list):
+                    raise ValueError(_("File does not contain a valid rules list"))
+                result = gui.messageBox(
+                    _("This will replace ALL current rules with the imported rules.\nA backup of your current rules will be saved.\n\nContinue?"),
+                    _("Import Rules"),
+                    wx.YES_NO | wx.ICON_WARNING,
+                    self,
+                )
+                if result != wx.YES:
+                    return
+                shutil.copy2(rulesFileName, rulesFileName + ".backup")
+                shutil.copy2(path, rulesFileName)
+                reloadRules()
+                self.allRules = []
+                for ft, rules in pp.rulesByFrenzy.items():
+                    self.allRules.extend(rules)
+                self.allRules.sort(key=lambda r: r.getFrenzyType().value)
+                i = self.frenzyCategory.control.GetSelection()
+                self.prepareRulesForFrenzy(list(FrenzyType)[i])
+                self._refreshList()
+                core.callLater(100, lambda: ui.message(_("Rules imported successfully")))
+            except Exception as e:
+                log.error(f"Import rules failed: {e}", exc_info=True)
+                gui.messageBox(
+                    _("Failed to import rules: {}").format(str(e)),
+                    _("Import Error"),
+                    wx.OK | wx.ICON_ERROR,
+                    self,
+                )
 
     def onFrenzyType(self, evt):
         oldFrenzyType = self.frenzyType
@@ -1061,6 +1131,7 @@ class RulesDialog(SettingsPanel):
             return
 
     def OnToggleEnable(self,evt, increment):
+        """Intentionally empty — reserved for future batch toggle feature."""
         pass
 
     def OnRemoveClick(self,evt):
@@ -1097,9 +1168,22 @@ class RulesDialog(SettingsPanel):
         postText = _("world")
         try:
             preCommand, postCommand = rule.getSpeechCommand()
-        except Exception:
+        except Exception as e:
+            log.error(f"OnTestRuleClick: getSpeechCommand failed: {e}", exc_info=True)
+            gui.messageBox(
+                _("Failed to test rule: {}").format(str(e)),
+                _("Test Rule"),
+                wx.OK|wx.ICON_ERROR,
+                self,
+            )
             return
         if preCommand is None:
+            gui.messageBox(
+                _("This rule type cannot be tested in isolation."),
+                _("Test Rule"),
+                wx.OK|wx.ICON_INFORMATION,
+                self,
+            )
             return
         if postCommand is not None:
             utterance = [preText, preCommand, postText, postCommand]
@@ -1114,21 +1198,13 @@ class RulesDialog(SettingsPanel):
         self.updateAllRules(self.frenzyType)
         rulesDicts = [rule.asDict() for rule in self.allRules]
         rulesJson = json.dumps(rulesDicts, indent=4, sort_keys=True)
-        
-        # Create a backup of the existing rules file before overwriting
-        import os
-        import shutil
         if os.path.exists(rulesFileName):
             try:
                 shutil.copy2(rulesFileName, rulesFileName + ".backup")
             except Exception as e:
-                import logging
-                logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
-        rulesFile = open(rulesFileName, "w")
-        try:
+                log.error(f"AudioThemes Error: {e}", exc_info=True)
+        with open(rulesFileName, "w") as rulesFile:
             rulesFile.write(rulesJson)
-        finally:
-            rulesFile.close()
         reloadRules()
 
         setConfig("applicationsBlacklist",self.applicationsBlacklistEdit.Value)

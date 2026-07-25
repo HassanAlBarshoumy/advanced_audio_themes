@@ -10,7 +10,6 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from uuid import uuid4
 import api
 import os
-import ctypes
 import random
 import shutil
 import copy
@@ -229,12 +228,14 @@ CONFIG_VERSION = 1
 
 _blacklisted_roles_cache = None
 _blacklisted_roles_cache_raw = None
+_blacklisted_roles_lock = threading.Lock()
 
 def _get_blacklisted_roles():
     global _blacklisted_roles_cache, _blacklisted_roles_cache_raw
     raw = config.conf["audiothemes"].get("blacklisted_roles", "[19]")
-    if raw == _blacklisted_roles_cache_raw:
-        return _blacklisted_roles_cache
+    with _blacklisted_roles_lock:
+        if raw == _blacklisted_roles_cache_raw:
+            return _blacklisted_roles_cache
     if isinstance(raw, list):
         result = raw if all(isinstance(r, int) for r in raw) else [19]
     elif isinstance(raw, str):
@@ -245,8 +246,9 @@ def _get_blacklisted_roles():
             result = [19]
     else:
         result = [19]
-    _blacklisted_roles_cache = result
-    _blacklisted_roles_cache_raw = raw
+    with _blacklisted_roles_lock:
+        _blacklisted_roles_cache = result
+        _blacklisted_roles_cache_raw = raw
     return result
 
 
@@ -1348,7 +1350,7 @@ class AudioThemesHandler:
     @classmethod
     def get_installed_themes(cls):
         if cls._installed_themes_cache is not None:
-            return cls._installed_themes_cache
+            return list(cls._installed_themes_cache)
         result = []
         for folder in os.listdir(THEMES_DIR):
             theme = cls.get_theme_from_folder(folder)
@@ -1356,7 +1358,7 @@ class AudioThemesHandler:
                 continue
             result.append(theme)
         cls._installed_themes_cache = result
-        return result
+        return list(result)
 
     @classmethod
     def _invalidate_themes_cache(cls):

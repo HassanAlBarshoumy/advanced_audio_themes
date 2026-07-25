@@ -125,13 +125,14 @@ ALLOWED_TYPES_BY_FRENZY_TYPE = {
         audioRuleBuiltInWave,
         audioRuleWave,
         audioRuleBeep,
+        audioRuleProsody,
         audioRuleTextSubstitution,
     ],
     FrenzyType.ROLE: [
         audioRuleBuiltInWave,
         audioRuleWave,
         audioRuleBeep,
-        #audioRuleProsody,
+        audioRuleProsody,
         audioRuleTextSubstitution,
     ],
     FrenzyType.STATE: [
@@ -165,7 +166,7 @@ ALLOWED_TYPES_BY_FRENZY_TYPE = {
         audioRuleBuiltInWave,
         audioRuleWave,
         audioRuleBeep,
-        #audioRuleProsody,
+        audioRuleProsody,
         audioRuleTextSubstitution,
     ],
 }
@@ -175,3 +176,5 @@ PROSODY_LABELS = [
     "Volume",
     "Rate",
 ]
+
+VOICE_CHANGE_PROSODY = "Speaker Voice"

@@ -6,49 +6,30 @@
 # This file is covered by the GNU General Public License.
 
 import addonHandler
-import api
 from array import array
 try:
     import audioop
     _HAS_AUDIOOP = True
 except ImportError:
     _HAS_AUDIOOP = False
-import bisect
 import characterProcessing
 import config
 import collections
 import controlTypes
-import copy
-import core
-import ctypes
-from ctypes import create_string_buffer, byref
 from enum import Enum
 import globalPluginHandler
 import globalVars
-import gui
-from gui import guiHelper, nvdaControls
-from gui.settingsDialogs import SettingsPanel
-import itertools
 import json
 from logHandler import log
-import NVDAHelper
-from NVDAObjects.window import winword
-import nvwave
-import operator
 import os
-from queue import Queue
 import re
-from scriptHandler import script, willSayAllResume
+from scriptHandler import script
 import speech
 import speech.commands
-import struct
 import textInfos
 import threading
-from threading import Thread
 import time
-import tones
 import ui
-import wave
 import wx
 
 from .common import *
@@ -1446,7 +1427,6 @@ def new_getControlFieldSpeech(
     global ignore_get_properties_hook
     appName, windowTitle, url = utils.getCurrentContext()
     
-    original_format = {}
     original_formatConfig_values = {}
     heading_has_rule = False
     for r, key in ROLE_TO_FORMAT_KEY.items():
@@ -1512,7 +1492,7 @@ def new_getControlFieldSpeech(
     if 'role' in patched_attrs:
         patched_role = patched_attrs['role']
         fmt_key = ROLE_TO_FORMAT_KEY.get(patched_role)
-        if fmt_key and not original_format.get(fmt_key, True):
+        if fmt_key and not original_formatConfig_values.get(fmt_key, True):
             patched_attrs.pop('role', None)
             patched_attrs.pop('level', None)
             
@@ -1521,9 +1501,9 @@ def new_getControlFieldSpeech(
             
     if 'states' in patched_attrs:
         new_states = set(patched_attrs['states'])
-        if not original_format.get("reportClickable", True) and controlTypes.State.CLICKABLE in new_states:
+        if not original_formatConfig_values.get("reportClickable", True) and controlTypes.State.CLICKABLE in new_states:
             new_states.remove(controlTypes.State.CLICKABLE)
-        if not original_format.get("reportLinks", True) and controlTypes.State.VISITED in new_states:
+        if not original_formatConfig_values.get("reportLinks", True) and controlTypes.State.VISITED in new_states:
             new_states.remove(controlTypes.State.VISITED)
         patched_attrs['states'] = new_states
     

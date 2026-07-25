@@ -38,6 +38,7 @@ _wave_player_pool_lock = threading.Lock()
 _DEFAULT_COMMANDS_CONFIG = {
     "audio3d": False,
     "reverb": False,
+    "enable_ffmpeg": False,
 }
 
 _commands_cached_config = dict(_DEFAULT_COMMANDS_CONFIG)
@@ -49,6 +50,7 @@ def refreshCommandsCachedConfig():
     _commands_cached_config = {
         "audio3d": ac.get("audio3d", _DEFAULT_COMMANDS_CONFIG["audio3d"]),
         "reverb": us.get("Reverb", _DEFAULT_COMMANDS_CONFIG["reverb"]),
+        "enable_ffmpeg": ac.get("enable_ffmpeg", _DEFAULT_COMMANDS_CONFIG["enable_ffmpeg"]),
     }
 
 _WAVE_PLAYER_POOL_MAX = 16
@@ -78,7 +80,12 @@ def get_pooled_player(channels, sample_rate, ducking=False):
                 purpose=nvwave.AudioPurpose.SOUNDS
             )
             if len(_wave_player_pool) > _WAVE_PLAYER_POOL_MAX:
-                _wave_player_pool.pop(next(iter(_wave_player_pool)))
+                evicted_key = next(iter(_wave_player_pool))
+                evicted = _wave_player_pool.pop(evicted_key)
+                try:
+                    evicted.close()
+                except Exception:
+                    pass
         return _wave_player_pool[key]
 
 # Cache for reverbed audio (capped at 50 entries to prevent unbounded growth)
@@ -92,8 +99,9 @@ def _apply_ducking(pcm_bytes, df):
     try:
         from . import frenzy
         return frenzy.apply_ducking_to_pcm(pcm_bytes, df)
-    except Exception:
-        pass
+    except Exception as e:
+        from logHandler import log
+        log.debugWarning(f"_apply_ducking: frenzy fallback: {e}")
     arr = array.array('h', (int(x * df) for x in array.array('h', pcm_bytes)))
     return arr.tobytes()
 
@@ -134,8 +142,9 @@ class PpBeepCommand(PpSynchronousCommand):
             if df < 1.0:
                 left = int(left * df)
                 right = int(right * df)
-        except Exception:
-            pass
+        except Exception as e:
+            from logHandler import log
+            log.debugWarning(f"PpBeepCommand.run(): ducking failed: {e}")
 
         _angle_x, _angle_y = 0, 0
         _audio3d = _commands_cached_config.get("audio3d", False)
@@ -149,7 +158,7 @@ class PpBeepCommand(PpSynchronousCommand):
         try:
             reverb_enabled = _commands_cached_config.get("reverb", False)
             if reverb_enabled:
-                cache_key = ("beep", hz, length, left, right)
+                cache_key = ("beep", hz, length, left, right, _angle_x, _angle_y)
                 reverbed = None
                 with _reverb_cache_lock:
                     if cache_key in _reverb_cache:
@@ -291,7 +300,13 @@ class PpWaveFileCommand(PpSynchronousCommand):
                     pos = self.startAdjustment * f.getframerate() // 1000
                     pos *= f.getnchannels()
                     arr = arr[pos:]
-                    
+
+                if self.endAdjustment > 0:
+                    end_pos = self.endAdjustment * f.getframerate() // 1000
+                    end_pos *= f.getnchannels()
+                    if end_pos < len(arr):
+                        arr = arr[:-end_pos]
+
                 self.buf = arr.tobytes()
                 self._channels = f.getnchannels()
                 self._sample_rate = f.getframerate()
@@ -329,8 +344,7 @@ class PpWaveFileCommand(PpSynchronousCommand):
 
         if self.buf is None and decoded is None:
             try:
-                from config import conf
-                if not conf.get("audiothemes", {}).get("enable_ffmpeg", False):
+                if not _commands_cached_config.get("enable_ffmpeg", False):
                     return
                 from logHandler import log
                 from .unspoken import ffmpeg_utils
@@ -353,6 +367,11 @@ class PpWaveFileCommand(PpSynchronousCommand):
                 pos = self.startAdjustment * sample_rate // 1000
                 pos *= channels
                 int_arr = int_arr[pos:]
+            if self.endAdjustment > 0:
+                end_pos = self.endAdjustment * sample_rate // 1000
+                end_pos *= channels
+                if end_pos < len(int_arr):
+                    int_arr = int_arr[:-end_pos]
             self.buf = int_arr.tobytes()
             self._channels = channels
             self._sample_rate = sample_rate
@@ -368,15 +387,16 @@ class PpWaveFileCommand(PpSynchronousCommand):
             self._duration = max(0, result)
         
         with self._cache_lock:
-            if len(self._wave_cache) > 50:
-                self._wave_cache.pop(next(iter(self._wave_cache)))
-            self._wave_cache[cache_key] = {
-                "buf": self.buf, 
-                "duration": self._duration,
-                "channels": self._channels,
-                "sample_rate": self._sample_rate
-            }
-            
+            if self.buf is not None:
+                if len(self._wave_cache) > 50:
+                    self._wave_cache.pop(next(iter(self._wave_cache)))
+                self._wave_cache[cache_key] = {
+                    "buf": self.buf,
+                    "duration": self._duration,
+                    "channels": self._channels,
+                    "sample_rate": self._sample_rate
+                }
+
         self._loaded = True
 
     def run(self):
@@ -393,8 +413,9 @@ class PpWaveFileCommand(PpSynchronousCommand):
         try:
             from . import frenzy
             _ducking_factor = frenzy.get_ducking_factor("earcons")
-        except Exception:
-            pass
+        except Exception as e:
+            from logHandler import log
+            log.debugWarning(f"PpWaveFileCommand.run(): ducking failed: {e}")
 
         _angle_x, _angle_y = 0, 0
         _audio3d = _commands_cached_config.get("audio3d", False)
@@ -408,7 +429,7 @@ class PpWaveFileCommand(PpSynchronousCommand):
         try:
             reverb_enabled = _commands_cached_config.get("reverb", False)
             if reverb_enabled:
-                cache_key = ("wave", self.fileName, self.volume, self.startAdjustment)
+                cache_key = ("wave", self.fileName, self.volume, self.startAdjustment, self.endAdjustment, _angle_x, _angle_y)
                 packed = None
                 with _reverb_cache_lock:
                     if cache_key in _reverb_cache:

@@ -7,43 +7,27 @@
 
 import addonHandler
 import api
-import bisect
 import characterProcessing
 import config
 import collections
 import controlTypes
 import copy
 import core
-import ctypes
-from ctypes import create_string_buffer, byref
 from enum import Enum
 from functools import lru_cache
-import globalPluginHandler
 import globalVars
 import gui
 from gui import guiHelper, nvdaControls
 from gui.settingsDialogs import SettingsPanel
-import itertools
 import json
 from logHandler import log
-import NVDAHelper
-from NVDAObjects.window import winword
-import nvwave
-import operator
 import os
-from queue import Queue
 import re
-from scriptHandler import script, willSayAllResume
+from scriptHandler import script
 import speech
 import speech.commands
-import struct
-import textInfos
 import threading
-from threading import Thread
-import time
 import tones
-import ui
-import wave
 import wx
 
 from .common import *
@@ -58,6 +42,7 @@ from config.configFlags import ReportLineIndentation
 import languageHandler
 import shutil
 import globalCommands
+
 
 # audioRuleTypes and audioRule* constants are imported from .common via wildcard import above.
 # Do NOT redefine them here — common.py has the complete list including numericProsody, textSubstitution, and noop.
@@ -74,7 +59,7 @@ class MaskedString:
         self.s = s
 
 class AudioRule:
-    jsonFields = "comment pattern ruleType wavFile builtInWavFile tone duration enabled caseSensitive startAdjustment endAdjustment prosodyName prosodyOffset prosodyMultiplier volume passThrough frenzyType frenzyValue minNumericValue maxNumericValue prosodyMinOffset prosodyMaxOffset replacementPattern suppressStateClutter applicationFilterRegex windowTitleRegex urlRegex speechBehavior customSpeechText customLabel".split()
+    jsonFields = "comment pattern ruleType wavFile builtInWavFile tone duration enabled caseSensitive startAdjustment endAdjustment prosodyName prosodyOffset prosodyMultiplier volume passThrough frenzyType frenzyValue minNumericValue maxNumericValue prosodyMinOffset prosodyMaxOffset replacementPattern suppressStateClutter applicationFilterRegex windowTitleRegex urlRegex speechBehavior customSpeechText customLabel voiceChangeSynthId voiceChangeVoiceId".split()
     def __init__(
         self,
         comment,
@@ -107,6 +92,8 @@ class AudioRule:
         speechBehavior=0,
         customSpeechText="",
         customLabel="",
+        voiceChangeSynthId="",
+        voiceChangeVoiceId="",
     ):
         self.comment = comment
         self.pattern = pattern
@@ -144,6 +131,8 @@ class AudioRule:
         self.speechBehavior = speechBehavior
         self.customSpeechText = customSpeechText
         self.customLabel = customLabel
+        self.voiceChangeSynthId = voiceChangeSynthId
+        self.voiceChangeVoiceId = voiceChangeVoiceId
 
         self.regexp = re.compile(self.pattern, 0 if self.caseSensitive else re.IGNORECASE)
         self._applicationFilterRegex = re.compile(applicationFilterRegex)
@@ -169,6 +158,8 @@ class AudioRule:
         elif self.ruleType == audioRuleBeep:
             return f"Beep: {self.tone}@{self.duration}"
         elif self.ruleType == audioRuleProsody:
+            if self.prosodyName == VOICE_CHANGE_PROSODY:
+                return f"VoiceChange: {self.voiceChangeSynthId}/{self.voiceChangeVoiceId}"
             return f"Prosody: {self.prosodyName}:{self.prosodyOffset}:{self.prosodyMultiplier}"
         elif self.ruleType in [audioRuleTextSubstitution]:
             return f"TextSubstitution: '{self.replacementPattern}'"
@@ -240,6 +231,8 @@ class AudioRule:
         elif self.ruleType == audioRuleBeep:
             return PpBeepCommand(self.tone, self.duration, left=self.volume, right=self.volume), None
         elif self.ruleType == audioRuleProsody:
+            if self.prosodyName == VOICE_CHANGE_PROSODY:
+                return None, None
             classClass = getProsodyClass(self.prosodyName)
             if self.prosodyOffset is not None:
                 # We shouldn't set offset to zero because it means restore defaults and confuses our nested prosody commands algorithm.
@@ -375,10 +368,16 @@ def reloadRules():
             errors.append(e)
         else:
             newRulesByFrenzy[rule.getFrenzyType()].append(rule)
-            if rule.enabled and rule.ruleType == audioRuleProsody:
+            if rule.enabled and rule.ruleType == audioRuleProsody and rule.prosodyName != VOICE_CHANGE_PROSODY:
                 newAllProsodies.add(rule.prosodyName)
     if len(errors) > 0:
         log.exception(f"Failed to load {len(errors)} audio rules; last exception:", errors[-1])
+        wx.CallAfter(
+            gui.messageBox,
+            _("Failed to load {count} audio rule(s). They may have invalid fields or be corrupted.\nCheck the NVDA log for details.").format(count=len(errors)),
+            _("Earcons and Speech Rules"),
+            wx.OK|wx.ICON_WARNING,
+        )
     
     newCharacterRules = {
         rule.pattern: rule
@@ -395,7 +394,8 @@ def reloadRules():
         pattern = f"({pattern})+"
         try:
             new_cached_passThrough_regex = re.compile(pattern, re.UNICODE)
-        except Exception:
+        except Exception as e:
+            log.warning(f"Failed to compile passThrough regex {pattern!r}: {e}")
             new_cached_passThrough_regex = None
     else:
         new_cached_passThrough_regex = None
@@ -539,8 +539,8 @@ class EmojiSoundCommand(speech.commands.BaseCallbackCommand):
                             break
                 if key is not None:
                     handler.play({"name": "emoji", "role": 0, "volume_override": vol / 100.0}, key)
-        except Exception:
-            pass
+        except Exception as e:
+            log.warning(f"EmojiSoundCommand.run() failed: {e}")
 
 
 # Module-level flag for emoji role sound suppression
@@ -790,27 +790,10 @@ highLevelSpeakFunctionNames = {
     ],
 }
 originalHighLevelSpeakFunctions = {}
-pdbg = False
 def monkeyPatchRestoreProsodyInAllHighLevelSpeakFunctions():
     def createFunctor(targetFunction, functionName):
         def functor(*args, **kwargs):
-            global pdbg
-            if functionName == 'speakTextInfo':
-                info = args[0]
-                if 'd' == info.text:
-                    tones.beep(500, 50)
-                    pdbg = True
-                    frenzy.pdbg = True
-            if isPhoneticPunctuationEnabled():
-                # Sending a string containing a single whitespace.
-                # For some reason if the string is empty, this causes a weird exception in braille.py.
-                #originalSpeechSpeechSpeak(resetProsodies([' ']))
-                pass
-            result = targetFunction(*args, **kwargs)
-            if pdbg:
-                pdbg = False
-                frenzy.pdbg = False
-            return result
+            return targetFunction(*args, **kwargs)
         return functor
     
     for module, functionNames in highLevelSpeakFunctionNames.items():
@@ -1089,7 +1072,7 @@ def resetProsodies(sequence):
     If we alter a prosody, we typically also insert another command to reset that prosody back.
     However, sometimes user would cancel speech before the second prosody command has reached the synth.
     We don't want prosody to stay altered and affect the next utterance.
-    NVDA appears to have some kind of logic to reset prosody, but it is unreliable and I ddin't track it down.
+    NVDA appears to have some kind of logic to reset prosody, but it is unreliable and I didn't track it down.
     So doing a poor man's prosody reset here.
     Also resetting prosodies stack.
     """
@@ -1133,8 +1116,8 @@ def new_processSpeechSymbol(locale, symbol):
             if cmd is not None:
                 try:
                     speech.speak([cmd])
-                except Exception:
-                    pass
+                except Exception as e:
+                    log.warning(f"new_processSpeechSymbol: failed to speak earcon for {symbol!r}: {e}")
 
             if speechBehavior == 1:
                 return symbol
