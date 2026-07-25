@@ -360,6 +360,11 @@ kbdLeft = fromNameSmart("LeftArrow")
 kbdRight = fromNameSmart("RightArrow")
 kbdUp = fromNameSmart("UpArrow")
 kbdDown = fromNameSmart("DownArrow")
+_kbd_gestures_resolved = all(g is not None for g in [
+    kbdControlC, kbdControlV, kbdControlA, kbdControlHome,
+    kbdControlShiftHome, kbdControlShiftDown, kbdShiftRight,
+    kbdControlEnd, kbdDelete, kbdLeft, kbdRight, kbdUp, kbdDown,
+])
 
 class NoSelectionError(Exception):
     def __init__(self, *args, **kwargs):
@@ -821,50 +826,64 @@ class BrowserNavMixin:
         global _activeAudioThemesPlugin
         _activeAudioThemesPlugin = None
         from contextlib import suppress
-        cursorManager.CursorManager._caretMovementScriptHelper = originalCaretMovementScriptHelper
-        inputCore.InputManager.executeGesture = originalExecuteGesture
-        browseMode.BrowseModeTreeInterceptor._quickNavScript = originalQuickNavScript
-        documentBase.DocumentWithTableNavigation._tableMovementScriptHelper = originalTableScriptHelper
-        cursorManager.CursorManager._set_selection = original_set_selection
-        browseMode.BrowseModeDocumentTreeInterceptor.event_gainFocus = quickJump.original_event_gainFocus
-        browseMode.BrowseModeDocumentTreeInterceptor.getAlternativeScript = quickJump.originalGetAlternativeScript
-        browseMode.BrowseModeTreeInterceptor.shouldPassThrough = quickJump.originalShouldPassThrough
-        browseMode.BrowseModeDocumentTreeInterceptor.event_treeInterceptor_gainFocus = quickJump.original_event_treeInterceptor_gainFocus
+        with suppress(Exception):
+            cursorManager.CursorManager._caretMovementScriptHelper = originalCaretMovementScriptHelper
+        with suppress(Exception):
+            inputCore.InputManager.executeGesture = originalExecuteGesture
+        with suppress(Exception):
+            browseMode.BrowseModeTreeInterceptor._quickNavScript = originalQuickNavScript
+        with suppress(Exception):
+            documentBase.DocumentWithTableNavigation._tableMovementScriptHelper = originalTableScriptHelper
+        with suppress(Exception):
+            cursorManager.CursorManager._set_selection = original_set_selection
+        with suppress(Exception):
+            browseMode.BrowseModeDocumentTreeInterceptor.event_gainFocus = quickJump.original_event_gainFocus
+        with suppress(Exception):
+            browseMode.BrowseModeDocumentTreeInterceptor.getAlternativeScript = quickJump.originalGetAlternativeScript
+        with suppress(Exception):
+            browseMode.BrowseModeTreeInterceptor.shouldPassThrough = quickJump.originalShouldPassThrough
+        with suppress(Exception):
+            browseMode.BrowseModeDocumentTreeInterceptor.event_treeInterceptor_gainFocus = quickJump.original_event_treeInterceptor_gainFocus
         # Safe Live Region unhook: only restore if the hook was successfully installed
-        if getattr(quickJump, 'originalReportLiveRegion', None) is not None:
-            NVDAHelper.nvdaControllerInternal_reportLiveRegion = quickJump.originalReportLiveRegion
+        with suppress(Exception):
+            if getattr(quickJump, 'originalReportLiveRegion', None) is not None:
+                NVDAHelper.nvdaControllerInternal_reportLiveRegion = quickJump.originalReportLiveRegion
         
-        virtualBuffers.VirtualBuffer._handleUpdate = originalVirtualBufferHandleUpdate
-        speech.speakTextInfo = originalSpeakTextInfo
+        with suppress(Exception):
+            virtualBuffers.VirtualBuffer._handleUpdate = originalVirtualBufferHandleUpdate
+        with suppress(Exception):
+            speech.speakTextInfo = originalSpeakTextInfo
         # Restore api module patches
-        if _original_api_getCurrentURL is not None:
-            api.getCurrentURL = _original_api_getCurrentURL
-        else:
+        with suppress(Exception):
+            if _original_api_getCurrentURL is not None:
+                api.getCurrentURL = _original_api_getCurrentURL
+            else:
+                try:
+                    del api.getCurrentURL
+                except AttributeError:
+                    pass
+        with suppress(Exception):
             try:
-                del api.getCurrentURL
+                del api.postFocusOrURLChange
             except AttributeError:
                 pass
-        try:
-            del api.postFocusOrURLChange
-        except AttributeError:
-            pass
         # Restore editableText class patches
-        if _original_editInBrowserNav is not None:
-            editableText.EditableText.script_editInBrowserNav = _original_editInBrowserNav
-        else:
+        with suppress(Exception):
+            if _original_editInBrowserNav is not None:
+                editableText.EditableText.script_editInBrowserNav = _original_editInBrowserNav
+            else:
+                try:
+                    del editableText.EditableText.script_editInBrowserNav
+                except AttributeError:
+                    pass
+        with suppress(Exception):
             try:
-                del editableText.EditableText.script_editInBrowserNav
-            except AttributeError:
+                del editableText.EditableText._EditableText__gestures['kb:NVDA+E']
+            except KeyError:
                 pass
-        try:
-            del editableText.EditableText._EditableText__gestures['kb:NVDA+E']
-        except KeyError:
-            pass
-        from core import postNvdaStartup
-        try:
+        with suppress(Exception):
+            from core import postNvdaStartup
             postNvdaStartup.unregister(_installExecuteGesturePatch)
-        except (ValueError, AttributeError):
-            pass
 
     def maybeAdjustOperator(self, op):
         mode = getConfig("browserMode")

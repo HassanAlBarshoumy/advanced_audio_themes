@@ -43,7 +43,10 @@ from controlTypes import OutputReason
 from config.configFlags import ReportLineIndentation
 
 
-_ctypes_mod = __import__('_ctypes')
+try:
+    _ctypes_mod = __import__('_ctypes')
+except ImportError:
+    _ctypes_mod = None
 
 ROLE_TO_FORMAT_KEY = {
     controlTypes.Role.LINK: "reportLinks",
@@ -286,11 +289,11 @@ def monkeyPatch():
         speech.sayAll.SayAllHandler._getTextInfoSpeech = speech.speech.getTextInfoSpeech
     
     global original_getPropertiesSpeech, original_getControlFieldSpeech
-    if speech.speech.getPropertiesSpeech is not new_getPropertiesSpeech:
+    if hasattr(speech.speech, 'getPropertiesSpeech') and speech.speech.getPropertiesSpeech is not new_getPropertiesSpeech:
         original_getPropertiesSpeech = speech.speech.getPropertiesSpeech
         speech.speech.getPropertiesSpeech = new_getPropertiesSpeech
         speech.getPropertiesSpeech = speech.speech.getPropertiesSpeech
-    if speech.speech.getControlFieldSpeech is not new_getControlFieldSpeech:
+    if hasattr(speech.speech, 'getControlFieldSpeech') and speech.speech.getControlFieldSpeech is not new_getControlFieldSpeech:
         original_getControlFieldSpeech = speech.speech.getControlFieldSpeech
         speech.speech.getControlFieldSpeech = new_getControlFieldSpeech
         speech.getControlFieldSpeech = speech.speech.getControlFieldSpeech
@@ -321,15 +324,20 @@ def monkeyUnpatch():
     if original_getObjectPropertiesSpeech is not None:
         speech.speech.getObjectPropertiesSpeech = original_getObjectPropertiesSpeech
 
-    speech.speech.getTextInfoSpeech = original_getTextInfoSpeech
-    speech.sayAll.SayAllHandler._getTextInfoSpeech = speech.speech.getTextInfoSpeech
-    speech.speech.getPropertiesSpeech = original_getPropertiesSpeech
-    speech.speech.getControlFieldSpeech = original_getControlFieldSpeech
+    if original_getTextInfoSpeech is not None:
+        speech.speech.getTextInfoSpeech = original_getTextInfoSpeech
+        speech.sayAll.SayAllHandler._getTextInfoSpeech = speech.speech.getTextInfoSpeech
+    if original_getPropertiesSpeech is not None:
+        speech.speech.getPropertiesSpeech = original_getPropertiesSpeech
+    if hasattr(speech, 'getPropertiesSpeech') and original_getPropertiesSpeech is not None:
+        speech.getPropertiesSpeech = speech.speech.getPropertiesSpeech
+    if original_getControlFieldSpeech is not None:
+        speech.speech.getControlFieldSpeech = original_getControlFieldSpeech
+    if hasattr(speech, 'getControlFieldSpeech') and original_getControlFieldSpeech is not None:
+        speech.getControlFieldSpeech = speech.speech.getControlFieldSpeech
     
-    speech.getPropertiesSpeech = speech.speech.getPropertiesSpeech
-    speech.getControlFieldSpeech = speech.speech.getControlFieldSpeech
-    
-    controlTypes.processAndLabelStates = original_processAndLabelStates
+    if original_processAndLabelStates is not None:
+        controlTypes.processAndLabelStates = original_processAndLabelStates
     
     if original_getTextInfoSpeech_considerSpelling is not None and hasattr(speech.speech, "_getTextInfoSpeech_considerSpelling"):
         speech.speech._getTextInfoSpeech_considerSpelling = original_getTextInfoSpeech_considerSpelling
@@ -349,13 +357,6 @@ def monkeyUnpatch():
             pass
         _original_speak = None
 
-roleRules = None
-stateRules = None
-stateDict = None
-negativeStateDict=None
-formatRules = None
-numericFormatRules = None
-otherRules = None
 roleRules = {}
 stateRules = {}
 negativeStateRules = {}

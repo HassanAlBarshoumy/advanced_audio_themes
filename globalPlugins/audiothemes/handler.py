@@ -696,10 +696,21 @@ class AudioThemesHandler:
         self._last_typing_time = 0.0
         self._last_typing_vk = 0
         self._cached_config = {}  # populated by configure()
+        self._theme_cache = {}  # populated by configure()
+        self._app_profiles_cache = {}  # populated by configure()
         self._system_monitor = None
-        self.ensure_themes_dir()
-        self.migrate_all_themes_to_named_files()
-        self.configure()
+        try:
+            self.ensure_themes_dir()
+        except Exception as e:
+            log.error(f"AudioThemes: failed to ensure themes directory: {e}", exc_info=True)
+        try:
+            self.migrate_all_themes_to_named_files()
+        except Exception as e:
+            log.error(f"AudioThemes: failed to migrate themes: {e}", exc_info=True)
+        try:
+            self.configure()
+        except Exception as e:
+            log.error(f"AudioThemes: failed to configure: {e}", exc_info=True)
         self._registered_actions = (
             post_configSave,
             post_configReset,
@@ -708,8 +719,9 @@ class AudioThemesHandler:
         )
         for action in self._registered_actions:
             action.register(self.configure)
-        self._NVDA_getPropertiesSpeech = speech.speech.getPropertiesSpeech
-        speech.speech.getPropertiesSpeech = self._hook_getSpeechTextForProperties
+        self._NVDA_getPropertiesSpeech = getattr(speech.speech, 'getPropertiesSpeech', None)
+        if self._NVDA_getPropertiesSpeech is not None:
+            speech.speech.getPropertiesSpeech = self._hook_getSpeechTextForProperties
         # System status monitor
         self._system_monitor = None
         self._start_system_status_monitoring()
@@ -763,7 +775,11 @@ class AudioThemesHandler:
 
     def ensure_themes_dir(self):
         if not os.path.isdir(THEMES_DIR):
-            os.makedirs(THEMES_DIR)
+            try:
+                os.makedirs(THEMES_DIR)
+            except OSError:
+                log.error(f"AudioThemes: failed to create themes directory: {THEMES_DIR}")
+                return
             
         user_config = config.conf["audiothemes"]
         bundled_themes_dir = os.path.join(os.path.dirname(__file__), "Themes")
@@ -825,7 +841,7 @@ class AudioThemesHandler:
                 pass
         if self._NVDA_getPropertiesSpeech is not None:
             speech.speech.getPropertiesSpeech = self._NVDA_getPropertiesSpeech
-        for action in self._registered_actions:
+        for action in getattr(self, '_registered_actions', ()):
             try:
                 action.unregister(self.configure)
             except (ValueError, AttributeError):
@@ -878,10 +894,14 @@ class AudioThemesHandler:
 
     def configure(self, *args, **kwargs):
         self._migrate_config()
+        new_active_theme = None
         with self._config_lock:
-            user_config = config.conf["audiothemes"]
-            new_enabled = user_config["enable_audio_themes"]
-            new_theme_folder = user_config["active_theme"] if new_enabled else None
+            try:
+                user_config = config.conf["audiothemes"]
+            except KeyError:
+                user_config = {}
+            new_enabled = user_config.get("enable_audio_themes", True)
+            new_theme_folder = user_config.get("active_theme") if new_enabled else None
             old_theme_folder = self.active_theme.folder if self.active_theme else None
             theme_changed = (
                 new_enabled != self.enabled or
@@ -891,11 +911,9 @@ class AudioThemesHandler:
                 if self.active_theme is not None:
                     self.active_theme.deactivate()
                 self.enabled = new_enabled
-                self.active_theme = self.get_active_theme()
                 with _typing_dir_cache_lock:
                     _typing_dir_cache.clear()
                 self._theme_cache = {}
-                log.debug(f"configure: enabled={self.enabled} active_theme={'present' if self.active_theme else 'None'}")
             else:
                 self.enabled = new_enabled
 
@@ -912,34 +930,43 @@ class AudioThemesHandler:
                 log.debugWarning(f"Malformed app_profiles JSON: {e}")
                 self._app_profiles_cache = {}
 
-        if self.active_theme is None:
-            return
-        self.player.audio3d = user_config["audio3d"]
-        self.player.use_in_say_all = user_config["use_in_say_all"]
-        self.player.speak_roles = user_config["speak_roles"]
-        self.player.use_synth_volume = user_config["use_synth_volume"]
-        self.player.volume = user_config["volume"]
-        unspoken_config = config.conf["unspoken"]
-        self.player.reverb = unspoken_config["Reverb"]
-        self.player.room_size = unspoken_config["RoomSize"]
-        self.player.damping = unspoken_config["Damping"]
-        self.player.wet_level = unspoken_config["WetLevel"]
-        self.player.dry_level = unspoken_config["DryLevel"]
-        self.player.width = unspoken_config["Width"]
-        # Cache processing config on the player to avoid config.conf reads in _ensure_processed
-        self.player._trim_silence = unspoken_config.get("TrimSilence", True)
-        self.player._trim_silence_threshold = float(unspoken_config.get("TrimSilenceThreshold", 0.01))
-        self.player._smart_volume = unspoken_config.get("SmartVolume", True)
-        self.player._smooth_envelope = unspoken_config.get("SmoothEnvelope", False)
-        self.player._noise_gate = unspoken_config.get("NoiseGate", False)
-        self.player._noise_gate_threshold = float(unspoken_config.get("NoiseGateThreshold", 0.02))
-        self.player._noise_gate_attack = int(unspoken_config.get("NoiseGateAttack", 5))
-        self.player._noise_gate_release = int(unspoken_config.get("NoiseGateRelease", 50))
-        self.player._bass_boost = unspoken_config.get("BassBoost", False)
-        self.player._bass_boost_gain = float(unspoken_config.get("BassBoostGain", 3))
-        self.player._bass_boost_cutoff = float(unspoken_config.get("BassBoostCutoff", 200))
+        # Theme loading outside the lock — avoids blocking get_theme_for_app()
+        if theme_changed:
+            new_active_theme = self.get_active_theme()
+            with self._config_lock:
+                self.active_theme = new_active_theme
+            log.debug(f"configure: enabled={self.enabled} active_theme={'present' if self.active_theme else 'None'}")
+
+        if self.active_theme is not None:
+            self.player.audio3d = user_config["audio3d"]
+            self.player.use_in_say_all = user_config["use_in_say_all"]
+            self.player.speak_roles = user_config["speak_roles"]
+            self.player.use_synth_volume = user_config["use_synth_volume"]
+            self.player.volume = user_config["volume"]
+            try:
+                unspoken_config = config.conf["unspoken"]
+            except KeyError:
+                unspoken_config = {}
+            self.player.reverb = unspoken_config.get("Reverb", False)
+            self.player.room_size = unspoken_config.get("RoomSize", 100)
+            self.player.damping = unspoken_config.get("Damping", 0)
+            self.player.wet_level = unspoken_config.get("WetLevel", 0)
+            self.player.dry_level = unspoken_config.get("DryLevel", 30)
+            self.player.width = unspoken_config.get("Width", 100)
+            # Cache processing config on the player to avoid config.conf reads in _ensure_processed
+            self.player._trim_silence = unspoken_config.get("TrimSilence", True)
+            self.player._trim_silence_threshold = float(unspoken_config.get("TrimSilenceThreshold", 0.01))
+            self.player._smart_volume = unspoken_config.get("SmartVolume", True)
+            self.player._smooth_envelope = unspoken_config.get("SmoothEnvelope", False)
+            self.player._noise_gate = unspoken_config.get("NoiseGate", False)
+            self.player._noise_gate_threshold = float(unspoken_config.get("NoiseGateThreshold", 0.02))
+            self.player._noise_gate_attack = int(unspoken_config.get("NoiseGateAttack", 5))
+            self.player._noise_gate_release = int(unspoken_config.get("NoiseGateRelease", 50))
+            self.player._bass_boost = unspoken_config.get("BassBoost", False)
+            self.player._bass_boost_gain = float(unspoken_config.get("BassBoostGain", 3))
+            self.player._bass_boost_cutoff = float(unspoken_config.get("BassBoostCutoff", 200))
         self.disabled_apps = []
-        raw_disabled = user_config["disabled_apps"]
+        raw_disabled = user_config.get("disabled_apps", "")
         if raw_disabled:
             for p in raw_disabled.split(','):
                 p = p.strip().lower().removesuffix('.exe')
@@ -965,7 +992,10 @@ class AudioThemesHandler:
                 blr_parsed = [19]
         else:
             blr_parsed = [19]
-        unspoken_cfg = config.conf["unspoken"]
+        try:
+            unspoken_cfg = config.conf["unspoken"]
+        except KeyError:
+            unspoken_cfg = {}
         self._cached_config = {
             # First/Last detection
             "universal_fl_enabled": user_config.get("universal_fl_enabled", True),
@@ -982,7 +1012,7 @@ class AudioThemesHandler:
             "general_fallback_role_name": user_config.get("general_fallback_role_name", "listitem"),
             "blacklisted_roles": blr_parsed,
             # Theme/app hot-path config
-            "volume": user_config["volume"],
+            "volume": user_config.get("volume", 50),
             "typing_sounds": user_config.get("typing_sounds", True),
             "typing_sounds_edit_only": user_config.get("typing_sounds_edit_only", False),
             "typing_sounds_volume": user_config.get("typing_sounds_volume", 10),

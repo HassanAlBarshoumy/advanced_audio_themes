@@ -825,7 +825,10 @@ def monkeyPatchRestoreProsodyInAllHighLevelSpeakFunctions():
     for module, functionNames in highLevelSpeakFunctionNames.items():
         originalHighLevelSpeakFunctions[module] = {}
         for functionName in functionNames:
-            function = getattr(module, functionName)
+            try:
+                function = getattr(module, functionName)
+            except AttributeError:
+                continue
             originalHighLevelSpeakFunctions[module][functionName] = function
             replacementFunctor = createFunctor(function, functionName)
             setattr(module, functionName, replacementFunctor)
@@ -846,7 +849,10 @@ def injectMonkeyPatches():
         originalSpeechSpeechSpeak = speech.speech.speak
     speech.speech.speak = preSpeak
     speech.speak = speech.speech.speak
-    speech.sayAll.SayAllHandler.speechWithoutPausesInstance.speak = speech.speech.speak
+    try:
+        speech.sayAll.SayAllHandler.speechWithoutPausesInstance.speak = speech.speech.speak
+    except Exception:
+        pass
     
     if originalSpeechCancel is None:
         originalSpeechCancel = speech.speech.cancelSpeech
@@ -864,7 +870,10 @@ def injectMonkeyPatches():
     except AttributeError:
         pass # Not available in older NVDA versions
     
-    frenzy.monkeyPatch()
+    try:
+        frenzy.monkeyPatch()
+    except Exception as e:
+        log.warning(f"AudioThemes: frenzy.monkeyPatch() failed: {e}", exc_info=True)
     
     global original_processSpeechSymbol
     if original_processSpeechSymbol is None:
@@ -885,16 +894,22 @@ def injectMonkeyPatches():
 
 def restoreMonkeyPatches():
     # global originalSpeechSpeechSpeak, originalSpeechCancel
+    # CRITICAL: frenzy.monkeyUnpatch() must run BEFORE we restore speak,
+    # because frenzy.monkeyUnpatch() sets speech.speech.speak = _original_speak,
+    # which was captured as preSpeak (our function), not the real NVDA original.
+    frenzy.monkeyUnpatch()
     if originalSpeechSpeechSpeak is not None:
         speech.speech.speak = originalSpeechSpeechSpeak
         speech.speak = speech.speech.speak
-        speech.sayAll.SayAllHandler.speechWithoutPausesInstance.speak = speech.speech.speak
+        try:
+            speech.sayAll.SayAllHandler.speechWithoutPausesInstance.speak = speech.speech.speak
+        except Exception:
+            pass
     if originalSpeechCancel is not None:
         speech.speech.cancelSpeech = originalSpeechCancel
         speech.cancelSpeech = speech.speech.cancelSpeech
     if originalProcessSpeechSymbols is not None:
         characterProcessing.processSpeechSymbols = originalProcessSpeechSymbols
-    frenzy.monkeyUnpatch()
     
     if original_processSpeechSymbol is not None:
         characterProcessing.processSpeechSymbol = original_processSpeechSymbol

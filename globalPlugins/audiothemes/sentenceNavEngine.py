@@ -434,7 +434,7 @@ try:
     _sentence_nav_registrations.append(post_configSave.register(clearRegexCaches))
     _sentence_nav_registrations.append(post_configReset.register(clearRegexCaches))
     _sentence_nav_registrations.append(post_configProfileSwitch.register(clearRegexCaches))
-except ImportError:
+except (ImportError, AttributeError):
     pass
 
 def _unregister_sentence_nav_hooks():

@@ -79,7 +79,10 @@ except AttributeError:
     pass
 
 utils.initConfiguration()
-pp.reloadRules()
+try:
+    pp.reloadRules()
+except Exception:
+    log.error("AudioThemes: Failed to reload rules at startup", exc_info=True)
 
 from . import quicknav
 
@@ -269,12 +272,18 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         _set_handler_ref(self.handler)
         
         # Patch Quick Nav Interceptor
-        self.quicknav_interceptor = quicknav.BrowseModeQuickNavInterceptor(self.handler)
-        self.quicknav_interceptor.patch()
+        try:
+            self.quicknav_interceptor = quicknav.BrowseModeQuickNavInterceptor(self.handler)
+            self.quicknav_interceptor.patch()
+        except Exception:
+            log.error("AudioThemes: Failed to init quicknav interceptor", exc_info=True)
         
-        gui.settingsDialogs.NVDASettingsDialog.categoryClasses.append(
-            AudioThemesSettingsPanel
-        )
+        try:
+            gui.settingsDialogs.NVDASettingsDialog.categoryClasses.append(
+                AudioThemesSettingsPanel
+            )
+        except Exception:
+            log.error("AudioThemes: Failed to add settings panel", exc_info=True)
         self._previous_mouse_object = None
         self._last_navigator_object = None
         self._last_play_time = 0  # debounce: monotonic timestamp of last dispatch
@@ -300,10 +309,16 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self._navigation_timer.Start(250)
 
         # Phonetic Punctuation Initialization
-        self.injectMonkeyPatches()
+        try:
+            self.injectMonkeyPatches()
+        except Exception:
+            log.error("AudioThemes: Failed to install speech patches", exc_info=True)
         
         self._keyboard_hooked = False
-        self._hook_keyboard()
+        try:
+            self._hook_keyboard()
+        except Exception:
+            log.error("AudioThemes: Failed to hook keyboard", exc_info=True)
         
         # Restore caretMovementScriptHelper hook for arrow keys
         self.orig_caretMovementScriptHelper = None
@@ -660,11 +675,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
     def injectMonkeyPatches(self):
         pp.injectMonkeyPatches()
-        frenzy.monkeyPatch()
 
     def restoreMonkeyPatches(self):
         pp.restoreMonkeyPatches()
-        frenzy.monkeyUnpatch()
 
     # Browse-mode navigation: timer-based polling of navigator object.
     def _onNavigationTimer(self, event):
