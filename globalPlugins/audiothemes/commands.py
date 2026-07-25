@@ -327,7 +327,7 @@ class PpWaveFileCommand(PpSynchronousCommand):
                 wavMillis = int(1000 * frames / rate)
                 result = wavMillis - self.startAdjustment - self.endAdjustment
                 self._duration = max(0, result)
-        except (wave.Error, OSError):
+        except Exception:
             pass
         finally:
             if f is not None:
@@ -408,7 +408,12 @@ class PpWaveFileCommand(PpSynchronousCommand):
     def run(self):
         if is_sound_suppressed("earcons"):
             return
-        self._ensureLoaded()
+        try:
+            self._ensureLoaded()
+        except Exception as e:
+            from logHandler import log
+            log.debugWarning(f"PpWaveFileCommand.run() _ensureLoaded failed: {e}", exc_info=True)
+            return
         if not self._loaded:
             return
         try:
@@ -553,27 +558,39 @@ class PpChainCommand(PpSynchronousCommand):
 
     def run(self):
         global currentChain
-        with _current_chain_lock:
-            currentChain = self
-        threadPool.add_task(self.threadFunc)
+        try:
+            with _current_chain_lock:
+                currentChain = self
+            threadPool.add_task(self.threadFunc)
+        except Exception as e:
+            from logHandler import log
+            log.debugWarning(f"PpChainCommand.run() failed: {e}", exc_info=True)
+            with _current_chain_lock:
+                if currentChain is self:
+                    currentChain = None
 
     def getDuration(self):
         return sum([subcommand.getDuration() for subcommand in self.subcommands])
 
     def threadFunc(self):
         global currentChain
-        timestamp = time.time()
-        for subcommand in self.subcommands:
-            if self.terminated:
-                return
-            threadPool.add_task(subcommand.run)
-            timestamp += subcommand.getDuration() / 1000
-            sleepTime = timestamp - time.time()
-            if sleepTime > 0:
-                time.sleep(sleepTime)
-        with _current_chain_lock:
-            if currentChain is self:
-                currentChain = None
+        try:
+            timestamp = time.time()
+            for subcommand in self.subcommands:
+                if self.terminated:
+                    return
+                threadPool.add_task(subcommand.run)
+                timestamp += subcommand.getDuration() / 1000
+                sleepTime = timestamp - time.time()
+                if sleepTime > 0:
+                    time.sleep(sleepTime)
+        except Exception as e:
+            from logHandler import log
+            log.debugWarning(f"PpChainCommand.threadFunc() failed: {e}", exc_info=True)
+        finally:
+            with _current_chain_lock:
+                if currentChain is self:
+                    currentChain = None
         
 
     def __repr__(self):

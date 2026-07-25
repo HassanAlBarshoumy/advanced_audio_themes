@@ -98,12 +98,13 @@ def decode_ogg_to_float(path):
         sample_rate = info.rate
         channels = info.channels
         raw_pcm = ov_read(vf)
-        ov_clear(vf)
         if not raw_pcm:
+            ov_clear(vf)
             return None
         arr = array.array('h')
         arr.frombytes(raw_pcm)
         float_samples = array.array('f', [s / 32768.0 for s in arr])
+        ov_clear(vf)
         return (float_samples, sample_rate, channels)
     except Exception as e:
         try:

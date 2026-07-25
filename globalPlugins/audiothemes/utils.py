@@ -196,15 +196,25 @@ def getConfig(key):
             return _pp_config_cache[key]
         except KeyError:
             pass
-    val = config.conf[phoneticPunctuationConfigKey].get(key)
+    try:
+        val = config.conf[phoneticPunctuationConfigKey].get(key)
+    except KeyError:
+        return None
     with _pp_config_lock:
         _pp_config_cache[key] = val
     return val
 
 def setConfig(key, value):
-    config.conf[phoneticPunctuationConfigKey][key] = value
-    with _pp_config_lock:
-        _pp_config_cache[key] = value
+	try:
+		config.conf[phoneticPunctuationConfigKey][key] = value
+	except KeyError:
+		try:
+			config.conf[phoneticPunctuationConfigKey] = {}
+			config.conf[phoneticPunctuationConfigKey][key] = value
+		except Exception:
+			pass
+	with _pp_config_lock:
+		_pp_config_cache[key] = value
 
 def initConfiguration():
     confspec = {

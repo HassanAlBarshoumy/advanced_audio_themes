@@ -342,24 +342,30 @@ class AudioRuleDialog(wx.Dialog):
         if self.frenzyType != rule.getFrenzyType():
             raise RuntimeError
         idx = None
-        if self.frenzyType        == FrenzyType.ROLE:
-            idx = list(controlTypes.Role).index(rule.getFrenzyValue())
-        elif self.frenzyType        in [FrenzyType.STATE, FrenzyType.NEGATIVE_STATE]:
-            idx = self.possibleFrenzyObjects.index(rule.getFrenzyValue())
-        elif self.frenzyType        == FrenzyType.FORMAT:
-            idx = list(TextFormat).index(rule.getFrenzyValue())
-        elif self.frenzyType        == FrenzyType.NUMERIC_FORMAT:
-            idx = list(NumericTextFormat).index(rule.getFrenzyValue())
-        elif self.frenzyType        == FrenzyType.OTHER_RULE:
-            idx = list(OtherRule).index(rule.getFrenzyValue())
-        elif self.frenzyType        in [FrenzyType.TEXT, FrenzyType.CHARACTER]:
-            pass
-        else:
-            raise ValueError
+        try:
+            if self.frenzyType        == FrenzyType.ROLE:
+                idx = list(controlTypes.Role).index(rule.getFrenzyValue())
+            elif self.frenzyType        in [FrenzyType.STATE, FrenzyType.NEGATIVE_STATE]:
+                idx = self.possibleFrenzyObjects.index(rule.getFrenzyValue())
+            elif self.frenzyType        == FrenzyType.FORMAT:
+                idx = list(TextFormat).index(rule.getFrenzyValue())
+            elif self.frenzyType        == FrenzyType.NUMERIC_FORMAT:
+                idx = list(NumericTextFormat).index(rule.getFrenzyValue())
+            elif self.frenzyType        == FrenzyType.OTHER_RULE:
+                idx = list(OtherRule).index(rule.getFrenzyValue())
+            elif self.frenzyType        in [FrenzyType.TEXT, FrenzyType.CHARACTER]:
+                pass
+            else:
+                raise ValueError
+        except ValueError:
+            idx = 0
         if idx is not None:
             self.frenzyValueCategory.control.SetSelection(idx)
 
-        self.setType(rule.ruleType)
+        try:
+            self.setType(rule.ruleType)
+        except ValueError:
+            self.setType(self.possibleTypes[0])
         if rule.wavFile is not None:
             self.wavName.SetValue(rule.wavFile)
         if rule.builtInWavFile is not None:
@@ -383,7 +389,7 @@ class AudioRuleDialog(wx.Dialog):
         self.caseSensitiveCheckBox.SetValue(rule.caseSensitive)
         self.passThroughCheckBox.SetValue(rule.passThrough)
         for name, control in self.numericProsodyControls.items():
-            control.SetValue(getattr(rule, name))
+            control.SetValue(getattr(rule, name, 0))
         self.replacementPatternTextCtrl.SetValue(rule.replacementPattern or "")
         self.suppressStateClutterCheckBox.SetValue(rule.suppressStateClutter)
         self.applicationFilterRegexTextCtrl.SetValue(rule.applicationFilterRegex)
@@ -548,9 +554,9 @@ class AudioRuleDialog(wx.Dialog):
             good = False
             try:
                 tone = self.getInt(self.toneTextCtrl.GetValue())
-                if 0 <= tone <= 50000:
+                if tone is not None and 0 <= tone <= 50000:
                     good = True
-            except ValueError:
+            except (ValueError, TypeError):
                 pass
             if not good:
                 gui.messageBox(_("tone must be an integer between 0 and 50000"), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
@@ -560,9 +566,9 @@ class AudioRuleDialog(wx.Dialog):
             good = False
             try:
                 duration = self.getInt(self.durationTextCtrl.GetValue())
-                if 0 <= duration <= 60000:
+                if duration is not None and 0 <= duration <= 60000:
                     good = True
-            except ValueError:
+            except (ValueError, TypeError):
                 pass
             if not good:
                 gui.messageBox(_("duration must be an integer between 0 and 60000"), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
@@ -649,16 +655,15 @@ class AudioRuleDialog(wx.Dialog):
 
     def _onBrowseClick(self, evt):
         p= 'c:'
-        while True:
-            # Translators: browse wav file message
-            fd = wx.FileDialog(self, message=_("Select audio file:"),
-                wildcard=_("Audio files")+"|*.wav;*.mp3;*.ogg;*.flac;*.m4a;*.aac|"+_("WAV files")+"|*.wav|"+_("All files")+"|*.*",
-                defaultDir=os.path.dirname(p), style=wx.FD_OPEN
-            )
-            if not fd.ShowModal() == wx.ID_OK: break
-            p = fd.GetPath()
-            self.wavName.SetValue(p)
-            break
+        fd = wx.FileDialog(self, message=_("Select audio file:"),
+            wildcard=_("Audio files")+"|*.wav;*.mp3;*.ogg;*.flac;*.m4a;*.aac|"+_("WAV files")+"|*.wav|"+_("All files")+"|*.*",
+            defaultDir=os.path.dirname(p), style=wx.FD_OPEN
+        )
+        try:
+            if fd.ShowModal() == wx.ID_OK:
+                self.wavName.SetValue(fd.GetPath())
+        finally:
+            fd.Destroy()
 
     def onTestClick(self, evt):
         if time.time() - self.lastTestTime < 1:
@@ -1228,7 +1233,7 @@ class RulesDialog(SettingsPanel):
             except Exception as e:
                 log.error(f"AudioThemes Error: {e}", exc_info=True)
         try:
-            with open(rulesFileName, "w") as rulesFile:
+            with open(rulesFileName, "w", encoding="utf-8") as rulesFile:
                 rulesFile.write(rulesJson)
         except OSError as e:
             log.error(f"AudioThemes Error saving rules: {e}", exc_info=True)

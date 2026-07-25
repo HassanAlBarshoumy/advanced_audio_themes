@@ -283,9 +283,9 @@ class ThemeBlenderDialog(BaseDialog):
             )
             if saveFileDlg.ShowModal() == wx.ID_OK:
                 filename = saveFileDlg.GetPath().strip()
-                saveFileDlg.Destroy()
                 if filename:
                     self.save_theme_package(filename)
+            saveFileDlg.Destroy()
         self.theme_state.initial_state = tuple(self.theme_state.state)
         self.EndModal(wx.ID_OK)
 
@@ -301,9 +301,9 @@ class ThemeBlenderDialog(BaseDialog):
         )
         if saveFileDlg.ShowModal() == wx.ID_OK:
             filename = saveFileDlg.GetPath().strip()
-            saveFileDlg.Destroy()
             if filename:
                 self.save_theme_package(filename)
+        saveFileDlg.Destroy()
 
     def onClose(self, event):
         if self.is_dirty():
@@ -458,7 +458,8 @@ class AudioSelectorDialog(BaseDialog):
         ]
         for role, label in nonexisting_roles:
             self.roleChoice.Append(label, role)
-        self.roleChoice.SetSelection(0)
+        if nonexisting_roles:
+            self.roleChoice.SetSelection(0)
         self.previewButton.Enable(False)
 
     @property

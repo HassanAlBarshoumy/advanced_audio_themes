@@ -939,7 +939,10 @@ class UnspokenPlayer:
 				self._audio_queue.task_done()
 		except queue.Empty:
 			pass
-		self.wave_player.close()
+		try:
+			self.wave_player.close()
+		except Exception as e:
+			log.error(f"AudioThemes Error closing wave player: {e}", exc_info=True)
 		if hasattr(self, "typing_players"):
 			for p in self.typing_players:
 				try: p.close()

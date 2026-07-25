@@ -901,6 +901,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
     def _createRoleGrid(self):
         self._gridFormatNames = [name for code, name in self._PER_ROLE_FORMATS]
         self._roleFormats = {}
+        self._roleListData = {}
         
         self.roleListCtrl = wx.ListCtrl(self.speechOrderPage, style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.BORDER_SIMPLE)
         self.roleListCtrl.AppendColumn(_("Role"), width=200)
@@ -924,6 +925,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
     def _populateRoleList(self, filterText=""):
         self.roleListCtrl.DeleteAllItems()
+        self._roleListData = {}
         for role, label in self._role_list:
             if filterText and filterText not in label.lower():
                 continue
@@ -934,12 +936,13 @@ class AudioThemesSettingsPanel(SettingsPanel):
                     fmtName = self._gridFormatNames[i]
                     break
             idx = self.roleListCtrl.Append([label, fmtName])
-            self.roleListCtrl.SetItemData(idx, role.value)
+            self._roleListData[idx] = role
 
     def _onRoleSelected(self, event):
         idx = event.GetIndex()
-        roleValue = self.roleListCtrl.GetItemData(idx)
-        role = controlTypes.Role(roleValue)
+        role = self._roleListData.get(idx)
+        if role is None:
+            return
         code = self._roleFormats.get(role, "global")
         for i, (c, n) in enumerate(self._PER_ROLE_FORMATS):
             if c == code:
@@ -951,8 +954,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
         idx = self.roleListCtrl.GetFirstSelected()
         if idx == -1:
             return
-        roleValue = self.roleListCtrl.GetItemData(idx)
-        role = controlTypes.Role(roleValue)
+        role = self._roleListData.get(idx)
+        if role is None:
+            return
         sel = self.roleFormatChoice.GetSelection()
         if sel == wx.NOT_FOUND:
             return
@@ -2001,22 +2005,37 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.trimThresholdSlider.Enable(self.trimSilenceCheckbox.GetValue())
         self.trimThresholdValueLabel.Enable(self.trimSilenceCheckbox.GetValue())
         self.noiseGateCheckbox.SetValue(_b(unspoken_conf.get("NoiseGate", False)))
-        ng_threshold = float(unspoken_conf.get("NoiseGateThreshold", 0.02))
+        try:
+            ng_threshold = float(unspoken_conf.get("NoiseGateThreshold", 0.02))
+        except (ValueError, TypeError):
+            ng_threshold = 0.02
         self.noiseThresholdSlider.SetValue(self._noise_threshold_to_slider(ng_threshold))
         self._on_noise_threshold_changed(None)
-        ng_attack = int(unspoken_conf.get("NoiseGateAttack", 5))
+        try:
+            ng_attack = int(unspoken_conf.get("NoiseGateAttack", 5))
+        except (ValueError, TypeError):
+            ng_attack = 5
         self.noiseAttackSlider.SetValue(ng_attack)
         self._on_noise_attack_changed(None)
-        ng_release = int(unspoken_conf.get("NoiseGateRelease", 50))
+        try:
+            ng_release = int(unspoken_conf.get("NoiseGateRelease", 50))
+        except (ValueError, TypeError):
+            ng_release = 50
         self.noiseReleaseSlider.SetValue(ng_release)
         self._on_noise_release_changed(None)
         self._on_noise_gate_changed(None)
 
         self.bassBoostCheckbox.SetValue(_b(unspoken_conf.get("BassBoost", False)))
-        bb_gain = int(unspoken_conf.get("BassBoostGain", 3))
+        try:
+            bb_gain = int(unspoken_conf.get("BassBoostGain", 3))
+        except (ValueError, TypeError):
+            bb_gain = 3
         self.bassGainSlider.SetValue(bb_gain)
         self._on_bass_gain_changed(None)
-        bb_cutoff = int(unspoken_conf.get("BassBoostCutoff", 200))
+        try:
+            bb_cutoff = int(unspoken_conf.get("BassBoostCutoff", 200))
+        except (ValueError, TypeError):
+            bb_cutoff = 200
         self.bassCutoffSlider.SetValue(bb_cutoff)
         self._on_bass_cutoff_changed(None)
         self._on_bass_boost_changed(None)
@@ -2666,7 +2685,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         snConf["textCrackleVolume"] = self.textCrackleVolumeSlider.GetValue()
         snConf["noNextTextChimeVolume"] = self.noNextTextChimeSlider.GetValue()
         snConf["noNextTextMessage"] = self.noNextTextMessageCheckbox.GetValue()
-        snConf["reconstructMode"] = self.reconstructOptions[self.reconstructModeCombobox.GetSelection()]
+        snConf["reconstructMode"] = self.reconstructOptions[max(0, self.reconstructModeCombobox.GetSelection())]
         
         snConf["sentenceBreakers"] = self.sentenceBreakersEdit.GetValue()
         snConf["fullWidthSentenceBreakers"] = self.fullWidthSentenceBreakersEdit.GetValue()
