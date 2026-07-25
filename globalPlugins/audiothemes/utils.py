@@ -42,8 +42,11 @@ def ensure_mono(audio_bytes, channels, sample_rate):
 		return audio_bytes
 	if _cached_output_mode != "mono":
 		return audio_bytes
-	arr = array.array('h')
-	arr.frombytes(audio_bytes)
+	try:
+		arr = array.array('h')
+		arr.frombytes(audio_bytes)
+	except Exception:
+		return audio_bytes
 	n = len(arr) // 2
 	result = array.array('h', (int((arr[i * 2] + arr[i * 2 + 1]) * 0.5) for i in range(n) for _ in range(2)))
 	return result.tobytes()

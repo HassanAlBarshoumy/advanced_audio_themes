@@ -203,18 +203,21 @@ class AudioRule:
             return None
         type = self.getFrenzyType()
         s = self.frenzyValue
-        if type == FrenzyType.ROLE:
-            return controlTypes.role._roleLabels[getattr(controlTypes.Role, s)]
-        elif type in [FrenzyType.STATE, FrenzyType.NEGATIVE_STATE]:
-            return controlTypes.state._stateLabels[getattr(controlTypes.State, s)]
-        elif type == FrenzyType.FORMAT:
-            return TEXT_FORMAT_NAMES[self.getFrenzyValue()]
-        elif type == FrenzyType.NUMERIC_FORMAT:
-            return NUMERIC_TEXT_FORMAT_NAMES[self.getFrenzyValue()]
-        elif type == FrenzyType.OTHER_RULE:
-            return OTHER_RULE_NAMES[self.getFrenzyValue()]
-        else:
-            raise ValueError
+        try:
+            if type == FrenzyType.ROLE:
+                return controlTypes.role._roleLabels.get(getattr(controlTypes.Role, s, None), s)
+            elif type in [FrenzyType.STATE, FrenzyType.NEGATIVE_STATE]:
+                return controlTypes.state._stateLabels.get(getattr(controlTypes.State, s, None), s)
+            elif type == FrenzyType.FORMAT:
+                return TEXT_FORMAT_NAMES.get(self.getFrenzyValue(), s)
+            elif type == FrenzyType.NUMERIC_FORMAT:
+                return NUMERIC_TEXT_FORMAT_NAMES.get(self.getFrenzyValue(), s)
+            elif type == FrenzyType.OTHER_RULE:
+                return OTHER_RULE_NAMES.get(self.getFrenzyValue(), s)
+            else:
+                return s
+        except Exception:
+            return s
 
     def getSpeechCommand(self):
         if self.ruleType in [audioRuleBuiltInWave, audioRuleWave]:
@@ -367,7 +370,15 @@ def reloadRules():
         except Exception as e:
             errors.append(e)
         else:
-            newRulesByFrenzy[rule.getFrenzyType()].append(rule)
+            try:
+                frenzyType = rule.getFrenzyType()
+            except Exception as e:
+                errors.append(e)
+                continue
+            if frenzyType is None:
+                errors.append(ValueError(f"Rule {rule.pattern!r} returned None for getFrenzyType()"))
+                continue
+            newRulesByFrenzy[frenzyType].append(rule)
             if rule.enabled and rule.ruleType == audioRuleProsody and rule.prosodyName != VOICE_CHANGE_PROSODY:
                 newAllProsodies.add(rule.prosodyName)
     if len(errors) > 0:
@@ -411,6 +422,7 @@ def reloadRules():
 
 def onPostNvdaStartup():
     if rulesByFrenzy and any([len(rule.urlRegex) > 0 for rule in rulesByFrenzy.get(FrenzyType.TEXT, [])]) and not isURLResolutionAvailable():
+        log.warning("BrowserNav not available; text rules with URL filter will be disabled")
         wx.CallAfter(
             gui.messageBox,
             _(
@@ -423,7 +435,6 @@ def onPostNvdaStartup():
             _("Earcons and speech rules add-on Error"),
             wx.ICON_ERROR | wx.OK,
         )
-        return
     # Load CLDR emoji data in background (lazy, will use cache or download)
     import threading
     threading.Thread(target=_load_cldr_emoji_data, daemon=True).start()
@@ -433,6 +444,9 @@ def onPostNvdaStartup():
         if 'NVDAExtensionGlobalPlugin' in mod_name and 'speechEx' in mod_name:
             try:
                 speechEx = sys.modules[mod_name]
+                if not hasattr(speechEx, '_myGetTextInfoSpeech') or not callable(speechEx._myGetTextInfoSpeech):
+                    log.debugWarning(f"NVDAExtensionGlobalPlugin module {mod_name} has no callable _myGetTextInfoSpeech, skipping patch")
+                    break
                 from speech import sayAll
                 global _original_ext_speechEx, _original_ext_sayAll
                 _original_ext_speechEx = speechEx._myGetTextInfoSpeech
@@ -445,9 +459,9 @@ def onPostNvdaStartup():
                 # Also patch SayAllHandler._getTextInfoSpeech, which received a direct
                 # reference to the original _myGetTextInfoSpeech at initialize() time.
                 sayAll.SayAllHandler._getTextInfoSpeech = _patched_myGet
-                log.warning("Patched NVDAExtensionGlobalPlugin's _myGetTextInfoSpeech and SayAllHandler._getTextInfoSpeech")
+                log.warning(f"Patched NVDAExtensionGlobalPlugin speech paths in module: {mod_name}")
             except Exception as e:
-                log.warning(f"Failed to patch NVDAExtensionGlobalPlugin's speech paths: {e}")
+                log.warning(f"Failed to patch NVDAExtensionGlobalPlugin speech paths: {e}", exc_info=True)
             break
 
 
@@ -472,43 +486,52 @@ def refreshCachedConfig():
 
 def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
     global speechCancelledFlag
-    if isPhoneticPunctuationEnabled():
-        if symbolLevel is None:
-            symbolLevel = _cached_speech_symbolLevel
-        newSequence = speechSequence
-        appName, windowTitle, url = getCurrentContext()
-        with _rules_lock:
-            text_rules = list(rulesByFrenzy[FrenzyType.TEXT]) if rulesByFrenzy else []
-        for rule in text_rules:
-            if len(rule.applicationFilterRegex) > 0 and not rule._applicationFilterRegex.search(appName):
-                continue
-            if len(rule.windowTitleRegex) > 0 and not rule._windowTitleRegex.search(windowTitle):
-                continue
-            if (
-                len(rule.urlRegex) > 0 
-                and (
-                    url is None
-                    or not rule._urlRegex.search(url)
-                )
-            ):
-                continue
-            newSequence = processRule(newSequence, rule, symbolLevel)
-        resetProsodiesSequence = []
-        if speechCancelledFlag:
-            resetProsodiesSequence = resetProsodies([])
-            speechCancelledFlag = False
-        newSequence = postProcessSynchronousCommands(newSequence, symbolLevel)
-        newSequence = resetProsodiesSequence + newSequence
-        #mylog("Speaking!")
-        mylog(str(newSequence))
-    else:
-        newSequence = speechSequence
-    # Emoji processing
-    if is_emoji_enabled():
-        newSequence = _processEmojiSequence(newSequence)
-    newSequence = newSequence + [' '] # Otherwise v2024.2 throws weird Braille Exception + 
-    
-    return originalSpeechSpeechSpeak(newSequence, symbolLevel=symbolLevel, *args, **kwargs)
+    try:
+        if isPhoneticPunctuationEnabled():
+            if symbolLevel is None:
+                symbolLevel = _cached_speech_symbolLevel
+            newSequence = speechSequence
+            appName, windowTitle, url = getCurrentContext()
+            with _rules_lock:
+                text_rules = list(rulesByFrenzy[FrenzyType.TEXT]) if rulesByFrenzy else []
+            for rule in text_rules:
+                try:
+                    if len(rule.applicationFilterRegex) > 0 and not rule._applicationFilterRegex.search(appName):
+                        continue
+                    if len(rule.windowTitleRegex) > 0 and not rule._windowTitleRegex.search(windowTitle):
+                        continue
+                    if (
+                        len(rule.urlRegex) > 0 
+                        and (
+                            url is None
+                            or not rule._urlRegex.search(url)
+                        )
+                    ):
+                        continue
+                    newSequence = processRule(newSequence, rule, symbolLevel)
+                except Exception:
+                    continue
+            resetProsodiesSequence = []
+            if speechCancelledFlag:
+                try:
+                    resetProsodiesSequence = resetProsodies([])
+                except Exception:
+                    resetProsodiesSequence = []
+                speechCancelledFlag = False
+            newSequence = postProcessSynchronousCommands(newSequence, symbolLevel)
+            newSequence = resetProsodiesSequence + newSequence
+            mylog(str(newSequence))
+        else:
+            newSequence = speechSequence
+        # Emoji processing
+        if is_emoji_enabled():
+            newSequence = _processEmojiSequence(newSequence)
+        newSequence = newSequence + [' '] # Otherwise v2024.2 throws weird Braille Exception + 
+        
+        return originalSpeechSpeechSpeak(newSequence, symbolLevel=symbolLevel, *args, **kwargs)
+    except Exception as e:
+        log.error(f"AudioThemes preSpeak error: {e}", exc_info=True)
+        return originalSpeechSpeechSpeak(speechSequence, symbolLevel=symbolLevel, *args, **kwargs)
 
 class EmojiSoundCommand(speech.commands.BaseCallbackCommand):
     """Plays emoji sound at the correct position during speech.
@@ -733,43 +756,45 @@ def is_emoji_suppress_role_flag_set():
 def preCancelSpeech(*args, **kwargs):
     global speechCancelledFlag
     speechCancelledFlag = True
-    if isPhoneticPunctuationEnabled():
-        commands.terminateCurrentChain()
-            
+    try:
+        if isPhoneticPunctuationEnabled():
+            commands.terminateCurrentChain()
+    except Exception:
+        pass
     originalSpeechCancel(*args, **kwargs)
     
 
 def preProcessSpeechSymbols(locale, text, level):
     if not cached_passThrough_regex:
         return originalProcessSpeechSymbols(locale, text, level)
-
-    r = cached_passThrough_regex
-    prevIndex = 0
-    result = []
-    for m in r.finditer(text):
-        start = m.start(0)
-        end = m.end(0)
-        prefix = text[prevIndex:start]
-        if len(prefix) > 0 and not speech.isBlank(prefix):
-            chunk = originalProcessSpeechSymbols(locale, prefix, level)
-            #mylog(f"{prefix} >> {chunk}")
+    try:
+        r = cached_passThrough_regex
+        prevIndex = 0
+        result = []
+        for m in r.finditer(text):
+            start = m.start(0)
+            end = m.end(0)
+            prefix = text[prevIndex:start]
+            if len(prefix) > 0 and not speech.isBlank(prefix):
+                chunk = originalProcessSpeechSymbols(locale, prefix, level)
+                result.append(chunk)
+            result.append(m.group(0))
+            prevIndex = end
+        suffix = text[prevIndex:]
+        if (
+            prevIndex == 0
+            or (
+                len(suffix) > 0 and
+                not speech.isBlank(suffix)
+            )
+        ):
+            chunk = originalProcessSpeechSymbols(locale, suffix, level)
             result.append(chunk)
-        result.append(m.group(0))
-        #mylog(f"=={m.group(0)}")
-        prevIndex = end
-    suffix = text[prevIndex:]
-    if (
-        prevIndex == 0
-        or (
-            len(suffix) > 0 and
-            not speech.isBlank(suffix)
-        )
-    ):
-        chunk = originalProcessSpeechSymbols(locale, suffix, level)
-        result.append(chunk)
-    finalResult = "".join(result)
-    #mylog(f"finalResult={finalResult}")
-    return finalResult
+        finalResult = "".join(result)
+        return finalResult
+    except Exception as e:
+        log.error(f"AudioThemes preProcessSpeechSymbols error: {e}", exc_info=True)
+        return originalProcessSpeechSymbols(locale, text, level)
 
 
 highLevelSpeakFunctionNames = {
@@ -859,17 +884,23 @@ def injectMonkeyPatches():
 
 def restoreMonkeyPatches():
     # global originalSpeechSpeechSpeak, originalSpeechCancel
-    speech.speech.speak = originalSpeechSpeechSpeak
-    speech.speak = speech.speech.speak
-    speech.sayAll.SayAllHandler.speechWithoutPausesInstance.speak = speech.speech.speak
-    speech.speech.cancelSpeech = originalSpeechCancel
-    speech.cancelSpeech = speech.speech.cancelSpeech
-    characterProcessing.processSpeechSymbols = originalProcessSpeechSymbols
+    if originalSpeechSpeechSpeak is not None:
+        speech.speech.speak = originalSpeechSpeechSpeak
+        speech.speak = speech.speech.speak
+        speech.sayAll.SayAllHandler.speechWithoutPausesInstance.speak = speech.speech.speak
+    if originalSpeechCancel is not None:
+        speech.speech.cancelSpeech = originalSpeechCancel
+        speech.cancelSpeech = speech.speech.cancelSpeech
+    if originalProcessSpeechSymbols is not None:
+        characterProcessing.processSpeechSymbols = originalProcessSpeechSymbols
     frenzy.monkeyUnpatch()
     
-    characterProcessing.processSpeechSymbol = original_processSpeechSymbol
-    speech.speech.getIndentationSpeech = original_getIndentationSpeech
-    speech.speech._getSelectionMessageSpeech = original_getSelectionMessageSpeech
+    if original_processSpeechSymbol is not None:
+        characterProcessing.processSpeechSymbol = original_processSpeechSymbol
+    if original_getIndentationSpeech is not None:
+        speech.speech.getIndentationSpeech = original_getIndentationSpeech
+    if original_getSelectionMessageSpeech is not None:
+        speech.speech._getSelectionMessageSpeech = original_getSelectionMessageSpeech
     
     # Restore NVDAExtensionGlobalPlugin speech patches
     if _original_ext_speechEx is not None:
@@ -878,16 +909,17 @@ def restoreMonkeyPatches():
             for mod_name in list(sys.modules.keys()):
                 if 'NVDAExtensionGlobalPlugin' in mod_name and 'speechEx' in mod_name:
                     speechEx = sys.modules[mod_name]
-                    speechEx._myGetTextInfoSpeech = _original_ext_speechEx
+                    if hasattr(speechEx, '_myGetTextInfoSpeech'):
+                        speechEx._myGetTextInfoSpeech = _original_ext_speechEx
                     break
-        except Exception:
-            pass
+        except Exception as e:
+            log.debugWarning(f"Failed to restore NVDAExtensionGlobalPlugin speechEx patch: {e}")
     if _original_ext_sayAll is not None:
         try:
             from speech import sayAll
             sayAll.SayAllHandler._getTextInfoSpeech = _original_ext_sayAll
-        except Exception:
-            pass
+        except Exception as e:
+            log.debugWarning(f"Failed to restore SayAllHandler patch: {e}")
     
     try:
         import config
@@ -906,7 +938,10 @@ def processRule(speechSequence, rule, symbolLevel):
     newSequence = []
     for command in speechSequence:
         if isinstance(command, str):
-            newSequence.extend(rule.processString(command, symbolLevel, language))
+            try:
+                newSequence.extend(rule.processString(command, symbolLevel, language))
+            except Exception:
+                newSequence.append(command)
         else:
             newSequence.append(command)
     return newSequence
@@ -924,7 +959,10 @@ def postProcessSynchronousCommands(speechSequence, symbolLevel):
     """
     language=speech.getCurrentLanguage()
     def isEmptyString(command):
-        return isinstance(command, str) and speech.isBlank(speech.processText(language,command,symbolLevel))
+        try:
+            return isinstance(command, str) and speech.isBlank(speech.processText(language,command,symbolLevel))
+        except Exception:
+            return isinstance(command, str) and not command.strip()
     hasNonEmptyString = False
     newSequence = []
     excludeIndices = set()
@@ -1006,82 +1044,79 @@ def fixProsodyCommands(sequence):
     Adjusting prosody offsets in this function so that they support nesting.
     """
     # global prosodyStacks, prosodyOffsets
-    prosodySettings = {}
-    def findProsodySetting(cls):
-        # nonlocal prosodySettings
-        try:
-            return prosodySettings[cls]
-        except KeyError:
-            pass
-        clsName  = cls.__name__
-        commandSuffix = 'Command'
-        if not clsName.endswith(commandSuffix):
-            raise RuntimeError(f"Unknown Prosody {clsName}")
-        prosodyName = clsName[:-len(commandSuffix)].lower()
-        for srs in globalVars.settingsRing.settings:
-            if srs.setting.id == prosodyName:
-                prosodySettings[cls] = srs
-                return srs
-        # Well, perhaps current synth doesn't support given prosody.
-        prosodySettings[cls] = None
-        return None
+    try:
+        prosodySettings = {}
+        def findProsodySetting(cls):
+            # nonlocal prosodySettings
+            try:
+                return prosodySettings[cls]
+            except KeyError:
+                pass
+            clsName  = cls.__name__
+            commandSuffix = 'Command'
+            if not clsName.endswith(commandSuffix):
+                raise RuntimeError(f"Unknown Prosody {clsName}")
+            prosodyName = clsName[:-len(commandSuffix)].lower()
+            for srs in globalVars.settingsRing.settings:
+                if srs.setting.id == prosodyName:
+                    prosodySettings[cls] = srs
+                    return srs
+            # Well, perhaps current synth doesn't support given prosody.
+            prosodySettings[cls] = None
+            return None
+                
         
-            
-    result = []
-    for i, command in enumerate(sequence):
-        if isinstance(command, speech.commands.BaseProsodyCommand):
-            cls = type(command)
-            if command._multiplier != 1:
-                log.error("Multiplicative prosody commands detected. This is not supported by Earcons and Speech Rules add-on.")
-                return sequence
-            commandOffset = command._offset
-            if commandOffset == 0:
-                # stack pop
-                if len(prosodyStacks[cls]) == 0:
-                    log.error("Stack underflow during fixProsodyCommands in Earcons and Speech Rules add-on.")
+        result = []
+        for i, command in enumerate(sequence):
+            if isinstance(command, speech.commands.BaseProsodyCommand):
+                cls = type(command)
+                if command._multiplier != 1:
+                    log.error("Multiplicative prosody commands detected. This is not supported by Earcons and Speech Rules add-on.")
                     return sequence
-                prosodyOffsets[cls] = prosodyStacks[cls][-1]
-                del prosodyStacks[cls][-1]
-            else:
-                prosodyStacks[cls].append(prosodyOffsets[cls])
-                prosodyOffsets[cls] += commandOffset
-            command = copy.copy(command)
-            # Let's make sure the offset doesn't go beyond (0, 100) interval - otherwise synths will ignore this command.
-            ps = findProsodySetting(cls)
-            if ps is not None:
-                maxOffset = ps.max - ps.value
-                minOffset = ps.min - ps.value
-                effectiveOffset = max(
-                    minOffset,
-                    min(
-                        maxOffset,
-                        prosodyOffsets[cls]
+                commandOffset = command._offset
+                if commandOffset == 0:
+                    # stack pop
+                    if len(prosodyStacks[cls]) == 0:
+                        log.error("Stack underflow during fixProsodyCommands in Earcons and Speech Rules add-on.")
+                        return sequence
+                    prosodyOffsets[cls] = prosodyStacks[cls][-1]
+                    del prosodyStacks[cls][-1]
+                else:
+                    prosodyStacks[cls].append(prosodyOffsets[cls])
+                    prosodyOffsets[cls] += commandOffset
+                command = copy.copy(command)
+                # Let's make sure the offset doesn't go beyond (0, 100) interval - otherwise synths will ignore this command.
+                ps = findProsodySetting(cls)
+                if ps is not None:
+                    maxOffset = ps.max - ps.value
+                    minOffset = ps.min - ps.value
+                    effectiveOffset = max(
+                        minOffset,
+                        min(
+                            maxOffset,
+                            prosodyOffsets[cls]
+                        )
                     )
-                )
-            else:
-                effectiveOffset = prosodyOffsets[cls]
-            command._offset = effectiveOffset
-            command.isDefault = command._offset == 0
-        result.append(command)
-    return result
+                else:
+                    effectiveOffset = prosodyOffsets[cls]
+                command._offset = effectiveOffset
+                command.isDefault = command._offset == 0
+            result.append(command)
+        return result
+    except Exception as e:
+        log.error(f"AudioThemes fixProsodyCommands error: {e}", exc_info=True)
+        return sequence
 
 def resetProsodies(sequence):
-    """
-    Resetting all prosodies at the beginning of each utterance so that previous speech doesn't affect this utterance.
-    Here is the explanation as to why this is needed:
-    If we alter a prosody, we typically also insert another command to reset that prosody back.
-    However, sometimes user would cancel speech before the second prosody command has reached the synth.
-    We don't want prosody to stay altered and affect the next utterance.
-    NVDA appears to have some kind of logic to reset prosody, but it is unreliable and I didn't track it down.
-    So doing a poor man's prosody reset here.
-    Also resetting prosodies stack.
-    """
-    # global prosodyStacks, prosodyOffsets
     prosodyStacks.clear()
     prosodyOffsets.clear()
     if not allProsodies or len(allProsodies) == 0:
         return sequence
-    return [getProsodyClass(prosodyName)() for prosodyName in allProsodies] + sequence
+    try:
+        return [getProsodyClass(prosodyName)() for prosodyName in allProsodies] + sequence
+    except Exception as e:
+        log.error(f"AudioThemes resetProsodies error: {e}", exc_info=True)
+        return sequence
 
 original_processSpeechSymbol = None
 _original_ext_speechEx = None
@@ -1111,7 +1146,10 @@ def new_processSpeechSymbol(locale, symbol):
                 logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
             speechBehavior = getattr(rule, 'speechBehavior', 0)
             customText = getattr(rule, 'customSpeechText', "")
-            cmd = rule.getSpeechCommand()[0]
+            try:
+                cmd = rule.getSpeechCommand()[0]
+            except Exception:
+                cmd = None
             
             if cmd is not None:
                 try:
@@ -1136,18 +1174,21 @@ def new_getIndentationSpeech(indentation, formatConfig):
     """
     if not isPhoneticPunctuationEnabled():
         return original_getIndentationSpeech(indentation, formatConfig)
-    speechIndentConfig = formatConfig["reportLineIndentation"] in (
-        ReportLineIndentation.SPEECH,
-        ReportLineIndentation.SPEECH_AND_TONES,
-    )
-    toneIndentConfig = (
-        formatConfig["reportLineIndentation"]
-        in (
-            ReportLineIndentation.TONES,
+    try:
+        speechIndentConfig = formatConfig.get("reportLineIndentation", ReportLineIndentation.OFF) in (
+            ReportLineIndentation.SPEECH,
             ReportLineIndentation.SPEECH_AND_TONES,
         )
-        and speech.speech._speechState.speechMode == speech.speech.SpeechMode.talk
-    )
+        toneIndentConfig = (
+            formatConfig.get("reportLineIndentation", ReportLineIndentation.OFF)
+            in (
+                ReportLineIndentation.TONES,
+                ReportLineIndentation.SPEECH_AND_TONES,
+            )
+            and getattr(getattr(speech.speech, '_speechState', None), 'speechMode', None) == speech.speech.SpeechMode.talk
+        )
+    except Exception:
+        return original_getIndentationSpeech(indentation, formatConfig)
     indentSequence = []
     if not indentation:
         if toneIndentConfig:

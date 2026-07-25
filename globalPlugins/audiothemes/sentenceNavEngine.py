@@ -424,7 +424,7 @@ def getPhraseRegex():
     return result
 
 def clearRegexCaches():
-    # global regexCache, phraseRegex
+    global phraseRegex
     regexCache.clear()
     phraseRegex = None
 

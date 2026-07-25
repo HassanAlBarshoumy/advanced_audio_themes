@@ -112,6 +112,7 @@ def download_addon(url, callback, parent=None):
             progress_dlg[0] = None
 
     def _download():
+        path = None
         try:
             ctx = ssl.create_default_context()
             req = Request(url, headers={"User-Agent": "advanced_audio_themes"})
@@ -129,6 +130,11 @@ def download_addon(url, callback, parent=None):
             wx.CallAfter(_close_progress)
             wx.CallAfter(callback, True, path, None)
         except Exception as e:
+            if path is not None:
+                try:
+                    os.unlink(path)
+                except Exception:
+                    pass
             wx.CallAfter(_close_progress)
             wx.CallAfter(callback, False, None, str(e))
     threading.Thread(target=_download, daemon=True).start()

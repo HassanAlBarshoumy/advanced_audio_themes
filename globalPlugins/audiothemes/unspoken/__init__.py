@@ -235,13 +235,17 @@ class UnspokenPlayer:
 
 		# Configure reverb settings
 		if self.steam_audio_active:
-			self.steam_audio.set_reverb_settings(
-				room_size=config.conf["unspoken"]["RoomSize"] / 100.0,
-				damping=config.conf["unspoken"]["Damping"] / 100.0,
-				wet_level=config.conf["unspoken"]["WetLevel"] / 100.0,
-				dry_level=config.conf["unspoken"]["DryLevel"] / 100.0,
-				width=config.conf["unspoken"]["Width"] / 100.0,
-			)
+			try:
+				unspoken_cfg = config.conf["unspoken"]
+				self.steam_audio.set_reverb_settings(
+					room_size=unspoken_cfg["RoomSize"] / 100.0,
+					damping=unspoken_cfg["Damping"] / 100.0,
+					wet_level=unspoken_cfg["WetLevel"] / 100.0,
+					dry_level=unspoken_cfg["DryLevel"] / 100.0,
+					width=unspoken_cfg["Width"] / 100.0,
+				)
+			except Exception:
+				pass
 
 		self.create_wave_player()
 		self._last_played_object = None
@@ -283,12 +287,21 @@ class UnspokenPlayer:
 		self.speak_roles = False
 		self.use_synth_volume = True
 		self.volume = 100
-		self._reverb = config.conf["unspoken"]["Reverb"]
-		self._room_size = config.conf["unspoken"]["RoomSize"]
-		self._damping = config.conf["unspoken"]["Damping"]
-		self._wet_level = config.conf["unspoken"]["WetLevel"]
-		self._dry_level = config.conf["unspoken"]["DryLevel"]
-		self._width = config.conf["unspoken"]["Width"]
+		try:
+			unspoken_cfg = config.conf["unspoken"]
+			self._reverb = unspoken_cfg["Reverb"]
+			self._room_size = unspoken_cfg["RoomSize"]
+			self._damping = unspoken_cfg["Damping"]
+			self._wet_level = unspoken_cfg["WetLevel"]
+			self._dry_level = unspoken_cfg["DryLevel"]
+			self._width = unspoken_cfg["Width"]
+		except Exception:
+			self._reverb = 0
+			self._room_size = 50
+			self._damping = 50
+			self._wet_level = 33
+			self._dry_level = 40
+			self._width = 100
 
 	def _audio_worker(self):
 		"""Persistent worker thread for playing audio data without spawning new threads."""

@@ -446,12 +446,18 @@ def updateRules():
                 d[rule.getFrenzyValue()].append(rule)
         return dict(d)
 
-    roleRules = buildList(FrenzyType.ROLE)
-    stateRules = buildList(FrenzyType.STATE)
-    negativeStateRules = buildList(FrenzyType.NEGATIVE_STATE)
-    formatRules = buildList(FrenzyType.FORMAT)
-    numericFormatRules = buildList(FrenzyType.NUMERIC_FORMAT)
-    otherRules = buildList(FrenzyType.OTHER_RULE)
+    new_roleRules = buildList(FrenzyType.ROLE)
+    new_stateRules = buildList(FrenzyType.STATE)
+    new_negativeStateRules = buildList(FrenzyType.NEGATIVE_STATE)
+    new_formatRules = buildList(FrenzyType.FORMAT)
+    new_numericFormatRules = buildList(FrenzyType.NUMERIC_FORMAT)
+    new_otherRules = buildList(FrenzyType.OTHER_RULE)
+    roleRules = new_roleRules
+    stateRules = new_stateRules
+    negativeStateRules = new_negativeStateRules
+    formatRules = new_formatRules
+    numericFormatRules = new_numericFormatRules
+    otherRules = new_otherRules
 
 class _LRUCache:
     def __init__(self, capacity: int):
@@ -770,17 +776,16 @@ def new_getTextInfoSpeech(
                 suppressBlanks,
             )
         return
-    if True:
-        # Computing formatConfig - identical to logic in the original function
-        extraDetail = unit in (textInfos.UNIT_CHARACTER, textInfos.UNIT_WORD)
-        if not formatConfig:
-            formatConfig = _cached_doc_formatting
-        formatConfig = formatConfig.copy()
-        if extraDetail:
-            formatConfig["extraDetail"] = True
-        # For performance reasons, when navigating by paragraph or table cell, spelling errors will not be announced.
-        if unit in (textInfos.UNIT_PARAGRAPH, textInfos.UNIT_CELL) and reason == OutputReason.CARET:
-            formatConfig["reportSpellingErrors"] = False
+    # Computing formatConfig - identical to logic in the original function
+    extraDetail = unit in (textInfos.UNIT_CHARACTER, textInfos.UNIT_WORD)
+    if not formatConfig:
+        formatConfig = _cached_doc_formatting
+    formatConfig = formatConfig.copy()
+    if extraDetail:
+        formatConfig["extraDetail"] = True
+    # For performance reasons, when navigating by paragraph or table cell, spelling errors will not be announced.
+    if unit in (textInfos.UNIT_PARAGRAPH, textInfos.UNIT_CELL) and reason == OutputReason.CARET:
+        formatConfig["reportSpellingErrors"] = False
     appName, windowTitle, url = utils.getCurrentContext()
     
     headingRule = getActiveRuleContext(formatRules.get(TextFormat.HEADING, []), appName, windowTitle, url)
@@ -829,7 +834,12 @@ def new_getTextInfoSpeech(
         pass
     if processHeadings:
         headingStarts = list(findAllControlFields(fields))
-        headingEnds = [findControlEnd(fields, headingSstart) for headingSstart in headingStarts]
+        headingEnds = []
+        for headingSstart in headingStarts:
+            try:
+                headingEnds.append(findControlEnd(fields, headingSstart))
+            except RuntimeError:
+                headingEnds.append(len(fields) - 1)
         nHeadings = len(headingStarts)
         # Filter out nested headings.
         # Nested headings happen on very few web pages and typically are not meaningful.
@@ -982,7 +992,10 @@ def new_getTextInfoSpeech(
                 continue
             prevFontSize = newCache.get('fontSize', None)
             newCache['fontSize'] = fontSize
-            preCommand, postCommand = fontSizeRule.getNumericSpeechCommand(fontSize)
+            try:
+                preCommand, postCommand = fontSizeRule.getNumericSpeechCommand(fontSize)
+            except Exception:
+                continue
             if isinstance(preCommand, speech.commands.BaseProsodyCommand):
                 pass
             elif isinstance(preCommand, str):
@@ -991,7 +1004,7 @@ def new_getTextInfoSpeech(
                     if prevFontSize == fontSize:
                         continue
             else:
-                raise RuntimeError
+                continue
             if preCommand is not None:
                 newCommands[begin].append(preCommand)
             if postCommand is not None:
@@ -1063,7 +1076,7 @@ def new_getTextInfoSpeech(
                 filteredIntervalsAndCommands.append(interval)
             emptyIndex += int(isEmpty)
         else:
-            raise RuntimeError
+            log.warning(f"AudioThemes: unexpected item type in intervalsAndCommands: {type(interval)}")
     
     # Here is the meaning of buffer
     # upstream speech commands return lists of speech sequences
@@ -1177,12 +1190,12 @@ def new_getTextInfoSpeech(
 PROPERTY_SPEECH_SIGNATURE = "🪛🪕🚛"
 PROPERTY_SPEECH_SIGNATURE2 = "🪼‣⁋"
 original_getPropertiesSpeech = None
-ignore_get_properties_hook = False
+ignore_get_properties_hook = 0
 def new_getPropertiesSpeech(
     reason: OutputReason = OutputReason.QUERY,
     **propertyValues,
 ):
-    if not isPhoneticPunctuationEnabled() or ignore_get_properties_hook:
+    if not isPhoneticPunctuationEnabled() or ignore_get_properties_hook > 0:
         if original_getPropertiesSpeech is not None:
             return original_getPropertiesSpeech(reason, **propertyValues)
         return
@@ -1512,7 +1525,9 @@ def new_getControlFieldSpeech(
             if m := PROPERTY_SPEECH_PATTERN.match(utterance):
                 # Replacing role speech with earcon
                 role_name = m.group(1)
-                role = getattr(controlTypes.Role, role_name)
+                role = getattr(controlTypes.Role, role_name, None)
+                if role is None:
+                    continue
                 
                 rule = None
                 if role == controlTypes.Role.HEADING:
@@ -1549,20 +1564,20 @@ def new_getControlFieldSpeech(
                         result2.append(command)
                         
                     if speechBehavior == 1:
-                        ignore_get_properties_hook = True
+                        ignore_get_properties_hook += 1
                         try:
                             orig_text = speech.speech.getPropertiesSpeech(reason=reason, **patched_attrs)
                         finally:
-                            ignore_get_properties_hook = False
+                            ignore_get_properties_hook -= 1
                         result2.extend(orig_text)
                     elif speechBehavior == 2 and customText:
                         result2.append(customText)
                 else:
-                    ignore_get_properties_hook = True
+                    ignore_get_properties_hook += 1
                     try:
                         orig_text = speech.speech.getPropertiesSpeech(reason=reason, **patched_attrs)
                     finally:
-                        ignore_get_properties_hook = False
+                        ignore_get_properties_hook -= 1
                     result2.extend(orig_text)
                     
                 if post_numeric_cmd is not None:
@@ -1584,17 +1599,19 @@ def new_getControlFieldSpeech(
                     if command:
                         result2.append(command)
                     if speechBehavior == 1:
-                        ignore_get_properties_hook = True
+                        ignore_get_properties_hook += 1
                         try:
                             orig_text = speech.speech.getPropertiesSpeech(reason=reason, **patched_attrs)
                         finally:
-                            ignore_get_properties_hook = False
+                            ignore_get_properties_hook -= 1
                         result2.extend(orig_text)
                     elif speechBehavior == 2 and customText:
                         result2.append(customText)
                     continue
                 else:
-                    role = getattr(controlTypes.Role, role_name)
+                    role = getattr(controlTypes.Role, role_name, None)
+                    if role is None:
+                        continue
                     rule = None
                     if role == controlTypes.Role.HEADING:
                         level = attrs.get('level', None)

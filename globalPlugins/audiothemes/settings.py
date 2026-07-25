@@ -353,7 +353,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.typingPackChoices = []
         typingSoundsDir = os.path.join(os.path.dirname(__file__), "typingSounds")
         if os.path.isdir(typingSoundsDir):
-            self.typingPackChoices = [d for d in os.listdir(typingSoundsDir) if os.path.isdir(os.path.join(typingSoundsDir, d))]
+            try:
+                self.typingPackChoices = [d for d in os.listdir(typingSoundsDir) if os.path.isdir(os.path.join(typingSoundsDir, d))]
+            except OSError:
+                self.typingPackChoices = []
         if not self.typingPackChoices:
             self.typingPackChoices = ["1blueSwitch"]
 
@@ -458,7 +461,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
         if not pack: return
         typingSoundsDir = os.path.join(os.path.dirname(__file__), "typingSounds", pack)
         if not os.path.isdir(typingSoundsDir): return
-        files = [f for f in os.listdir(typingSoundsDir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
+        try:
+            files = [f for f in os.listdir(typingSoundsDir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
+        except OSError:
+            return
         if not files: return
 
         # Play a sequence of 3 rapid random keystrokes to simulate typing
@@ -2205,10 +2211,13 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.textCrackleVolumeSlider.SetValue(_i(snConf.get("textCrackleVolume", 25)))
         self.noNextTextChimeSlider.SetValue(_i(snConf.get("noNextTextChimeVolume", 50)))
         self.noNextTextMessageCheckbox.SetValue(_b(snConf.get("noNextTextMessage", False)))
-        reconIndex = self.reconstructOptions.index(str(snConf["reconstructMode"]))
+        try:
+            reconIndex = self.reconstructOptions.index(str(snConf["reconstructMode"]))
+        except (ValueError, KeyError):
+            reconIndex = 0
         self.reconstructModeCombobox.SetSelection(reconIndex)
         
-        self.sentenceBreakersEdit.SetValue(snConf["sentenceBreakers"])
+        self.sentenceBreakersEdit.SetValue(snConf.get("sentenceBreakers", ""))
         self.fullWidthSentenceBreakersEdit.SetValue(snConf.get("fullWidthSentenceBreakers", "。！？"))
         self.phraseBreakersEdit.SetValue(snConf.get("phraseBreakers", ".!?,;:-\u2013()"))
         self.fullWidthPhraseBreakersEdit.SetValue(snConf.get("fullWidthPhraseBreakers", "\u3002\uff01\uff1f\uff0c\uff1b\uff1a\uff08\uff09"))
@@ -2230,13 +2239,13 @@ class AudioThemesSettingsPanel(SettingsPanel):
         except Exception:
             self.exceptionalAbbreviationsEdit.SetValue("Mr Ms Mrs Dr St e.g")
         
-        self.snAppsBlacklistEdit.SetValue(snConf["applicationsBlacklist"])
+        self.snAppsBlacklistEdit.SetValue(snConf.get("applicationsBlacklist", ""))
 
         # Miscellaneous tab — BrowserNav settings
         bnConf = config.conf["browsernav"]
-        self.crackleVolumeSlider.SetValue(_i(bnConf["crackleVolume"]))
-        self.beepVolumeSlider.SetValue(_i(bnConf["beepVolume"]))
-        self.skipChimeVolumeSlider.SetValue(_i(bnConf["skipChimeVolume"]))
+        self.crackleVolumeSlider.SetValue(_i(bnConf.get("crackleVolume", 50)))
+        self.beepVolumeSlider.SetValue(_i(bnConf.get("beepVolume", 50)))
+        self.skipChimeVolumeSlider.SetValue(_i(bnConf.get("skipChimeVolume", 50)))
 
         # Miscellaneous tab — Navigation Layer settings
         nlConf = config.conf.get("audiothemes", {})
@@ -2754,6 +2763,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
         threading.Thread(target=play_preview, daemon=True).start()
 
     def onAbout(self, event):
+        if self.selected_theme is None:
+            wx.MessageBox(_("No theme selected"), _("About Audio Theme"), style=wx.ICON_WARNING)
+            return
         theme_dict = self.selected_theme.todict()
         author_val = theme_dict.get("author", "").strip()
         if not author_val or author_val.lower() == "unknown":
@@ -2779,10 +2791,16 @@ class AudioThemesSettingsPanel(SettingsPanel):
     def onStoreClicked(self, event):
         from .studio.themes_store import ThemesStoreDialog
         dlg = ThemesStoreDialog(self)
-        dlg.ShowModal()
+        try:
+            dlg.ShowModal()
+        finally:
+            dlg.Destroy()
 
     def onRemove(self, event):
         theme = self.selected_theme
+        if theme is None:
+            wx.MessageBox(_("No theme selected"), _("Remove Audio Theme"), style=wx.ICON_WARNING)
+            return
         confirm = wx.MessageBox(
             # Translators: message asking the user to confirm the removal of an audio theme
             _(

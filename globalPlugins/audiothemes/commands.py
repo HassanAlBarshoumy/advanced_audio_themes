@@ -132,6 +132,13 @@ class PpBeepCommand(PpSynchronousCommand):
     def run(self):
         if is_sound_suppressed("earcons"):
             return
+        try:
+            self._runInner()
+        except Exception as e:
+            from logHandler import log
+            log.debugWarning(f"PpBeepCommand.run() failed: {e}", exc_info=True)
+
+    def _runInner(self):
         from NVDAHelper.localLib import generateBeep
         hz,length,left,right = self.hz, self.length, self.left, self.right
 
@@ -396,8 +403,7 @@ class PpWaveFileCommand(PpSynchronousCommand):
                     "channels": self._channels,
                     "sample_rate": self._sample_rate
                 }
-
-        self._loaded = True
+                self._loaded = True
 
     def run(self):
         if is_sound_suppressed("earcons"):
@@ -405,6 +411,13 @@ class PpWaveFileCommand(PpSynchronousCommand):
         self._ensureLoaded()
         if not self._loaded:
             return
+        try:
+            self._runInner()
+        except Exception as e:
+            from logHandler import log
+            log.debugWarning(f"PpWaveFileCommand.run() failed: {e}", exc_info=True)
+
+    def _runInner(self):
         if self.startAdjustment < 0:
             time.sleep(-self.startAdjustment / 1000.0)
 
@@ -471,6 +484,8 @@ class PpWaveFileCommand(PpSynchronousCommand):
             log.error(f"Failed to apply reverb to PpWaveFileCommand: {e}", exc_info=True)
 
         audio_bytes = self.buf
+        if audio_bytes is None:
+            return
         cur_channels = self._channels
         cur_sample_rate = self._sample_rate
 
@@ -496,6 +511,8 @@ class PpWaveFileCommand(PpSynchronousCommand):
             audio_bytes = ensure_mono(audio_bytes, cur_channels, cur_sample_rate)
 
         fileWavePlayer = self.fileWavePlayer
+        if fileWavePlayer is None:
+            return
         fileWavePlayer.stop()
         try:
             fileWavePlayer.feed(_apply_ducking(audio_bytes, _ducking_factor))

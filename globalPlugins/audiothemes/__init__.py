@@ -61,6 +61,7 @@ from .sentenceNavEngine import SentenceNavMixin, initSentenceNavConfiguration
 from .browserNavEngine import BrowserNavMixin
 
 _cached_desktop_location = None
+_cached_desktop_location_time = 0.0
 
 _HEADING_LEVEL_MAP = {
     7: SpecialProps.heading7,
@@ -198,31 +199,24 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             except Exception:
                 info["next_role"] = None
             # Multi-hop traversal for same-role sibling detection
+            # Capped at 1 level to avoid expensive COM tree walks (was 3, caused 40s freezes)
             fl_mode = fl_cfg.get("fl_detection_mode", "smart")
             if fl_mode in ("strict", "smart"):
                 _role = info.get("role")
-                # Walk back up to 3 levels to find a same-role sibling
                 try:
                     p = obj.previous
-                    _depth = 0
-                    while p is not None and _depth < 3:
-                        if p.role == _role:
-                            break
-                        p = p.previous
-                        _depth += 1
-                    info["prev_same_role"] = p.role if (p is not None and _depth < 3) else None
+                    if p is not None and p.role == _role:
+                        info["prev_same_role"] = p.role
+                    else:
+                        info["prev_same_role"] = None
                 except Exception:
                     info["prev_same_role"] = None
-                # Walk forward up to 3 levels to find a same-role sibling
                 try:
                     n = obj.next
-                    _depth = 0
-                    while n is not None and _depth < 3:
-                        if n.role == _role:
-                            break
-                        n = n.next
-                        _depth += 1
-                    info["next_same_role"] = n.role if (n is not None and _depth < 3) else None
+                    if n is not None and n.role == _role:
+                        info["next_same_role"] = n.role
+                    else:
+                        info["next_same_role"] = None
                 except Exception:
                     info["next_same_role"] = None
             else:
@@ -237,13 +231,16 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # Carry forward a custom snd override (e.g. SpecialProps.notify).
         info["snd"] = extra_snd
         # Desktop dimensions for 3D audio (avoids COM call on worker thread).
-        global _cached_desktop_location
-        if _cached_desktop_location is None:
+        global _cached_desktop_location, _cached_desktop_location_time
+        now = time.monotonic()
+        if _cached_desktop_location is None or (now - _cached_desktop_location_time) > 30.0:
             try:
                 desktop = NVDAObjects.api.getDesktopObject()
                 _cached_desktop_location = tuple(desktop.location) if desktop and desktop.location else None
+                _cached_desktop_location_time = now
             except Exception:
                 _cached_desktop_location = None
+                _cached_desktop_location_time = now
 
         info["desktop_location"] = _cached_desktop_location
         if foreground_app is None:
@@ -257,7 +254,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         try:
             info["_extra_snd"] = extra_snd
             info["_fg"] = foreground_app
-            _snapshot_cache[obj] = info
+            _snapshot_cache[obj] = info.copy()
         except Exception:
             pass
         return info
@@ -618,7 +615,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     self.script_navigationLayer,
                 ]
                 if 0 <= sel < len(cmds):
-                    cmds[sel](None)
+                    try:
+                        cmds[sel](None)
+                    except Exception:
+                        pass
             dlg.Destroy()
             self._helpDialog = None
             self._helpPending = False
@@ -629,22 +629,27 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             gui.settingsDialogs.NVDASettingsDialog.categoryClasses.remove(
                 AudioThemesSettingsPanel
             )
+        with suppress(Exception):
             self._remove_tray_menu_items()
+        with suppress(Exception):
             self.restoreMonkeyPatches()
+        with suppress(Exception):
             self._unhook_keyboard()
-            if self.orig_caretMovementScriptHelper:
+        if self.orig_caretMovementScriptHelper:
+            with suppress(Exception):
                 import speech
                 if hasattr(speech, "_caretMovementScriptHelper"):
                     speech._caretMovementScriptHelper = self.orig_caretMovementScriptHelper
-                
+        with suppress(Exception):
             self.quicknav_interceptor.terminate()
+        with suppress(Exception):
             self.handler.close()
+        with suppress(Exception):
             self._navigation_timer.Stop()
-            # Unregister sentenceNav config hooks
+        with suppress(Exception):
             from .sentenceNavEngine import _unregister_sentence_nav_hooks
             _unregister_sentence_nav_hooks()
-            # Shut down the shared thread pool cleanly so worker threads do not
-            # linger after the add-on is unloaded.
+        with suppress(Exception):
             utils.threadPool.shutdown(wait=False)
         # ── BrowserNav termination ──
         with suppress(Exception):
@@ -756,6 +761,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception as e:
             log.debugWarning(f"event_gainFocus nextHandler: {e}")
         try:
+            if not self.handler._cached_config.get("enable_audio_themes", True):
+                return
             obj_info = self._snapshot_obj(obj, foreground_app=self.handler._current_app_name)
             utils.threadPool.add_task(self.playObject, obj_info)
             utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
@@ -838,6 +845,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         if isFocus:
             try:
                 nextHandler()
+            except StopIteration:
+                raise
             except Exception as e:
                 log.debugWarning(f"event_becomeNavigatorObject nextHandler (isFocus): {e}")
             return
@@ -845,6 +854,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         if obj is self._last_focused_obj and (time.monotonic() - self._last_focus_time) < 0.3:
             try:
                 nextHandler()
+            except StopIteration:
+                raise
             except Exception as e:
                 log.debugWarning(f"event_becomeNavigatorObject nextHandler (dedup): {e}")
             return
@@ -873,7 +884,13 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 obj_id = id(obj)
                 last_t = self._last_progress_times.get(obj_id, 0)
                 if now - last_t < 0.5:
-                    return nextHandler()
+                    try:
+                        nextHandler()
+                    except StopIteration:
+                        raise
+                    except Exception:
+                        pass
+                    return
                 self._last_progress_times[obj_id] = now
                 if len(self._last_progress_times) > 64:
                     self._last_progress_times.clear()
@@ -987,7 +1004,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # Clipboard shortcut detection
         if not injected:
             try:
-                if cfg.get("clipboard_enabled", True):
+                cfg2 = self.handler._cached_config if hasattr(self, 'handler') else {}
+                if cfg2.get("clipboard_enabled", True):
                     if winUser.getAsyncKeyState(winUser.VK_CONTROL) & 0x8000:
                         shift = winUser.getAsyncKeyState(winUser.VK_SHIFT) & 0x8000
                         if vkCode == 0x43:  # C
@@ -1022,7 +1040,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                         self.handler.play_typing_sound(ch=ch, vkCode=vk, extended=ext)
             except Exception as e:
                 log.debugWarning(f"event_typedCharacter: {e}")
-        nextHandler()
+        try:
+            nextHandler()
+        except StopIteration:
+            raise
+        except Exception as e:
+            log.debugWarning(f"event_typedCharacter nextHandler: {e}")
     @script(description=_("Switches to the next audio theme."), gestures=[])
     def script_nextAudioTheme(self, gesture):
         themes = self.handler.get_installed_themes()
@@ -1365,10 +1388,17 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     def script_speakHeadingLevel(self, gesture):
         count=scriptHandler.getLastScriptRepeatCount()
         focus  = api.getFocusObject()
+        if focus is None:
+            ui.message(_("No heading level information"))
+            return
         if focus.treeInterceptor is not None:
             if not focus.treeInterceptor.passThrough:
                 focus = focus.treeInterceptor
-        info = focus.makeTextInfo(textInfos.POSITION_CARET)
+        try:
+            info = focus.makeTextInfo(textInfos.POSITION_CARET)
+        except (NotImplementedError, RuntimeError):
+            ui.message(_("No heading level information"))
+            return
         info.expand(textInfos.UNIT_CHARACTER)
         fields = info.getTextWithFields()
         levelFound = False
@@ -1499,7 +1529,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
         collect_children(obj)
         # sort by X coordinate
-        children.sort(key=lambda c: c.location[0] if c.location else 0)
+        try:
+            children.sort(key=lambda c: c.location[0] if c.location else 0)
+        except Exception:
+            pass
         
         snapshots = []
         for child in children:

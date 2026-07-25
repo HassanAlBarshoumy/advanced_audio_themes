@@ -152,6 +152,7 @@ class ThemesStoreDialog(wx.Dialog):
         threading.Thread(target=self.DownloadAndInstall, args=(url, pkg_type), daemon=True).start()
         
     def DownloadAndInstall(self, url, pkg_type):
+        tmp_path = None
         try:
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             with urllib.request.urlopen(req, timeout=30) as response:
@@ -178,6 +179,9 @@ class ThemesStoreDialog(wx.Dialog):
                 
             wx.CallAfter(self.InstallFinished, tmp_path, pkg_type)
         except Exception as e:
+            if tmp_path and os.path.exists(tmp_path):
+                with suppress(Exception):
+                    os.remove(tmp_path)
             wx.CallAfter(self.statusLabel.SetLabel, _("Download failed."))
             wx.CallAfter(self.downloadBtn.Enable)
             

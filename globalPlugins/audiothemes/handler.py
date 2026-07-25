@@ -509,12 +509,15 @@ class AudioTheme:
             return
         new_sounds = {}
         available = set()
-        for filename in os.listdir(self.directory):
-            available.add(filename.lower())
-            path = os.path.join(self.directory, filename)
-            rep_role = self.is_valid_audio_file(path)
-            if rep_role is not None:
-                new_sounds[rep_role] = player.make_sound_object(path)
+        try:
+            for filename in os.listdir(self.directory):
+                available.add(filename.lower())
+                path = os.path.join(self.directory, filename)
+                rep_role = self.is_valid_audio_file(path)
+                if rep_role is not None:
+                    new_sounds[rep_role] = player.make_sound_object(path)
+        except OSError:
+            return
         self._auto_create_missing_sounds(new_sounds, available, player)
         with self._lock:
             self.sounds = new_sounds
@@ -711,43 +714,46 @@ class AudioThemesHandler:
     def _hook_getSpeechTextForProperties(
         self, reason=NVDAObjects.controlTypes.OutputReason.QUERY, *args, **kwargs
     ):
-        role = kwargs.get("role", None)
-        states = kwargs.get("states", None)
-        
-        if role is not None:
-            suppress = False
+        try:
+            role = kwargs.get("role", None)
+            states = kwargs.get("states", None)
             
-            if not self.player.speak_roles:
-                suppress = True
-            
-            blacklisted_roles = self._cached_config.get("blacklisted_roles", [19])
-            if role in blacklisted_roles:
-                suppress = True
-                
-            if role == controlTypes.Role.HEADING and role not in blacklisted_roles:
+            if role is not None:
                 suppress = False
                 
-            if suppress:
-                try:
-                    from . import frenzy
-                    from . import utils
-                    appName, windowTitle, url = utils.getCurrentContext()
-                    if hasattr(frenzy, "roleRules") and role in frenzy.roleRules:
-                        rule = frenzy.getActiveRuleContext(frenzy.roleRules[role], appName, windowTitle, url)
-                        if rule is not None and getattr(rule, 'speechBehavior', 2) == 0:
-                            suppress = False
-                except Exception as e:
-                    log.error(f"AudioThemes Error: {e}", exc_info=True)
-            if self.player.use_in_say_all and SayAllHandler.isRunning():
-                suppress = False
+                if not getattr(self, 'player', None) or not self.player.speak_roles:
+                    suppress = True
                 
-            if suppress:
-                kwargs["_role"] = kwargs["role"]
-                del kwargs["role"]
-                if "level" in kwargs:
-                    kwargs["_level"] = kwargs["level"]
-                    del kwargs["level"]
-                
+                blacklisted_roles = getattr(self, '_cached_config', {}).get("blacklisted_roles", [19])
+                if role in blacklisted_roles:
+                    suppress = True
+                    
+                if role == controlTypes.Role.HEADING and role not in blacklisted_roles:
+                    suppress = False
+                    
+                if suppress:
+                    try:
+                        from . import frenzy
+                        from . import utils
+                        appName, windowTitle, url = utils.getCurrentContext()
+                        if hasattr(frenzy, "roleRules") and role in frenzy.roleRules:
+                            rule = frenzy.getActiveRuleContext(frenzy.roleRules[role], appName, windowTitle, url)
+                            if rule is not None and getattr(rule, 'speechBehavior', 2) == 0:
+                                suppress = False
+                    except Exception as e:
+                        log.error(f"AudioThemes Error: {e}", exc_info=True)
+                if getattr(self, 'player', None) and self.player.use_in_say_all and SayAllHandler.isRunning():
+                    suppress = False
+                    
+                if suppress:
+                    kwargs["_role"] = kwargs["role"]
+                    del kwargs["role"]
+                    if "level" in kwargs:
+                        kwargs["_level"] = kwargs["level"]
+                        del kwargs["level"]
+        except Exception as e:
+            log.error(f"AudioThemes _hook_getSpeechTextForProperties error: {e}", exc_info=True)
+
         return self._NVDA_getPropertiesSpeech(reason, *args, **kwargs)
 
     def ensure_themes_dir(self):
@@ -759,7 +765,11 @@ class AudioThemesHandler:
         
         # Copy ALL bundled themes to the user's THEMES_DIR if they don't exist
         if os.path.isdir(bundled_themes_dir):
-            for theme_name in os.listdir(bundled_themes_dir):
+            try:
+                bundled_entries = os.listdir(bundled_themes_dir)
+            except OSError:
+                bundled_entries = []
+            for theme_name in bundled_entries:
                 if theme_name == "Default" and user_config.get("default_theme_deleted"):
                     continue
                 bundled_theme_path = os.path.join(bundled_themes_dir, theme_name)
@@ -782,22 +792,34 @@ class AudioThemesHandler:
             return
             
         # Fallback: create empty directory with info.json if Default was completely missing.
-        os.makedirs(default_theme_path)
+        try:
+            os.makedirs(default_theme_path)
+        except OSError:
+            return
         info_path = os.path.join(default_theme_path, INFO_FILE_NAME)
         if not os.path.exists(info_path):
-            with open(info_path, "w") as f:
-                json.dump(
-                    {"name": "Default", "author": "NVDA Contributers", "summary": "Default theme"}, f
-                )
+            try:
+                with open(info_path, "w") as f:
+                    json.dump(
+                        {"name": "Default", "author": "NVDA Contributers", "summary": "Default theme"}, f
+                    )
+            except OSError:
+                pass
 
     def close(self):
         if self.active_theme is not None:
             self.active_theme.deactivate()
+            self.active_theme = None
         if self._system_monitor is not None:
             self._system_monitor.stop()
             self._system_monitor = None
-        speech.speech.getPropertiesSpeech = self._NVDA_getPropertiesSpeech
-        speech.getPropertiesSpeech = self._NVDA_getPropertiesSpeech
+        if self.player is not None:
+            try:
+                self.player.stop()
+            except Exception:
+                pass
+        if self._NVDA_getPropertiesSpeech is not None:
+            speech.speech.getPropertiesSpeech = self._NVDA_getPropertiesSpeech
         for action in self._registered_actions:
             try:
                 action.unregister(self.configure)
@@ -1250,6 +1272,12 @@ class AudioThemesHandler:
             return global_pack
 
     def play_typing_sound(self, ch=None, vkCode=None, extended=None):
+        try:
+            self._play_typing_sound_inner(ch, vkCode, extended)
+        except Exception as e:
+            log.debugWarning(f"play_typing_sound failed: {e}", exc_info=True)
+
+    def _play_typing_sound_inner(self, ch=None, vkCode=None, extended=None):
         if not self._cached_config.get("typing_sounds", True):
             return
         if not self.enabled or (self.active_theme is None):
@@ -1267,9 +1295,11 @@ class AudioThemesHandler:
             return
 
         theme = self.get_theme_for_app(foreground_app)
+        if theme is None:
+            return
 
         # 1. Check if the active theme has its own typingSounds folder (cached)
-        theme_typing_dir = os.path.join(theme.directory, "typingSounds") if theme else None
+        theme_typing_dir = os.path.join(theme.directory, "typingSounds")
         typing_dir = None
         
         if theme_typing_dir:
@@ -1296,7 +1326,10 @@ class AudioThemesHandler:
                 cache = _typing_dir_cache.get(typing_dir)
             if cache is None:
                 if os.path.isdir(typing_dir):
-                    files = [f for f in os.listdir(typing_dir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
+                    try:
+                        files = [f for f in os.listdir(typing_dir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
+                    except OSError:
+                        files = []
                     cache = {'files': files}
                 else:
                     cache = {'files': []}
@@ -1352,7 +1385,11 @@ class AudioThemesHandler:
         if cls._installed_themes_cache is not None:
             return list(cls._installed_themes_cache)
         result = []
-        for folder in os.listdir(THEMES_DIR):
+        try:
+            entries = os.listdir(THEMES_DIR)
+        except OSError:
+            return []
+        for folder in entries:
             theme = cls.get_theme_from_folder(folder)
             if theme is None:
                 continue
@@ -1374,14 +1411,17 @@ class AudioThemesHandler:
     def install_audio_themePackage(cls, theme_pack):
         cls._invalidate_themes_cache()
         identified_path = os.path.join(THEMES_DIR, uuid4().hex).lower()
-        with ZipFile(theme_pack, "r") as pack:
-            infolist = pack.infolist()
-            if not infolist:
-                return
-            if infolist[0].is_dir():
-                cls._install_legacy(pack, identified_path)
-            else:
-                pack.extractall(path=identified_path)
+        try:
+            with ZipFile(theme_pack, "r") as pack:
+                infolist = pack.infolist()
+                if not infolist:
+                    return
+                if infolist[0].is_dir():
+                    cls._install_legacy(pack, identified_path)
+                else:
+                    pack.extractall(path=identified_path)
+        except Exception:
+            return
         info_file = os.path.join(identified_path, INFO_FILE_NAME)
         if not os.path.exists(info_file):
             folder_name = os.path.basename(os.path.normpath(theme_pack))
@@ -1392,11 +1432,17 @@ class AudioThemesHandler:
             if os.path.isdir(target_path):
                 shutil.rmtree(target_path)
             if safe_name != os.path.basename(identified_path):
-                os.rename(identified_path, target_path)
+                try:
+                    os.rename(identified_path, target_path)
+                except OSError:
+                    return
             info = {"name": folder_name, "author": "Unknown", "summary": folder_name}
             cls.write_info_file(os.path.join(target_path, INFO_FILE_NAME), info)
             return
-        theme_info = cls.load_info_file(info_file)
+        try:
+            theme_info = cls.load_info_file(info_file)
+        except Exception:
+            return
         theme_name = theme_info.get("name", "").strip()
         if theme_name:
             safe_name = cls._sanitize_folder_name(theme_name)
@@ -1406,7 +1452,10 @@ class AudioThemesHandler:
             if os.path.isdir(target_path):
                 shutil.rmtree(target_path)
             if safe_name != os.path.basename(identified_path):
-                os.rename(identified_path, target_path)
+                try:
+                    os.rename(identified_path, target_path)
+                except OSError:
+                    pass
 
     @classmethod
     def install_audio_themeFolder(cls, source_path):
@@ -1457,11 +1506,17 @@ class AudioThemesHandler:
         if not pack_infolist:
             return
         theme_name = pack_infolist[0].orig_filename.strip("/")
-        os.mkdir(final_dst)
+        try:
+            os.mkdir(final_dst)
+        except OSError:
+            return
         for zinfo in pack_infolist[1:]:
             filename = os.path.split(zinfo.filename)[1]
-            with open(os.path.join(final_dst, filename), "wb") as soundfile:
-                soundfile.write(pack.read(zinfo))
+            try:
+                with open(os.path.join(final_dst, filename), "wb") as soundfile:
+                    soundfile.write(pack.read(zinfo))
+            except OSError:
+                continue
         info_file = os.path.join(final_dst, INFO_FILE_NAME)
         theme_info = cls.load_info_file(info_file)
         if "name" not in theme_info:
@@ -1479,18 +1534,28 @@ class AudioThemesHandler:
 
     @staticmethod
     def load_info_file(info_file):
-        with open(info_file, "r", encoding="utf8") as f:
-            return json.load(f)
+        try:
+            with open(info_file, "r", encoding="utf8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
 
     @staticmethod
     def write_info_file(file_path, data):
-        with open(file_path, "w", encoding="utf8") as f:
-            json.dump(data, f)
+        try:
+            with open(file_path, "w", encoding="utf8") as f:
+                json.dump(data, f)
+        except OSError:
+            pass
 
     @staticmethod
     def make_zip_file(output_filename, source_dir):
         with ZipFile(output_filename, "w", ZIP_DEFLATED) as zip:
-            for filename in os.listdir(source_dir):
+            try:
+                entries = os.listdir(source_dir)
+            except OSError:
+                return
+            for filename in entries:
                 file = os.path.join(source_dir, filename)
                 if os.path.isfile(file):
                     zip.write(file, filename)
@@ -1499,7 +1564,10 @@ class AudioThemesHandler:
 def get_typing_sound_packs():
     typingSoundsDir = os.path.join(os.path.dirname(__file__), "typingSounds")
     if os.path.isdir(typingSoundsDir):
-        packs = [d for d in os.listdir(typingSoundsDir) if os.path.isdir(os.path.join(typingSoundsDir, d))]
+        try:
+            packs = [d for d in os.listdir(typingSoundsDir) if os.path.isdir(os.path.join(typingSoundsDir, d))]
+        except OSError:
+            packs = []
         if packs:
             return packs
     return ["1blueSwitch"]

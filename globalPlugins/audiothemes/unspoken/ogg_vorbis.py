@@ -23,8 +23,9 @@ class VorbisInfo(ctypes.Structure):
         ("bitrate_window", ctypes.c_long),
     ]
 
-# OggVorbis_File is large; allocate a buffer of sufficient size
-OGG_VORBIS_FILE_SIZE = 1024
+# OggVorbis_File struct size varies by platform (~1952 on x64, ~1088 on x86).
+# Use a generous fixed size that safely covers both.
+OGG_VORBIS_FILE_SIZE = 4096
 
 # --- ov_fopen ---
 _vorbisfile_lib.ov_fopen.argtypes = [ctypes.c_char_p, ctypes.c_void_p]

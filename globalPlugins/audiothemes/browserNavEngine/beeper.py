@@ -251,6 +251,7 @@ def skippedParagraphChime():
             spcFile.close()
     def playSkipParagraphChime():
         with _spc_play_lock:
+          try:
             spcPlayer.stop()
             # Apply audio ducking
             buf = spcBuf
@@ -272,5 +273,7 @@ def skippedParagraphChime():
                 )
             )
             spcPlayer.idle()
+          except Exception:
+            pass
     threading.Thread(target=playSkipParagraphChime, daemon=True).start()
 

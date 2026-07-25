@@ -61,7 +61,7 @@ class AudioRuleDialog(wx.Dialog):
             disallowedFrenzyValues = []
         self.frenzyType = frenzyType
         if frenzyType        == FrenzyType.ROLE:
-            self.possibleFrenzyValues = [controlTypes.role._roleLabels[role] for role in controlTypes.Role]
+            self.possibleFrenzyValues = [controlTypes.role._roleLabels.get(role, str(role)) for role in controlTypes.Role]
         elif frenzyType        in [FrenzyType.STATE]:
             possibleFrenzyValues = []
             possibleFrenzyObjects = []
@@ -89,11 +89,11 @@ class AudioRuleDialog(wx.Dialog):
         elif frenzyType        in [FrenzyType.TEXT, FrenzyType.CHARACTER]:
             self.possibleFrenzyValues = []
         elif frenzyType        == FrenzyType.FORMAT:
-            self.possibleFrenzyValues = [TEXT_FORMAT_NAMES[f] for f in TextFormat]
+            self.possibleFrenzyValues = [TEXT_FORMAT_NAMES.get(f, str(f)) for f in TextFormat]
         elif frenzyType        == FrenzyType.NUMERIC_FORMAT:
-            self.possibleFrenzyValues = [NUMERIC_TEXT_FORMAT_NAMES[f] for f in NumericTextFormat]
+            self.possibleFrenzyValues = [NUMERIC_TEXT_FORMAT_NAMES.get(f, str(f)) for f in NumericTextFormat]
         elif frenzyType        == FrenzyType.OTHER_RULE:
-            self.possibleFrenzyValues = [OTHER_RULE_NAMES[f] for f in OtherRule]
+            self.possibleFrenzyValues = [OTHER_RULE_NAMES.get(f, str(f)) for f in OtherRule]
         else:
             raise RuntimeError
         self.disallowedFrenzyValues = disallowedFrenzyValues
@@ -691,18 +691,26 @@ class AudioRuleDialog(wx.Dialog):
         speech.speak(utterance)
     def getBiwCategories(self):
         soundsPath = getSoundsPath()
-        return [o for o in os.listdir(soundsPath)
-            if os.path.isdir(os.path.join(soundsPath,o))
-        ]
+        try:
+            return [o for o in os.listdir(soundsPath)
+                if os.path.isdir(os.path.join(soundsPath,o))
+            ]
+        except OSError:
+            return []
 
     def getBuiltInWaveFilesInCategory(self):
         soundsPath = getSoundsPath()
         category = self.getBiwCategory()
+        if not category:
+            return []
         ext = ".wav"
-        return [o for o in os.listdir(os.path.join(soundsPath, category))
-            if not os.path.isdir(os.path.join(soundsPath, category, o))
-                and o.lower().endswith(ext)
-        ]
+        try:
+            return [o for o in os.listdir(os.path.join(soundsPath, category))
+                if not os.path.isdir(os.path.join(soundsPath, category, o))
+                    and o.lower().endswith(ext)
+            ]
+        except OSError:
+            return []
 
     def getBuiltInWaveFiles(self):
         soundsPath = getSoundsPath()
@@ -717,17 +725,29 @@ class AudioRuleDialog(wx.Dialog):
         return result
 
     def getBiw(self):
+        files = self.getBuiltInWaveFilesInCategory()
+        idx = self.biwList.control.GetSelection()
+        if idx < 0 or idx >= len(files):
+            return ""
         return os.path.join(
             self.getBiwCategory(),
-            self.getBuiltInWaveFilesInCategory()[self.biwList.control.GetSelection()]
+            files[idx]
         )
 
     def setBiw(self, biw):
         category, biwFile = os.path.split(biw)
-        categoryIndex = self.getBiwCategories().index(category)
+        categories = self.getBiwCategories()
+        try:
+            categoryIndex = categories.index(category)
+        except ValueError:
+            return
         self.biwCategory.control.SetSelection(categoryIndex)
         self.onBiwCategory(None)
-        biwIndex = self.getBuiltInWaveFilesInCategory().index(biwFile)
+        files = self.getBuiltInWaveFilesInCategory()
+        try:
+            biwIndex = files.index(biwFile)
+        except ValueError:
+            return
         self.biwList.control.SetSelection(biwIndex)
 
 
@@ -738,7 +758,11 @@ class AudioRuleDialog(wx.Dialog):
         nvwave.playWaveFile(fullPath)
 
     def getBiwCategory(self):
-        return   self.getBiwCategories()[self.biwCategory.control.GetSelection()]
+        cats = self.getBiwCategories()
+        idx = self.biwCategory.control.GetSelection()
+        if idx < 0 or idx >= len(cats):
+            return cats[0] if cats else ""
+        return cats[idx]
 
     def onBiwCategory(self, evt):
         soundsPath = getSoundsPath()
@@ -1203,8 +1227,13 @@ class RulesDialog(SettingsPanel):
                 shutil.copy2(rulesFileName, rulesFileName + ".backup")
             except Exception as e:
                 log.error(f"AudioThemes Error: {e}", exc_info=True)
-        with open(rulesFileName, "w") as rulesFile:
-            rulesFile.write(rulesJson)
+        try:
+            with open(rulesFileName, "w") as rulesFile:
+                rulesFile.write(rulesJson)
+        except OSError as e:
+            log.error(f"AudioThemes Error saving rules: {e}", exc_info=True)
+            ui.message(_("Error saving rules. Check file permissions."))
+            return
         reloadRules()
 
         setConfig("applicationsBlacklist",self.applicationsBlacklistEdit.Value)

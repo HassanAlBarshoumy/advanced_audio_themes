@@ -61,7 +61,7 @@ class SoundFileInfo:
 
     @property
     def role_label(self):
-        return theme_roles[self.role]
+        return theme_roles.get(self.role, str(self.role))
 
     def reconcile(self):
         src_ext = os.path.splitext(self.src)[-1]
@@ -82,7 +82,11 @@ class ThemeState:
     def __post_init__(self):
         _init_state = []
         basedir = self.theme.directory
-        for file in os.listdir(basedir):
+        try:
+            files = os.listdir(basedir)
+        except OSError:
+            files = []
+        for file in files:
             filepath = os.path.join(basedir, file)
             role = AudioTheme.is_valid_audio_file(filepath)
             if role:

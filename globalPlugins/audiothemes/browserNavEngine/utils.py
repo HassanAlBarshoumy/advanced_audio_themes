@@ -124,7 +124,7 @@ class ThreadPool:
         self.tasks.join()
 
 
-threadPool = ThreadPool(5)
+threadPool = ThreadPool(3)
 
 
 

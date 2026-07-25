@@ -54,7 +54,6 @@ def _qj_clear_output_device_cache():
     global _qj_output_device
     _qj_output_device = None
 import uuid
-import requests
 import scriptHandler
 
 try:
@@ -706,8 +705,11 @@ def saveConfig(config=None):
     config = config or globalConfig
     configDict = config.asDict()
     rulesJson = json.dumps(configDict, indent=4, sort_keys=True)
-    with open(rulesFileName, "w", encoding="utf-8") as rulesFile:
-        rulesFile.write(rulesJson)
+    try:
+        with open(rulesFileName, "w", encoding="utf-8") as rulesFile:
+            rulesFile.write(rulesJson)
+    except OSError as e:
+        log.error(f"AudioThemes quickJump saveConfig error: {e}", exc_info=True)
 
 globalConfig  = loadConfig()
 
@@ -807,7 +809,7 @@ def getDebugBeepModes(url, config):
 def getSuppressOptions(url, config):
     sites = findSites(url, config)
     if len(sites) == 0:
-        return False
+        return {}
     options ={
         option: max([
             getattr(site, option)
@@ -1038,11 +1040,11 @@ def processAutoSpeakbookmark(browse, bookmark, textToSpeak, cachedLines):
     if bookmark.autoSpeakMode == AutoSpeakMode.PARAGRAPH_DIFF:
         for line in diffAndExtractInterestingLines(cachedLines.lines, textToSpeak):
             if line[0] in "!+":
-                line = line[1:]
-                def speak(firstUtterance):
+                _capturedLine = line[1:]
+                def speak(firstUtterance, _line=_capturedLine):
                     if firstUtterance:
                         speech.cancelSpeech()
-                    speech.speakText(line)
+                    speech.speakText(_line)
                 wx.CallAfter(speak, firstUtterance)
     elif bookmark.autoSpeakMode.value.startswith("chime"):
         filterByType = {
@@ -1496,7 +1498,7 @@ def shouldSkipClutter(textInfo, allBookmarks):
         try:
             bookmarks0 = allBookmarks[0]
         except KeyError:
-            bookmarksZero = []
+            bookmarks0 = []
         bookmarksOther = allBookmarks
     for match in matchTextAndAttributes(bookmarks0, textInfo):
         scriptMatch, message, __ = runScriptAndApplyOffset(textInfo, match, skipClutterBookmarks=[])
@@ -2066,8 +2068,7 @@ def scanLevelsSync(self, config, bookmarks):
         category = BookmarkCategory.HIERARCHICAL
         mylog(f"sltf bookmarks={len(bookmarks)} url=?")
         if len(bookmarks) == 0:
-            future.set([])
-            return
+            return HierarchicalLevelsInfo([])
         textInfo = self.makeTextInfo(textInfos.POSITION_ALL)
         textInfo.collapse()
         textInfo.expand(textInfos.UNIT_PARAGRAPH)
@@ -3683,6 +3684,7 @@ def importImpl(self, sites, site):
 
 
 def downloadAllWebsitesFromStore():
+    import requests
     url = "https://raw.githubusercontent.com/mltony/nvda-browser-nav-bookmark-store/refs/heads/main/output/websites.json"
     response = requests.get(url, timeout=10)
     response.raise_for_status()

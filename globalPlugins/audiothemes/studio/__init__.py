@@ -192,6 +192,8 @@ class AudioThemesStudioStartupDialog(BaseDialog):
             if selectDlg.ShowModal() != wx.ID_OK:
                 return
             selected_theme = selectDlg.selected_theme
+        if selected_theme is None:
+            return
         dlg = ThemeBlenderDialog(
             # Translators: title for create new theme dialog
             _("Editing Audio Theme: {name}").format(name=selected_theme.name),

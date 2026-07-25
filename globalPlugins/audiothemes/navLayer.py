@@ -187,7 +187,6 @@ class NavLayerMixin:
         self._playNavTone(1500, 40)
         text = self._getCurrentUnitText()
         if text:
-            import wx
             if wx.TheClipboard.Open():
                 wx.TheClipboard.SetData(wx.TextDataObject(text))
                 wx.TheClipboard.Close()

@@ -896,39 +896,43 @@ class BrowserNavMixin:
 
     def script_moveToParent(self, gesture, selfself):
         mode = getMode()
-        op = self.maybeAdjustOperator(PARENT_OPERATORS[mode])
+        rawOp = PARENT_OPERATORS[mode]
+        op = self.maybeAdjustOperator(rawOp)
         # Translators: error message if parent could not be found
         errorMessage = _("No previous paragraph  with {qualifier} {mode} in the document").format(
             mode=BROWSE_MODES[mode],
-            qualifier=OPERATOR_STRINGS[op])
+            qualifier=OPERATOR_STRINGS[rawOp])
         self.moveInBrowser(-1, errorMessage, op, selfself)
 
     def script_moveToNextParent(self, gesture, selfself):
         mode = getMode()
-        op = self.maybeAdjustOperator(PARENT_OPERATORS[mode])
+        rawOp = PARENT_OPERATORS[mode]
+        op = self.maybeAdjustOperator(rawOp)
         # Translators: error message if parent could not be found
         errorMessage = _("No next paragraph  with {qualifier} {mode} in the document").format(
             mode=BROWSE_MODES[mode],
-            qualifier=OPERATOR_STRINGS[op])
+            qualifier=OPERATOR_STRINGS[rawOp])
         self.moveInBrowser(1, errorMessage, op, selfself)
 
 
     def script_moveToChild(self, gesture, selfself):
         mode = getMode()
-        op = self.maybeAdjustOperator(CHILD_OPERATORS[mode])
+        rawOp = CHILD_OPERATORS[mode]
+        op = self.maybeAdjustOperator(rawOp)
         # Translators: error message if child could not be found
         errorMessage = _("No next paragraph  with {qualifier} {mode} in the document").format(
             mode=BROWSE_MODES[mode],
-            qualifier=OPERATOR_STRINGS[op])
+            qualifier=OPERATOR_STRINGS[rawOp])
         self.moveInBrowser(1, errorMessage, op, selfself)
 
     def script_moveToPreviousChild(self, gesture, selfself):
         mode = getMode()
-        op = self.maybeAdjustOperator(CHILD_OPERATORS[mode])
+        rawOp = CHILD_OPERATORS[mode]
+        op = self.maybeAdjustOperator(rawOp)
         # Translators: error message if child could not be found
         errorMessage = _("No previous paragraph  with {qualifier} {mode} in the document").format(
             mode=BROWSE_MODES[mode],
-            qualifier=OPERATOR_STRINGS[op])
+            qualifier=OPERATOR_STRINGS[rawOp])
         self.moveInBrowser(-1, errorMessage, op, selfself)
 
     def script_rotor(self, gesture, selfself):
