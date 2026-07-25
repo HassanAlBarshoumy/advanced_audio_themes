@@ -129,6 +129,22 @@ def new_getObjectPropertiesSpeech(
         _prefixSpeechCommand = None,
         **allowedProperties
 ):
+    try:
+        return _new_getObjectPropertiesSpeech_inner(obj, reason, _prefixSpeechCommand, **allowedProperties)
+    except Exception:
+        try:
+            if original_getObjectPropertiesSpeech is not None:
+                return original_getObjectPropertiesSpeech(obj, reason, _prefixSpeechCommand, **allowedProperties)
+        except Exception:
+            pass
+        return []
+
+def _new_getObjectPropertiesSpeech_inner(
+        obj,
+        reason = controlTypes.OutputReason.QUERY,
+        _prefixSpeechCommand = None,
+        **allowedProperties
+):
     if obj is None:
         if original_getObjectPropertiesSpeech is not None:
             return original_getObjectPropertiesSpeech(
@@ -441,7 +457,8 @@ def updateRules():
     
     def buildList(frenzyType):
         d = collections.defaultdict(list)
-        for rule in pp.rulesByFrenzy[frenzyType]:
+        rulesByFrenzy = getattr(pp, 'rulesByFrenzy', None) or {}
+        for rule in rulesByFrenzy.get(frenzyType, []):
             if rule.enabled:
                 d[rule.getFrenzyValue()].append(rule)
         return dict(d)
@@ -763,6 +780,26 @@ def new_getTextInfoSpeech(
         onlyInitialFields = False,
         suppressBlanks = False
 ):
+    try:
+        yield from _new_getTextInfoSpeech_inner(
+            info, useCache, formatConfig, unit, reason, _prefixSpeechCommand, onlyInitialFields, suppressBlanks
+        )
+    except Exception:
+        if original_getTextInfoSpeech is not None:
+            yield from original_getTextInfoSpeech(
+                info, useCache, formatConfig, unit, reason, _prefixSpeechCommand, onlyInitialFields, suppressBlanks
+            )
+
+def _new_getTextInfoSpeech_inner(
+        info,
+        useCache = True,
+        formatConfig= None,
+        unit = None,
+        reason = OutputReason.QUERY,
+        _prefixSpeechCommand= None,
+        onlyInitialFields = False,
+        suppressBlanks = False
+):
     if not isPhoneticPunctuationEnabled():
         if original_getTextInfoSpeech is not None:
             yield from original_getTextInfoSpeech(
@@ -943,7 +980,12 @@ def new_getTextInfoSpeech(
                     
     if highlightedRule is not None:
         highlightedStarts = list(findAllControlFields(fields, role=controlTypes.Role.MARKED_CONTENT))
-        highlightedEnds = [findControlEnd(fields, highlightedSstart) for highlightedSstart in highlightedStarts]
+        highlightedEnds = []
+        for highlightedSstart in highlightedStarts:
+            try:
+                highlightedEnds.append(findControlEnd(fields, highlightedSstart))
+            except RuntimeError:
+                highlightedEnds.append(len(fields) - 1)
         nHighlighteds = len(highlightedStarts)
         # Filter out nested highlighteds.
         # This has never been observed in real life.
@@ -1094,7 +1136,8 @@ def new_getTextInfoSpeech(
     # Some of the intervals might still be blank, e.g., if an interval only contains a single whitespace character,
     # NVDA would speak it as blank".
     # We would like to avoid that, so we will suppress blanks on all intervals except for the last one if all previous are blank.
-    lastIntervalIndex = [i for i, interval in enumerate(filteredIntervalsAndCommands) if isinstance(interval, tuple)][-1]
+    _tupleIndices = [i for i, interval in enumerate(filteredIntervalsAndCommands) if isinstance(interval, tuple)]
+    lastIntervalIndex = _tupleIndices[-1] if _tupleIndices else -1
     isBlankSoFar = True
     for i, item in enumerate(filteredIntervalsAndCommands):
         if isinstance(item, list):
@@ -1192,6 +1235,20 @@ PROPERTY_SPEECH_SIGNATURE2 = "🪼‣⁋"
 original_getPropertiesSpeech = None
 ignore_get_properties_hook = 0
 def new_getPropertiesSpeech(
+    reason: OutputReason = OutputReason.QUERY,
+    **propertyValues,
+):
+    try:
+        return _new_getPropertiesSpeech_inner(reason, **propertyValues)
+    except Exception:
+        try:
+            if original_getPropertiesSpeech is not None:
+                return original_getPropertiesSpeech(reason, **propertyValues)
+        except Exception:
+            pass
+        return []
+
+def _new_getPropertiesSpeech_inner(
     reason: OutputReason = OutputReason.QUERY,
     **propertyValues,
 ):
@@ -1408,6 +1465,24 @@ PROPERTY_SPEECH_PATTERN = re.compile(fr"{PROPERTY_SPEECH_SIGNATURE}(\w+){PROPERT
 PROPERTY_SPEECH_PATTERN2 = re.compile(fr"{PROPERTY_SPEECH_SIGNATURE2}(.+){PROPERTY_SPEECH_SIGNATURE2}")
 original_getControlFieldSpeech = None
 def new_getControlFieldSpeech(
+    attrs,
+    ancestorAttrs,
+    fieldType,
+    formatConfig=None,
+    extraDetail = False,
+    reason = None,
+):
+    try:
+        return _new_getControlFieldSpeech_inner(attrs, ancestorAttrs, fieldType, formatConfig, extraDetail, reason)
+    except Exception:
+        try:
+            if original_getControlFieldSpeech is not None:
+                return original_getControlFieldSpeech(attrs, ancestorAttrs, fieldType, formatConfig, extraDetail, reason)
+        except Exception:
+            pass
+        return ""
+
+def _new_getControlFieldSpeech_inner(
     attrs,
     ancestorAttrs,
     fieldType,
@@ -1669,6 +1744,25 @@ def new_processAndLabelStates(
     positiveStateLabelDict=None,
     negativeStateLabelDict=None,
 ):
+    try:
+        return _new_processAndLabelStates_inner(role, states, reason, positiveStates, negativeStates, positiveStateLabelDict, negativeStateLabelDict)
+    except Exception:
+        try:
+            if original_processAndLabelStates is not None:
+                return original_processAndLabelStates(role, states, reason, positiveStates, negativeStates, positiveStateLabelDict, negativeStateLabelDict)
+        except Exception:
+            pass
+        return []
+
+def _new_processAndLabelStates_inner(
+    role,
+    states,
+    reason,
+    positiveStates= None,
+    negativeStates=None,
+    positiveStateLabelDict=None,
+    negativeStateLabelDict=None,
+):
     if positiveStateLabelDict is None:
         positiveStateLabelDict = {}
     if negativeStateLabelDict is None:
@@ -1715,6 +1809,24 @@ def new_processAndLabelStates(
 
 original_getTextInfoSpeech_considerSpelling = None
 def new_getTextInfoSpeech_considerSpelling(
+    unit,
+    onlyInitialFields,
+    textWithFields,
+    reason,
+    speechSequence,
+    language,
+):
+    try:
+        yield from _new_getTextInfoSpeech_considerSpelling_inner(
+            unit, onlyInitialFields, textWithFields, reason, speechSequence, language
+        )
+    except Exception:
+        if original_getTextInfoSpeech_considerSpelling is not None:
+            yield from original_getTextInfoSpeech_considerSpelling(
+                unit, onlyInitialFields, textWithFields, reason, speechSequence, language
+            )
+
+def _new_getTextInfoSpeech_considerSpelling_inner(
     unit,
     onlyInitialFields,
     textWithFields,

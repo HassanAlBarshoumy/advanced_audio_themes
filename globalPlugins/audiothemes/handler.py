@@ -515,7 +515,10 @@ class AudioTheme:
                 path = os.path.join(self.directory, filename)
                 rep_role = self.is_valid_audio_file(path)
                 if rep_role is not None:
-                    new_sounds[rep_role] = player.make_sound_object(path)
+                    try:
+                        new_sounds[rep_role] = player.make_sound_object(path)
+                    except Exception:
+                        log.warning(f"AudioThemes: failed to load sound for role {rep_role}: {path}")
         except OSError:
             return
         self._auto_create_missing_sounds(new_sounds, available, player)
@@ -753,6 +756,8 @@ class AudioThemesHandler:
                         del kwargs["level"]
         except Exception as e:
             log.error(f"AudioThemes _hook_getSpeechTextForProperties error: {e}", exc_info=True)
+            kwargs.pop("_role", None)
+            kwargs.pop("_level", None)
 
         return self._NVDA_getPropertiesSpeech(reason, *args, **kwargs)
 
@@ -1031,23 +1036,47 @@ class AudioThemesHandler:
         self.player._cached_config = self._cached_config
         if self._system_monitor is not None:
             self._system_monitor._cached_config = self._cached_config
-        from .emoji_handler import refreshCachedConfig as _refreshEmojiConfig
-        _refreshEmojiConfig()
-        from .phoneticPunctuation import refreshCachedConfig as _refreshPpConfig
-        _refreshPpConfig()
-        from .frenzy import refreshFrenzyCachedConfig
-        refreshFrenzyCachedConfig()
-        from .commands import refreshCommandsCachedConfig
-        refreshCommandsCachedConfig()
-        from . import utils
-        utils._set_cached_output_mode(self._cached_config.get("output_mode", "stereo"))
-        utils.refreshPpConfigCache()
-        from . import sentenceNavEngine
-        sentenceNavEngine._refresh_doc_formatting()
-        from .browserNavEngine import _bne_refresh_doc_formatting
-        _bne_refresh_doc_formatting()
-        from .browserNavEngine.addonConfig import refreshBNEConfigCache
-        refreshBNEConfigCache()
+        try:
+            from .emoji_handler import refreshCachedConfig as _refreshEmojiConfig
+            _refreshEmojiConfig()
+        except Exception:
+            pass
+        try:
+            from .phoneticPunctuation import refreshCachedConfig as _refreshPpConfig
+            _refreshPpConfig()
+        except Exception:
+            pass
+        try:
+            from .frenzy import refreshFrenzyCachedConfig
+            refreshFrenzyCachedConfig()
+        except Exception:
+            pass
+        try:
+            from .commands import refreshCommandsCachedConfig
+            refreshCommandsCachedConfig()
+        except Exception:
+            pass
+        try:
+            from . import utils
+            utils._set_cached_output_mode(self._cached_config.get("output_mode", "stereo"))
+            utils.refreshPpConfigCache()
+        except Exception:
+            pass
+        try:
+            from . import sentenceNavEngine
+            sentenceNavEngine._refresh_doc_formatting()
+        except Exception:
+            pass
+        try:
+            from .browserNavEngine import _bne_refresh_doc_formatting
+            _bne_refresh_doc_formatting()
+        except Exception:
+            pass
+        try:
+            from .browserNavEngine.addonConfig import refreshBNEConfigCache
+            refreshBNEConfigCache()
+        except Exception:
+            pass
 
     def _start_system_status_monitoring(self):
         try:
@@ -1099,7 +1128,10 @@ class AudioThemesHandler:
         sound_obj = sounds.get(sound_key)
         if sound_obj is None:
             return
-        self.player.play({"name": str(sound_key.value), "role": 0, "system_sound": True, "volume_override": cfg.get("sys_status_volume", 20) / 100.0}, sound_obj)
+        try:
+            self.player.play({"name": str(sound_key.value), "role": 0, "system_sound": True, "volume_override": cfg.get("sys_status_volume", 20) / 100.0}, sound_obj)
+        except Exception:
+            pass
 
     def play(self, obj_info, sound, _pre_resolved_theme=None):
         """
@@ -1162,7 +1194,10 @@ class AudioThemesHandler:
                     sound_obj = sounds.get(target)
         if sound_obj is None:
             return
-        self.player.play(obj_info, sound_obj)
+        try:
+            self.player.play(obj_info, sound_obj)
+        except Exception:
+            log.warning(f"AudioThemes: failed to play sound {getattr(sound, 'name', sound)}")
 
     def get_theme_for_app(self, app_name):
         with self._config_lock:
@@ -1170,7 +1205,9 @@ class AudioThemesHandler:
                 return self.active_theme
             app_name = app_name.lower()
             profile = self._app_profiles_cache.get(app_name)
-            target_folder = profile.get("theme") if isinstance(profile, dict) else profile
+            if profile is None:
+                return self.active_theme
+            target_folder = profile.get("theme") if isinstance(profile, dict) else (profile if isinstance(profile, str) else None)
             if target_folder and self.active_theme is not None:
                 if target_folder == self.active_theme.folder:
                     return self.active_theme
@@ -1209,13 +1246,16 @@ class AudioThemesHandler:
 
         # Check pre-indexed files in memory to eliminate Disk I/O
         if sound_name.lower() in getattr(theme, 'available_files', set()):
-            self.player.play_file(
-                sound_path,
-                volume=self._cached_config.get("volume", 50),
-                audio3d=bool(angle_x or angle_y),
-                angle_x=angle_x,
-                angle_y=angle_y
-            )
+            try:
+                self.player.play_file(
+                    sound_path,
+                    volume=self._cached_config.get("volume", 50),
+                    audio3d=bool(angle_x or angle_y),
+                    angle_x=angle_x,
+                    angle_y=angle_y
+                )
+            except Exception:
+                return False
             return True
         return False
 
@@ -1251,11 +1291,14 @@ class AudioThemesHandler:
             return False
         vol = (volume if volume is not None
                else self._cached_config.get("clipboard_volume", 20))
-        self.player.play(
-            {"name": str(special_prop.value), "role": 0, "system_sound": True,
-             "volume_override": vol / 100.0},
-            sound_obj
-        )
+        try:
+            self.player.play(
+                {"name": str(special_prop.value), "role": 0, "system_sound": True,
+                 "volume_override": vol / 100.0},
+                sound_obj
+            )
+        except Exception:
+            pass
         return True
 
     def get_typing_pack_for_app(self, app_name):
@@ -1374,6 +1417,8 @@ class AudioThemesHandler:
         info_file = os.path.join(expected, INFO_FILE_NAME)
         if os.path.isfile(info_file):
             info = cls.load_info_file(info_file)
+            if not isinstance(info, dict):
+                info = {}
             return AudioTheme(directory=expected, **info)
         name = os.path.basename(expected)
         info = {"name": name, "author": "Unknown", "summary": name}
@@ -1390,7 +1435,11 @@ class AudioThemesHandler:
         except OSError:
             return []
         for folder in entries:
-            theme = cls.get_theme_from_folder(folder)
+            try:
+                theme = cls.get_theme_from_folder(folder)
+            except Exception:
+                log.warning(f"AudioThemes: failed to load theme from {folder}")
+                continue
             if theme is None:
                 continue
             result.append(theme)

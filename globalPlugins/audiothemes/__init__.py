@@ -1518,7 +1518,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             
         children = []
         def collect_children(root, depth=0):
-            if depth > 3: return
+            if depth > 1: return
             try:
                 for child in root.children:
                     loc = child.location

@@ -531,7 +531,8 @@ def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
         return originalSpeechSpeechSpeak(newSequence, symbolLevel=symbolLevel, *args, **kwargs)
     except Exception as e:
         log.error(f"AudioThemes preSpeak error: {e}", exc_info=True)
-        return originalSpeechSpeechSpeak(speechSequence, symbolLevel=symbolLevel, *args, **kwargs)
+        if originalSpeechSpeechSpeak is not None:
+            return originalSpeechSpeechSpeak(speechSequence, symbolLevel=symbolLevel, *args, **kwargs)
 
 class EmojiSoundCommand(speech.commands.BaseCallbackCommand):
     """Plays emoji sound at the correct position during speech.
@@ -1007,11 +1008,14 @@ def eloquenceFix(speechSequence, hasNonEmptyString=None):
     else:
         language = speech.getCurrentLanguage()
         symbolLevel = _cached_speech_symbolLevel
-        hasNonEmpty = any(
-            isinstance(element, str)
-            and not speech.isBlank(speech.processText(language, element, symbolLevel))
-            for element in speechSequence
-        )
+        try:
+            hasNonEmpty = any(
+                isinstance(element, str)
+                and not speech.isBlank(speech.processText(language, element, symbolLevel))
+                for element in speechSequence
+            )
+        except Exception:
+            hasNonEmpty = any(isinstance(element, str) and element.strip() for element in speechSequence)
     if hasNonEmpty:
         return speechSequence
     indicesToRemove = []
@@ -1195,7 +1199,8 @@ def new_getIndentationSpeech(indentation, formatConfig):
             indentSequence.append(speech.commands.BeepCommand(speech.speech.IDT_BASE_FREQUENCY, speech.speech.getIndentToneDuration()))
         if speechIndentConfig:
             # mltony change
-            noIndentList = frenzy.otherRules.get(OtherRule.NO_INDENT, None)
+            otherRules = getattr(frenzy, 'otherRules', None) or {}
+            noIndentList = otherRules.get(OtherRule.NO_INDENT, None)
             if noIndentList:
                 noIndentRule = frenzy.getActiveRuleContext(noIndentList, *_utils_mod.getCurrentContext())
                 if noIndentRule is None:
