@@ -418,8 +418,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             pass
 
     def _hook_caretMovementScriptHelper(self, extraDetail, unit, direction, posConstant=textInfos.POSITION_CARET, *args, **kwargs):
+        _orig_exc = None
         if self.orig_caretMovementScriptHelper:
-            self.orig_caretMovementScriptHelper(extraDetail, unit, direction, posConstant, *args, **kwargs)
+            try:
+                self.orig_caretMovementScriptHelper(extraDetail, unit, direction, posConstant, *args, **kwargs)
+            except Exception as e:
+                _orig_exc = e
         try:
             current_nav = api.getNavigatorObject()
             if current_nav and getattr(current_nav, 'treeInterceptor', None) and not current_nav.treeInterceptor.passThrough:
@@ -431,6 +435,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
             log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+        if _orig_exc is not None:
+            raise _orig_exc
     def _rebindInstanceGestures(self):
         # ── SentenceNav & TextNav Initialization ──
         # Bind gestures explicitly to ensure NVDA's ScriptableObject metaclass 
@@ -646,11 +652,11 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 if hasattr(speech, "_caretMovementScriptHelper"):
                     speech._caretMovementScriptHelper = self.orig_caretMovementScriptHelper
         with suppress(Exception):
+            self._navigation_timer.Stop()
+        with suppress(Exception):
             self.quicknav_interceptor.terminate()
         with suppress(Exception):
             self.handler.close()
-        with suppress(Exception):
-            self._navigation_timer.Stop()
         with suppress(Exception):
             from .sentenceNavEngine import _unregister_sentence_nav_hooks
             _unregister_sentence_nav_hooks()
@@ -858,7 +864,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             except Exception as e:
                 log.debugWarning(f"event_becomeNavigatorObject nextHandler (isFocus): {e}")
             return
-        self.handler._current_url = None
         # Dedup: skip if gainFocus just fired for this very object
         if obj is self._last_focused_obj and (time.monotonic() - self._last_focus_time) < 0.3:
             try:
@@ -868,6 +873,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             except Exception as e:
                 log.debugWarning(f"event_becomeNavigatorObject nextHandler (dedup): {e}")
             return
+        self.handler._current_url = None
         try:
             nextHandler()
         except StopIteration:
@@ -890,8 +896,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         try:
             if obj.role == controlTypes.Role.PROGRESSBAR:
                 now = time.monotonic()
-                obj_id = id(obj)
-                last_t = self._last_progress_times.get(obj_id, 0)
+                obj_key = (id(obj), type(obj).__name__)
+                last_t = self._last_progress_times.get(obj_key, 0)
                 if now - last_t < 0.5:
                     try:
                         nextHandler()
@@ -900,9 +906,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     except Exception:
                         pass
                     return
-                self._last_progress_times[obj_id] = now
+                self._last_progress_times[obj_key] = now
                 if len(self._last_progress_times) > 64:
-                    self._last_progress_times.clear()
+                    oldest_key = min(self._last_progress_times, key=self._last_progress_times.get)
+                    del self._last_progress_times[oldest_key]
                 cfg = self.handler._cached_config
                 if cfg.get("enable_audio_themes", True) and self.handler.active_theme:
                     val = obj.value

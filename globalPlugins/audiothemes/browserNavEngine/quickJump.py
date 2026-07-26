@@ -1046,6 +1046,7 @@ def processAutoSpeakbookmark(browse, bookmark, textToSpeak, cachedLines):
                         speech.cancelSpeech()
                     speech.speakText(_line)
                 wx.CallAfter(speak, firstUtterance)
+                firstUtterance = False
     elif bookmark.autoSpeakMode.value.startswith("chime"):
         filterByType = {
             AutoSpeakMode.CHIME_ON_ADD: "+",
@@ -1121,9 +1122,15 @@ def playBiwInThread(bookmark=None, earcon=None, volume=None):
             wantDucking=False,
             purpose=nvwave.AudioPurpose.SOUNDS,
         )
-        fileWavePlayer.stop()
-        fileWavePlayer.feed(buf)
-        fileWavePlayer.idle()
+        try:
+            fileWavePlayer.stop()
+            fileWavePlayer.feed(buf)
+            fileWavePlayer.idle()
+        except Exception:
+            try:
+                fileWavePlayer.stop()
+            except Exception:
+                pass
 
 def getTextFast(info):
     fields = info.getTextWithFields()
@@ -2094,7 +2101,7 @@ def scanLevelsSync(self, config, bookmarks):
             if result == 0:
                 # collect all the futures and return
                 result = HierarchicalLevelsInfo(sorted(list({
-                    inner.get()
+                    inner.get(timeout=60)
                     for inner in futures
                 })))
                 return result
@@ -3154,7 +3161,7 @@ class BookmarksListDialog(
             return
 
     def OnSortClick(self,evt):
-        self.bookmarks.sort(key=QJSite.getDisplayName)
+        self.bookmarks.sort(key=QJBookmark.getDisplayName)
 
     def onOk(self,evt):
         evt.Skip()
@@ -3933,7 +3940,11 @@ class SettingsDialog(SettingsPanel):
                     str(e),
                 )
                 gui.messageBox(errorMsg, _("Site Entry Error"), wx.OK|wx.ICON_WARNING, self)
+                file_dialog.Destroy()
                 return
+        else:
+            file_dialog.Destroy()
+            return
         file_dialog.Destroy()
         sites = importImpl(self, sites, site)
         if sites is not None:

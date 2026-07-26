@@ -112,9 +112,9 @@ class ThreadPool:
     def add_task(self, func, *args, **kargs):
         """ Add a task to the queue """
         try:
-            self.tasks.put_nowait((func, args, kargs))
+            self.tasks.put((func, args, kargs), timeout=30)
         except queue.Full:
-            pass
+            log.error("AudioThemes ThreadPool: queue full after 30s timeout, task dropped")
     def map(self, func, args_list):
         """ Add a list of tasks to the queue """
         for args in args_list:
@@ -135,10 +135,18 @@ class Future:
         self.__exc = None
         self.__is_set = False
 
-    def get(self):
+    def get(self, timeout=None):
         with self.__condition:
-            while not self.__is_set:
-                self.__condition.wait()
+            if timeout is not None:
+                endTime = time.time() + timeout
+                while not self.__is_set:
+                    remaining = endTime - time.time()
+                    if remaining <= 0:
+                        raise TimeoutError("AudioThemes Future.get() timed out")
+                    self.__condition.wait(remaining)
+            else:
+                while not self.__is_set:
+                    self.__condition.wait()
             if self.__exc is not None:
                 raise self.__exc
             return self.__val
