@@ -7,7 +7,7 @@ Complete a performance, disk I/O, thread‑safety, and memory audit of all files
 - "لا تكسر اي وظيفة" — do not break any existing functionality.
 
 ## Status
-All known issues fixed (rounds 1–29). No known remaining issues.
+All known issues fixed (rounds 1–30). No known remaining issues.
 
 ## Fix History
 
@@ -273,3 +273,11 @@ Targeted optimization of `GlobalPlugin.__init__` and module-level imports to red
 - **`phoneticPunctuation.py _processEmojiSequence` functions-in-loop** — `_make_emoji_commands()` and `_get_emoji_text()` were defined inside `for item in sequence:` loop, creating a new function object per emoji-containing string item. Moved outside loop (still inside `_processEmojiSequence` scope).
 - **`phoneticPunctuation.py postProcessSynchronousCommands` dead variable** — `language=speech.getCurrentLanguage()` was called on every speech event but never referenced. Removed.
 - **`handler.py get_earcon_angles` uncached COM** — Called `api.getDesktopObject().location` on every earcon play. Now uses cached `_cached_desktop_location` from `__init__.py` (30s TTL). Falls back to COM only on cache miss.
+
+### Round 30 (committed): memory + CPU optimization — 5 fixes
+Full audit of disk I/O, memory, and CPU across all files.
+- **unspoken `raw_data` leak** — After `_ensure_processed()` runs, `sound_data` held both `raw_data` (~350KB) and `data` (~350KB) per sound. `raw_data` was never accessed again but still referenced. Added `sound_data.pop("raw_data", None)`. Saves ~22.5MB across 64 cached sounds.
+- **frenzy `headingLevelRules` double computation** — `_new_getControlFieldSpeech_inner` called `getActiveRuleContext()` for HEADING1-6 and HEADING format **twice** — once in the first loop (to check existence) and again in a dict comprehension (to build lookup). Now saves results into `_heading_level_rules_cache` during first pass and reuses them. Saves ~7 cache lookups per control field speech event.
+- **handler `get_earcon_angles` pre-computed** — Was calling `api.getFocusObject().location` (COM) from worker threads. Now `_snapshot_obj()` computes angles on main thread and stores in `_latest_earcon_angles` module-level tuple. `get_earcon_angles()` reads the cache first (zero-COM), falling back to COM only on cache miss.
+- **Disk I/O audit result:** ZERO hot-path issues remaining. Every config read, filesystem call, and JSON parse on speech/focus/keypress paths is served from in-memory caches.
+- **Memory audit result:** All caches properly bounded (LRU/WeakKeyDictionary/maxsize). Only the `raw_data` leak was actionable.
