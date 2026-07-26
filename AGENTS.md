@@ -7,7 +7,7 @@ Complete a performance, disk I/O, thread‑safety, and memory audit of all files
 - "لا تكسر اي وظيفة" — do not break any existing functionality.
 
 ## Status
-All known issues fixed (rounds 1–32). No known remaining issues.
+All known issues fixed (rounds 1–34). No known remaining issues.
 
 ## Fix History
 
@@ -300,3 +300,18 @@ Deep audit of shutdown path, resource lifecycle, and remaining edge cases.
 - **`phoneticPunctuation.py fixProsodyCommands` early-out** — Pre-scans sequence for `BaseProsodyCommand` instances. Returns original sequence untouched when no prosody commands exist (vast majority of events).
 - **`handler.py` module import caching** — `_frenzy_mod` and `_utils_mod_cache` stored on handler instance at `configure()` time, used by `_hook_getSpeechTextForProperties` hot path. Eliminates `from . import` per speech event.
 - **`handler.py get_earcon_angles` audio3d guard** — Earcon angle computation skipped entirely when `audio3d` config is disabled.
+
+### Round 33 (committed): error sound on NVDA restart — 4 fixes
+- **`unspoken/__init__.py` `on_synthChanged` during shutdown** — CRITICAL: `on_synthChanged` fires during NVDA shutdown, tries to open audio device being released. Added `_terminated` flag set at start of `terminate()`; `on_synthChanged` checks flag before creating new WavePlayers; `create_wave_player()` wrapped in try/except inside `on_synthChanged`; `steam_audio.cleanup()` wrapped in try/except so `synthChanged.unregister()` is always reached.
+- **`unspoken/__init__.py` `terminate()` restructured** — Moved `synthChanged.unregister()` to START of terminate (before cleanup) so our hook is removed first.
+- **`handler.py` `close()` `getPropertiesSpeech` restore** — `speech.speech.getPropertiesSpeech` restoration wrapped in try/except.
+- **`phoneticPunctuation.py` `preSpeak` `_utils_mod._reset_pp_enabled_cache()`** — Moved inside try/except to prevent crash during shutdown when module state is inconsistent.
+- **`__init__.py` `terminate()` crash logging** — Added file-based crash logging to `shutdown_crash.log` for post-restart diagnosis.
+
+### Round 34 (committed): speech pipeline resilience + config crash guards — 6 fixes
+- **`frenzy.py:210` `except (Exception, _ctypes_mod.COMError)`** — When `_ctypes_mod` is `None` (ImportError fallback), evaluating `_ctypes_mod.COMError` in the except clause raised `AttributeError`, masking the original exception. Simplified to `except Exception:`.
+- **`frenzy.py:918` `getNumericSpeechCommand()` unguarded** — `getNumericSpeechCommand()` can raise `ValueError` if a rule has misconfigured fields. One malformed heading level rule crashed ALL custom text formatting for the entire utterance. Added `try/except: continue` matching the existing font-size handler at line 1044.
+- **`handler.py` `configure()` bare `user_config["key"]` lookups** — If `config.conf["audiothemes"]` raised `KeyError`, `user_config` was `{}`; lines 1021-1025 used bare `[]` lookups on empty dict, crashing with `KeyError`. Changed to `.get()` with safe defaults.
+- **`handler.py` `get_theme_from_folder()` `AudioTheme(**info)` crash** — Extra keys in `info.json` (e.g. `"description"`, `"version"`) passed as kwargs, causing `TypeError`. Now filters to known dataclass fields (`name`, `directory`, `author`, `summary`).
+- **`handler.py` `__init__` `_frenzy_mod`/`_utils_mod_cache` uninitialized** — These attributes were only set in `configure()` and cleared in `close()`. If `configure()` failed, `_hook_getSpeechTextForProperties` raised `AttributeError`, silently disabling role suppression. Added `None` initialization in `__init__`.
+- **`__init__.py` `script_speakHeadingLevel` COM access** — `focus.treeInterceptor` is a COM property access that can raise `COMError` on stale focus objects. Wrapped in `try/except Exception`. Also broadened `makeTextInfo` except clause to catch all exceptions.
