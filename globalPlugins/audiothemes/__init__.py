@@ -666,16 +666,31 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         wx.CallAfter(runDialog)
 
     def terminate(self):
+        import os, traceback, datetime
+        _crash_log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "shutdown_crash.log")
+        def _crash_log(msg):
+            try:
+                with open(_crash_log_path, "a", encoding="utf-8") as f:
+                    f.write(f"[{datetime.datetime.now().isoformat()}] {msg}\n")
+            except Exception:
+                pass
+        def _crash_log_exc(step, exc):
+            _crash_log(f"ERROR in {step}: {exc}\n{traceback.format_exc()}")
+        _crash_log("=== terminate() called ===")
         with suppress(Exception):
             gui.settingsDialogs.NVDASettingsDialog.categoryClasses.remove(
                 AudioThemesSettingsPanel
             )
         with suppress(Exception):
             self._remove_tray_menu_items()
-        with suppress(Exception):
+        try:
             self.restoreMonkeyPatches()
-        with suppress(Exception):
+        except Exception as e:
+            _crash_log_exc("restoreMonkeyPatches", e)
+        try:
             self._unhook_keyboard()
+        except Exception as e:
+            _crash_log_exc("_unhook_keyboard", e)
         with suppress(Exception):
             if self.orig_caretMovementScriptHelper:
                 import speech
@@ -685,8 +700,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self._navigation_timer.Stop()
         with suppress(Exception):
             self.quicknav_interceptor.terminate()
-        with suppress(Exception):
+        try:
             self.handler.close()
+        except Exception as e:
+            _crash_log_exc("handler.close", e)
         GlobalPlugin._instance_handler = None
         with suppress(Exception):
             from .sentenceNavEngine import _unregister_sentence_nav_hooks
@@ -699,6 +716,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # Ensure mixin classes (SentenceNavMixin, BrowserNavMixin) clean up properly.
         with suppress(Exception):
             super().terminate()
+        _crash_log("=== terminate() completed ===")
 
     def injectMonkeyPatches(self):
         pp.injectMonkeyPatches()

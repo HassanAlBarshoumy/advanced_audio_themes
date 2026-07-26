@@ -493,7 +493,10 @@ def refreshCachedConfig():
 
 def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
     global speechCancelledFlag
-    _utils_mod._reset_pp_enabled_cache()
+    try:
+        _utils_mod._reset_pp_enabled_cache()
+    except Exception:
+        pass
     try:
         if isPhoneticPunctuationEnabled():
             if symbolLevel is None:

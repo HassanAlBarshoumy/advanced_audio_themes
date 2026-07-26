@@ -274,6 +274,7 @@ class UnspokenPlayer:
 		self._bass_boost = False
 		self._bass_boost_gain = 3.0
 		self._bass_boost_cutoff = 200.0
+		self._terminated = False
 		self._audio_worker_thread = threading.Thread(target=self._audio_worker, daemon=True)
 		self._audio_worker_thread.start()
 
@@ -908,6 +909,15 @@ class UnspokenPlayer:
 			pass
 
 	def terminate(self):
+		# Signal termination FIRST — prevents on_synthChanged from creating new
+		# WavePlayers during NVDA shutdown (which triggers the Windows error beep
+		# when the audio device is being released).
+		self._terminated = True
+		# Unregister synthChanged early so it cannot fire during cleanup.
+		try:
+			synthChanged.unregister(self.on_synthChanged)
+		except Exception:
+			pass
 		# Stop worker thread
 		if hasattr(self, "_audio_queue"):
 			self._audio_queue.put(None)
@@ -928,10 +938,14 @@ class UnspokenPlayer:
 				    log.error(f"AudioThemes Error: {e}", exc_info=True)
 		# Cleanup Steam Audio
 		if hasattr(self, "steam_audio"):
-			self.steam_audio.cleanup()
-		synthChanged.unregister(self.on_synthChanged)
+			try:
+				self.steam_audio.cleanup()
+			except Exception as e:
+				log.error(f"AudioThemes Error cleaning up Steam Audio: {e}", exc_info=True)
 
 	def on_synthChanged(self, **kwargs):
+		if self._terminated:
+			return
 		with self._generation_lock:
 			self._generation += 1
 		try:
@@ -949,6 +963,11 @@ class UnspokenPlayer:
 				try: p.close()
 				except Exception as e:
 				    log.error(f"AudioThemes Error: {e}", exc_info=True)
-		self.create_wave_player()
+		if self._terminated:
+			return
+		try:
+			self.create_wave_player()
+		except Exception as e:
+			log.error(f"AudioThemes Error creating wave player on synth change: {e}", exc_info=True)
 
 

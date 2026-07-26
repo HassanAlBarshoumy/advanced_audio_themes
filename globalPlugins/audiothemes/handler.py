@@ -908,7 +908,10 @@ class AudioThemesHandler:
                 pass
             self.player = None
         if self._NVDA_getPropertiesSpeech is not None:
-            speech.speech.getPropertiesSpeech = self._NVDA_getPropertiesSpeech
+            try:
+                speech.speech.getPropertiesSpeech = self._NVDA_getPropertiesSpeech
+            except Exception:
+                pass
         for action in getattr(self, '_registered_actions', ()):
             try:
                 action.unregister(self.configure)
