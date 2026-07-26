@@ -124,7 +124,18 @@ class ThreadPool:
         self.tasks.join()
 
 
-threadPool = ThreadPool(3)
+_threadPool = None
+def _get_threadPool():
+    global _threadPool
+    if _threadPool is None:
+        _threadPool = ThreadPool(3)
+    return _threadPool
+
+class _ThreadPoolProxy:
+    def __getattr__(self, name):
+        return getattr(_get_threadPool(), name)
+
+threadPool = _ThreadPoolProxy()
 
 
 

@@ -174,7 +174,19 @@ class ThreadPool:
                 w = Worker(self.tasks)
                 self._workers.append(w)
 
-threadPool = ThreadPool(4)   # 4 workers for audio playback tasks.
+_threadPool = None
+def _get_threadPool():
+    global _threadPool
+    if _threadPool is None:
+        _threadPool = ThreadPool(4)
+    return _threadPool
+
+class _ThreadPoolProxy:
+    """Lazy proxy that creates the real ThreadPool on first attribute access."""
+    def __getattr__(self, name):
+        return getattr(_get_threadPool(), name)
+
+threadPool = _ThreadPoolProxy()
 
 phoneticPunctuationConfigKey = "phoneticpunctuation"
 _pp_config_cache = {}

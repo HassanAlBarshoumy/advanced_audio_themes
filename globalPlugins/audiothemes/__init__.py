@@ -79,10 +79,7 @@ except AttributeError:
     pass
 
 utils.initConfiguration()
-try:
-    pp.reloadRules()
-except Exception:
-    log.error("AudioThemes: Failed to reload rules at startup", exc_info=True)
+# pp.reloadRules() deferred to onPostNvdaStartup — avoids disk I/O + JSON parse + regex compile at import time.
 
 from . import quicknav
 
@@ -322,10 +319,15 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # ── BrowserNav initialization ──
         # Wire up all BrowserNav monkey patches, browse-mode keystrokes,
         # QuickJump system, and URL tracking.
+        # Deferred to avoid blocking startup with heavy imports.
         try:
-            self.initBrowserNav()
+            import wx
+            wx.CallLater(1000, self.initBrowserNav)
         except Exception:
-            log.exception("Failed to initialize BrowserNav engine")
+            try:
+                self.initBrowserNav()
+            except Exception:
+                log.exception("Failed to initialize BrowserNav engine")
 
         self.toggling = False
         self._audioThemesLayerGestures = {
@@ -679,10 +681,15 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     def _onNavigationTimer(self, event):
         """Check if the navigator object changed (e.g. arrow keys in browse mode)."""
         try:
+            try:
+                if not self.handler._cached_config.get("enable_audio_themes", True) or not self.handler.active_theme:
+                    return
+            except Exception:
+                return
             current_nav = api.getNavigatorObject()
-            if current_nav and current_nav.treeInterceptor and not current_nav.treeInterceptor.passThrough:
-                if current_nav != getattr(self, "_last_navigator_object", None):
-                    self._last_navigator_object = current_nav
+            if current_nav and current_nav != getattr(self, "_last_navigator_object", None):
+                self._last_navigator_object = current_nav
+                if current_nav.treeInterceptor and not current_nav.treeInterceptor.passThrough:
                     # Debounce: skip if last dispatch was < 80ms ago.
                     now = time.monotonic()
                     if now - getattr(self, "_last_play_time", 0) < 0.08:
@@ -880,6 +887,11 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             raise
         except Exception as e:
             log.debugWarning(f"event_becomeNavigatorObject nextHandler: {e}")
+        try:
+            if not self.handler._cached_config.get("enable_audio_themes", True) or not self.handler.active_theme:
+                return
+        except Exception:
+            return
         self._last_play_time = time.monotonic()
         try:
             self._last_navigator_object = api.getNavigatorObject()
@@ -1130,8 +1142,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         if obj is not self._previous_mouse_object:
             self._previous_mouse_object = obj
             try:
-                obj_info = self._snapshot_obj(obj, foreground_app=self.handler._current_app_name)
-                utils.threadPool.add_task(self.playObject, obj_info)
+                if self.handler._cached_config.get("enable_audio_themes", True) and self.handler.active_theme:
+                    obj_info = self._snapshot_obj(obj, foreground_app=self.handler._current_app_name)
+                    utils.threadPool.add_task(self.playObject, obj_info)
             except Exception as e:
                 log.debugWarning(f"event_mouseMove snapshot: {e}")
         try:
@@ -1143,8 +1156,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     def event_show(self, obj, nextHandler):
         try:
             if getattr(obj, "role", None) == controlTypes.Role.HELPBALLOON:
-                obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.notify, foreground_app=self.handler._current_app_name)
-                utils.threadPool.add_task(self.playObject, obj_info)
+                if self.handler._cached_config.get("enable_audio_themes", True) and self.handler.active_theme:
+                    obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.notify, foreground_app=self.handler._current_app_name)
+                    utils.threadPool.add_task(self.playObject, obj_info)
         except Exception as e:
             log.debugWarning(f"event_show: {e}")
         try:
@@ -1159,11 +1173,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self.handler._current_app_name = obj.appModule.appName if obj.appModule else None
         except Exception:
             self.handler._current_app_name = None
-        try:
-            obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.loaded, foreground_app=self.handler._current_app_name)
-            utils.threadPool.add_task(self.playObject, obj_info)
-        except Exception as e:
-            log.debug(f"AudioThemes event_documentLoadComplete: {e}")
+        if self.handler._cached_config.get("enable_audio_themes", True) and self.handler.active_theme:
+            try:
+                obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.loaded, foreground_app=self.handler._current_app_name)
+                utils.threadPool.add_task(self.playObject, obj_info)
+            except Exception as e:
+                log.debug(f"AudioThemes event_documentLoadComplete: {e}")
         try:
             nextHandler()
         except StopIteration:

@@ -693,7 +693,7 @@ class AudioThemesHandler:
     def __init__(self):
         config.conf.spec["audiothemes"] = audiothemes_config_defaults
         self.enabled = True
-        self.player = UnspokenPlayer()
+        self.player = None  # Lazy: created on first play via _ensure_player()
         self.active_theme = None
         self._config_lock = threading.RLock()
         # Cache updated on main thread by GlobalPlugin events (avoids COM in hook)
@@ -710,10 +710,20 @@ class AudioThemesHandler:
             self.ensure_themes_dir()
         except Exception as e:
             log.error(f"AudioThemes: failed to ensure themes directory: {e}", exc_info=True)
+        # Defer migration to background thread — avoids blocking startup on first run.
+        def _deferred_migrate():
+            try:
+                self.migrate_all_themes_to_named_files()
+            except Exception as e:
+                log.error(f"AudioThemes: failed to migrate themes: {e}", exc_info=True)
         try:
-            self.migrate_all_themes_to_named_files()
-        except Exception as e:
-            log.error(f"AudioThemes: failed to migrate themes: {e}", exc_info=True)
+            import threading as _t
+            _t.Thread(target=_deferred_migrate, daemon=True, name="ATMigrate").start()
+        except Exception:
+            try:
+                self.migrate_all_themes_to_named_files()
+            except Exception as e:
+                log.error(f"AudioThemes: failed to migrate themes: {e}", exc_info=True)
         try:
             self.configure()
         except Exception as e:
@@ -729,9 +739,15 @@ class AudioThemesHandler:
         self._NVDA_getPropertiesSpeech = getattr(speech.speech, 'getPropertiesSpeech', None)
         if self._NVDA_getPropertiesSpeech is not None:
             speech.speech.getPropertiesSpeech = self._hook_getSpeechTextForProperties
-        # System status monitor
-        self._system_monitor = None
-        self._start_system_status_monitoring()
+        # System status monitor — deferred to avoid Win32 window + thread creation at startup.
+        try:
+            import wx as _wx
+            _wx.CallLater(3000, self._start_system_status_monitoring)
+        except Exception:
+            try:
+                self._start_system_status_monitoring()
+            except Exception:
+                pass
 
     def _hook_getSpeechTextForProperties(
         self, reason=NVDAObjects.controlTypes.OutputReason.QUERY, *args, **kwargs
@@ -779,6 +795,42 @@ class AudioThemesHandler:
             kwargs.pop("_level", None)
 
         return self._NVDA_getPropertiesSpeech(reason, *args, **kwargs)
+
+    def _ensure_player(self):
+        if self.player is None:
+            self.player = UnspokenPlayer()
+            try:
+                user_config = config.conf["audiothemes"]
+                self.player.audio3d = user_config.get("audio3d", False)
+                self.player.use_in_say_all = user_config.get("use_in_say_all", False)
+                self.player.speak_roles = user_config.get("speak_roles", True)
+                self.player.use_synth_volume = user_config.get("use_synth_volume", True)
+                self.player.volume = user_config.get("volume", 50)
+                try:
+                    unspoken_config = config.conf["unspoken"]
+                except KeyError:
+                    unspoken_config = {}
+                self.player.reverb = unspoken_config.get("Reverb", False)
+                self.player.room_size = unspoken_config.get("RoomSize", 100)
+                self.player.damping = unspoken_config.get("Damping", 0)
+                self.player.wet_level = unspoken_config.get("WetLevel", 0)
+                self.player.dry_level = unspoken_config.get("DryLevel", 30)
+                self.player.width = unspoken_config.get("Width", 100)
+                self.player._trim_silence = unspoken_config.get("TrimSilence", True)
+                self.player._trim_silence_threshold = float(unspoken_config.get("TrimSilenceThreshold", 0.01))
+                self.player._smart_volume = unspoken_config.get("SmartVolume", True)
+                self.player._smooth_envelope = unspoken_config.get("SmoothEnvelope", False)
+                self.player._noise_gate = unspoken_config.get("NoiseGate", False)
+                self.player._noise_gate_threshold = float(unspoken_config.get("NoiseGateThreshold", 0.02))
+                self.player._noise_gate_attack = int(unspoken_config.get("NoiseGateAttack", 5))
+                self.player._noise_gate_release = int(unspoken_config.get("NoiseGateRelease", 50))
+                self.player._bass_boost = unspoken_config.get("BassBoost", False)
+                self.player._bass_boost_gain = float(unspoken_config.get("BassBoostGain", 3))
+                self.player._bass_boost_cutoff = float(unspoken_config.get("BassBoostCutoff", 200))
+                self.player._cached_config = self._cached_config
+            except Exception:
+                log.debugWarning("AudioThemes: failed to apply initial config to player", exc_info=True)
+        return self.player
 
     def ensure_themes_dir(self):
         if not os.path.isdir(THEMES_DIR):
@@ -859,6 +911,8 @@ class AudioThemesHandler:
             _typing_dir_cache.clear()
 
     def shouldNukeRoleSpeech(self):
+        if self.player is None:
+            return True
         if self.player.use_in_say_all and SayAllHandler.isRunning():
             return False
         if self.player.speak_roles:
@@ -945,33 +999,38 @@ class AudioThemesHandler:
             log.debug(f"configure: enabled={self.enabled} active_theme={'present' if self.active_theme else 'None'}")
 
         if self.active_theme is not None:
-            self.player.audio3d = user_config["audio3d"]
-            self.player.use_in_say_all = user_config["use_in_say_all"]
-            self.player.speak_roles = user_config["speak_roles"]
-            self.player.use_synth_volume = user_config["use_synth_volume"]
-            self.player.volume = user_config["volume"]
             try:
-                unspoken_config = config.conf["unspoken"]
-            except KeyError:
-                unspoken_config = {}
-            self.player.reverb = unspoken_config.get("Reverb", False)
-            self.player.room_size = unspoken_config.get("RoomSize", 100)
-            self.player.damping = unspoken_config.get("Damping", 0)
-            self.player.wet_level = unspoken_config.get("WetLevel", 0)
-            self.player.dry_level = unspoken_config.get("DryLevel", 30)
-            self.player.width = unspoken_config.get("Width", 100)
-            # Cache processing config on the player to avoid config.conf reads in _ensure_processed
-            self.player._trim_silence = unspoken_config.get("TrimSilence", True)
-            self.player._trim_silence_threshold = float(unspoken_config.get("TrimSilenceThreshold", 0.01))
-            self.player._smart_volume = unspoken_config.get("SmartVolume", True)
-            self.player._smooth_envelope = unspoken_config.get("SmoothEnvelope", False)
-            self.player._noise_gate = unspoken_config.get("NoiseGate", False)
-            self.player._noise_gate_threshold = float(unspoken_config.get("NoiseGateThreshold", 0.02))
-            self.player._noise_gate_attack = int(unspoken_config.get("NoiseGateAttack", 5))
-            self.player._noise_gate_release = int(unspoken_config.get("NoiseGateRelease", 50))
-            self.player._bass_boost = unspoken_config.get("BassBoost", False)
-            self.player._bass_boost_gain = float(unspoken_config.get("BassBoostGain", 3))
-            self.player._bass_boost_cutoff = float(unspoken_config.get("BassBoostCutoff", 200))
+                self._ensure_player()
+            except Exception:
+                log.debugWarning("AudioThemes: failed to initialize player during configure")
+            if self.player is not None:
+                self.player.audio3d = user_config["audio3d"]
+                self.player.use_in_say_all = user_config["use_in_say_all"]
+                self.player.speak_roles = user_config["speak_roles"]
+                self.player.use_synth_volume = user_config["use_synth_volume"]
+                self.player.volume = user_config["volume"]
+                try:
+                    unspoken_config = config.conf["unspoken"]
+                except KeyError:
+                    unspoken_config = {}
+                self.player.reverb = unspoken_config.get("Reverb", False)
+                self.player.room_size = unspoken_config.get("RoomSize", 100)
+                self.player.damping = unspoken_config.get("Damping", 0)
+                self.player.wet_level = unspoken_config.get("WetLevel", 0)
+                self.player.dry_level = unspoken_config.get("DryLevel", 30)
+                self.player.width = unspoken_config.get("Width", 100)
+                # Cache processing config on the player to avoid config.conf reads in _ensure_processed
+                self.player._trim_silence = unspoken_config.get("TrimSilence", True)
+                self.player._trim_silence_threshold = float(unspoken_config.get("TrimSilenceThreshold", 0.01))
+                self.player._smart_volume = unspoken_config.get("SmartVolume", True)
+                self.player._smooth_envelope = unspoken_config.get("SmoothEnvelope", False)
+                self.player._noise_gate = unspoken_config.get("NoiseGate", False)
+                self.player._noise_gate_threshold = float(unspoken_config.get("NoiseGateThreshold", 0.02))
+                self.player._noise_gate_attack = int(unspoken_config.get("NoiseGateAttack", 5))
+                self.player._noise_gate_release = int(unspoken_config.get("NoiseGateRelease", 50))
+                self.player._bass_boost = unspoken_config.get("BassBoost", False)
+                self.player._bass_boost_gain = float(unspoken_config.get("BassBoostGain", 3))
+                self.player._bass_boost_cutoff = float(unspoken_config.get("BassBoostCutoff", 200))
         self.disabled_apps = []
         raw_disabled = user_config.get("disabled_apps", "")
         if raw_disabled:
@@ -1070,7 +1129,8 @@ class AudioThemesHandler:
             "AudioCache": unspoken_cfg.get("AudioCache", True),
             "enable_ffmpeg": user_config.get("enable_ffmpeg", False),
         }
-        self.player._cached_config = self._cached_config
+        if self.player is not None:
+            self.player._cached_config = self._cached_config
         if self._system_monitor is not None:
             self._system_monitor._cached_config = self._cached_config
         try:
@@ -1138,7 +1198,7 @@ class AudioThemesHandler:
     def _play_system_sound(self, sound_key):
         if not self._cached_config.get("sys_status_enabled", True):
             return
-        if not self.enabled or self.active_theme is None:
+        if not self.enabled or self.active_theme is None or self.player is None:
             return
         cfg = self._cached_config
         if sound_key == SpecialProps.sys_ac_plug or sound_key == SpecialProps.sys_ac_unplug:
@@ -1180,6 +1240,11 @@ class AudioThemesHandler:
         """
         force_3d = obj_info.get("force_3d", False) if isinstance(obj_info, dict) else False
         if not force_3d and (not self.enabled or (self.active_theme is None)):
+            return
+        try:
+            player = self._ensure_player()
+        except Exception:
+            log.debugWarning("AudioThemes: failed to initialize player")
             return
 
         if not force_3d and self._is_app_disabled_for_category("theme_sounds"):
@@ -1271,7 +1336,7 @@ class AudioThemesHandler:
         return self.active_theme
 
     def play_theme_sound(self, sound_name, angle_x=0, angle_y=0):
-        if not self.enabled or (self.active_theme is None):
+        if not self.enabled or (self.active_theme is None) or self.player is None:
             return False
             
         if self._is_app_disabled_for_category("theme_sounds"):
@@ -1308,9 +1373,20 @@ class AudioThemesHandler:
             location = getattr(obj, 'location', None)
             if not location:
                 return 0.0, 0.0
-            desk_location = api.getDesktopObject().location
-            desktop_max_x = desk_location[2] if desk_location else 1920
-            desktop_max_y = desk_location[3] if desk_location else 1080
+            desktop_max_x = 1920
+            desktop_max_y = 1080
+            try:
+                from . import _cached_desktop_location
+                if _cached_desktop_location:
+                    desktop_max_x = _cached_desktop_location[2] if _cached_desktop_location[2] else 1920
+                    desktop_max_y = _cached_desktop_location[3] if _cached_desktop_location[3] else 1080
+            except Exception:
+                try:
+                    desk_location = api.getDesktopObject().location
+                    desktop_max_x = desk_location[2] if desk_location else 1920
+                    desktop_max_y = desk_location[3] if desk_location else 1080
+                except Exception:
+                    pass
             obj_x = location[0] + (location[2] / 2.0)
             obj_y = location[1] + (location[3] / 2.0)
             if desktop_max_x == 0 or desktop_max_y == 0:
@@ -1325,7 +1401,7 @@ class AudioThemesHandler:
             return 0.0, 0.0
 
     def play_clipboard_sound(self, special_prop, volume=None):
-        if not self.enabled or self.active_theme is None:
+        if not self.enabled or self.active_theme is None or self.player is None:
             return False
         theme = self.active_theme
         sound_obj = theme.sounds.get(special_prop)
@@ -1366,7 +1442,7 @@ class AudioThemesHandler:
     def _play_typing_sound_inner(self, ch=None, vkCode=None, extended=None):
         if not self._cached_config.get("typing_sounds", True):
             return
-        if not self.enabled or (self.active_theme is None):
+        if not self.enabled or (self.active_theme is None) or self.player is None:
             return
             
         # Debounce: prevent same key sound from playing twice rapidly (keyDown + typedCharacter overlap)

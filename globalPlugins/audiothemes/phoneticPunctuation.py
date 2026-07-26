@@ -422,6 +422,11 @@ def reloadRules():
     frenzy.updateRules()
 
 def onPostNvdaStartup():
+    # Deferred reloadRules from module-level __init__ to avoid blocking startup.
+    try:
+        reloadRules()
+    except Exception:
+        log.error("AudioThemes: Failed to reload rules at startup", exc_info=True)
     if rulesByFrenzy and any([len(rule.urlRegex) > 0 for rule in rulesByFrenzy.get(FrenzyType.TEXT, [])]) and not isURLResolutionAvailable():
         log.warning("BrowserNav not available; text rules with URL filter will be disabled")
         wx.CallAfter(
@@ -595,6 +600,41 @@ def _processEmojiSequence(sequence):
     suppress_role = is_emoji_suppress_role_sound()
     found_emoji = False
 
+    def _make_emoji_commands(cat, snd_pos, delay_b, delay_a, emoji_char=None):
+        before = []
+        after = []
+        effective_snd_pos = snd_pos
+        if cat is not None:
+            cat_snd_pos = get_emoji_sound_position_for_category(cat)
+            if cat_snd_pos != get_emoji_sound_position():
+                effective_snd_pos = cat_snd_pos
+        effective_prefix = get_emoji_prefix_text_for_category(cat) if cat is not None else global_prefix
+        effective_suffix = get_emoji_suffix_text_for_category(cat) if cat is not None else global_suffix
+        effective_pos = global_position
+        if do_sound_global and effective_snd_pos != "none":
+            if delay_b > 0:
+                before.append(speech.commands.BreakCommand(delay_b))
+            if effective_snd_pos in ("before", "both"):
+                before.append(EmojiSoundCommand(category=cat, position="before", sound_key=SpecialProps.emoji_before))
+            if effective_snd_pos in ("after", "both"):
+                after.append(EmojiSoundCommand(category=cat, position="after", sound_key=SpecialProps.emoji_after))
+            if delay_a > 0:
+                after.append(speech.commands.BreakCommand(delay_a))
+        if do_prefix_global and effective_pos != "none":
+            prefix_text = effective_prefix + " " if effective_prefix else ""
+            suffix_text = effective_suffix + " " if effective_suffix else ""
+            if effective_pos in ("before", "both") and prefix_text.strip():
+                before.append(prefix_text)
+            if effective_pos in ("after", "both") and suffix_text.strip():
+                after.append(suffix_text)
+        return before, after
+
+    def _get_emoji_text(emoji_char):
+        desc = get_emoji_custom_description(emoji_char)
+        if desc:
+            return desc
+        return emoji_char
+
     newSeq = []
     for item in sequence:
         if not isinstance(item, str):
@@ -625,50 +665,9 @@ def _processEmojiSequence(sequence):
             newSeq.append(item)
             continue
 
-        # Build before/after commands for both sound types
-        def _make_emoji_commands(cat, snd_pos, delay_b, delay_a, emoji_char=None):
-            """Return (before_commands, after_commands) for one emoji."""
-            before = []
-            after = []
-            effective_snd_pos = snd_pos
-            if cat is not None:
-                cat_snd_pos = get_emoji_sound_position_for_category(cat)
-                if cat_snd_pos != get_emoji_sound_position():
-                    effective_snd_pos = cat_snd_pos
-            effective_prefix = get_emoji_prefix_text_for_category(cat) if cat is not None else global_prefix
-            effective_suffix = get_emoji_suffix_text_for_category(cat) if cat is not None else global_suffix
-            effective_pos = global_position
-
-            if do_sound_global and effective_snd_pos != "none":
-                if delay_b > 0:
-                    before.append(speech.commands.BreakCommand(delay_b))
-                if effective_snd_pos in ("before", "both"):
-                    before.append(EmojiSoundCommand(category=cat, position="before", sound_key=SpecialProps.emoji_before))
-                if effective_snd_pos in ("after", "both"):
-                    after.append(EmojiSoundCommand(category=cat, position="after", sound_key=SpecialProps.emoji_after))
-                if delay_a > 0:
-                    after.append(speech.commands.BreakCommand(delay_a))
-
-            if do_prefix_global and effective_pos != "none":
-                prefix_text = effective_prefix + " " if effective_prefix else ""
-                suffix_text = effective_suffix + " " if effective_suffix else ""
-                if effective_pos in ("before", "both") and prefix_text.strip():
-                    before.append(prefix_text)
-                if effective_pos in ("after", "both") and suffix_text.strip():
-                    after.append(suffix_text)
-
-            return before, after
-
         # Determine repeat modes
         effective_sound_repeat = sound_repeat
         effective_prefix_repeat = prefix_repeat
-
-        def _get_emoji_text(emoji_char):
-            """Return custom description or the original emoji character (let NVDA speak it)."""
-            desc = get_emoji_custom_description(emoji_char)
-            if desc:
-                return desc
-            return emoji_char
 
         if effective_sound_repeat == "per_block" and effective_prefix_repeat == "per_block":
             # Both per_block: single block-level instructions
@@ -978,7 +977,6 @@ def postProcessSynchronousCommands(speechSequence, symbolLevel):
     We also connect earcons separated by some meaningless commands together into a single chain.
     Examples of meaningless commands are LangChain commands or empty strings.
     """
-    language=speech.getCurrentLanguage()
     def isEmptyString(command):
         if not isinstance(command, str):
             return False
