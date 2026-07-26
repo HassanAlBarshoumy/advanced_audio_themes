@@ -7,7 +7,7 @@ Complete a performance, disk I/O, thread‑safety, and memory audit of all files
 - "لا تكسر اي وظيفة" — do not break any existing functionality.
 
 ## Status
-All known issues fixed (rounds 1–31). No known remaining issues.
+All known issues fixed (rounds 1–32). No known remaining issues.
 
 ## Fix History
 
@@ -63,7 +63,7 @@ All known issues fixed (rounds 1–31). No known remaining issues.
   - Fixed `KeyError: 'detectFormatAfterCursor'` and `KeyError: 'reportLineIndentation'` when NVDAExtensionGlobalPlugin is active.
 - `utils.py:179-180` — same `isinstance` fix for `_pp_config_cache`.
 
-### Round 14 (uncommitted): audit‑driven hot‑path + thread‑safety fixes
+### Round 14 (committed): audit‑driven hot‑path + thread‑safety fixes
 - **handler.py `_get_blacklisted_roles()`** — `blacklisted_roles` JSON is parsed once in `configure()` and stored in `_cached_config["blacklisted_roles"]` (list of ints). `_hook_getSpeechTextForProperties` reads from `_cached_config` instead of calling the module‑level function, avoiding a `config.conf["audiothemes"]` proxy lookup on every speech event.
 - **handler.py `_typing_dir_cache` locking** — `play_typing_sound()` and `configure()` now hold `_typing_dir_cache_lock` for all reads/writes to `_typing_dir_cache` (was a data race — keyboard hook can fire from background threads).
 - **handler.py `_cached_config`** — added `"blacklisted_roles"` (parsed int list) and `"disabled_apps_suppress_categories"` (raw JSON string) keys.
@@ -80,7 +80,7 @@ All files under `globalPlugins/audiothemes/` verified safe (hot paths use cached
 - `quicknav.py`, `navLayer.py`, `clipboard.py`, `commands.py`, `emoji_handler.py`, `phoneticPunctuation.py`
 - `handler.py`, `utils.py`, `frenzy.py`, `sentenceNavEngine.py`, `browserNavEngine/__init__.py`, `browserNavEngine/quickJump.py`, `browserNavEngine/beeper.py`
 
-### Round 16 (uncommitted): performance + thread‑safety audit (14 findings)
+### Round 16 (committed): performance + thread‑safety audit (14 findings)
 - **emoji_handler.py `_get_json_config()`** — `json.loads()` was called per emoji per category lookup (up to 40× per utterance). Now pre‑parses JSON strings into `_cached_json_configs` dict in `refreshCachedConfig()`, zero‑cost on hot path.
 - **sentenceNavEngine.py `getSNConfig()`** — read `config.conf["sentencenav"][key]` on every navigation gesture (7+ call sites). Now reads from `_cached_sentencenav_config` dict, populated in `_refresh_doc_formatting()`. Falls back to `config.conf` only for `setSNConfig()` writes.
 - **phoneticPunctuation.py `eloquenceFix` double `speech.processText()`** — `postProcessSynchronousCommands` called `isEmptyString()` → `speech.processText()` per element, then `eloquenceFix()` did it again. Refactored: `postProcessSynchronousCommands` passes a `hasNonEmptyString` boolean to `eloquenceFix()`, eliminating the second `speech.processText()` pass.
@@ -89,7 +89,7 @@ All files under `globalPlugins/audiothemes/` verified safe (hot paths use cached
 - **browserNavEngine `margin_eq/lt/gt` lambdas** — lambdas read `getConfig("verticalAlignmentMargin")` on every paragraph comparison during navigation. Changed `maybeAdjustOperator()` to return closures that capture the margin value once at call time.
 - **browserNavEngine `selectionHistory` lock** — `selectionHistoryLock` was defined but never used. `purgeSelectionHistory()` now acquires the lock before mutating the dict.
 
-### Round 17 (uncommitted): 36‑issue AI audit — 6 fixes applied
+### Round 17 (committed): 36‑issue AI audit — 6 fixes applied
 - `unspoken/ogg_vorbis.py` — `OGG_VORBIS_FILE_SIZE` 1024 → 4096 (buffer overflow fix).
 - `__init__.py:845,854` — `except StopIteration: raise` added before `except Exception` in `event_becomeNavigatorObject`.
 - `frenzy.py:832` — `findControlEnd` list comprehension → try/except loop (RuntimeError on malformed UI trees).
@@ -99,7 +99,7 @@ All files under `globalPlugins/audiothemes/` verified safe (hot paths use cached
 
 ## No known remaining issues
 
-### Round 17 (uncommitted): 36‑issue AI audit — verified & fixed (6 fixes, 7 false positives, 9 safe)
+### Round 17 (committed): 36‑issue AI audit — verified & fixed (6 fixes, 7 false positives, 9 safe)
 - **unspoken/ogg_vorbis.py** — `OGG_VORBIS_FILE_SIZE` increased from 1024 to 4096. Original was ~2x too small on x64 Windows (OggVorbis_File struct is ~1952 bytes), causing buffer overflow on every OGG decode.
 - **__init__.py `event_becomeNavigatorObject`** — Added `except StopIteration: raise` before `except Exception` in the isFocus (line 845) and dedup (line 854) paths. StopIteration was being swallowed, breaking NVDA's generator protocol.
 - **frenzy.py `new_getTextInfoSpeech` headingEnds** — `findControlEnd` list comprehension replaced with try/except loop. Malformed UI trees with unbalanced control fields would raise uncaught RuntimeError, crashing speech.
@@ -109,7 +109,7 @@ All files under `globalPlugins/audiothemes/` verified safe (hot paths use cached
 - **Verified false positives**: ctypes.wintypes.DWORD (#3, loaded by systemStatus.py), monkey-unpatch (#5, standard NVDA pattern), emoji cache keys (#7, _get_json_config has fallback), navLayer gesture removal (#9, plugin-scoped), Steam Audio mutex (#14, sequential lock/unlock), FFmpeg pipe leak (#23, communicate() closes pipes), auto_create_sounds (#29, safe iteration), duplicate init (#31, not found).
 - **Skipped**: snapshot cache staleness (#4, WeakKeyDictionary by design, high refactor cost for negligible benefit).
 
-### Round 18 (uncommitted): deep‑scan bug fixes (6 High + 3 Medium)
+### Round 18 (committed): deep‑scan bug fixes (6 High + 3 Medium)
 - **phoneticPunctuation.py `onPostNvdaStartup`** — Removed `return` after URL warning; early return was skipping CLDR emoji loading and NVDAExtensionGlobalPlugin patching entirely.
 - **phoneticPunctuation.py `reloadRules`** — Wrapped `rule.getFrenzyType()` in try/except. Previously could crash on malformed rule (returns None or raises in else block outside try/except).
 - **sentenceNavEngine.py `clearRegexCaches`** — Uncommented `global phraseRegex`. Previously the `= None` assignment created a local variable, leaving the module‑level cache stale after config changes.
@@ -120,7 +120,7 @@ All files under `globalPlugins/audiothemes/` verified safe (hot paths use cached
 - **settings.py `_initialize_at_state`** — `reconstructOptions.index()` wrapped in try/except (ValueError, KeyError) with fallback to index 0. Unrecognized config value no longer crashes settings dialog.
 - **settings.py `onStoreClicked`** — `ThemesStoreDialog` now `Destroy()`ed in `finally` block after `ShowModal()`. Previously leaked GDI resources.
 
-### Round 19 (uncommitted): speech crash resilience — 9 fixes
+### Round 19 (committed): speech crash resilience — 9 fixes
 Root cause of "addon stops speaking": CallbackCommand `run()` methods and speech hooks had **no top-level try/except**. Any unhandled exception killed NVDA's speech pipeline entirely.
 - **commands.py `PpBeepCommand.run()`** — Split into `run()` (try/except wrapper) + `_runInner()`. Any exception in beep generation, spatial audio, or playback now logged and silenced instead of crashing speech.
 - **commands.py `PpWaveFileCommand.run()`** — Split into `run()` (try/except wrapper) + `_runInner()`. Also fixed `_ensureLoaded()` to only set `_loaded=True` when `buf` is not None (was setting it unconditionally, causing `AttributeError` on `fileWavePlayer.stop()` when all decoders failed). Added null-guard for `fileWavePlayer` before `.stop()`. Added null-guard for `audio_bytes` before `ensure_mono()`.
@@ -131,7 +131,7 @@ Root cause of "addon stops speaking": CallbackCommand `run()` methods and speech
 - **browserNavEngine/beeper.py `skippedParagraphChime`** — Thread function body wrapped in try/except to prevent lock leak on exception (lock is `with`-managed but exception inside would propagate to daemon thread).
 - **handler.py `play_typing_sound`** — Split into `play_typing_sound()` (try/except wrapper) + `_play_typing_sound_inner()`. Added explicit `theme is None` guard. `os.listdir()` wrapped in try/except for `OSError`.
 
-### Round 20 (uncommitted): full‑file deep audit — 14 fixes
+### Round 20 (committed): full‑file deep audit — 14 fixes
 Comprehensive audit of ALL files including studio/, settings, GUI dialogs.
 - **__init__.py `_new_keyDownEvent`** — `cfg` variable used outside its try/except scope (line 998 used `cfg` from line 977). Clipboard shortcut detection would `NameError` on every keypress if first try block failed. Fixed by re‑reading `_cached_config` independently.
 - **__init__.py `terminate()`** — Entire cleanup in single `with suppress(Exception)` block. If any line failed (e.g. settings panel removal), all subsequent cleanup (keyboard unhook, handler.close, timer.Stop, threadPool.shutdown, BrowserNav) was skipped. Split into 11 individual `suppress` blocks.
@@ -150,12 +150,12 @@ Comprehensive audit of ALL files including studio/, settings, GUI dialogs.
 - **studio/__init__.py `selected_theme`** — `selectDlg.selected_theme` could be `None` if dialog state was inconsistent. Added null guard before accessing `.name`.
 - **browserNavEngine/quickJump.py `saveConfig`** — `open(rulesFileName, "w")` without try/except. Wrapped in `try/except OSError`.
 
-### Round 21 (uncommitted): regression + resource leak audit — 3 fixes
+### Round 21 (committed): regression + resource leak audit — 3 fixes
 - **browserNavEngine/__init__.py `OPERATOR_STRINGS[op]` KeyError** — Regression from round 16: `maybeAdjustOperator()` returns new lambda objects when mode=0 with non-zero margin, but `OPERATOR_STRINGS` only contains the original module-level lambdas. `script_moveToParent/NextParent/Child/PreviousChild` all crashed with `KeyError`. Fixed by looking up `rawOp` (original operator) instead of `op` (adjusted operator) for the error message string.
 - **browserNavEngine/quickJump.py `import requests`** — Module-level import of third-party `requests` library crashed the entire browserNavEngine (and addon) on load if `requests` wasn't bundled. Moved to lazy import inside `downloadAllWebsitesFromStore()`.
 - **update_checker.py temp file leak** — `tempfile.mkstemp()` file was never cleaned up on download failure (exception path). Added `path = None` init + `os.unlink(path)` in except block.
 
-### Round 22 (uncommitted): speech pipeline resilience + COM freeze fix — 21 fixes
+### Round 22 (committed): speech pipeline resilience + COM freeze fix — 21 fixes
 Root cause of 40-second NVDA freezes: `_snapshot_obj` performed multi-hop UIA COM tree traversal (up to 3 levels of `obj.previous/next`) synchronously on MainThread during `event_gainFocus`.
 - **__init__.py `_snapshot_obj` COM freeze** — Reduced multi-hop traversal from 3 levels to 1. The `while p is not None and _depth < 3` loops walked up to 3 siblings via UIA COM tree walkers, each taking 5-15 seconds on complex windows. Now does a single `obj.previous` / `obj.next` check only.
 - **__init__.py `event_gainFocus` early exit** — Added `enable_audio_themes` check before calling `_snapshot_obj`. When themes are disabled, skips all COM snapshot work entirely.
@@ -179,7 +179,7 @@ Root cause of 40-second NVDA freezes: `_snapshot_obj` performed multi-hop UIA CO
 - **__init__.py `terminate()`** — Fixed incorrect edit that removed the 11-block structure (from Round 20).
 - **browserNavEngine/utils.py thread pool** — Reduced from 5 to 3 threads (14 total → 12).
 
-### Round 24 (uncommitted): speech pipeline resilience — 22 fixes
+### Round 24 (committed): speech pipeline resilience — 22 fixes
 Critical audit of all speech hooks and hot paths. If any monkey-patched speech hook crashes, NVDA's entire speech pipeline stops.
 - **frenzy.py `new_getObjectPropertiesSpeech`** — Extracted body to `_new_getObjectPropertiesSpeech_inner()`. Outer wrapper catches any exception and falls back to `original_getObjectPropertiesSpeech`.
 - **frenzy.py `new_getTextInfoSpeech`** — Extracted body to `_new_getTextInfoSpeech_inner()` (generator). Outer generator catches and yields from `original_getTextInfoSpeech`.
@@ -204,7 +204,7 @@ Critical audit of all speech hooks and hot paths. If any monkey-patched speech h
 - **handler.py `_hook_getSpeechTextForProperties`** — kwargs mutation rollback added: `except` block cleans up `_role`/`_level` from kwargs if exception occurs mid-mutation.
 - **__init__.py `script_audioSonar`** — COM tree walk depth capped from 3 to 1 level. Reduces MainThread blocking on complex windows.
 
-### Round 25 (uncommitted): deep audit of all remaining files — 19 fixes
+### Round 25 (committed): deep audit of all remaining files — 19 fixes
 - **commands.py `PpWaveFileCommand.run()`** — `_ensureLoaded()` moved inside try/except. Previously unprotected `struct.error` from malformed WAV could crash speech pipeline.
 - **commands.py `_ensureLoaded()`** — `except (wave.Error, OSError)` changed to `except Exception`. `struct.error` from truncated WAV now falls through to FFmpeg decode instead of aborting.
 - **commands.py `PpChainCommand.run()`** — Wrapped in try/except. `threadPool.add_task()` failure no longer leaves `currentChain` permanently stale.
@@ -225,7 +225,7 @@ Critical audit of all speech hooks and hot paths. If any monkey-patched speech h
 - **unspoken/ogg_vorbis.py** — Double `ov_clear` native double-free. Moved `ov_clear` after all throw-capable processing.
 - **unspoken/__init__.py `wave_player.close()`** — Unguarded. Device removed/bad state crashed `create_wave_player()`. Wrapped in try/except.
 
-### Round 26 (uncommitted): handler.py initialization + configuration audit — 5 fixes
+### Round 26 (committed): handler.py initialization + configuration audit — 5 fixes
 Critical audit of `handler.py` focusing on init, config loading, and thread safety.
 - **handler.py `ensure_themes_dir()` `os.makedirs()`** — Unguarded. `OSError` (permissions, disk full) crashed `__init__`, preventing the entire addon from loading and leaking UnspokenPlayer/SteamAudio native resources. Wrapped in `try/except OSError` with early return.
 - **handler.py `configure()` early return** — When `active_theme is None` (themes disabled), `configure()` returned at line 916 **before** building `_cached_config` and before refreshing ALL 8 submodule caches (emoji, pp, frenzy, commands, utils, sentenceNav, browserNav×2). This meant: (a) all non-theme features (system status, clipboard, typing sounds, ducking) retained stale config when themes were disabled, (b) changing settings while themes were disabled had no effect on hot-path behavior. Fixed by converting the early `return` to `if self.active_theme is not None:` guard only around the player property block, so `_cached_config` and submodule refreshes always execute.
@@ -233,7 +233,7 @@ Critical audit of `handler.py` focusing on init, config loading, and thread safe
 - **handler.py `__init__` unguarded init calls** — `ensure_themes_dir()`, `migrate_all_themes_to_named_files()`, and `configure()` were called without try/except. Any exception killed the entire handler, leaking UnspokenPlayer resources. Wrapped each in individual try/except with error logging.
 - **handler.py `_theme_cache` / `_app_profiles_cache` uninitialized** — These were only set inside `configure()` (conditionally), but accessed by `close()`. If `configure()` failed, `close()` would crash with `AttributeError`. Initialized both to `{}` in `__init__`.
 
-### Round 27 (uncommitted): initialization + monkey-patching audit — 9 fixes
+### Round 27 (committed): initialization + monkey-patching audit — 9 fixes
 Deep audit of module-level code, init functions, monkey-patching lifecycle, and teardown for phoneticPunctuation, browserNavEngine, sentenceNavEngine, emoji_handler, and frenzy.
 - **phoneticPunctuation.py `restoreMonkeyPatches()` ordering bug** — CRITICAL: `frenzy.monkeyUnpatch()` was called AFTER restoring `speech.speech.speak`, overwriting the correct NVDA original with `preSpeak` (our function). `_original_speak` was captured as `preSpeak` during `injectMonkeyPatches()` because our hook was already installed. Moved `frenzy.monkeyUnpatch()` to run BEFORE speak restoration so our restoration is final.
 - **phoneticPunctuation.py `injectMonkeyPatches()` `speechWithoutPausesInstance`** — Unguarded access to `speech.sayAll.SayAllHandler.speechWithoutPausesInstance.speak` crashed if lazy init hadn't completed. Wrapped in try/except.
@@ -246,7 +246,7 @@ Deep audit of module-level code, init functions, monkey-patching lifecycle, and 
 - **browserNavEngine/__init__.py `terminateBrowserNav()`** — All 13+ restore operations in single block with no individual try/except. One failure (e.g. `NameError` from never-called `initBrowserNav()`) skipped all subsequent restores. Each restore wrapped in individual `with suppress(Exception):`.
 - **sentenceNavEngine.py module-level config hooks** — `post_configSave/Reset/ProfileSwitch.register()` wrapped only `ImportError`. Also caught `AttributeError` for older NVDA versions.
 
-### Round 28 (uncommitted): speech hot-path CPU audit — 7 fixes
+### Round 28 (committed): speech hot-path CPU audit — 7 fixes
 Targeted audit of `frenzy.py` + `phoneticPunctuation.py` hot paths called on every speech event.
 - **utils.py `isPhoneticPunctuationEnabled()`** — Called 7-10× per speech event, each acquiring 3 locks (2× `_pp_config_lock` + 1× `_blacklist_lock`). Added `_pp_enabled_result` cache + `_reset_pp_enabled_cache()`. Result cached until explicitly cleared at start of `preSpeak`, on `preCancelSpeech`, and on config refresh. Eliminates ~21-30 lock acquisitions per event.
 - **frenzy.py `_LRUCache` lock contention** — `_active_rule_cache.get()` acquired `self.lock` on every call (20-30× per event for `getActiveRuleContext()`). Replaced with lock-free reads (plain dict `in` check; CPython GIL makes dict reads atomic). Lock only on writes (`put()` during config reload). Saves ~5-10μs per event.
@@ -257,7 +257,7 @@ Targeted audit of `frenzy.py` + `phoneticPunctuation.py` hot paths called on eve
 - **frenzy.py double `formatConfig.copy()`** — `_new_getTextInfoSpeech_inner` copied formatConfig (line 821), then `FakeTextInfo.__init__` copied it again (line 557). Removed redundant copy in `FakeTextInfo` since caller always provides a local copy.
 - **phoneticPunctuation.py `processRule` per-rule `speech.getCurrentLanguage()`** — `processRule()` called `speech.getCurrentLanguage()` for every text rule. Language is constant per speech event. Moved to `preSpeak` and passed as parameter. Saves ~1-3μs per event with text rules.
 
-### Round 29 (uncommitted): startup time optimization — 6 fixes
+### Round 29 (committed): startup time optimization — 6 fixes
 Targeted optimization of `GlobalPlugin.__init__` and module-level imports to reduce NVDA startup blocking time.
 - **handler.py Lazy UnspokenPlayer** — `UnspokenPlayer()` (SteamAudio DLL load ~50-100ms + 6 WavePlayer instances ~20-50ms) moved from `__init__` to `_ensure_player()` lazy init. Created on first `play()` call or first `configure()` when a theme is active. All `self.player.*` access sites guarded with None checks. Config applied both at creation time and on subsequent `configure()` calls. Estimated savings: ~100-150ms when no theme is active.
 - **handler.py Deferred theme migration** — `migrate_all_themes_to_named_files()` (iterates bundled themes, copies missing ones to user dir) moved to daemon thread. Avoids filesystem I/O at startup. Estimated savings: ~50-200ms on first run.
@@ -282,7 +282,7 @@ Full audit of disk I/O, memory, and CPU across all files.
 - **Disk I/O audit result:** ZERO hot-path issues remaining. Every config read, filesystem call, and JSON parse on speech/focus/keypress paths is served from in-memory caches.
 - **Memory audit result:** All caches properly bounded (LRU/WeakKeyDictionary/maxsize). Only the `raw_data` leak was actionable.
 
-### Round 31 (uncommitted): shutdown/cleanup + robustness audit — 7 fixes
+### Round 31 (committed): shutdown/cleanup + robustness audit — 7 fixes
 Deep audit of shutdown path, resource lifecycle, and remaining edge cases.
 - **handler.py `close()` `player.stop()` → `player.terminate()`** — CRITICAL: `UnspokenPlayer` has no `stop()` method; the correct method is `terminate()`. The `AttributeError` was silently caught, but **nothing was actually cleaned up**: audio worker thread never stopped, WavePlayers never closed (audio device handles leaked), SteamAudio native resources never freed, synthChanged listener never unregistered.
 - **handler.py `close()` set `player = None`** — After terminate, player still referenced. Downstream code checking `if self.player is not None` would try to use the dead player.
@@ -291,3 +291,12 @@ Deep audit of shutdown path, resource lifecycle, and remaining edge cases.
 - **handler.py `close()` caches not cleared** — `_app_profiles_cache` and `_cached_config` retained stale data. Late-firing event handlers or speech hooks could read stale config.
 - **phoneticPunctuation.py `reloadRules` double-register guard** — `config.post_configProfileSwitch.register(reloadRules)` had no idempotency check. If `injectMonkeyPatches()` was called twice without `restoreMonkeyPatches()`, reloadRules fired twice per config change.
 - **studio `SetSelection(0)` on empty Choice** — `self.themeChoice.SetSelection(0)` without checking `GetCount() > 0` raised wx assertion when no themes installed.
+
+### Round 32 (committed): hot-path micro-optimizations — 7 fixes
+- **`__init__.py _snapshot_obj` fl_detection_mode off skip** — When first/last detection is disabled (`fl_detection_mode == "off"`), skip all 3 expensive UIA COM tree walks (`parent_role`, `previous_role`, `next_role`). Also skip earcon angle computation when `audio3d` is disabled.
+- **`phoneticPunctuation.py preSpeak` list concatenation** — `resetProsodiesSequence + newSequence` created a new list every event. Changed to `resetProsodiesSequence.extend(newSequence)` (zero-copy in-place mutation). Same for trailing `[' ']` → `.append(' ')`.
+- **`phoneticPunctuation.py _processEmojiSequence` emoji pre-scan** — Added `_has_emoji_codepoints()` fast Unicode range check (FE00-FE0F, 1F000-1FFFF). Skips full emoji processing entirely when no string contains emoji codepoints (vast majority of speech events).
+- **`phoneticPunctuation.py postProcessSynchronousCommands` inline unmask** — `MaskedString` unwrapping now happens in the same pass as the synchronous command scan, eliminating `unmaskMaskedStrings()` list copy.
+- **`phoneticPunctuation.py fixProsodyCommands` early-out** — Pre-scans sequence for `BaseProsodyCommand` instances. Returns original sequence untouched when no prosody commands exist (vast majority of events).
+- **`handler.py` module import caching** — `_frenzy_mod` and `_utils_mod_cache` stored on handler instance at `configure()` time, used by `_hook_getSpeechTextForProperties` hot path. Eliminates `from . import` per speech event.
+- **`handler.py get_earcon_angles` audio3d guard** — Earcon angle computation skipped entirely when `audio3d` config is disabled.
