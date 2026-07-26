@@ -7,7 +7,7 @@ Complete a performance, disk I/O, thread‑safety, and memory audit of all files
 - "لا تكسر اي وظيفة" — do not break any existing functionality.
 
 ## Status
-All known issues fixed (rounds 1–34). No known remaining issues.
+All known issues fixed (rounds 1–35). No known remaining issues.
 
 ## Fix History
 
@@ -315,3 +315,20 @@ Deep audit of shutdown path, resource lifecycle, and remaining edge cases.
 - **`handler.py` `get_theme_from_folder()` `AudioTheme(**info)` crash** — Extra keys in `info.json` (e.g. `"description"`, `"version"`) passed as kwargs, causing `TypeError`. Now filters to known dataclass fields (`name`, `directory`, `author`, `summary`).
 - **`handler.py` `__init__` `_frenzy_mod`/`_utils_mod_cache` uninitialized** — These attributes were only set in `configure()` and cleared in `close()`. If `configure()` failed, `_hook_getSpeechTextForProperties` raised `AttributeError`, silently disabling role suppression. Added `None` initialization in `__init__`.
 - **`__init__.py` `script_speakHeadingLevel` COM access** — `focus.treeInterceptor` is a COM property access that can raise `COMError` on stale focus objects. Wrapped in `try/except Exception`. Also broadened `makeTextInfo` except clause to catch all exceptions.
+
+### Round 35 (committed): sentenceNav, unspoken, browserNavEngine deep audit — 26 fixes
+- **sentenceNavEngine.py `moveExtended` sameIndent lambda** — `NVDAObjectAtStart.location` COM access unguarded; `location` can be `None`. Crashes all `sameIndent` sentence navigation. Extracted to `_sameIndent()` with try/except fallback to style-only comparison.
+- **sentenceNavEngine.py `_sn_move`/`_sn_moveToText` `makeTextInfo`** — Only catches `NotImplementedError`, not `COMError`. Broadened to `except Exception`.
+- **sentenceNavEngine.py `setSNConfig`** — Bare `config.conf["sentencenav"][key]` dict lookup; changed to `.get()`.
+- **unspoken `UnspokenPlayer.__init__`** — Unguarded `create_wave_player()` crashes addon load and leaks SteamAudio resources. Wrapped in try/except.
+- **unspoken `play()`/`play_file()`** — Unguarded `wave_player.stop()` / `player.stop()` crashes during synth change. Wrapped in try/except.
+- **browserNavEngine `getBeepTone`** — `offset` can be `None`, causing TypeError in division. Added None guard.
+- **browserNavEngine `browserNavPopup`** — `wx.Frame` never `Destroy()`'d. Added to finally block.
+- **browserNavEngine `AdjustedTextInfo.getTextWithFields`** — `field.command in ("controlStart")` is substring check, not equality (Python treats `("s")` as string, not tuple). Changed to `==`. Also `field.field['role']` bare dict lookup changed to `.get()` with None guard.
+- **browserNavEngine `getBiwCategories`/`getBuiltInWaveFilesInCategory`/`getBuiltInWaveFiles`** — Unguarded `os.listdir`/`os.walk`. Wrapped in `try/except OSError`.
+- **browserNavEngine `getBiw`/`getBiwCategory`** — `IndexError` on empty list or `GetSelection()=-1`. Added bounds checks.
+- **browserNavEngine `setBiw`** — Unguarded `.index()` raises `ValueError`. Wrapped in try/except.
+- **browserNavEngine dialog Destroy leaks** — 5 dialogs (`EditBookmarkDialog`, `EditSiteDialog`, `WebsiteStoreDialog`, `OverwriteSiteDialog`, `TextEntryDialog`) never destroyed on cancel. Moved `Destroy()` outside OK-only blocks or wrapped in try/finally.
+- **browserNavEngine `playBiwInThread`** — Unguarded `wave.open` (`FileNotFoundError`); `raise RuntimeError` on unsupported WAV. Wrapped entire body in try/except; RuntimeError → log.warning.
+- **browserNavEngine `getChordFrequencies`** — `NOTES.index()` raises `ValueError` for notes not in list. Wrapped in try/except.
+- **quickJump.py broken indentation** — Pre-existing `try:` without proper indentation of `if` block inside it caused syntax error cascading to `match` keyword parser. Fixed indentation.
