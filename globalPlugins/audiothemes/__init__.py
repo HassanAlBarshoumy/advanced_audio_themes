@@ -187,8 +187,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         handler = GlobalPlugin._instance_handler
         fl_cfg = getattr(handler, '_cached_config', None) or {}
         # --- getOrder data (parent / previous / next roles) ---
-        # Now collected for ALL roles to support universal first/last detection.
-        if fl_cfg.get("enable_audio_themes", True):
+        # Only fetch when first/last detection is active (avoids 3 expensive
+        # UIA COM tree walks per snapshot on complex windows).
+        fl_mode = fl_cfg.get("fl_detection_mode", "smart")
+        if fl_cfg.get("enable_audio_themes", True) and fl_mode != "off":
             try:
                 info["parent_role"] = obj.parent.role if obj.parent else None
             except Exception:
@@ -201,10 +203,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 info["next_role"] = obj.next.role if obj.next else None
             except Exception:
                 info["next_role"] = None
-            # Multi-hop traversal for same-role sibling detection
-            # Reuse already-cached previous_role/next_role to avoid
-            # duplicate COM property accesses (each walks the UIA tree).
-            fl_mode = fl_cfg.get("fl_detection_mode", "smart")
             if fl_mode in ("strict", "smart"):
                 _role = info.get("role")
                 prev_role = info.get("previous_role")
@@ -236,23 +234,28 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
         info["desktop_location"] = _cached_desktop_location
         # Pre-compute earcon angles on main thread (avoids COM on worker thread).
-        try:
-            loc = info.get("location")
-            dl = _cached_desktop_location
-            if loc and dl and dl[2] and dl[3]:
-                dmx = dl[2]
-                dmy = dl[3]
-                ox = loc[0] + (loc[2] / 2.0)
-                oy = loc[1] + (loc[3] / 2.0)
-                ax = ((ox - dmx / 2.0) / dmx) * 180.0
-                pct = (dmy - oy) / dmy
-                ay = 50.0 * pct + (-40.0)
-                info["earcon_angle_x"] = max(-90.0, min(90.0, ax))
-                info["earcon_angle_y"] = max(-90.0, min(90.0, ay))
-            else:
+        # Skip when audio3d is disabled — no spatial audio needed.
+        if fl_cfg.get("audio3d", False):
+            try:
+                loc = info.get("location")
+                dl = _cached_desktop_location
+                if loc and dl and dl[2] and dl[3]:
+                    dmx = dl[2]
+                    dmy = dl[3]
+                    ox = loc[0] + (loc[2] / 2.0)
+                    oy = loc[1] + (loc[3] / 2.0)
+                    ax = ((ox - dmx / 2.0) / dmx) * 180.0
+                    pct = (dmy - oy) / dmy
+                    ay = 50.0 * pct + (-40.0)
+                    info["earcon_angle_x"] = max(-90.0, min(90.0, ax))
+                    info["earcon_angle_y"] = max(-90.0, min(90.0, ay))
+                else:
+                    info["earcon_angle_x"] = 0.0
+                    info["earcon_angle_y"] = 0.0
+            except Exception:
                 info["earcon_angle_x"] = 0.0
                 info["earcon_angle_y"] = 0.0
-        except Exception:
+        else:
             info["earcon_angle_x"] = 0.0
             info["earcon_angle_y"] = 0.0
         # Update module-level cache so worker threads can read angles without COM.

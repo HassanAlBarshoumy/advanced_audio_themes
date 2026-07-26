@@ -528,14 +528,16 @@ def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
                     resetProsodiesSequence = []
                 speechCancelledFlag = False
             newSequence = postProcessSynchronousCommands(newSequence, symbolLevel)
-            newSequence = resetProsodiesSequence + newSequence
+            if resetProsodiesSequence:
+                resetProsodiesSequence.extend(newSequence)
+                newSequence = resetProsodiesSequence
             mylog(str(newSequence))
         else:
             newSequence = speechSequence
         # Emoji processing
         if is_emoji_enabled():
             newSequence = _processEmojiSequence(newSequence)
-        newSequence = newSequence + [' '] # Otherwise v2024.2 throws weird Braille Exception + 
+        newSequence.append(' ') # Otherwise v2024.2 throws weird Braille Exception
         
         return originalSpeechSpeechSpeak(newSequence, symbolLevel=symbolLevel, *args, **kwargs)
     except Exception as e:
@@ -580,12 +582,28 @@ class EmojiSoundCommand(speech.commands.BaseCallbackCommand):
 _suppress_role_sound_flag = False
 _suppress_role_sound_lock = threading.Lock()
 
+def _has_emoji_codepoints(text):
+    """Fast check if text contains any emoji-range codepoints."""
+    for ch in text:
+        cp = ord(ch)
+        if 0xFE00 <= cp <= 0xFE0F or 0x1F000 <= cp <= 0x1FFFF:
+            return True
+    return False
+
 def _processEmojiSequence(sequence):
     global _suppress_role_sound_flag
     master_enabled = is_emoji_enabled()
     if not master_enabled:
         with _suppress_role_sound_lock:
             _suppress_role_sound_flag = False
+        return sequence
+    # Quick pre-scan: skip full processing if no string contains emoji codepoints
+    has_emoji = False
+    for item in sequence:
+        if isinstance(item, str) and _has_emoji_codepoints(item):
+            has_emoji = True
+            break
+    if not has_emoji:
         return sequence
     do_prefix_global = is_emoji_prefix_enabled()
     do_sound_global = is_emoji_sound_enabled()
@@ -1010,11 +1028,13 @@ def postProcessSynchronousCommands(speechSequence, symbolLevel):
             # Removed BreakCommand to allow speech and audio to play simultaneously without delay
             # newSequence.append(speech.commands.BreakCommand(duration))
         elif not isEmptyString(command):
+            # Inline unmask: unwrap MaskedString to plain str in the same pass
+            if isinstance(command, MaskedString):
+                command = command.s
             if isinstance(command, str):
                 hasNonEmptyString = True
             newSequence.append(command)
     newSequence = eloquenceFix(newSequence, hasNonEmptyString)
-    newSequence = unmaskMaskedStrings(newSequence)
     newSequence = fixProsodyCommands(newSequence)
     return newSequence
 
@@ -1086,6 +1106,14 @@ def fixProsodyCommands(sequence):
     """
     # global prosodyStacks, prosodyOffsets
     try:
+        # Fast path: if no prosody commands exist, skip list rebuild entirely
+        has_prosody = False
+        for cmd in sequence:
+            if isinstance(cmd, speech.commands.BaseProsodyCommand):
+                has_prosody = True
+                break
+        if not has_prosody:
+            return sequence
         result = []
         for i, command in enumerate(sequence):
             if isinstance(command, speech.commands.BaseProsodyCommand):

@@ -771,8 +771,11 @@ class AudioThemesHandler:
 
                 if suppress:
                     try:
-                        from . import frenzy
-                        from . import utils
+                        frenzy = self._frenzy_mod
+                        utils = self._utils_mod_cache
+                        if frenzy is None or utils is None:
+                            from . import frenzy
+                            from . import utils
                         appName, windowTitle, url = utils.getCurrentContext()
                         if hasattr(frenzy, "roleRules") and role in frenzy.roleRules:
                             rule = frenzy.getActiveRuleContext(frenzy.roleRules[role], appName, windowTitle, url)
@@ -894,7 +897,10 @@ class AudioThemesHandler:
             self.active_theme = None
         if self._system_monitor is not None:
             self._system_monitor.stop()
-            self._system_monitor = None
+        self._system_monitor = None
+        # Cached module references for hot-path hooks (avoids `from . import` per speech event)
+        self._frenzy_mod = None
+        self._utils_mod_cache = None
         if self.player is not None:
             try:
                 self.player.terminate()
@@ -1177,6 +1183,14 @@ class AudioThemesHandler:
         try:
             from .browserNavEngine.addonConfig import refreshBNEConfigCache
             refreshBNEConfigCache()
+        except Exception:
+            pass
+        # Cache module references for _hook_getSpeechTextForProperties hot path
+        try:
+            from . import frenzy as _f
+            from . import utils as _u
+            self._frenzy_mod = _f
+            self._utils_mod_cache = _u
         except Exception:
             pass
 
