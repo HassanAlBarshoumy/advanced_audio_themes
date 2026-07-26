@@ -871,7 +871,9 @@ def injectMonkeyPatches():
     # Register reloadRules to config profile switch instead of monkey patching tones.initialize
     import config
     try:
-        config.post_configProfileSwitch.register(reloadRules)
+        if not getattr(config.post_configProfileSwitch, '_atm_reload_registered', False):
+            config.post_configProfileSwitch.register(reloadRules)
+            config.post_configProfileSwitch._atm_reload_registered = True
     except AttributeError:
         pass # Not available in older NVDA versions
     

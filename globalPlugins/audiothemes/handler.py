@@ -791,8 +791,10 @@ class AudioThemesHandler:
                         del kwargs["level"]
         except Exception as e:
             log.error(f"AudioThemes _hook_getSpeechTextForProperties error: {e}", exc_info=True)
-            kwargs.pop("_role", None)
-            kwargs.pop("_level", None)
+            if "_role" in kwargs:
+                kwargs["role"] = kwargs.pop("_role")
+            if "_level" in kwargs:
+                kwargs["level"] = kwargs.pop("_level")
 
         return self._NVDA_getPropertiesSpeech(reason, *args, **kwargs)
 
@@ -895,9 +897,10 @@ class AudioThemesHandler:
             self._system_monitor = None
         if self.player is not None:
             try:
-                self.player.stop()
+                self.player.terminate()
             except Exception:
                 pass
+            self.player = None
         if self._NVDA_getPropertiesSpeech is not None:
             speech.speech.getPropertiesSpeech = self._NVDA_getPropertiesSpeech
         for action in getattr(self, '_registered_actions', ()):
@@ -907,6 +910,8 @@ class AudioThemesHandler:
                 pass
         with self._config_lock:
             self._theme_cache.clear()
+            self._app_profiles_cache.clear()
+            self._cached_config = {}
         with _typing_dir_cache_lock:
             _typing_dir_cache.clear()
 

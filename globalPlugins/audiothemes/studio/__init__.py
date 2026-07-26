@@ -90,7 +90,8 @@ class AudioThemeSelectorDialog(BaseDialog):
         )
         for theme in AudioThemesHandler.get_installed_themes():
             self.themeChoice.Append(theme.name, theme)
-        self.themeChoice.SetSelection(0)
+        if self.themeChoice.GetCount() > 0:
+            self.themeChoice.SetSelection(0)
 
     @property
     def selected_theme(self):

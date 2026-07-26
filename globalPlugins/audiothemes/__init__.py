@@ -452,7 +452,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 _orig_exc = e
         try:
             current_nav = api.getNavigatorObject()
-            if current_nav and getattr(current_nav, 'treeInterceptor', None) and not current_nav.treeInterceptor.passThrough:
+            ti = getattr(current_nav, 'treeInterceptor', None) if current_nav else None
+            if ti and not ti.passThrough:
                 if current_nav != getattr(self, "_last_navigator_object", None):
                     self._last_navigator_object = current_nav
                     self._last_play_time = time.monotonic()
@@ -672,8 +673,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self.restoreMonkeyPatches()
         with suppress(Exception):
             self._unhook_keyboard()
-        if self.orig_caretMovementScriptHelper:
-            with suppress(Exception):
+        with suppress(Exception):
+            if self.orig_caretMovementScriptHelper:
                 import speech
                 if hasattr(speech, "_caretMovementScriptHelper"):
                     speech._caretMovementScriptHelper = self.orig_caretMovementScriptHelper
@@ -683,6 +684,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self.quicknav_interceptor.terminate()
         with suppress(Exception):
             self.handler.close()
+        GlobalPlugin._instance_handler = None
         with suppress(Exception):
             from .sentenceNavEngine import _unregister_sentence_nav_hooks
             _unregister_sentence_nav_hooks()
@@ -713,7 +715,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             current_nav = api.getNavigatorObject()
             if current_nav and current_nav != getattr(self, "_last_navigator_object", None):
                 self._last_navigator_object = current_nav
-                if current_nav.treeInterceptor and not current_nav.treeInterceptor.passThrough:
+                ti = current_nav.treeInterceptor
+                if ti and not ti.passThrough:
                     # Debounce: skip if last dispatch was < 80ms ago.
                     now = time.monotonic()
                     if now - getattr(self, "_last_play_time", 0) < 0.08:
@@ -904,7 +907,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             except Exception as e:
                 log.debugWarning(f"event_becomeNavigatorObject nextHandler (dedup): {e}")
             return
-        self.handler._current_url = None
+        try:
+            self.handler._current_url = None
+        except Exception:
+            pass
         try:
             nextHandler()
         except StopIteration:
@@ -1197,12 +1203,15 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self.handler._current_app_name = obj.appModule.appName if obj.appModule else None
         except Exception:
             self.handler._current_app_name = None
-        if self.handler._cached_config.get("enable_audio_themes", True) and self.handler.active_theme:
-            try:
-                obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.loaded, foreground_app=self.handler._current_app_name)
-                utils.threadPool.add_task(self.playObject, obj_info)
-            except Exception as e:
-                log.debug(f"AudioThemes event_documentLoadComplete: {e}")
+        try:
+            if self.handler._cached_config.get("enable_audio_themes", True) and self.handler.active_theme:
+                try:
+                    obj_info = self._snapshot_obj(obj, extra_snd=SpecialProps.loaded, foreground_app=self.handler._current_app_name)
+                    utils.threadPool.add_task(self.playObject, obj_info)
+                except Exception as e:
+                    log.debug(f"AudioThemes event_documentLoadComplete: {e}")
+        except Exception:
+            pass
         try:
             nextHandler()
         except StopIteration:
