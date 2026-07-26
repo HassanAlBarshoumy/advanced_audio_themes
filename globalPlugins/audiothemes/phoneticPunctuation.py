@@ -417,6 +417,7 @@ def reloadRules():
         allProsodies = newAllProsodies
         characterRules = newCharacterRules
         cached_passThrough_regex = new_cached_passThrough_regex
+    _prosody_setting_cache.clear()
 
     frenzy.updateRules()
 
@@ -483,17 +484,20 @@ def refreshCachedConfig():
         _cached_speech_symbolLevel = config.conf["speech"]["symbolLevel"]
     except Exception:
         _cached_speech_symbolLevel = 100
+    _utils_mod._reset_pp_enabled_cache()
 
 def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
     global speechCancelledFlag
+    _utils_mod._reset_pp_enabled_cache()
     try:
         if isPhoneticPunctuationEnabled():
             if symbolLevel is None:
                 symbolLevel = _cached_speech_symbolLevel
             newSequence = speechSequence
+            language = speech.getCurrentLanguage()
             appName, windowTitle, url = getCurrentContext()
             with _rules_lock:
-                text_rules = list(rulesByFrenzy[FrenzyType.TEXT]) if rulesByFrenzy else []
+                text_rules = rulesByFrenzy.get(FrenzyType.TEXT, []) if rulesByFrenzy else []
             for rule in text_rules:
                 try:
                     if len(rule.applicationFilterRegex) > 0 and not rule._applicationFilterRegex.search(appName):
@@ -508,7 +512,7 @@ def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
                         )
                     ):
                         continue
-                    newSequence = processRule(newSequence, rule, symbolLevel)
+                    newSequence = processRule(newSequence, rule, symbolLevel, language)
                 except Exception:
                     continue
             resetProsodiesSequence = []
@@ -573,10 +577,10 @@ _suppress_role_sound_lock = threading.Lock()
 
 def _processEmojiSequence(sequence):
     global _suppress_role_sound_flag
-    with _suppress_role_sound_lock:
-        _suppress_role_sound_flag = False
     master_enabled = is_emoji_enabled()
     if not master_enabled:
+        with _suppress_role_sound_lock:
+            _suppress_role_sound_flag = False
         return sequence
     do_prefix_global = is_emoji_prefix_enabled()
     do_sound_global = is_emoji_sound_enabled()
@@ -589,6 +593,7 @@ def _processEmojiSequence(sequence):
     delay_before = get_emoji_delay_before()
     delay_after = get_emoji_delay_after()
     suppress_role = is_emoji_suppress_role_sound()
+    found_emoji = False
 
     newSeq = []
     for item in sequence:
@@ -604,9 +609,7 @@ def _processEmojiSequence(sequence):
             newSeq.append(item)
             continue
 
-        # Suppress role sound for this utterance if enabled
-        with _suppress_role_sound_lock:
-            _suppress_role_sound_flag = suppress_role
+        found_emoji = True
 
         # Filter blacklisted emojis
         emojis = [(e, c, s, en) for e, c, s, en in emojis if not is_emoji_blacklisted(e)]
@@ -728,6 +731,8 @@ def _processEmojiSequence(sequence):
             items.append(item[last_end:])
             merged = _merge_strings(items)
             newSeq.extend(merged)
+    with _suppress_role_sound_lock:
+        _suppress_role_sound_flag = found_emoji and suppress_role
     return newSeq
 
 
@@ -757,6 +762,7 @@ def is_emoji_suppress_role_flag_set():
 def preCancelSpeech(*args, **kwargs):
     global speechCancelledFlag
     speechCancelledFlag = True
+    _utils_mod._reset_pp_enabled_cache()
     try:
         if isPhoneticPunctuationEnabled():
             commands.terminateCurrentChain()
@@ -949,8 +955,7 @@ def restoreMonkeyPatches():
         pass
 
 
-def processRule(speechSequence, rule, symbolLevel):
-    language=speech.getCurrentLanguage()
+def processRule(speechSequence, rule, symbolLevel, language):
     newSequence = []
     for command in speechSequence:
         if isinstance(command, str):
@@ -975,10 +980,11 @@ def postProcessSynchronousCommands(speechSequence, symbolLevel):
     """
     language=speech.getCurrentLanguage()
     def isEmptyString(command):
-        try:
-            return isinstance(command, str) and speech.isBlank(speech.processText(language,command,symbolLevel))
-        except Exception:
-            return isinstance(command, str) and not command.strip()
+        if not isinstance(command, str):
+            return False
+        if not command.strip():
+            return True
+        return False
     hasNonEmptyString = False
     newSequence = []
     excludeIndices = set()
@@ -1053,6 +1059,22 @@ def unmaskMaskedStrings(sequence):
 
 prosodyStacks = collections.defaultdict(lambda: [])
 prosodyOffsets = collections.defaultdict(lambda: 0)
+_prosody_setting_cache = {}
+def _findProsodySetting(cls):
+    cached = _prosody_setting_cache.get(cls)
+    if cached is not None or cls in _prosody_setting_cache:
+        return cached
+    clsName = cls.__name__
+    commandSuffix = 'Command'
+    if not clsName.endswith(commandSuffix):
+        return None
+    prosodyName = clsName[:-len(commandSuffix)].lower()
+    for srs in globalVars.settingsRing.settings:
+        if srs.setting.id == prosodyName:
+            _prosody_setting_cache[cls] = srs
+            return srs
+    _prosody_setting_cache[cls] = None
+    return None
 def fixProsodyCommands(sequence):
     """
     Prosody commands in NVDA don't support nesting natively.
@@ -1064,27 +1086,6 @@ def fixProsodyCommands(sequence):
     """
     # global prosodyStacks, prosodyOffsets
     try:
-        prosodySettings = {}
-        def findProsodySetting(cls):
-            # nonlocal prosodySettings
-            try:
-                return prosodySettings[cls]
-            except KeyError:
-                pass
-            clsName  = cls.__name__
-            commandSuffix = 'Command'
-            if not clsName.endswith(commandSuffix):
-                raise RuntimeError(f"Unknown Prosody {clsName}")
-            prosodyName = clsName[:-len(commandSuffix)].lower()
-            for srs in globalVars.settingsRing.settings:
-                if srs.setting.id == prosodyName:
-                    prosodySettings[cls] = srs
-                    return srs
-            # Well, perhaps current synth doesn't support given prosody.
-            prosodySettings[cls] = None
-            return None
-                
-        
         result = []
         for i, command in enumerate(sequence):
             if isinstance(command, speech.commands.BaseProsodyCommand):
@@ -1105,7 +1106,7 @@ def fixProsodyCommands(sequence):
                     prosodyOffsets[cls] += commandOffset
                 command = copy.copy(command)
                 # Let's make sure the offset doesn't go beyond (0, 100) interval - otherwise synths will ignore this command.
-                ps = findProsodySetting(cls)
+                ps = _findProsodySetting(cls)
                 if ps is not None:
                     maxOffset = ps.max - ps.value
                     minOffset = ps.min - ps.value

@@ -131,6 +131,7 @@ _snapshot_cache = weakref.WeakKeyDictionary()
 
 class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPluginHandler.GlobalPlugin):
 
+    _instance_handler = None
     scriptCategory = "Advanced Audio Themes"
 
     # -- COM-safety: extract everything on the main thread ---------------
@@ -184,7 +185,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             info["windowClassName"] = obj.windowClassName or ""
         except Exception:
             info["windowClassName"] = ""
-        handler = GlobalPlugin._instance_handler if hasattr(GlobalPlugin, '_instance_handler') else None
+        handler = GlobalPlugin._instance_handler
         fl_cfg = getattr(handler, '_cached_config', None) or {}
         # --- getOrder data (parent / previous / next roles) ---
         # Now collected for ALL roles to support universal first/last detection.
@@ -202,26 +203,15 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             except Exception:
                 info["next_role"] = None
             # Multi-hop traversal for same-role sibling detection
-            # Capped at 1 level to avoid expensive COM tree walks (was 3, caused 40s freezes)
+            # Reuse already-cached previous_role/next_role to avoid
+            # duplicate COM property accesses (each walks the UIA tree).
             fl_mode = fl_cfg.get("fl_detection_mode", "smart")
             if fl_mode in ("strict", "smart"):
                 _role = info.get("role")
-                try:
-                    p = obj.previous
-                    if p is not None and p.role == _role:
-                        info["prev_same_role"] = p.role
-                    else:
-                        info["prev_same_role"] = None
-                except Exception:
-                    info["prev_same_role"] = None
-                try:
-                    n = obj.next
-                    if n is not None and n.role == _role:
-                        info["next_same_role"] = n.role
-                    else:
-                        info["next_same_role"] = None
-                except Exception:
-                    info["next_same_role"] = None
+                prev_role = info.get("previous_role")
+                info["prev_same_role"] = prev_role if prev_role is not None and prev_role == _role else None
+                next_role = info.get("next_role")
+                info["next_same_role"] = next_role if next_role is not None and next_role == _role else None
             else:
                 info["prev_same_role"] = None
                 info["next_same_role"] = None
@@ -753,7 +743,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self._last_focused_obj = obj
         self._last_focus_time = time.monotonic()
         self._last_play_time = self._last_focus_time
-        self._last_focus_is_editable = self._is_editable(obj)
         # Also sync navigator tracking so the 180ms timer doesn't double-fire
         try:
             self._last_navigator_object = api.getNavigatorObject()
@@ -775,8 +764,15 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             log.debugWarning(f"event_gainFocus nextHandler: {e}")
         try:
             if not self.handler._cached_config.get("enable_audio_themes", True):
+                self._last_focus_is_editable = self._is_editable(obj)
                 return
             obj_info = self._snapshot_obj(obj, foreground_app=self.handler._current_app_name)
+            # Compute editable from snapshot dict instead of live COM object
+            # (avoids redundant obj.role + obj.states COM accesses already done by _snapshot_obj)
+            _r = obj_info.get("role", 0)
+            _s = obj_info.get("states", frozenset())
+            _ectl = (controlTypes.Role.EDITABLETEXT, controlTypes.Role.TERMINAL, controlTypes.Role.RICHEDIT)
+            self._last_focus_is_editable = (_r in _ectl or controlTypes.State.EDITABLE in _s) and controlTypes.State.READONLY not in _s
             utils.threadPool.add_task(self.playObject, obj_info)
             utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
@@ -847,14 +843,13 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         Also skip if this is the same object as the last gainFocus within 300ms
         (some browsers fire both events for the same element on Tab).
         """
-        # Cache app name on handler
+        # Cache app name on handler (needed by event_gainFocus and speech hooks)
         try:
             self.handler._current_app_name = obj.appModule.appName if obj.appModule else None
             self.handler._current_window_title = getattr(obj, 'name', None)
         except Exception:
             self.handler._current_app_name = None
             self.handler._current_window_title = None
-        self.handler._current_url = None
         if isFocus:
             try:
                 nextHandler()
@@ -863,6 +858,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             except Exception as e:
                 log.debugWarning(f"event_becomeNavigatorObject nextHandler (isFocus): {e}")
             return
+        self.handler._current_url = None
         # Dedup: skip if gainFocus just fired for this very object
         if obj is self._last_focused_obj and (time.monotonic() - self._last_focus_time) < 0.3:
             try:
@@ -994,9 +990,11 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         if not injected and vkCode not in (16, 17, 18, 20, 91, 92, 144, 160, 161, 162, 163, 164, 165):
             self._last_vkCode = vkCode
             self._last_extended = extended
+        # Cache handler and config once (avoids duplicate hasattr + attribute lookups per keypress)
+        handler = getattr(self, 'handler', None)
+        cfg = handler._cached_config if handler is not None else {}
         # Play advanced typing sounds for non-characters
         try:
-            cfg = self.handler._cached_config if hasattr(self, 'handler') else {}
             if not injected and cfg.get("typing_sounds", True):
                 # Check edit only
                 play = True
@@ -1005,9 +1003,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 
                 if play:
                     # Specific keys
-                    if vkCode in (0x0D, 0x08): # Enter, Backspace
-                        self.handler.play_typing_sound(vkCode=vkCode, extended=extended)
-                    elif vkCode in (0x10, 0x11, 0x12, 0x5B, 0x5C): # Shift, Ctrl, Alt, Win
+                    if vkCode in (0x0D, 0x08, 0x10, 0x11, 0x12, 0x5B, 0x5C): # Enter, Backspace, Shift, Ctrl, Alt, Win
                         self.handler.play_typing_sound(vkCode=vkCode, extended=extended)
                     # Note: printable characters will still be caught by event_typedCharacter
                     # We don't catch them here to avoid double playing, except if we want to bypass event_typedCharacter completely.
@@ -1017,8 +1013,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # Clipboard shortcut detection
         if not injected:
             try:
-                cfg2 = self.handler._cached_config if hasattr(self, 'handler') else {}
-                if cfg2.get("clipboard_enabled", True):
+                if cfg.get("clipboard_enabled", True):
                     if winUser.getAsyncKeyState(winUser.VK_CONTROL) & 0x8000:
                         shift = winUser.getAsyncKeyState(winUser.VK_SHIFT) & 0x8000
                         if vkCode == 0x43:  # C
@@ -1040,17 +1035,18 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         return True
 
     def event_typedCharacter(self, obj, nextHandler, ch):
-        if hasattr(self, 'handler'):
+        handler = getattr(self, 'handler', None)
+        if handler is not None:
             try:
-                cfg = self.handler._cached_config
+                cfg = handler._cached_config
                 if cfg.get("typing_sounds", True):
                     vk = getattr(self, "_last_vkCode", None)
                     ext = getattr(self, "_last_extended", None)
                     if cfg.get("typing_sounds_edit_only", False):
                         if getattr(self, "_last_focus_is_editable", True):
-                            self.handler.play_typing_sound(ch=ch, vkCode=vk, extended=ext)
+                            handler.play_typing_sound(ch=ch, vkCode=vk, extended=ext)
                     else:
-                        self.handler.play_typing_sound(ch=ch, vkCode=vk, extended=ext)
+                        handler.play_typing_sound(ch=ch, vkCode=vk, extended=ext)
             except Exception as e:
                 log.debugWarning(f"event_typedCharacter: {e}")
         try:

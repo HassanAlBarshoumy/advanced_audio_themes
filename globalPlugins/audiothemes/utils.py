@@ -191,18 +191,25 @@ def refreshPpConfigCache():
         _pp_config_cache = new_cache
 
 def getConfig(key):
-    with _pp_config_lock:
-        try:
-            return _pp_config_cache[key]
-        except KeyError:
-            pass
-    try:
-        val = config.conf[phoneticPunctuationConfigKey].get(key)
-    except KeyError:
-        return None
-    with _pp_config_lock:
-        _pp_config_cache[key] = val
-    return val
+	# Lock-free fast path: _pp_config_cache is an atomic reference swap (GIL-safe).
+	cache = _pp_config_cache
+	try:
+		return cache[key]
+	except KeyError:
+		pass
+	# Cache miss — acquire lock for the fallback path.
+	with _pp_config_lock:
+		try:
+			return _pp_config_cache[key]
+		except KeyError:
+			pass
+	try:
+		val = config.conf[phoneticPunctuationConfigKey].get(key)
+	except KeyError:
+		return None
+	with _pp_config_lock:
+		_pp_config_cache[key] = val
+	return val
 
 def setConfig(key, value):
 	try:
@@ -249,10 +256,12 @@ def isAppBlacklisted():
         return False
         
     current_blacklist = getConfig("applicationsBlacklist")
-    with _blacklist_lock:
-        if current_blacklist != _cached_blacklist_string:
-            _cached_blacklist_string = current_blacklist
-            _cached_blacklist_set = {app.strip().lower() for app in current_blacklist.split(",") if app.strip()}
+    # Double-checked locking: skip lock when blacklist hasn't changed.
+    if current_blacklist != _cached_blacklist_string:
+        with _blacklist_lock:
+            if current_blacklist != _cached_blacklist_string:
+                _cached_blacklist_string = current_blacklist
+                _cached_blacklist_set = {app.strip().lower() for app in current_blacklist.split(",") if app.strip()}
         
     app_lower = appName.lower()
     if app_lower in _cached_blacklist_set:
@@ -264,8 +273,18 @@ def isAppBlacklisted():
             
     return False
 
+_pp_enabled_result = None
+
 def isPhoneticPunctuationEnabled():
-    return not isAppBlacklisted() and getConfig("enabled")
+    global _pp_enabled_result
+    if _pp_enabled_result is not None:
+        return _pp_enabled_result
+    _pp_enabled_result = not isAppBlacklisted() and getConfig("enabled")
+    return _pp_enabled_result
+
+def _reset_pp_enabled_cache():
+    global _pp_enabled_result
+    _pp_enabled_result = None
 
 def isURLResolutionAvailable():
     try:

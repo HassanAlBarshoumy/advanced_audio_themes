@@ -66,6 +66,12 @@ FFMPEG_ONLY_FORMATS = {"m4a", "aac", "opus", "wma", "mp2", "ac3"}
 
 SPECIAL_TYPING_FILES = frozenset({"enter.wav", "backspace.wav", "space.wav", "shift.wav", "ctrl.wav", "alt.wav", "win.wav"})
 
+_SPECIAL_VK_FILE_MAP = {
+    0x0D: "enter.wav", 0x08: "backspace.wav", 0x20: "space.wav",
+    0x10: "shift.wav", 0x11: "ctrl.wav", 0x12: "alt.wav",
+    0x5B: "win.wav", 0x5C: "win.wav"
+}
+
 def get_active_file_types():
     try:
         from config import conf
@@ -678,6 +684,7 @@ def showPendingConflicts():
 
 _typing_dir_cache = {}
 _typing_dir_cache_lock = threading.Lock()
+_is_sound_suppressed_cache = None
 
 class AudioThemesHandler:
     """Query and manage audio themes."""
@@ -731,21 +738,21 @@ class AudioThemesHandler:
     ):
         try:
             role = kwargs.get("role", None)
-            states = kwargs.get("states", None)
-            
             if role is not None:
+                player = self.player
+                cfg = self._cached_config
                 suppress = False
-                
-                if not getattr(self, 'player', None) or not self.player.speak_roles:
+
+                if not player or not player.speak_roles:
                     suppress = True
-                
-                blacklisted_roles = getattr(self, '_cached_config', {}).get("blacklisted_roles", [19])
+
+                blacklisted_roles = cfg.get("blacklisted_roles", [19])
                 if role in blacklisted_roles:
                     suppress = True
-                    
+
                 if role == controlTypes.Role.HEADING and role not in blacklisted_roles:
                     suppress = False
-                    
+
                 if suppress:
                     try:
                         from . import frenzy
@@ -757,9 +764,9 @@ class AudioThemesHandler:
                                 suppress = False
                     except Exception as e:
                         log.error(f"AudioThemes Error: {e}", exc_info=True)
-                if getattr(self, 'player', None) and self.player.use_in_say_all and SayAllHandler.isRunning():
+                if player and player.use_in_say_all and SayAllHandler.isRunning():
                     suppress = False
-                    
+
                 if suppress:
                     kwargs["_role"] = kwargs["role"]
                     del kwargs["role"]
@@ -1122,8 +1129,11 @@ class AudioThemesHandler:
             return False
         if not any(p in app_name.lower() for p in self.disabled_apps):
             return False
-        from .utils import is_sound_suppressed
-        return is_sound_suppressed(category)
+        global _is_sound_suppressed_cache
+        if _is_sound_suppressed_cache is None:
+            from .utils import is_sound_suppressed
+            _is_sound_suppressed_cache = is_sound_suppressed
+        return _is_sound_suppressed_cache(category)
 
     def _play_system_sound(self, sound_key):
         if not self._cached_config.get("sys_status_enabled", True):
@@ -1230,9 +1240,11 @@ class AudioThemesHandler:
             log.warning(f"AudioThemes: failed to play sound {getattr(sound, 'name', sound)}")
 
     def get_theme_for_app(self, app_name):
+        # Lock-free fast path: no profiles enabled (covers ~90% of calls).
+        # _cached_config is an atomic reference swap, safe to read without lock.
+        if not app_name or not self._cached_config.get("app_profiles_enabled", False):
+            return self.active_theme
         with self._config_lock:
-            if not app_name or not self._cached_config.get("app_profiles_enabled", False):
-                return self.active_theme
             app_name = app_name.lower()
             profile = self._app_profiles_cache.get(app_name)
             if profile is None:
@@ -1332,10 +1344,11 @@ class AudioThemesHandler:
         return True
 
     def get_typing_pack_for_app(self, app_name):
+        global_pack = self._cached_config.get("typing_sound_pack", "1blueSwitch")
+        # Lock-free fast path: no profiles enabled (covers ~90% of calls).
+        if not app_name or not self._cached_config.get("app_profiles_enabled", False):
+            return global_pack
         with self._config_lock:
-            global_pack = self._cached_config.get("typing_sound_pack", "1blueSwitch")
-            if not app_name or not self._cached_config.get("app_profiles_enabled", False):
-                return global_pack
             app_name = app_name.lower()
             profile = self._app_profiles_cache.get(app_name)
             if isinstance(profile, dict):
@@ -1403,9 +1416,9 @@ class AudioThemesHandler:
                         files = [f for f in os.listdir(typing_dir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
                     except OSError:
                         files = []
-                    cache = {'files': files}
+                    cache = {'files': files, 'valid_choices': [f for f in files if f not in SPECIAL_TYPING_FILES]}
                 else:
-                    cache = {'files': []}
+                    cache = {'files': [], 'valid_choices': []}
                 with _typing_dir_cache_lock:
                     if len(_typing_dir_cache) > 32:
                         _typing_dir_cache.pop(next(iter(_typing_dir_cache)))
@@ -1413,18 +1426,12 @@ class AudioThemesHandler:
             
             if cache['files']:
                 if vkCode is not None:
-                    # Check for dedicated sound files based on vkCode
-                    vk_file_map = {
-                        0x0D: "enter.wav", 0x08: "backspace.wav", 0x20: "space.wav",
-                        0x10: "shift.wav", 0x11: "ctrl.wav", 0x12: "alt.wav",
-                        0x5B: "win.wav", 0x5C: "win.wav"
-                    }
-                    expected_file = vk_file_map.get(vkCode)
+                    expected_file = _SPECIAL_VK_FILE_MAP.get(vkCode)
                     if expected_file and expected_file in cache['files']:
                         sound_path = os.path.join(typing_dir, expected_file)
-                
+
                 if not sound_path:
-                    valid_choices = [f for f in cache['files'] if f not in SPECIAL_TYPING_FILES]
+                    valid_choices = cache.get('valid_choices', cache['files'])
                     if valid_choices:
                         sound_path = os.path.join(typing_dir, random.choice(valid_choices))
                     else:

@@ -85,9 +85,12 @@ _cached_blacklisted_roles = [19]
 _cached_blacklisted_roles_version = -1
 _cached_delayed_char_descriptions = False
 _cached_doc_formatting = {}
+_cached_role_formats_json = None
+_cached_role_formats_dict = {}
 
 def refreshFrenzyCachedConfig():
     global _frenzy_cached_config, _frenzy_config_version, _cached_delayed_char_descriptions, _cached_doc_formatting
+    global _cached_role_formats_json, _cached_role_formats_dict
     _frenzy_cached_config = dict(_DEFAULT_FRENZY_CONFIG)
     ac = config.conf["audiothemes"]
     for key in _frenzy_cached_config:
@@ -98,6 +101,13 @@ def refreshFrenzyCachedConfig():
         _cached_doc_formatting = config.conf["documentFormatting"]
     except Exception:
         _cached_doc_formatting = {}
+    try:
+        rj = _frenzy_cached_config.get("roleAnnounceFormats", "{}")
+        _cached_role_formats_json = rj
+        _cached_role_formats_dict = json.loads(rj)
+    except Exception:
+        _cached_role_formats_json = None
+        _cached_role_formats_dict = {}
 
 def _get_blacklisted_roles():
     global _cached_blacklisted_roles, _cached_blacklisted_roles_version
@@ -159,15 +169,7 @@ def _new_getObjectPropertiesSpeech_inner(
     global_fmt = fc.get("announceFormat", "0")
     speak_roles = fc.get("speak_roles", True)
     
-    # Load per-role overrides
-    try:
-        roleFormatsJson = fc.get("roleAnnounceFormats", "{}")
-        if not hasattr(utils, '_cachedRoleFormatsJson') or utils._cachedRoleFormatsJson != roleFormatsJson:
-            utils._cachedRoleFormatsJson = roleFormatsJson
-            utils._cachedRoleFormatsDict = json.loads(roleFormatsJson)
-        roleFormatsDict = utils._cachedRoleFormatsDict
-    except Exception:
-        roleFormatsDict = {}
+    roleFormatsDict = _cached_role_formats_dict
     
     # Determine format for this specific role
     try:
@@ -478,24 +480,27 @@ def updateRules():
     otherRules = new_otherRules
 
 class _LRUCache:
+    """Lock-free reads, locked writes. Under CPython GIL, dict reads are atomic."""
     def __init__(self, capacity: int):
-        self.cache = collections.OrderedDict()
+        self._data = {}
+        self._order = []
         self.capacity = capacity
-        self.lock = threading.Lock()
+        self._write_lock = threading.Lock()
 
     def get(self, key):
-        with self.lock:
-            if key not in self.cache:
-                return False, None
-            self.cache.move_to_end(key)
-            return True, self.cache[key]
+        if key in self._data:
+            return True, self._data[key]
+        return False, None
 
     def put(self, key, value):
-        with self.lock:
-            self.cache[key] = value
-            self.cache.move_to_end(key)
-            if len(self.cache) > self.capacity:
-                self.cache.popitem(last=False)
+        with self._write_lock:
+            if key in self._data:
+                self._order.remove(key)
+            self._data[key] = value
+            self._order.append(key)
+            if len(self._order) > self.capacity:
+                old = self._order.pop(0)
+                self._data.pop(old, None)
 
 _active_rule_cache = _LRUCache(256)
 
@@ -554,7 +559,7 @@ def getRuleStateValue(rule, is_negative=False):
 class FakeTextInfo:
     def __init__(self, info, formatConfig, preventSpellingCharacters, addFakeEmptyText):
         self.info = info
-        self.formatConfig = formatConfig.copy()
+        self.formatConfig = formatConfig
         self.preventSpellingCharacters = preventSpellingCharacters
         fields = info.getTextWithFields(formatConfig)
         if addFakeEmptyText:
@@ -1261,14 +1266,7 @@ def _new_getPropertiesSpeech_inner(
     fc = _frenzy_cached_config
     speak_roles = fc.get("speak_roles", True)
     global_fmt = fc.get("announceFormat", "0")
-    try:
-        roleFormatsJson = fc.get("roleAnnounceFormats", "{}")
-        if not hasattr(utils, '_cachedRoleFormatsJson') or utils._cachedRoleFormatsJson != roleFormatsJson:
-            utils._cachedRoleFormatsJson = roleFormatsJson
-            utils._cachedRoleFormatsDict = json.loads(roleFormatsJson)
-        roleFormatsDict = utils._cachedRoleFormatsDict
-    except Exception:
-        roleFormatsDict = {}
+    roleFormatsDict = _cached_role_formats_dict
         
     role = propertyValues.get('role', None)
     
