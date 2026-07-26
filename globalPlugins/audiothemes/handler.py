@@ -938,7 +938,7 @@ class AudioThemesHandler:
             log.debug("get_active_theme: no theme found")
             return
         if theme.exists():
-            theme.load(self.player)
+            theme.load(self._ensure_player())
             theme.is_active = True
             return theme
 
@@ -1325,7 +1325,7 @@ class AudioThemesHandler:
         # Lock released before disk I/O / theme.load
         theme = self.get_theme_from_folder(target_folder)
         if theme and theme.exists():
-            theme.load(self.player)
+            theme.load(self._ensure_player())
             with self._config_lock:
                 # Re-check cache (another thread may have loaded it)
                 if target_folder not in self._theme_cache:
