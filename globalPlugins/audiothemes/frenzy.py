@@ -1516,17 +1516,24 @@ def _new_getControlFieldSpeech_inner(
     
     original_formatConfig_values = {}
     heading_has_rule = False
+    _heading_level_rules_cache = {}
+    _heading_generic_rule = None
     for r, key in ROLE_TO_FORMAT_KEY.items():
         has_active_rule = getActiveRuleContext(roleRules.get(r, []), appName, windowTitle, url) is not None
         
         if not has_active_rule and r == controlTypes.Role.HEADING:
             for lvl in range(1, 7):
                 fmt = getattr(TextFormat, f'HEADING{lvl}', None)
-                if fmt and getActiveRuleContext(formatRules.get(fmt, []), appName, windowTitle, url) is not None:
-                    has_active_rule = True
-                    break
+                if fmt:
+                    _rule = getActiveRuleContext(formatRules.get(fmt, []), appName, windowTitle, url)
+                    _heading_level_rules_cache[lvl] = _rule
+                    if _rule is not None:
+                        has_active_rule = True
+                else:
+                    _heading_level_rules_cache[lvl] = None
             if not has_active_rule:
-                if getActiveRuleContext(formatRules.get(TextFormat.HEADING, []), appName, windowTitle, url) is not None:
+                _heading_generic_rule = getActiveRuleContext(formatRules.get(TextFormat.HEADING, []), appName, windowTitle, url)
+                if _heading_generic_rule is not None:
                     has_active_rule = True
             if not has_active_rule:
                 if getActiveRuleContext(numericFormatRules.get(NumericTextFormat.HEADING_LEVEL, []), appName, windowTitle, url) is not None:
@@ -1568,12 +1575,12 @@ def _new_getControlFieldSpeech_inner(
 
     result2 = []
     
-    # Calculate heading level rules once
-    headingLevelRules = {
+    # Reuse heading level rules from first-pass cache (avoids duplicate getActiveRuleContext calls)
+    headingLevelRules = _heading_level_rules_cache if _heading_level_rules_cache else {
         level: getActiveRuleContext(formatRules.get(getattr(TextFormat, f'HEADING{level}'), []), appName, windowTitle, url)
         for level in range(1, 7)
     }
-    headingRule = getActiveRuleContext(formatRules.get(TextFormat.HEADING, []), appName, windowTitle, url)
+    headingRule = _heading_generic_rule if _heading_generic_rule is not None else getActiveRuleContext(formatRules.get(TextFormat.HEADING, []), appName, windowTitle, url)
     
     patched_attrs = attrs.copy()
     if 'role' in patched_attrs:

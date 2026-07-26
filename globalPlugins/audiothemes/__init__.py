@@ -125,6 +125,8 @@ def _text_contains_emoji(text):
 
 import weakref
 _snapshot_cache = weakref.WeakKeyDictionary()
+# Pre-computed earcon angles (main thread) for worker thread access.
+_latest_earcon_angles = (0.0, 0.0)
 
 class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPluginHandler.GlobalPlugin):
 
@@ -233,6 +235,29 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 _cached_desktop_location_time = now
 
         info["desktop_location"] = _cached_desktop_location
+        # Pre-compute earcon angles on main thread (avoids COM on worker thread).
+        try:
+            loc = info.get("location")
+            dl = _cached_desktop_location
+            if loc and dl and dl[2] and dl[3]:
+                dmx = dl[2]
+                dmy = dl[3]
+                ox = loc[0] + (loc[2] / 2.0)
+                oy = loc[1] + (loc[3] / 2.0)
+                ax = ((ox - dmx / 2.0) / dmx) * 180.0
+                pct = (dmy - oy) / dmy
+                ay = 50.0 * pct + (-40.0)
+                info["earcon_angle_x"] = max(-90.0, min(90.0, ax))
+                info["earcon_angle_y"] = max(-90.0, min(90.0, ay))
+            else:
+                info["earcon_angle_x"] = 0.0
+                info["earcon_angle_y"] = 0.0
+        except Exception:
+            info["earcon_angle_x"] = 0.0
+            info["earcon_angle_y"] = 0.0
+        # Update module-level cache so worker threads can read angles without COM.
+        global _latest_earcon_angles
+        _latest_earcon_angles = (info["earcon_angle_x"], info["earcon_angle_y"])
         if foreground_app is None:
             try:
                 appName, _, _ = utils.getCurrentContext()

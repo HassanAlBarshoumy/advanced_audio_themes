@@ -1368,6 +1368,11 @@ class AudioThemesHandler:
 
     def get_earcon_angles(self):
         try:
+            from . import _latest_earcon_angles
+            return _latest_earcon_angles
+        except Exception:
+            pass
+        try:
             focus = api.getFocusObject()
             obj = focus
             location = getattr(obj, 'location', None)

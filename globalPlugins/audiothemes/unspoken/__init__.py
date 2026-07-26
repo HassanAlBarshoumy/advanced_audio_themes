@@ -450,6 +450,7 @@ class UnspokenPlayer:
 		if remainder != 0:
 			float_samples.extend(array('f', [0.0]) * (1024 - remainder))
 		sound_data["data"] = float_samples
+		sound_data.pop("raw_data", None)
 		sound_data["_processed"] = True
 		return sound_data
 
