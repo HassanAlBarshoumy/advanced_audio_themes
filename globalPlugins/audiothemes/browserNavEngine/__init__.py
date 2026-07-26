@@ -485,8 +485,13 @@ def getFormatting(info):
 def getBeepTone(textInfo):
     mode = getConfig("browserMode")
     if mode == 0:
-        offset = getSimpleHorizontalOffset(textInfo)
-        width = api.getDesktopObject().location.right
+        try:
+            offset = getSimpleHorizontalOffset(textInfo)
+            width = api.getDesktopObject().location.right
+        except Exception:
+            return 0
+        if offset is None:
+            return 0
         MAX_ALLOWED_OCTAVES = 3
         octave_pixels = width/MAX_ALLOWED_OCTAVES
         base_freq = speech.IDT_BASE_FREQUENCY
@@ -494,6 +499,8 @@ def getBeepTone(textInfo):
         return tone
     elif mode in [1,2]:
         size = getFontSize(textInfo, getFormatting(textInfo))
+        if size == 0:
+            return 0
         # Larger fonts should map onto lower tones, so computing inverse here
         tone = 3000/size
         return tone
@@ -678,6 +685,8 @@ class SelectionHistory:
 def browserNavPopup(selfself,gesture):
     self = selfself
     gui.mainFrame.prePopup()
+    menu = None
+    frame = None
     try:
         frame = wx.Frame(None, -1,"Fake popup frame", pos=(1, 1),size=(1, 1))
         menu = wx.Menu()
@@ -692,6 +701,16 @@ def browserNavPopup(selfself,gesture):
         wx.CallAfter(lambda: frame.PopupMenu(menu))
     finally:
         gui.mainFrame.postPopup()
+        if menu is not None:
+            try:
+                menu.Destroy()
+            except Exception:
+                pass
+        if frame is not None:
+            try:
+                frame.Destroy()
+            except Exception:
+                pass
 
 def getFocusedURL():
     focus = api.getFocusObject()
@@ -1258,7 +1277,11 @@ class BrowserNavMixin:
                 ):
                     return field.field.get('uniqueID', 0)
             return None
-        focus = api.getFocusObject().treeInterceptor
+        focusObj = api.getFocusObject()
+        if focusObj is None or focusObj.treeInterceptor is None:
+            endOfDocument(errorMessage)
+            return
+        focus = focusObj.treeInterceptor
         textInfo = focus.makeTextInfo(textInfos.POSITION_CARET)
         textInfo.expand(textInfos.UNIT_PARAGRAPH)
         originalId = getUniqueId(textInfo)
@@ -1283,11 +1306,14 @@ class BrowserNavMixin:
     def script_editJupyter(self, gesture, selfself):
         # global jupyterUpdateInProgress
         if jupyterUpdateInProgress:
-            ui.message_("Jupyter cell update in progress!")
+            ui.message(_("Jupyter cell update in progress!"))
             self.beeper.fancyBeep("AF#", length=100, left=20, right=20)
             return
         fg=winUser.getForegroundWindow()
         focus = api.getFocusObject()
+        if focus is None or focus.appModule is None:
+            ui.message(_("No focused application."))
+            return
         appName = focus.appModule.appName
         if appName == 'nvda':
             ui.message(_("Cannot edit in this window."))
@@ -1671,6 +1697,7 @@ class BrowserNavMixin:
         d = EditTextDialog(gui.mainFrame, text, cursorLine, cursorColumn, onTextComplete)
         result = d.Show()
         gui.mainFrame.postPopup()
+        # d is non-modal; it will be destroyed when the user closes it
 
     def script_toggleOption(self, gesture, selfself, option, messages):
         setConfig(option, not getConfig(option))

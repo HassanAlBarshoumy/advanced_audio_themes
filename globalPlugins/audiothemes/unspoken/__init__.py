@@ -247,7 +247,10 @@ class UnspokenPlayer:
 			except Exception:
 				pass
 
-		self.create_wave_player()
+		try:
+			self.create_wave_player()
+		except Exception:
+			pass
 		self._last_played_object = None
 		self._last_played_time = 0
 		self._last_played_lock = threading.Lock()
@@ -729,7 +732,10 @@ class UnspokenPlayer:
 				self._play_cache[cache_key] = final_audio
 
 		# Play the final audio
-		self.wave_player.stop()
+		try:
+			self.wave_player.stop()
+		except Exception:
+			pass
 		self._play_audio_data(final_audio)
 
 
@@ -893,10 +899,16 @@ class UnspokenPlayer:
 			with self._typing_player_lock:
 				player = self.typing_players[self._typing_player_index]
 				self._typing_player_index = (self._typing_player_index + 1) % len(self.typing_players)
-			player.stop()
+			try:
+				player.stop()
+			except Exception:
+				pass
 			self._play_typing_audio(player, final_audio)
 		else:
-			self.wave_player.stop()
+			try:
+				self.wave_player.stop()
+			except Exception:
+				pass
 			self._play_audio_data(final_audio)
 
 	def _play_typing_audio(self, player, audio_bytes):

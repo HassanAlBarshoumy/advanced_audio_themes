@@ -128,7 +128,10 @@ class Beeper:
         result = []
         for m in self.NOTE_RE.finditer(chord):
             s = m.group()
-            i =self.NOTES.index(s)
+            try:
+                i =self.NOTES.index(s)
+            except ValueError:
+                continue
             while i < prev:
                 i += 12
             result.append(int(self.BASE_FREQ * (2 ** (i / 12.0))))

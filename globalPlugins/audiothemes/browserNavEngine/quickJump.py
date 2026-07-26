@@ -1082,55 +1082,59 @@ def playBiw(bookmark=None, earcon=None, volume=None):
     thread.start()
 
 def playBiwInThread(bookmark=None, earcon=None, volume=None):
-    from ..utils import is_sound_suppressed
-    if is_sound_suppressed("browsernav"):
-        return
-    if volume is None:
-        volume = bookmark.wavFileVolume if bookmark is not None else 100
-    volume = 1.0 * volume
-    absPath = os.path.join(
-        utils.getSoundsPath(),
-        earcon or bookmark.builtInWavFile,
-    )
-    with wave.open(absPath,"r") as f:
-        if f.getsampwidth() != 2:
-            bits = f.getsampwidth() * 8
-            raise RuntimeError(f"We only support 16-bit encoded wav files. '{absPath}' is encoded with {bits} bits per sample.")
-        buf =  f.readframes(f.getnframes())
-        bufSize = len(buf)
-        n = bufSize//2
-        unpacked = struct.unpack(f"<{n}h", buf)
-        unpacked = list(unpacked)
-        for i in range(n):
-            unpacked[i] = int(unpacked[i] * volume/100)
-        packed = struct.pack(f"<{n}h", *unpacked)
-        buf = ensure_mono(packed, f.getnchannels(), f.getframerate())
-        # Apply audio ducking
-        try:
-            from .. import frenzy
-            df = frenzy.get_ducking_factor("browsernav")
-            if df < 1.0:
-                buf = frenzy.apply_ducking_to_pcm(buf, df, 2)
-        except Exception:
-            pass
-        outputDevice=_qj_get_output_device()
-        fileWavePlayer = nvwave.WavePlayer(
-            channels=f.getnchannels(),
-            samplesPerSec=f.getframerate(),
-            bitsPerSample=f.getsampwidth()*8,
-            outputDevice=outputDevice,
-            wantDucking=False,
-            purpose=nvwave.AudioPurpose.SOUNDS,
+    try:
+        from ..utils import is_sound_suppressed
+        if is_sound_suppressed("browsernav"):
+            return
+        if volume is None:
+            volume = bookmark.wavFileVolume if bookmark is not None else 100
+        volume = 1.0 * volume
+        absPath = os.path.join(
+            utils.getSoundsPath(),
+            earcon or bookmark.builtInWavFile,
         )
-        try:
-            fileWavePlayer.stop()
-            fileWavePlayer.feed(buf)
-            fileWavePlayer.idle()
-        except Exception:
+        with wave.open(absPath,"r") as f:
+            if f.getsampwidth() != 2:
+                bits = f.getsampwidth() * 8
+                log.warning(f"BrowserNav: unsupported WAV format {bits}-bit: '{absPath}'")
+                return
+            buf =  f.readframes(f.getnframes())
+            bufSize = len(buf)
+            n = bufSize//2
+            unpacked = struct.unpack(f"<{n}h", buf)
+            unpacked = list(unpacked)
+            for i in range(n):
+                unpacked[i] = int(unpacked[i] * volume/100)
+            packed = struct.pack(f"<{n}h", *unpacked)
+            buf = ensure_mono(packed, f.getnchannels(), f.getframerate())
+            # Apply audio ducking
             try:
-                fileWavePlayer.stop()
+                from .. import frenzy
+                df = frenzy.get_ducking_factor("browsernav")
+                if df < 1.0:
+                    buf = frenzy.apply_ducking_to_pcm(buf, df, 2)
             except Exception:
                 pass
+            outputDevice=_qj_get_output_device()
+            fileWavePlayer = nvwave.WavePlayer(
+                channels=f.getnchannels(),
+                samplesPerSec=f.getframerate(),
+                bitsPerSample=f.getsampwidth()*8,
+                outputDevice=outputDevice,
+                wantDucking=False,
+                purpose=nvwave.AudioPurpose.SOUNDS,
+            )
+            try:
+                fileWavePlayer.stop()
+                fileWavePlayer.feed(buf)
+                fileWavePlayer.idle()
+            except Exception:
+                try:
+                    fileWavePlayer.stop()
+                except Exception:
+                    pass
+    except Exception:
+        pass
 
 def getTextFast(info):
     fields = info.getTextWithFields()
@@ -1204,8 +1208,9 @@ class AdjustedTextInfo:
     def getTextWithFields(self, formatConfig=None):
         ff = self.textInfo.getTextWithFields(formatConfig)
         for field in ff:
-            if isinstance(field, textInfos.FieldCommand) and field.command in ("controlStart"):
-                if self.suppressAriaLabel and field.field['role'] in (
+            if isinstance(field, textInfos.FieldCommand) and field.command == "controlStart":
+                _role = field.field.get('role') if field.field else None
+                if self.suppressAriaLabel and _role in (
                     controlTypes.Role.GROUPING,
                     controlTypes.Role.PROPERTYPAGE,
                     controlTypes.Role.LANDMARK,
@@ -1213,13 +1218,13 @@ class AdjustedTextInfo:
                 ):
                     field.field['name'] = ""
                 
-                if self.suppressAriaLabelEditable and field.field['role'] in (
+                if self.suppressAriaLabelEditable and _role in (
                     controlTypes.Role.EDITABLETEXT,
                     controlTypes.Role.COMBOBOX,
                 ):
                     field.field['name'] = ""
                 
-                if self.suppressTreeLevel and 'level' in field.field and field.field['role'] in [
+                if self.suppressTreeLevel and 'level' in field.field and _role in [
                     controlTypes.Role.TREEVIEWITEM
                 ]:
                     del field.field['level']
@@ -2068,6 +2073,13 @@ def getIndentFunc(textInfo, documentHolder, future):
     except Exception as e:
         future.setException(e)
 
+def _safe_get(future, timeout):
+    try:
+        return future.get(timeout=timeout)
+    except Exception:
+        log.warning("BrowserNav: thread pool task failed", exc_info=True)
+        return None
+
 def scanLevelsSync(self, config, bookmarks):
     futures = []
     direction = 1
@@ -2100,10 +2112,12 @@ def scanLevelsSync(self, config, bookmarks):
             result = moveParagraph(textInfo, direction)
             if result == 0:
                 # collect all the futures and return
-                result = HierarchicalLevelsInfo(sorted(list({
-                    inner.get(timeout=60)
-                    for inner in futures
-                })))
+                result = HierarchicalLevelsInfo(sorted(list([
+                    r for r in [
+                        _safe_get(inner, 60)
+                        for inner in futures
+                    ] if r is not None
+                ])))
                 return result
     except Exception as e:
         raise e
@@ -2301,18 +2315,21 @@ def editOrCreateSite(self, site=None, url=None, domain=None):
         index = None
         knownSites = config.sites
     entryDialog=EditSiteDialog(None, knownSites=knownSites, site=site, url=url, domain=domain, config=config)
-    if entryDialog.ShowModal()==wx.ID_OK:
-        sites = list(config.sites)
-        mylog(f"len(sites) = {len(sites)} index={index}")
-        if index is not None:
-            sites[index] = entryDialog.site
-        else:
-            sites.append(entryDialog.site)
-        mylog(f"Afterwards len(sites) = {len(sites)} new name = {entryDialog.site.getDisplayName()}")
-        config = config.updateSites(sites)
-        globalConfig = config
-        saveConfig()
-        mylog(f"Config saved!")
+    try:
+        if entryDialog.ShowModal()==wx.ID_OK:
+            sites = list(config.sites)
+            mylog(f"len(sites) = {len(sites)} index={index}")
+            if index is not None:
+                sites[index] = entryDialog.site
+            else:
+                sites.append(entryDialog.site)
+            mylog(f"Afterwards len(sites) = {len(sites)} new name = {entryDialog.site.getDisplayName()}")
+            config = config.updateSites(sites)
+            globalConfig = config
+            saveConfig()
+            mylog(f"Config saved!")
+    finally:
+        entryDialog.Destroy()
 def makeWebsiteSubmenu(self, frame):
     url = getUrl(self)
     sites = findSites(url, globalConfig)
@@ -2364,36 +2381,39 @@ def editOrCreateBookmark(self, site, bookmark=None, paragraphInfo=None, text=Non
         allowSiteSelection=(bookmark is not None),
         text=text,
     )
-    if entryDialog.ShowModal()==wx.ID_OK:
-        if site != entryDialog.newSite:
-            # moving to newSite!
-            # Step 1: updating destination site by adding bookmark there
-            newSite = entryDialog.newSite
-            bookmarks = list(newSite.bookmarks)
-            bookmarks.append(entryDialog.bookmark)
-            newSite2 = newSite.updateBookmarks(bookmarks)
-            sites = list(config.sites)
-            index = sites.index(newSite)
-            sites[index] = newSite2
-            # Step 2: Removing bookmark from old site:
-            bookmarks = list(sites[siteIndex].bookmarks)
-            del bookmarks[bookmarkIndex]
-            sites[siteIndex] = sites[siteIndex].updateBookmarks(bookmarks)
-
-            config = config.updateSites(sites)
-        else:
-            # Adding or updating bookmark
-            sites = list(config.sites)
-            bookmarks = list(sites[siteIndex].bookmarks)
-            if bookmarkIndex is not None:
-                bookmarks[bookmarkIndex] = entryDialog.bookmark
-            else:
+    try:
+        if entryDialog.ShowModal()==wx.ID_OK:
+            if site != entryDialog.newSite:
+                # moving to newSite!
+                # Step 1: updating destination site by adding bookmark there
+                newSite = entryDialog.newSite
+                bookmarks = list(newSite.bookmarks)
                 bookmarks.append(entryDialog.bookmark)
-            sites[siteIndex] = sites[siteIndex].updateBookmarks(bookmarks)
+                newSite2 = newSite.updateBookmarks(bookmarks)
+                sites = list(config.sites)
+                index = sites.index(newSite)
+                sites[index] = newSite2
+                # Step 2: Removing bookmark from old site:
+                bookmarks = list(sites[siteIndex].bookmarks)
+                del bookmarks[bookmarkIndex]
+                sites[siteIndex] = sites[siteIndex].updateBookmarks(bookmarks)
 
-            config = config.updateSites(sites)
-        globalConfig = config
-        saveConfig()
+                config = config.updateSites(sites)
+            else:
+                # Adding or updating bookmark
+                sites = list(config.sites)
+                bookmarks = list(sites[siteIndex].bookmarks)
+                if bookmarkIndex is not None:
+                    bookmarks[bookmarkIndex] = entryDialog.bookmark
+                else:
+                    bookmarks.append(entryDialog.bookmark)
+                sites[siteIndex] = sites[siteIndex].updateBookmarks(bookmarks)
+
+                config = config.updateSites(sites)
+            globalConfig = config
+            saveConfig()
+    finally:
+        entryDialog.Destroy()
 
 def makeBookmarkSubmenu(self, frame):
     menu = wx.Menu()
@@ -2952,45 +2972,64 @@ class EditBookmarkDialog(wx.Dialog):
 
     def getBiwCategories(self):
         soundsPath = utils.getSoundsPath()
-        return [o for o in os.listdir(soundsPath)
-            if os.path.isdir(os.path.join(soundsPath,o))
-        ]
+        try:
+            return [o for o in os.listdir(soundsPath)
+                if os.path.isdir(os.path.join(soundsPath,o))
+            ]
+        except OSError:
+            return []
 
     def getBuiltInWaveFilesInCategory(self):
         soundsPath = utils.getSoundsPath()
         category = self.getBiwCategory()
         ext = ".wav"
-        return [o for o in os.listdir(os.path.join(soundsPath, category))
-            if not os.path.isdir(os.path.join(soundsPath,o))
-                and o.lower().endswith(ext)
-        ]
+        try:
+            return [o for o in os.listdir(os.path.join(soundsPath, category))
+                if not os.path.isdir(os.path.join(soundsPath,o))
+                    and o.lower().endswith(ext)
+            ]
+        except OSError:
+            return []
 
     def getBuiltInWaveFiles(self):
         soundsPath = utils.getSoundsPath()
         result = []
-        for dirName, subdirList, fileList in os.walk(soundsPath, topdown=True):
-            relDirName = dirName[len(soundsPath):]
-            if len(relDirName) > 0 and relDirName[0] == "\\":
-                relDirName = relDirName[1:]
-            for fileName in fileList:
-                if fileName.lower().endswith((".wav", ".mp3")):
-                    result.append(os.path.join(relDirName, fileName))
+        try:
+            for dirName, subdirList, fileList in os.walk(soundsPath, topdown=True):
+                relDirName = dirName[len(soundsPath):]
+                if len(relDirName) > 0 and relDirName[0] == "\\":
+                    relDirName = relDirName[1:]
+                for fileName in fileList:
+                    if fileName.lower().endswith((".wav", ".mp3")):
+                        result.append(os.path.join(relDirName, fileName))
+        except OSError:
+            pass
         return result
 
     def getBiw(self):
+        files = self.getBuiltInWaveFilesInCategory()
+        sel = self.biwList.control.GetSelection()
+        if sel < 0 or sel >= len(files):
+            return None
         return os.path.join(
             self.getBiwCategory(),
-            self.getBuiltInWaveFilesInCategory()[self.biwList.control.GetSelection()]
+            files[sel]
         )
 
     def setBiw(self, biw):
         if biw is None:
             return
         category, biwFile = os.path.split(biw)
-        categoryIndex = self.getBiwCategories().index(category)
+        try:
+            categoryIndex = self.getBiwCategories().index(category)
+        except ValueError:
+            return
         self.biwCategory.control.SetSelection(categoryIndex)
         self.onBiwCategory(None)
-        biwIndex = self.getBuiltInWaveFilesInCategory().index(biwFile)
+        try:
+            biwIndex = self.getBuiltInWaveFilesInCategory().index(biwFile)
+        except ValueError:
+            return
         self.biwList.control.SetSelection(biwIndex)
 
     def onBiw(self, evt):
@@ -3001,7 +3040,11 @@ class EditBookmarkDialog(wx.Dialog):
         playBiw(None, biw, self.volumeSlider.GetValue())
 
     def getBiwCategory(self):
-        return   self.getBiwCategories()[self.biwCategory.control.GetSelection()]
+        cats = self.getBiwCategories()
+        sel = self.biwCategory.control.GetSelection()
+        if sel < 0 or sel >= len(cats):
+            return ""
+        return cats[sel]
 
     def onBiwCategory(self, evt):
         soundsPath = utils.getSoundsPath()
@@ -3101,7 +3144,7 @@ class BookmarksListDialog(
             # We don't get a new focus event with the new index.
             self.rulesList.sendListItemFocusedEvent(index)
             self.rulesList.SetFocus()
-            entryDialog.Destroy()
+        entryDialog.Destroy()
 
     def OnEditClick(self,evt):
         if self.rulesList.GetSelectedItemCount()!=1:
@@ -3637,7 +3680,10 @@ def importImpl(self, sites, site):
             site.version,
         )
         dialog = OverwriteSiteDialog(parent=self, title=title, message=message)
-        result = dialog.ShowModal()
+        try:
+            result = dialog.ShowModal()
+        finally:
+            dialog.Destroy()
         if result == wx.ID_YES:
             # overwrite the whole site
             sites = sites[:]
@@ -3676,18 +3722,21 @@ def importImpl(self, sites, site):
                     "Enter New Name",
                     name,
                 )
-                if dialog.ShowModal() == wx.ID_OK:
-                    newName = dialog.GetValue()
-                    if newName in existingNames:
-                        errorMsg = _("There is already a website with this name. Please enter a different name.")
-                        gui.messageBox(errorMsg, _("Site Entry Error"), wx.OK|wx.ICON_ERROR, self)
-                        continue
-                    d['name'] = newName
-                    newSite = QJSite(d)
-                    sites.append(newSite)
-                    return sites
-                else:
-                    return None
+                try:
+                    if dialog.ShowModal() == wx.ID_OK:
+                        newName = dialog.GetValue()
+                        if newName in existingNames:
+                            errorMsg = _("There is already a website with this name. Please enter a different name.")
+                            gui.messageBox(errorMsg, _("Site Entry Error"), wx.OK|wx.ICON_ERROR, self)
+                            continue
+                        d['name'] = newName
+                        newSite = QJSite(d)
+                        sites.append(newSite)
+                        return sites
+                    else:
+                        return None
+                finally:
+                    dialog.Destroy()
 
 
 def downloadAllWebsitesFromStore():
@@ -3843,7 +3892,7 @@ class SettingsDialog(SettingsPanel):
             # We don't get a new focus event with the new index.
             self.sitesList.sendListItemFocusedEvent(index)
             self.sitesList.SetFocus()
-            entryDialog.Destroy()
+        entryDialog.Destroy()
 
     def OnEditClick(self,evt):
         if self.sitesList.GetSelectedItemCount()!=1:
@@ -3962,14 +4011,17 @@ class SettingsDialog(SettingsPanel):
             gui.messageBox(errorMsg, _("Bookmark store communication error"), wx.OK|wx.ICON_ERROR, self)
             return
         dialog=WebsiteStoreDialog(self, self.j)
-        if dialog.ShowModal()!=wx.ID_OK:
-            return
-        site = QJSite(dialog.site)
-        sites = list(self.config.sites)
-        sites = importImpl(self, sites, site)
-        if sites is not None:
-            self.config = self.config.updateSites(sites)
-            self.sitesList.ItemCount = len(self.config.sites)
+        try:
+            if dialog.ShowModal()!=wx.ID_OK:
+                return
+            site = QJSite(dialog.site)
+            sites = list(self.config.sites)
+            sites = importImpl(self, sites, site)
+            if sites is not None:
+                self.config = self.config.updateSites(sites)
+                self.sitesList.ItemCount = len(self.config.sites)
+        finally:
+            dialog.Destroy()
 
 
     def onSave(self):

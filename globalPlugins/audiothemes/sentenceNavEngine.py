@@ -154,7 +154,7 @@ def getSNConfig(key, lang=None):
 
 
 def setSNConfig(key, value, lang):
-    fullValue = config.conf["sentencenav"][key]
+    fullValue = config.conf["sentencenav"].get(key, '{}')
     try:
         dictionary = json.loads(fullValue)
     except Exception:
@@ -594,9 +594,16 @@ class SentenceNavMixin:
         if reconstructMode == "always":
             compatibilityFunc = lambda x, y: True
         elif reconstructMode == "sameIndent":
-            compatibilityFunc = lambda ti1, ti2: (
-                ti1.NVDAObjectAtStart.location[0] == ti2.NVDAObjectAtStart.location[0]
-            ) and (self.getParagraphStyle(ti1) == self.getParagraphStyle(ti2))
+            def _sameIndent(ti1, ti2):
+                try:
+                    loc1 = ti1.NVDAObjectAtStart.location
+                    loc2 = ti2.NVDAObjectAtStart.location
+                    if loc1 is None or loc2 is None:
+                        return self.getParagraphStyle(ti1) == self.getParagraphStyle(ti2)
+                    return loc1[0] == loc2[0] and self.getParagraphStyle(ti1) == self.getParagraphStyle(ti2)
+                except Exception:
+                    return self.getParagraphStyle(ti1) == self.getParagraphStyle(ti2)
+            compatibilityFunc = _sameIndent
         elif reconstructMode == "never":
             compatibilityFunc = lambda x, y: False
         else:
@@ -753,7 +760,7 @@ class SentenceNavMixin:
             return
         try:
             caretInfo = focus.makeTextInfo(textInfos.POSITION_CARET)
-        except NotImplementedError:
+        except Exception:
             gesture.send()
             return
         caretIndex, paragraphInfo = getCaretIndexWithinParagraph(caretInfo)
@@ -883,7 +890,7 @@ class SentenceNavMixin:
             focus = focus.treeInterceptor
         try:
             textInfo = focus.makeTextInfo(textInfos.POSITION_CARET)
-        except NotImplementedError:
+        except Exception:
             gesture.send()
             return
             
