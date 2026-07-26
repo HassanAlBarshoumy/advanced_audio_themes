@@ -705,6 +705,8 @@ class AudioThemesHandler:
         self._cached_config = {}  # populated by configure()
         self._theme_cache = {}  # populated by configure()
         self._app_profiles_cache = {}  # populated by configure()
+        self._frenzy_mod = None  # populated by configure()
+        self._utils_mod_cache = None  # populated by configure()
         self._system_monitor = None
         try:
             self.ensure_themes_dir()
@@ -1018,11 +1020,11 @@ class AudioThemesHandler:
             except Exception:
                 log.debugWarning("AudioThemes: failed to initialize player during configure")
             if self.player is not None:
-                self.player.audio3d = user_config["audio3d"]
-                self.player.use_in_say_all = user_config["use_in_say_all"]
-                self.player.speak_roles = user_config["speak_roles"]
-                self.player.use_synth_volume = user_config["use_synth_volume"]
-                self.player.volume = user_config["volume"]
+                self.player.audio3d = user_config.get("audio3d", False)
+                self.player.use_in_say_all = user_config.get("use_in_say_all", True)
+                self.player.speak_roles = user_config.get("speak_roles", True)
+                self.player.use_synth_volume = user_config.get("use_synth_volume", False)
+                self.player.volume = user_config.get("volume", 20)
                 try:
                     unspoken_config = config.conf["unspoken"]
                 except KeyError:
@@ -1559,7 +1561,9 @@ class AudioThemesHandler:
             info = cls.load_info_file(info_file)
             if not isinstance(info, dict):
                 info = {}
-            return AudioTheme(directory=expected, **info)
+            _known = {"name", "directory", "author", "summary"}
+            filtered = {k: v for k, v in info.items() if k in _known}
+            return AudioTheme(directory=expected, **filtered)
         name = os.path.basename(expected)
         info = {"name": name, "author": "Unknown", "summary": name}
         cls.write_info_file(info_file, info)

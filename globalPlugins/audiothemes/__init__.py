@@ -1476,12 +1476,15 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         if focus is None:
             ui.message(_("No heading level information"))
             return
-        if focus.treeInterceptor is not None:
-            if not focus.treeInterceptor.passThrough:
-                focus = focus.treeInterceptor
+        try:
+            if focus.treeInterceptor is not None:
+                if not focus.treeInterceptor.passThrough:
+                    focus = focus.treeInterceptor
+        except Exception:
+            pass
         try:
             info = focus.makeTextInfo(textInfos.POSITION_CARET)
-        except (NotImplementedError, RuntimeError):
+        except Exception:
             ui.message(_("No heading level information"))
             return
         info.expand(textInfos.UNIT_CHARACTER)

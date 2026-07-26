@@ -207,7 +207,7 @@ def _new_getObjectPropertiesSpeech_inner(
                     
         try:
             orig_res = original_getObjectPropertiesSpeech(obj, reason=reason, _prefixSpeechCommand=None, **patchedProps)
-        except (Exception, _ctypes_mod.COMError):
+        except Exception:
             orig_res = []
         
         cleaned_orig_res = []
@@ -915,7 +915,10 @@ def _new_getTextInfoSpeech_inner(
             skipSet.add(end)
 
             if headingLevelRule is not None:
-                preCommand, postCommand = headingLevelRule.getNumericSpeechCommand(level)
+                try:
+                    preCommand, postCommand = headingLevelRule.getNumericSpeechCommand(level)
+                except Exception:
+                    continue
                 if isinstance(preCommand, speech.commands.BaseProsodyCommand):
                     pass
                 elif isinstance(preCommand, (str, PpSynchronousCommand)):
