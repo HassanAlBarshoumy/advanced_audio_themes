@@ -7,7 +7,7 @@ Complete a performance, disk I/O, thread‑safety, and memory audit of all files
 - "لا تكسر اي وظيفة" — do not break any existing functionality.
 
 ## Status
-All known issues fixed (rounds 1–30). No known remaining issues.
+All known issues fixed (rounds 1–31). No known remaining issues.
 
 ## Fix History
 
@@ -281,3 +281,13 @@ Full audit of disk I/O, memory, and CPU across all files.
 - **handler `get_earcon_angles` pre-computed** — Was calling `api.getFocusObject().location` (COM) from worker threads. Now `_snapshot_obj()` computes angles on main thread and stores in `_latest_earcon_angles` module-level tuple. `get_earcon_angles()` reads the cache first (zero-COM), falling back to COM only on cache miss.
 - **Disk I/O audit result:** ZERO hot-path issues remaining. Every config read, filesystem call, and JSON parse on speech/focus/keypress paths is served from in-memory caches.
 - **Memory audit result:** All caches properly bounded (LRU/WeakKeyDictionary/maxsize). Only the `raw_data` leak was actionable.
+
+### Round 31 (uncommitted): shutdown/cleanup + robustness audit — 7 fixes
+Deep audit of shutdown path, resource lifecycle, and remaining edge cases.
+- **handler.py `close()` `player.stop()` → `player.terminate()`** — CRITICAL: `UnspokenPlayer` has no `stop()` method; the correct method is `terminate()`. The `AttributeError` was silently caught, but **nothing was actually cleaned up**: audio worker thread never stopped, WavePlayers never closed (audio device handles leaked), SteamAudio native resources never freed, synthChanged listener never unregistered.
+- **handler.py `close()` set `player = None`** — After terminate, player still referenced. Downstream code checking `if self.player is not None` would try to use the dead player.
+- **`__init__.py` `terminate()` unguarded `orig_caretMovementScriptHelper`** — If `__init__` crashed before setting this attribute, the bare `if self.orig_caretMovementScriptHelper:` at line 676 raised `AttributeError`, which was NOT in a `suppress()` block. This killed all subsequent cleanup: timer never stopped, handler never closed, thread pool never shut down, BrowserNav never terminated.
+- **`__init__.py` `terminate()` `_instance_handler` never cleared** — Class variable still pointed to closed handler after terminate. Late-firing `_snapshot_obj` calls used stale handler.
+- **handler.py `close()` caches not cleared** — `_app_profiles_cache` and `_cached_config` retained stale data. Late-firing event handlers or speech hooks could read stale config.
+- **phoneticPunctuation.py `reloadRules` double-register guard** — `config.post_configProfileSwitch.register(reloadRules)` had no idempotency check. If `injectMonkeyPatches()` was called twice without `restoreMonkeyPatches()`, reloadRules fired twice per config change.
+- **studio `SetSelection(0)` on empty Choice** — `self.themeChoice.SetSelection(0)` without checking `GetCount() > 0` raised wx assertion when no themes installed.
