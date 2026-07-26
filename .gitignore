@@ -3,3 +3,4 @@
 *.nvda-addon
 __pycache__/
 AGENTS.md
+globalPlugins/shutdown_crash.log
