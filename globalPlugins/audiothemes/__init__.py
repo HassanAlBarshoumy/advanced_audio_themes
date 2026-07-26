@@ -321,7 +321,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # QuickJump system, and URL tracking.
         # Deferred to avoid blocking startup with heavy imports.
         try:
-            import wx
             wx.CallLater(1000, self.initBrowserNav)
         except Exception:
             try:
