@@ -7,7 +7,7 @@ Complete a performance, disk I/O, thread‑safety, and memory audit of all files
 - "لا تكسر اي وظيفة" — do not break any existing functionality.
 
 ## Status
-All known issues fixed (rounds 1–35). No known remaining issues.
+All known issues fixed (rounds 1–36). No known remaining issues.
 
 ## Fix History
 
@@ -332,3 +332,19 @@ Deep audit of shutdown path, resource lifecycle, and remaining edge cases.
 - **browserNavEngine `playBiwInThread`** — Unguarded `wave.open` (`FileNotFoundError`); `raise RuntimeError` on unsupported WAV. Wrapped entire body in try/except; RuntimeError → log.warning.
 - **browserNavEngine `getChordFrequencies`** — `NOTES.index()` raises `ValueError` for notes not in list. Wrapped in try/except.
 - **quickJump.py broken indentation** — Pre-existing `try:` without proper indentation of `if` block inside it caused syntax error cascading to `match` keyword parser. Fixed indentation.
+
+### Round 36 (committed): deep audit — correctness + robustness fixes
+- **emoji_handler.py `int()` unguarded** — `int(config["emoji_delay_before"])` / `int(config["emoji_delay_after"])` crashed with `ValueError`/`TypeError` on non-numeric config. Wrapped in try/except with fallback to 0.
+- **emoji_handler.py volume-0 falsy with `or`** — `per_cat.get(...)` returns `0` for volume=0 but `0 or get_emoji_volume()` treats `0` as falsy, falling through to default volume. Changed to `val if val is not None else default`.
+- **phoneticPunctuation.py `re.compile` crash** — `re.compile(pattern)` with user-supplied invalid regex crashed entire rules file parse. Each `re.compile` wrapped in try/except with fallback to `re.compile(".*")`.
+- **phoneticPunctuation.py `reloadRules` file I/O** — `open(rulesFileName)` without try/except. Missing file crashes all rule loading. Wrapped with early return.
+- **frenzy.py `del result[-1]` / `del stack[-1]`** — Two `findControlEnd`-style functions with unguarded `del list[-1]`. Empty list raises `IndexError`. Added emptiness guards.
+- **frenzy.py `info.text` COM access** — `preventSpellingCharacters` accessed `info.text` (COM property) without try/except. Stale/invalid TextInfo crashes `new_getTextInfoSpeech`. Wrapped in try/except.
+- **themes_store.py `DownloadAndPreview` async audio killed by `finally`** — `finally` block deleted `tmp_path` immediately, but `async playWaveFile` may still be reading it. Now `tmp_path` is set to `None` after handing ownership to the Timer, so `finally` only deletes on error paths.
+- **themes_store.py `wx.CallAfter` on destroyed dialog** — Background threads call `wx.CallAfter(self.statusLabel.SetLabel, ...)` after dialog is destroyed. Added `_closed` flag; `FetchStoreData`/`DownloadAndPreview` check flag before `CallAfter`.
+- **themes_store.py `OnClose` missing** — Dialog had no `Close` handler. Added `OnClose` that calls `self.Destroy()`.
+- **themes_blender.py `FileDialog` leaked on cancel** — `_show_audio_file_dialog` never called `Destroy()` on cancel path. Wrapped in try/finally with `Destroy()`.
+- **themes_blender.py `self.player` fallback creates unneeded `UnspokenPlayer`** — Fallback created a whole new `UnspokenPlayer` (SteamAudio DLL + WavePlayers) just for volume preview. Changed to `self.player = None`; preview functions guard with `if self.player is None: return`.
+- **`__init__.py script_cycleAudioThemes` broken `themes` attr** — Referenced `self.handler.themes` which doesn't exist. Handler uses `get_installed_themes()` which returns list of AudioTheme objects. Fixed to call `get_installed_themes()` and extract `.name` from each.
+- **`__init__.py` 7 toggle scripts missing `configure()` call** — `script_toggleAudioThemes` (double-tap), `script_toggleAudioDucking`, `script_toggleEmojiSounds`, `script_toggleAppProfiles`, `script_toggleClipboard`, `script_toggleSystemStatus` all wrote to `config.conf` without calling `configure()`, leaving `_cached_config` stale. Added `self.handler.configure()` to each.
+- **`handler.py get_theme_from_folder` missing required fields** — If `info.json` had no `name` key (corrupted or missing field), `AudioTheme(**filtered)` crashed with `TypeError`. Added defaults for required fields (`name`, `author`, `summary`).

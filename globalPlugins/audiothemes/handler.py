@@ -1563,6 +1563,12 @@ class AudioThemesHandler:
                 info = {}
             _known = {"name", "directory", "author", "summary"}
             filtered = {k: v for k, v in info.items() if k in _known}
+            if "name" not in filtered:
+                filtered["name"] = os.path.basename(expected)
+            if "author" not in filtered:
+                filtered["author"] = "Unknown"
+            if "summary" not in filtered:
+                filtered["summary"] = filtered["name"]
             return AudioTheme(directory=expected, **filtered)
         name = os.path.basename(expected)
         info = {"name": name, "author": "Unknown", "summary": name}

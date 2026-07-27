@@ -46,11 +46,13 @@ def _show_audio_file_dialog(parent):
         wildcard="|".join(wildcards),
         style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
     )
-    if openFileDlg.ShowModal() == wx.ID_OK:
-        filename = openFileDlg.GetPath().strip()
+    try:
+        if openFileDlg.ShowModal() == wx.ID_OK:
+            filename = openFileDlg.GetPath().strip()
+            if filename.strip():
+                return filename
+    finally:
         openFileDlg.Destroy()
-        if filename.strip():
-            return filename
 
 
 @dataclass(order=True, eq=True)
@@ -183,7 +185,12 @@ class ThemeBlenderDialog(BaseDialog):
             from .. import __init__ as main_init
             self.player = main_init.GlobalPlugin._instance_handler.player
         except Exception:
-            self.player = UnspokenPlayer()
+            self.player = None
+        if self.player is None:
+            try:
+                self.player = UnspokenPlayer()
+            except Exception:
+                pass
         super().__init__(title)
 
     def addControls(self, sizer, parent):
@@ -410,7 +417,7 @@ class ThemeBlenderDialog(BaseDialog):
 
     def onEntriesListSelectionChanged(self, event):
         selected_sound = self.selected_sound
-        if selected_sound is not None:
+        if selected_sound is not None and self.player is not None:
             self.player.play_file(selected_sound.src)
         self.editButton.Enable(selected_sound is not None)
         self.removeButton.Enable(selected_sound is not None)
@@ -478,7 +485,7 @@ class AudioSelectorDialog(BaseDialog):
             self.set_audio_file(filepath)
 
     def onPreviewClicked(self, event):
-        if self.selected_audio is not None:
+        if self.selected_audio is not None and self.Parent.player is not None:
             self.Parent.player.play_file(self.selected_audio)
 
     def should_return_id_ok(self):

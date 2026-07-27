@@ -134,10 +134,22 @@ class AudioRule:
         self.voiceChangeSynthId = voiceChangeSynthId
         self.voiceChangeVoiceId = voiceChangeVoiceId
 
-        self.regexp = re.compile(self.pattern, 0 if self.caseSensitive else re.IGNORECASE)
-        self._applicationFilterRegex = re.compile(applicationFilterRegex)
-        self._windowTitleRegex = re.compile(windowTitleRegex)
-        self._urlRegex = re.compile(urlRegex)
+        try:
+            self.regexp = re.compile(self.pattern, 0 if self.caseSensitive else re.IGNORECASE)
+        except re.error:
+            self.regexp = re.compile(".*", re.IGNORECASE)
+        try:
+            self._applicationFilterRegex = re.compile(applicationFilterRegex)
+        except re.error:
+            self._applicationFilterRegex = re.compile(".*")
+        try:
+            self._windowTitleRegex = re.compile(windowTitleRegex)
+        except re.error:
+            self._windowTitleRegex = re.compile(".*")
+        try:
+            self._urlRegex = re.compile(urlRegex)
+        except re.error:
+            self._urlRegex = re.compile(".*")
         self.speechCommand, self.postSpeechCommand = self.getSpeechCommand()
 
     def getDisplayName(self):
@@ -356,8 +368,11 @@ def reloadRules():
         else:
             shutil.copy(defaultRulesFileName, rulesFileName)
         
-    with open(rulesFileName, "r", encoding="utf-8") as f:
-        rulesConfig = f.read()
+    try:
+        with open(rulesFileName, "r", encoding="utf-8") as f:
+            rulesConfig = f.read()
+    except (OSError, IOError):
+        return
     newRulesByFrenzy = {
         frenzy: []
         for frenzy in FrenzyType

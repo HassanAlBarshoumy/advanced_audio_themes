@@ -631,7 +631,8 @@ class FakeTextInfo:
                     if field.command == "controlStart":
                         result.append(field)
                     elif field.command == "controlEnd":
-                        del result[-1]
+                        if result:
+                            del result[-1]
             else:
                 # If we are just closing the previous controlStart without any content - drop that controlStart instead
                 if (
@@ -713,7 +714,8 @@ def findControlEnd(fields, start):
             if field.command == "controlStart":
                 stack.append(field)
             elif field.command == "controlEnd":
-                del stack[-1]
+                if stack:
+                    del stack[-1]
         if len(stack) == 0:
             return i
         i += 1
@@ -853,10 +855,13 @@ def _new_getTextInfoSpeech_inner(
         formatConfig["reportLinks"] = True
         
     firstHeadingLevelCommand = None
-    preventSpellingCharacters = (
-        unit not in  [textInfos.UNIT_CHARACTER, textInfos.UNIT_WORD]
-        or len(info.text) != 1
-    )
+    try:
+        preventSpellingCharacters = (
+            unit not in  [textInfos.UNIT_CHARACTER, textInfos.UNIT_WORD]
+            or len(info.text) != 1
+        )
+    except Exception:
+        preventSpellingCharacters = False
     
     fakeTextInfo  = FakeTextInfo(info, formatConfig, preventSpellingCharacters=preventSpellingCharacters, addFakeEmptyText=False)
     fields = fakeTextInfo.fields

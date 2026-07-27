@@ -20,6 +20,7 @@ STORE_URL = "https://raw.githubusercontent.com/HassanAlBarshoumy/AudioThemesStor
 class ThemesStoreDialog(wx.Dialog):
     def __init__(self, parent):
         super().__init__(parent, title=_("Themes Store"), size=(500, 450))
+        self._closed = False
         self.themes_data = []
         self.filtered_themes = []
         
@@ -95,9 +96,11 @@ class ThemesStoreDialog(wx.Dialog):
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             with urllib.request.urlopen(req, timeout=10) as response:
                 data = json.loads(response.read().decode('utf-8'))
-                wx.CallAfter(self.PopulateList, data)
+                if not self._closed:
+                    wx.CallAfter(self.PopulateList, data)
         except Exception as e:
-            wx.CallAfter(self.statusLabel.SetLabel, _("Failed to connect to store. Check your internet connection."))
+            if not self._closed:
+                wx.CallAfter(self.statusLabel.SetLabel, _("Failed to connect to store. Check your internet connection."))
             
     def PopulateList(self, data):
         if isinstance(data, list):
@@ -217,6 +220,7 @@ class ThemesStoreDialog(wx.Dialog):
         threading.Thread(target=self.DownloadAndPreview, args=(url, preview_url), daemon=True).start()
 
     def DownloadAndPreview(self, url, preview_url):
+        tmp_path = None
         try:
             import nvwave
             import urllib.request
@@ -233,12 +237,13 @@ class ThemesStoreDialog(wx.Dialog):
                 try:
                     nvwave.playWaveFile(tmp_path, asynchronous=True)
                     import threading
-                    threading.Timer(5.0, lambda: os.remove(tmp_path) if os.path.exists(tmp_path) else None).start()
+                    threading.Timer(5.0, lambda p=tmp_path: os.remove(p) if os.path.exists(p) else None).start()
+                    tmp_path = None  # hand ownership to timer
                 except Exception:
-                    if os.path.exists(tmp_path):
-                        os.remove(tmp_path)
-                wx.CallAfter(self.statusLabel.SetLabel, _("Preview finished."))
-                wx.CallAfter(self.previewBtn.Enable)
+                    pass
+                if not self._closed:
+                    wx.CallAfter(self.statusLabel.SetLabel, _("Preview finished."))
+                    wx.CallAfter(self.previewBtn.Enable)
                 return
 
             import zipfile
@@ -257,10 +262,12 @@ class ThemesStoreDialog(wx.Dialog):
                     downloaded += len(chunk)
                     if total_size:
                         percent = int((downloaded / total_size) * 100)
-                        wx.CallAfter(self.progressBar.SetValue, percent)
-                        wx.CallAfter(self.statusLabel.SetLabel, _("Downloading preview... {}%").format(percent))
+                        if not self._closed:
+                            wx.CallAfter(self.progressBar.SetValue, percent)
+                            wx.CallAfter(self.statusLabel.SetLabel, _("Downloading preview... {}%").format(percent))
             
-            wx.CallAfter(self.progressBar.SetValue, 0)
+            if not self._closed:
+                wx.CallAfter(self.progressBar.SetValue, 0)
             fd, tmp_path = tempfile.mkstemp(suffix=".atp")
             with os.fdopen(fd, 'wb') as f:
                 f.write(pack_data)
@@ -286,11 +293,14 @@ class ThemesStoreDialog(wx.Dialog):
                             if os.path.exists(extracted_path):
                                 os.remove(extracted_path)
                         
-            wx.CallAfter(self.statusLabel.SetLabel, _("Preview finished."))
+            if not self._closed:
+                wx.CallAfter(self.statusLabel.SetLabel, _("Preview finished."))
         except Exception as e:
-            wx.CallAfter(self.statusLabel.SetLabel, _("Audio preview failed."))
+            if not self._closed:
+                wx.CallAfter(self.statusLabel.SetLabel, _("Audio preview failed."))
         finally:
-            wx.CallAfter(self.previewBtn.Enable)
+            if not self._closed:
+                wx.CallAfter(self.previewBtn.Enable)
             try:
                 tp = locals().get("tmp_path")
                 if tp and os.path.exists(tp):
@@ -300,4 +310,5 @@ class ThemesStoreDialog(wx.Dialog):
             except Exception:
                 pass
     def OnClose(self, event):
+        self._closed = True
         self.Destroy()

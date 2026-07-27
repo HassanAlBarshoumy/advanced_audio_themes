@@ -56,8 +56,14 @@ def refreshCachedConfig():
     ac = config.conf["audiothemes"]
     for key in _cached_emoji_config:
         _cached_emoji_config[key] = ac.get(key, _cached_emoji_config[key])
-    _cached_emoji_config["emoji_delay_before"] = int(_cached_emoji_config["emoji_delay_before"])
-    _cached_emoji_config["emoji_delay_after"] = int(_cached_emoji_config["emoji_delay_after"])
+    try:
+        _cached_emoji_config["emoji_delay_before"] = int(_cached_emoji_config["emoji_delay_before"])
+    except (ValueError, TypeError):
+        _cached_emoji_config["emoji_delay_before"] = 0
+    try:
+        _cached_emoji_config["emoji_delay_after"] = int(_cached_emoji_config["emoji_delay_after"])
+    except (ValueError, TypeError):
+        _cached_emoji_config["emoji_delay_after"] = 0
     _cached_json_configs = {}
     for key in ("emoji_prefix_text_per_category", "emoji_suffix_text_per_category",
                 "emoji_volume_per_category", "emoji_sound_position_per_category",
@@ -400,12 +406,14 @@ def get_emoji_suffix_text_for_category(cat):
 
 def get_emoji_volume_for_category(cat):
     per_cat = _get_json_config("emoji_volume_per_category")
-    return per_cat.get(CATEGORY_NAMES.get(cat)) or get_emoji_volume()
+    val = per_cat.get(CATEGORY_NAMES.get(cat))
+    return val if val is not None else get_emoji_volume()
 
 
 def get_emoji_sound_position_for_category(cat):
     per_cat = _get_json_config("emoji_sound_position_per_category")
-    return per_cat.get(CATEGORY_NAMES.get(cat)) or get_emoji_sound_position()
+    val = per_cat.get(CATEGORY_NAMES.get(cat))
+    return val if val is not None else get_emoji_sound_position()
 
 
 def get_emoji_delay_before():

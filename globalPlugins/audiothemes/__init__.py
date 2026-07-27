@@ -1183,6 +1183,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         elif isSameScript == 1:
             typing_enabled = not config.conf["audiothemes"]["typing_sounds"]
             config.conf["audiothemes"]["typing_sounds"] = typing_enabled
+            self.handler.configure()
             if typing_enabled:
                 ui.message(_("Enable typing sounds"))
             else:
@@ -1510,13 +1511,13 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
     @script(description=_("Cycles through available audio themes."), gestures=['kb:NVDA+alt+t'])
     def script_cycleAudioThemes(self, gesture):
-        themes = getattr(self.handler, "themes", {})
+        themes = self.handler.get_installed_themes()
         if not themes:
             ui.message(_("No audio themes available"))
             return
             
         current = config.conf["audiothemes"]["active_theme"]
-        theme_names = list(themes.keys())
+        theme_names = [t.name for t in themes]
         if not theme_names:
             return
             
@@ -1650,18 +1651,21 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     def script_toggleAudioDucking(self, gesture):
         enabled = not config.conf["audiothemes"]["audio_ducking_enabled"]
         config.conf["audiothemes"]["audio_ducking_enabled"] = enabled
+        self.handler.configure()
         ui.message(_("Audio ducking enabled") if enabled else _("Audio ducking disabled"))
 
     @script(description=_("Toggles emoji enhancement sounds on and off."), gestures=['kb:NVDA+alt+e'])
     def script_toggleEmojiSounds(self, gesture):
         enabled = not config.conf["audiothemes"]["emoji_enabled"]
         config.conf["audiothemes"]["emoji_enabled"] = enabled
+        self.handler.configure()
         ui.message(_("Emoji sounds enabled") if enabled else _("Emoji sounds disabled"))
 
     @script(description=_("Toggles app-specific audio profiles on and off."))
     def script_toggleAppProfiles(self, gesture):
         enabled = not config.conf["audiothemes"]["app_profiles_enabled"]
         config.conf["audiothemes"]["app_profiles_enabled"] = enabled
+        self.handler.configure()
         ui.message(_("App profiles enabled") if enabled else _("App profiles disabled"))
 
     @script(description=_("Toggles 3D spatial audio mode on and off."))
@@ -1675,12 +1679,14 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     def script_toggleClipboard(self, gesture):
         enabled = not config.conf["audiothemes"]["clipboard_enabled"]
         config.conf["audiothemes"]["clipboard_enabled"] = enabled
+        self.handler.configure()
         ui.message(_("Clipboard announcements enabled") if enabled else _("Clipboard announcements disabled"))
 
     @script(description=_("Toggles system status monitoring sounds on and off."))
     def script_toggleSystemStatus(self, gesture):
         enabled = not config.conf["audiothemes"]["sys_status_enabled"]
         config.conf["audiothemes"]["sys_status_enabled"] = enabled
+        self.handler.configure()
         ui.message(_("System status sounds enabled") if enabled else _("System status sounds disabled"))
 
     @script(description=_("Opens the Audio Themes Studio to create and edit themes."))
