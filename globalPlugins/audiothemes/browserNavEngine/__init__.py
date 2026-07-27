@@ -580,7 +580,11 @@ originalQuickNavScript = None
 originalTableScriptHelper = None
 original_set_selection = None
 def preCaretMovementScriptHelper(self, gesture,unit, direction=None,posConstant=textInfos.POSITION_SELECTION, *args, **kwargs):
-    oldSelection = self.selection
+    try:
+        oldSelection = self.selection
+    except Exception:
+        originalCaretMovementScriptHelper(self, gesture, unit, direction, posConstant, *args, **kwargs)
+        return
     if (
         (
             quickJump.isSkipClutterEnabledForThisUnit(unit)
@@ -594,13 +598,22 @@ def preCaretMovementScriptHelper(self, gesture,unit, direction=None,posConstant=
     else:
         originalCaretMovementScriptHelper(self, gesture, unit, direction, posConstant, *args, **kwargs)
     if unit not in {textInfos.UNIT_CHARACTER, textInfos.UNIT_WORD}:
-        sonifyTextInfo(self.selection)
+        try:
+            sonifyTextInfo(self.selection)
+        except Exception:
+            pass
 
 def preQuickNavScript(self,gesture, itemType, direction, errorMessage, readUnit, *args, **kwargs):
-    oldSelection = self.selection
+    try:
+        oldSelection = self.selection
+    except Exception:
+        return originalQuickNavScript(self,gesture, itemType, direction, errorMessage, readUnit, *args, **kwargs)
     result = originalQuickNavScript(self,gesture, itemType, direction, errorMessage, readUnit, *args, **kwargs)
     if itemType == 'table' and getConfig("tableNavigateToCell"):
-        info = self.selection.copy()
+        try:
+            info = self.selection.copy()
+        except Exception:
+            return result
         info.collapse()
         info.expand(textInfos.UNIT_PARAGRAPH)
         roles = extractRoles(info)
@@ -622,13 +635,22 @@ def preQuickNavScript(self,gesture, itemType, direction, errorMessage, readUnit,
                 self._set_selection(info, reason=controlTypes.OutputReason.QUICKNAV)
                 speech.speakTextInfo(info, reason=controlTypes.OutputReason.QUICKNAV)
 
-    sonifyTextInfo(self.selection, oldTextInfo=oldSelection, includeCrackle=True)
+    try:
+        sonifyTextInfo(self.selection, oldTextInfo=oldSelection, includeCrackle=True)
+    except Exception:
+        pass
     return result
 
 def preTableScriptHelper(self, *args, **kwargs):
-    oldSelection = self.selection
+    try:
+        oldSelection = self.selection
+    except Exception:
+        return originalTableScriptHelper(self, *args, **kwargs)
     result = originalTableScriptHelper(self, *args, **kwargs)
-    sonifyTextInfo(self.selection)
+    try:
+        sonifyTextInfo(self.selection)
+    except Exception:
+        pass
     return result
 
 selectionHistory = {}
