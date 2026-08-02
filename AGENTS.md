@@ -7,11 +7,19 @@ Complete a performance, disk I/O, thread‑safety, and memory audit of all files
 - "لا تكسر اي وظيفة" — do not break any existing functionality.
 
 ## Status
-All known issues fixed (rounds 1–41). No known remaining issues.
+All known issues fixed (rounds 1–42). No known remaining issues.
 
 ## Fix History
 
-### Round 41 (uncommitted): watchdog freeze fix — blocking `obj.name` COM gated behind needs_window_title
+### Round 42 (uncommitted): other-addon main-thread freeze resilience — no stale/missing sounds after stalls
+Root cause of user-visible symptoms (sounds missing/old, error-sound bursts) traced to **external addons stalling NVDA's MainThread**, not to audiothemes: `unigramPlus\appModules\unigram.py` polls the voice-recording button every `_VOICE_RECORDING_POLL_INTERVAL = .2` (line 59) via `_scheduleVoiceRecordingPoll` (1740-1745) → `_pollVoiceRecordingState` (1803-1830) → `getElements` (1097-1099: `api.getForegroundObject().lastChild.previous.children` → full UIA COM tree walk), and `visionAssistant\__init__.py:11736 chooseNVDAObjectOverlayClasses` / `:6939 _generate_object_signature` run per object. Result: repeated 0.5–1s stalls whenever focus is in unigram. The root fix belongs in those addons (settings/disable); audiothemes now self-protects.
+- **`__init__.py` new fields** — `_last_timer_tick = 0.0` and `_freeze_suppress_until = 0.0` in `__init__`.
+- **`__init__.py` `_is_freeze_suppressed()`** — helper: `time.monotonic() < _freeze_suppress_until`, wrapped in try/except → False.
+- **`__init__.py` `_onNavigationTimer()` freeze detection** — the timer is expected every ~250ms; a tick gap > 0.6s means the main thread stalled. On detection: sets `_freeze_suppress_until = now + 0.2` and returns (skips the queued stale-tick burst). Also early-returns while suppressed. Threshold 0.6s chosen: worst legit gap is one 250ms tick + processing (< 0.6s), observed freeze was 0.655s.
+- **Dispatch suppression** — while `_is_freeze_suppressed()`, `event_gainFocus` (line 873), `event_becomeNavigatorObject` (line 1009), and `_hook_caretMovementScriptHelper` (line 476) skip snapshot/dispatch. **No functionality broken**: the original handlers / `nextHandler()` always run first (never swallowed), `_orig_exc` is still re-raised in the caret hook, and `_last_focus_is_editable` is still updated so `typing_sounds_edit_only` keeps working. After the 0.2s window, dispatch resumes (stale sound burst suppressed, current position re-dispatch works).
+- Verified: `py_compile` OK for all 4 touched files; synthetic timer test — normal 250ms ticks → DISPATCH ×5; 0.65s gap → FREEZE-DETECTED; queued burst ticks → SUPPRESSED ×5; 0.25s after window → DISPATCH; 0.4s gap (heavy load, not freeze) → DISPATCH; first tick at startup → DISPATCH; 0.55s borderline gap → DISPATCH.
+
+### Round 41 (committed 28092e6): watchdog freeze fix — blocking `obj.name` COM gated behind needs_window_title
 NVDA log showed 3 watchdog freeze recoveries during startup (2.035s, 0.716s, 0.770s). The first two were NVDA-internal (UIA `isUIAWindow`/`accParent` during foreground probing). The third was ours: MainThread blocked at `__init__.py:937` in `event_becomeNavigatorObject`:
 ```
 File "__init__.py", line 937, in event_becomeNavigatorObject

@@ -315,6 +315,11 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self._last_focused_obj = None   # for gainFocus / becomeNavigator dedup
         self._last_focus_time = 0.0
         self._last_progress_times = {}  # debounce: {obj_id: timestamp} for progress bars
+        # Freeze resilience: other addons (e.g. unigramPlus's 200ms UIA poll)
+        # can stall the main thread for 0.5-1s. Track tick gaps so we can pause
+        # sound dispatch briefly after a stall instead of firing stale sounds.
+        self._last_timer_tick = 0.0
+        self._freeze_suppress_until = 0.0
         self._audio_beacon_location = None
         self._audio_beacon_desktop = None
         self._last_focus_is_editable = False
@@ -465,6 +470,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 _orig_exc = e
         try:
             if not self.handler._cached_config.get("enable_audio_themes", True) or not self.handler.active_theme:
+                if _orig_exc is not None:
+                    raise _orig_exc
+                return
+            if self._is_freeze_suppressed():
                 if _orig_exc is not None:
                     raise _orig_exc
                 return
@@ -739,8 +748,28 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         pp.restoreMonkeyPatches()
 
     # Browse-mode navigation: timer-based polling of navigator object.
+    def _is_freeze_suppressed(self):
+        """True while sound dispatch is paused after a main-thread stall."""
+        try:
+            return time.monotonic() < self._freeze_suppress_until
+        except Exception:
+            return False
+
     def _onNavigationTimer(self, event):
         """Check if the navigator object changed (e.g. arrow keys in browse mode)."""
+        # Freeze resilience: the timer is expected every ~250ms. A gap much
+        # larger than that means the main thread was stalled (e.g. by another
+        # addon's UIA polling). When the thread recovers, queued timer ticks
+        # fire in a burst; skip them so we don't play sounds for stale
+        # navigator positions, and pause dispatch briefly until things settle.
+        now = time.monotonic()
+        last_tick = getattr(self, "_last_timer_tick", 0.0)
+        self._last_timer_tick = now
+        if last_tick and (now - last_tick) > 0.6:
+            self._freeze_suppress_until = now + 0.2
+            return
+        if self._is_freeze_suppressed():
+            return
         try:
             try:
                 if not self.handler._cached_config.get("enable_audio_themes", True) or not self.handler.active_theme:
@@ -839,6 +868,9 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             log.debugWarning(f"event_gainFocus nextHandler: {e}")
         try:
             if not self.handler._cached_config.get("enable_audio_themes", True):
+                self._last_focus_is_editable = self._is_editable(obj)
+                return
+            if self._is_freeze_suppressed():
                 self._last_focus_is_editable = self._is_editable(obj)
                 return
             obj_info = self._snapshot_obj(obj, foreground_app=self.handler._current_app_name)
@@ -973,6 +1005,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             if not self.handler._cached_config.get("enable_audio_themes", True) or not self.handler.active_theme:
                 return
         except Exception:
+            return
+        if self._is_freeze_suppressed():
             return
         self._last_play_time = time.monotonic()
         try:
