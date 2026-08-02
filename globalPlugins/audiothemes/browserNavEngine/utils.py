@@ -112,7 +112,7 @@ class ThreadPool:
     def add_task(self, func, *args, **kargs):
         """ Add a task to the queue """
         try:
-            self.tasks.put((func, args, kargs), timeout=30)
+            self.tasks.put_nowait((func, args, kargs))
         except queue.Full:
             log.error("AudioThemes ThreadPool: queue full after 30s timeout, task dropped")
     def map(self, func, args_list):
@@ -128,7 +128,7 @@ _threadPool = None
 def _get_threadPool():
     global _threadPool
     if _threadPool is None:
-        _threadPool = ThreadPool(3)
+        _threadPool = ThreadPool(1)
     return _threadPool
 
 class _ThreadPoolProxy:

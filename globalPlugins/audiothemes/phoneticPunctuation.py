@@ -513,45 +513,46 @@ def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
     except Exception:
         pass
     try:
-        if isPhoneticPunctuationEnabled():
-            if symbolLevel is None:
-                symbolLevel = _cached_speech_symbolLevel
-            newSequence = speechSequence
-            language = speech.getCurrentLanguage()
-            appName, windowTitle, url = getCurrentContext()
-            with _rules_lock:
-                text_rules = rulesByFrenzy.get(FrenzyType.TEXT, []) if rulesByFrenzy else []
-            for rule in text_rules:
-                try:
-                    if len(rule.applicationFilterRegex) > 0 and not rule._applicationFilterRegex.search(appName):
-                        continue
-                    if len(rule.windowTitleRegex) > 0 and not rule._windowTitleRegex.search(windowTitle):
-                        continue
-                    if (
-                        len(rule.urlRegex) > 0 
-                        and (
-                            url is None
-                            or not rule._urlRegex.search(url)
-                        )
-                    ):
-                        continue
-                    newSequence = processRule(newSequence, rule, symbolLevel, language)
-                except Exception:
+        if not isPhoneticPunctuationEnabled():
+            return originalSpeechSpeechSpeak(speechSequence, symbolLevel=symbolLevel, *args, **kwargs)
+
+        if symbolLevel is None:
+            symbolLevel = _cached_speech_symbolLevel
+        newSequence = list(speechSequence)
+        language = speech.getCurrentLanguage()
+        appName, windowTitle, _ = getCurrentContext(fetch_url=False)
+        url_fetched = False
+        url = None
+        with _rules_lock:
+            text_rules = rulesByFrenzy.get(FrenzyType.TEXT, []) if rulesByFrenzy else []
+        for rule in text_rules:
+            try:
+                if len(rule.applicationFilterRegex) > 0 and not rule._applicationFilterRegex.search(appName):
                     continue
-            resetProsodiesSequence = []
-            if speechCancelledFlag:
-                try:
-                    resetProsodiesSequence = resetProsodies([])
-                except Exception:
-                    resetProsodiesSequence = []
-                speechCancelledFlag = False
-            newSequence = postProcessSynchronousCommands(newSequence, symbolLevel)
-            if resetProsodiesSequence:
-                resetProsodiesSequence.extend(newSequence)
-                newSequence = resetProsodiesSequence
-            mylog(str(newSequence))
-        else:
-            newSequence = speechSequence
+                if len(rule.windowTitleRegex) > 0 and not rule._windowTitleRegex.search(windowTitle):
+                    continue
+                if len(rule.urlRegex) > 0:
+                    if not url_fetched:
+                        _, _, url = getCurrentContext(fetch_url=True)
+                        url_fetched = True
+                    if url is None or not rule._urlRegex.search(url):
+                        continue
+                newSequence = processRule(newSequence, rule, symbolLevel, language)
+            except Exception:
+                continue
+        resetProsodiesSequence = []
+        if speechCancelledFlag:
+            try:
+                resetProsodiesSequence = resetProsodies([])
+            except Exception:
+                resetProsodiesSequence = []
+            speechCancelledFlag = False
+        newSequence = postProcessSynchronousCommands(newSequence, symbolLevel)
+        if resetProsodiesSequence:
+            resetProsodiesSequence.extend(newSequence)
+            newSequence = resetProsodiesSequence
+        mylog(str(newSequence))
+        
         # Emoji processing
         if is_emoji_enabled():
             newSequence = _processEmojiSequence(newSequence)
@@ -600,13 +601,11 @@ class EmojiSoundCommand(speech.commands.BaseCallbackCommand):
 _suppress_role_sound_flag = False
 _suppress_role_sound_lock = threading.Lock()
 
+_emoji_quick_regex = re.compile(r'[\uFE00-\uFE0F\U0001F000-\U0001FFFF]')
+
 def _has_emoji_codepoints(text):
-    """Fast check if text contains any emoji-range codepoints."""
-    for ch in text:
-        cp = ord(ch)
-        if 0xFE00 <= cp <= 0xFE0F or 0x1F000 <= cp <= 0x1FFFF:
-            return True
-    return False
+    """Fast check if text contains any emoji-range codepoints using regex."""
+    return bool(_emoji_quick_regex.search(text))
 
 def _processEmojiSequence(sequence):
     global _suppress_role_sound_flag

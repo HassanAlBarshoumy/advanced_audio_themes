@@ -56,27 +56,12 @@ class Beeper:
             wantDucking=False,
             purpose=nvwave.AudioPurpose.SOUNDS,
         )
-        self._beep_queue = queue.Queue(maxsize=8)
-        self._beep_worker = threading.Thread(target=self._beep_worker_loop, daemon=True)
-        self._beep_worker.start()
-
-    def _beep_worker_loop(self):
-        while True:
-            item = self._beep_queue.get()
-            if item is None:
-                self._beep_queue.task_done()
-                break
-            player, data = item
-            try:
-                player.feed(data)
-            except Exception:
-                pass
-            self._beep_queue.task_done()
 
     def _feed_player(self, player, data):
         try:
-            self._beep_queue.put_nowait((player, data))
-        except queue.Full:
+            from ..utils import threadPool
+            threadPool.add_task(player.feed, data)
+        except Exception:
             pass
 
 

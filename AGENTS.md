@@ -7,7 +7,7 @@ Complete a performance, disk I/O, thread‑safety, and memory audit of all files
 - "لا تكسر اي وظيفة" — do not break any existing functionality.
 
 ## Status
-All known issues fixed (rounds 1–36). No known remaining issues.
+All known issues fixed (rounds 1–38). No known remaining issues.
 
 ## Fix History
 
@@ -348,3 +348,10 @@ Deep audit of shutdown path, resource lifecycle, and remaining edge cases.
 - **`__init__.py script_cycleAudioThemes` broken `themes` attr** — Referenced `self.handler.themes` which doesn't exist. Handler uses `get_installed_themes()` which returns list of AudioTheme objects. Fixed to call `get_installed_themes()` and extract `.name` from each.
 - **`__init__.py` 7 toggle scripts missing `configure()` call** — `script_toggleAudioThemes` (double-tap), `script_toggleAudioDucking`, `script_toggleEmojiSounds`, `script_toggleAppProfiles`, `script_toggleClipboard`, `script_toggleSystemStatus` all wrote to `config.conf` without calling `configure()`, leaving `_cached_config` stale. Added `self.handler.configure()` to each.
 - **`handler.py get_theme_from_folder` missing required fields** — If `info.json` had no `name` key (corrupted or missing field), `AudioTheme(**filtered)` crashed with `TypeError`. Added defaults for required fields (`name`, `author`, `summary`).
+
+### Round 37: main-thread COM freeze fix — 1 fix
+- **`__init__.py event_becomeNavigatorObject` `getattr(obj, 'name', None)` COM hang** — CRITICAL: `obj.name` triggered a synchronous IAccessible COM call (`accName` → `comtypes._memberspec.__call__`) that blocked the main thread for 1–2+ seconds on stale/broken objects. This was called unconditionally on every navigator-object change (even when themes were disabled). Repeated blocks caused 6–7 watchdog freeze recoveries in 30 seconds, corrupting NVDA's speech pipeline state such that only a full system restart could recover. Replaced with `obj.windowText` which uses Win32 `GetWindowTextW` (fast, non-blocking). `windowTitleRegex` filtering in phonetic punctuation and frenzy rules continues to work correctly.
+
+### Round 38 (committed): event handler hardening — 2 fixes
+- **`__init__.py _hook_caretMovementScriptHelper` missing themes guard** — CRITICAL: Every arrow key press in browse mode called `_snapshot_obj()` (which includes `obj.name` IAccessible COM call) even when audio themes were disabled. No `enable_audio_themes` or `active_theme` check existed before the COM accesses. Added themes guard with early return. Also restructured to check navigator identity *before* `treeInterceptor` COM access (saves one COM call when navigator hasn't changed). Added 80ms debounce matching `_onNavigationTimer`.
+- **`__init__.py event_mouseMove` missing debounce** — Every mouse move to a new object called `_snapshot_obj()` immediately, with only an object-identity dedup (no time-based throttle). Rapid mouse movement across many objects could trigger dozens of COM snapshots per second. Added 80ms time-based debounce via `_last_play_time`, matching `_onNavigationTimer` and `_hook_caretMovementScriptHelper`.

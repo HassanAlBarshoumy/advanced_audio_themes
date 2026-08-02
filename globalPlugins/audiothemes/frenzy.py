@@ -508,6 +508,11 @@ def getActiveRuleContext(ruleList, appName, windowTitle, url):
     if not ruleList:
         return None
         
+    has_url_rule = any(len(rule.urlRegex) > 0 for rule in ruleList)
+    if has_url_rule and url is None:
+        import utils
+        url = utils.getCurrentURLSafe()
+        
     cache_key = (id(ruleList), appName, windowTitle, url)
     found, cached_val = _active_rule_cache.get(cache_key)
     if found:

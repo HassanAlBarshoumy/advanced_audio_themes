@@ -178,7 +178,7 @@ _threadPool = None
 def _get_threadPool():
     global _threadPool
     if _threadPool is None:
-        _threadPool = ThreadPool(4)
+        _threadPool = ThreadPool(1)
     return _threadPool
 
 class _ThreadPoolProxy:
@@ -319,13 +319,13 @@ def getCurrentURLSafe():
         _last_url_time = now
     return _last_url
 
-def getCurrentContext():
+def getCurrentContext(fetch_url=False):
     try:
         handler = _handler_ref
         appName = getattr(handler, '_current_app_name', "")
         windowTitle = getattr(handler, '_current_window_title', "")
         url = getattr(handler, '_current_url', None)
-        if url is None:
+        if fetch_url and url is None:
             url = getCurrentURLSafe()
     except Exception:
         appName, windowTitle, url = "", "", ""

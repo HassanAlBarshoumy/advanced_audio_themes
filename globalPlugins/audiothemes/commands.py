@@ -561,7 +561,9 @@ class PpChainCommand(PpSynchronousCommand):
         try:
             with _current_chain_lock:
                 currentChain = self
-            threadPool.add_task(self.threadFunc)
+            import threading
+            t = threading.Thread(target=self.threadFunc, daemon=True)
+            t.start()
         except Exception as e:
             from logHandler import log
             log.debugWarning(f"PpChainCommand.run() failed: {e}", exc_info=True)

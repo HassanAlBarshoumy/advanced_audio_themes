@@ -195,14 +195,38 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 info["parent_role"] = obj.parent.role if obj.parent else None
             except Exception:
                 info["parent_role"] = None
+            
+            # Hybrid approach: Attempt fast positionInfo first
+            pos_valid = False
             try:
-                info["previous_role"] = obj.previous.role if obj.previous else None
+                pos = obj.positionInfo
+                if pos and isinstance(pos, dict):
+                    idx = pos.get("indexInGroup")
+                    total = pos.get("similarItemsInGroup")
+                    if idx and total and idx > 0 and total > 0:
+                        info["indexInGroup"] = idx
+                        info["similarItemsInGroup"] = total
+                        pos_valid = True
             except Exception:
+                pass
+            
+            # Fallback for legacy objects that don't support positionInfo.
+            # Tree-walking is avoided on UIA or VirtualBuffer elements to prevent 40s freezes.
+            is_slow = getattr(obj, "UIAElement", None) is not None or getattr(obj, "treeInterceptor", None) is not None
+            
+            if not pos_valid and not is_slow:
+                try:
+                    info["previous_role"] = obj.previous.role if obj.previous else None
+                except Exception:
+                    info["previous_role"] = None
+                try:
+                    info["next_role"] = obj.next.role if obj.next else None
+                except Exception:
+                    info["next_role"] = None
+            else:
                 info["previous_role"] = None
-            try:
-                info["next_role"] = obj.next.role if obj.next else None
-            except Exception:
                 info["next_role"] = None
+                
             if fl_mode in ("strict", "smart"):
                 _role = info.get("role")
                 prev_role = info.get("previous_role")
@@ -1389,30 +1413,37 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         next_same_role = obj_info.get("next_same_role")
         fl_mode = fl_cfg.get("fl_detection_mode", "smart")
 
-        # Determine is_first / is_last based on detection mode
-        if fl_mode == "strict":
-            # Only same-role siblings count (ignores separators, headings, etc.)
-            is_first = prev_same_role is None
-            is_last = next_same_role is None
-        elif fl_mode == "any_sibling":
-            # Any adjacent item counts (current v9.31 behavior)
-            is_first = prev_role is None
-            is_last = next_role is None
+        # Fast path using positionInfo if available
+        idx = obj_info.get("indexInGroup")
+        total = obj_info.get("similarItemsInGroup")
+        if idx is not None and total is not None and idx > 0 and total > 0:
+            is_first = (idx == 1)
+            is_last = (idx == total)
         else:
-            # "smart" (default) – same-role check with any-sibling fallback
-            if prev_same_role is not None:
-                is_first = False
-            elif prev_role is None:
-                is_first = True
+            # Determine is_first / is_last based on detection mode (legacy fallback)
+            if fl_mode == "strict":
+                # Only same-role siblings count (ignores separators, headings, etc.)
+                is_first = prev_same_role is None
+                is_last = next_same_role is None
+            elif fl_mode == "any_sibling":
+                # Any adjacent item counts (current v9.31 behavior)
+                is_first = prev_role is None
+                is_last = next_role is None
             else:
-                # prev exists but different role, no same-role found → first
-                is_first = True
-            if next_same_role is not None:
-                is_last = False
-            elif next_role is None:
-                is_last = True
-            else:
-                is_last = True
+                # "smart" (default) – same-role check with any-sibling fallback
+                if prev_same_role is not None:
+                    is_first = False
+                elif prev_role is None:
+                    is_first = True
+                else:
+                    # prev exists but different role, no same-role found → first
+                    is_first = True
+                if next_same_role is not None:
+                    is_last = False
+                elif next_role is None:
+                    is_last = True
+                else:
+                    is_last = True
 
         # Solo items: no siblings at all (regardless of mode)
         has_any_adjacent = prev_role is not None or next_role is not None
