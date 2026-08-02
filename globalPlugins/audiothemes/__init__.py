@@ -464,6 +464,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             except Exception as e:
                 _orig_exc = e
         try:
+            if not self.handler._cached_config.get("enable_audio_themes", True) or not self.handler.active_theme:
+                if _orig_exc is not None:
+                    raise _orig_exc
+                return
             current_nav = api.getNavigatorObject()
             ti = getattr(current_nav, 'treeInterceptor', None) if current_nav else None
             if ti and not ti.passThrough:
@@ -914,12 +918,26 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         Also skip if this is the same object as the last gainFocus within 300ms
         (some browsers fire both events for the same element on Tab).
         """
-        # Cache app name on handler (needed by event_gainFocus and speech hooks)
+        # Cache app name on handler (needed by event_gainFocus and speech hooks).
+        # obj.appModule.appName is cheap (no COM). obj.name is a COM call that can
+        # block on hung apps; only fetch it when audio themes or phonetic
+        # punctuation rules could actually consume the window title.
         try:
             self.handler._current_app_name = obj.appModule.appName if obj.appModule else None
-            self.handler._current_window_title = getattr(obj, 'name', None)
         except Exception:
             self.handler._current_app_name = None
+        try:
+            need_window_title = self.handler._cached_config.get("enable_audio_themes", True)
+            try:
+                if utils.isPhoneticPunctuationEnabled():
+                    need_window_title = True
+            except Exception:
+                pass
+            if need_window_title:
+                self.handler._current_window_title = getattr(obj, 'name', None)
+            else:
+                self.handler._current_window_title = None
+        except Exception:
             self.handler._current_window_title = None
         if isFocus:
             try:
@@ -1485,6 +1503,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             msg = _("Speech order: Default (Name, Role, State)")
             
         config.conf["audiothemes"]["announceFormat"] = new_fmt
+        try:
+            self.handler.configure()
+        except Exception:
+            pass
         ui.message(msg)
 
     @script(description=_("Speak current heading level."), gestures=['kb:NVDA+h'])

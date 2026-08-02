@@ -51,6 +51,7 @@ import tones
 import types
 import ui
 from . import utils
+from ..utils import is_sound_suppressed as _at_is_sound_suppressed
 from virtualBuffers.gecko_ia2 import Gecko_ia2_TextInfo
 import virtualBuffers
 import wave
@@ -531,7 +532,7 @@ def sonifyTextInfoImpl(textInfo, lastTextInfo, includeCrackle):
         tone = min(tone, 20000)
 
         if tone != lastTone:
-            if utils.is_sound_suppressed("browsernav"):
+            if _at_is_sound_suppressed("browsernav"):
                 return
             try:
                 from .. import frenzy
@@ -1495,7 +1496,7 @@ class BrowserNavMixin:
                         elif focus.role == ROLE_EDITABLETEXT:
                             goodCounter += 1
                             if goodCounter > 10:
-                                if utils.is_sound_suppressed("browsernav"):
+                                if _at_is_sound_suppressed("browsernav"):
                                     break
                                 try:
                                     from .. import frenzy

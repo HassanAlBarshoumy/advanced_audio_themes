@@ -33,7 +33,7 @@ import wx
 from .common import *
 from .utils import *
 from .commands import *
-from .emoji_handler import is_emoji_enabled, is_emoji_sound_enabled, is_emoji_prefix_enabled, get_emoji_prefix_text, get_emoji_suffix_text, get_emoji_position, get_emoji_sound_position, get_emoji_repeat, get_emoji_volume, find_emojis, is_category_enabled, get_special_prop_for_category, get_emoji_sound_repeat, get_emoji_prefix_repeat, is_emoji_sound_category_enabled, get_emoji_prefix_text_for_category, get_emoji_suffix_text_for_category, get_emoji_volume_for_category, get_emoji_sound_position_for_category, get_emoji_delay_before, get_emoji_delay_after, is_emoji_suppress_role_sound, is_emoji_blacklisted, get_emoji_custom_description
+from .emoji_handler import is_emoji_enabled, is_emoji_sound_enabled, is_emoji_prefix_enabled, get_emoji_prefix_text, get_emoji_suffix_text, get_emoji_position, get_emoji_sound_position, get_emoji_repeat, get_emoji_volume, find_emojis, is_category_enabled, get_special_prop_for_category, get_emoji_sound_repeat, get_emoji_prefix_repeat, is_emoji_sound_category_enabled, get_emoji_prefix_text_for_category, get_emoji_suffix_text_for_category, get_emoji_volume_for_category, get_emoji_sound_position_for_category, get_emoji_delay_before, get_emoji_delay_after, is_emoji_suppress_role_sound, is_emoji_blacklisted, get_emoji_custom_description, _EMOJI_RANGES
 from .handler import SpecialProps
 from . import commands
 from . import frenzy
@@ -601,7 +601,18 @@ class EmojiSoundCommand(speech.commands.BaseCallbackCommand):
 _suppress_role_sound_flag = False
 _suppress_role_sound_lock = threading.Lock()
 
-_emoji_quick_regex = re.compile(r'[\uFE00-\uFE0F\U0001F000-\U0001FFFF]')
+# Build a quick pre-scan regex covering every emoji codepoint range handled by
+# emoji_handler (including BMP-only emoji like \u2600, \u2764), plus variation
+# selectors (FE00-FE0F) and a defensive catch-all for all supplementary-plane
+# codepoints. Compiled once at import time.
+_emoji_quick_ranges = [(0xFE00, 0xFE0F)]
+for _cat, _ranges in _EMOJI_RANGES:
+    _emoji_quick_ranges.extend(_ranges)
+_emoji_quick_ranges.append((0x1F000, 0x1FFFF))
+_emoji_quick_ranges.sort()
+_emoji_quick_regex = re.compile(
+    '[' + ''.join(r'\U%08X-\U%08X' % (lo, hi) for lo, hi in _emoji_quick_ranges) + ']'
+)
 
 def _has_emoji_codepoints(text):
     """Fast check if text contains any emoji-range codepoints using regex."""
@@ -621,6 +632,8 @@ def _processEmojiSequence(sequence):
             has_emoji = True
             break
     if not has_emoji:
+        with _suppress_role_sound_lock:
+            _suppress_role_sound_flag = False
         return sequence
     do_prefix_global = is_emoji_prefix_enabled()
     do_sound_global = is_emoji_sound_enabled()

@@ -182,6 +182,41 @@ def trim_silence_array(audio_data, threshold=0.01):
 def clamp(my_value, min_value, max_value):
 	return max(min(my_value, max_value), min_value)
 
+# All WavePlayers and Steam Audio are hardcoded to 44100 Hz. Decoders return the
+# file's native rate (e.g. 22050/48000/96000), which would otherwise play at the
+# wrong speed. Resample once to 44100 with linear interpolation.
+def resample_audio(float_samples, src_rate, dst_rate, channels):
+	if src_rate == dst_rate or not float_samples or channels < 1:
+		return float_samples
+	if src_rate <= 0 or dst_rate <= 0:
+		return float_samples
+	ratio = float(src_rate) / dst_rate
+	n_in = len(float_samples)
+	frames_in = n_in // channels
+	if frames_in < 1:
+		return float_samples
+	frames_out = max(1, int(frames_in * dst_rate / src_rate))
+	n_out = frames_out * channels
+	out = array('f', [0.0]) * n_out
+	max_base = (frames_in - 1) * channels
+	for f in range(frames_out):
+		pos = f * ratio
+		idx = int(pos)
+		frac = pos - idx
+		if idx >= frames_in - 1:
+			frac = 0.0
+			src_a = max_base
+			src_b = max_base
+		else:
+			src_a = idx * channels
+			src_b = src_a + channels
+		out_f = f * channels
+		for c in range(channels):
+			a = float_samples[src_a + c]
+			b = float_samples[src_b + c]
+			out[out_f + c] = a + (b - a) * frac
+	return out
+
 def floats_to_pcm_bytes(float_samples):
 	return array('h', (max(-32768, min(32767, int(s * 32767.0))) for s in float_samples)).tobytes()
 
@@ -422,6 +457,12 @@ class UnspokenPlayer:
 		from . import audio_filters as _audio_filters
 		float_samples = sound_data["raw_data"]
 		sample_rate = sound_data["sample_rate"]
+		channels = sound_data.get("channels", 1)
+		# Convert to the fixed 44100 Hz playback rate once (cached afterwards).
+		if sample_rate != 44100:
+			float_samples = resample_audio(float_samples, sample_rate, 44100, channels)
+			sample_rate = 44100
+			sound_data["sample_rate"] = 44100
 		if self._trim_silence:
 			float_samples = trim_silence_array(float_samples, threshold=self._trim_silence_threshold)
 		if not float_samples:

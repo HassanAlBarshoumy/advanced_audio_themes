@@ -47,15 +47,20 @@ class Beeper:
     MAX_BEEP_COUNT = 40 # Corresponds to about 500 paragraphs with the log formula
 
     def __init__(self):
-        outputDevice = _get_beeper_output_device()
-        self.player = nvwave.WavePlayer(
-            channels=2,
-            samplesPerSec=int(tones.SAMPLE_RATE),
-            bitsPerSample=16,
-            outputDevice=outputDevice,
-            wantDucking=False,
-            purpose=nvwave.AudioPurpose.SOUNDS,
-        )
+        self.player = None
+
+    def _ensure_player(self):
+        if self.player is None:
+            outputDevice = _get_beeper_output_device()
+            self.player = nvwave.WavePlayer(
+                channels=2,
+                samplesPerSec=int(tones.SAMPLE_RATE),
+                bitsPerSample=16,
+                outputDevice=outputDevice,
+                wantDucking=False,
+                purpose=nvwave.AudioPurpose.SOUNDS,
+            )
+        return self.player
 
     def _feed_player(self, player, data):
         try:
@@ -98,8 +103,9 @@ class Beeper:
                 ctypes.cast(ctypes.byref(buf, bufPtr), ctypes.POINTER(ctypes.c_char)),
                 self.getPitch(l), beepLen, volume, volume)
             bufPtr += pauseBufSize # add a short pause
-        self.player.stop()
-        self._feed_player(self.player, buf.raw)
+        player = self._ensure_player()
+        player.stop()
+        self._feed_player(player, buf.raw)
 
     def simpleCrackle(self, n, volume, initialDelay=0, category="browsernav"):
         return self.fancyCrackle([0] * n, volume, initialDelay=initialDelay, category=category)
@@ -142,7 +148,8 @@ class Beeper:
         if bufSize % intSize != 0:
             bufSize += intSize
             bufSize -= (bufSize % intSize)
-        self.player.stop()
+        player = self._ensure_player()
+        player.stop()
         bbs = []
         result = [0] * (bufSize//intSize)
         for freq in freqs:
@@ -154,7 +161,7 @@ class Beeper:
         maxInt = 1 << (8 * intSize)
         result = map(lambda x : x %maxInt, result)
         packed = struct.pack("<%dQ" % (bufSize // intSize), *result)
-        self._feed_player(self.player, packed)
+        self._feed_player(player, packed)
 
     def uniformSample(self, a, m):
         n = len(a)
@@ -166,7 +173,8 @@ class Beeper:
             result.append(a[i  // m])
         return result
     def stop(self):
-        self.player.stop()
+        if self.player is not None:
+            self.player.stop()
 
 
 beeper = Beeper()

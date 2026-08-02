@@ -690,16 +690,33 @@ defaultRulesFileName = os.path.join(
 )
 
 def loadConfig():
+    rulesConfig = None
     try:
         with open(rulesFileName, "r", encoding="utf-8") as f:
             rulesConfig = f.read()
         mylog(rulesFileName)
     except FileNotFoundError:
-        with open(defaultRulesFileName, "r", encoding="utf-8") as f:
-            rulesConfig = f.read()
-        mylog(defaultRulesFileName)
-    result = QJConfig(json.loads(rulesConfig))
-    saveConfig(result)
+        try:
+            with open(defaultRulesFileName, "r", encoding="utf-8") as f:
+                rulesConfig = f.read()
+            mylog(defaultRulesFileName)
+        except OSError:
+            log.error("AudioThemes quickJump: cannot read default rules file", exc_info=True)
+            return QJConfig({'sites': []})
+    except OSError:
+        log.error(f"AudioThemes quickJump: error reading rules file {rulesFileName}", exc_info=True)
+    if rulesConfig is None:
+        return QJConfig({'sites': []})
+    try:
+        parsed = json.loads(rulesConfig)
+        result = QJConfig(parsed)
+    except Exception as e:
+        log.error(f"AudioThemes quickJump: corrupt rules config, using defaults: {e}", exc_info=True)
+        return QJConfig({'sites': []})
+    try:
+        saveConfig(result)
+    except Exception:
+        pass
     return result
 
 

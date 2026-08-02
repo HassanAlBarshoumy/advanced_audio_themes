@@ -7,9 +7,21 @@ Complete a performance, disk I/O, thread‑safety, and memory audit of all files
 - "لا تكسر اي وظيفة" — do not break any existing functionality.
 
 ## Status
-All known issues fixed (rounds 1–39). No known remaining issues.
+All known issues fixed (rounds 1–40). No known remaining issues.
 
 ## Fix History
+
+### Round 40 (uncommitted): targeted correctness + perf fixes — 9 fixes
+- **browserNavEngine/__init__.py `utils.is_sound_suppressed` AttributeError (CRITICAL)** — Call sites at 534/1498 used `utils.is_sound_suppressed(...)` but `utils` there is `browserNavEngine/utils.py` (no such function). Added `from ..utils import is_sound_suppressed as _at_is_sound_suppressed` (line 54) and switched both call sites to `_at_is_sound_suppressed("browsernav")`.
+- **phoneticPunctuation.py emoji quick-regex missing BMP ranges** — `_emoji_quick_regex` was built only from FE00-FE0F + 1F000-1FFFF, missing BMP-only emoji (e.g. ☀\u2600, ❤\u2764). Now built programmatically from `_EMOJI_RANGES` + FE00-FE0F + 1F000-1FFFF (34 ranges, sorted). Verified PASS against test points.
+- **phoneticPunctuation.py `_suppress_role_sound_flag` sticky** — In `_processEmojiSequence` when `not has_emoji`, flag was never reset; now reset under `_suppress_role_sound_lock` (matches the disabled path).
+- **__init__.py `script_rotateSpeechOrder` missing `configure()`** — Wrote to config.conf without refreshing `_cached_config`. Added `try: self.handler.configure() except Exception: pass` before `ui.message(msg)`.
+- **quickJump.py module-level `loadConfig` crash** — File-read / json.loads unguarded; missing/corrupt rules file crashed addon at import. Rewrote `loadConfig()` with OSError fallbacks to `defaultRulesFileName`, `QJConfig({'sites': []})` fallbacks, and try/except around `json.loads`.
+- **__init__.py `_hook_caretMovementScriptHelper` missing themes guard** — Every browse-mode arrow key called `_snapshot_obj()` (COM) even when themes disabled. Added `enable_audio_themes`+`active_theme` check with early return (re-raising `_orig_exc`), and navigator-identity check before `treeInterceptor` COM.
+- **__init__.py `event_becomeNavigatorObject` `obj.name` COM guard** — `getattr(obj, 'name')` is a blocking IAccessible COM call. Now only fetched when `enable_audio_themes` or `utils.isPhoneticPunctuationEnabled()` is true; app name (`appModule.appName`, no COM) always cached.
+- **browserNavEngine/beeper.py lazy WavePlayer** — `Beeper.__init__` (module-level `beeper = Beeper()`) created a WavePlayer at import. Now `self.player = None` + `_ensure_player()` lazy init; `fancyCrackle`/`fancyBeep` call it, `stop()` null-guards. Output device still cached via `_get_beeper_output_device()`.
+- **unspoken/__init__.py 44100 Hz resampling** — 32 of 155 bundled WAVs are 22050/11025/48000/96000 Hz but all WavePlayers run at 44100, playing them at the wrong speed. Added `resample_audio()` (linear interp, preserves stereo interleave) and call it at top of `_ensure_processed` when `sample_rate != 44100`, updating `sound_data["sample_rate"]`. Verified: identity, 22050→44100 doubling, 48000→44100, stereo interleave, 3 real files.
+
 
 ### Round 39 (committed): AI-walkthrough claim verification + hot-path fixes
 Audit of the AI-generated "Advanced Audio Themes Fixes Walkthrough" against actual code; every claim verified line-by-line before keeping.
@@ -357,8 +369,8 @@ Deep audit of shutdown path, resource lifecycle, and remaining edge cases.
 - **`__init__.py` 7 toggle scripts missing `configure()` call** — `script_toggleAudioThemes` (double-tap), `script_toggleAudioDucking`, `script_toggleEmojiSounds`, `script_toggleAppProfiles`, `script_toggleClipboard`, `script_toggleSystemStatus` all wrote to `config.conf` without calling `configure()`, leaving `_cached_config` stale. Added `self.handler.configure()` to each.
 - **`handler.py get_theme_from_folder` missing required fields** — If `info.json` had no `name` key (corrupted or missing field), `AudioTheme(**filtered)` crashed with `TypeError`. Added defaults for required fields (`name`, `author`, `summary`).
 
-### Round 37: main-thread COM freeze fix — 1 fix
-- **`__init__.py event_becomeNavigatorObject` `getattr(obj, 'name', None)` COM hang** — CRITICAL: `obj.name` triggered a synchronous IAccessible COM call (`accName` → `comtypes._memberspec.__call__`) that blocked the main thread for 1–2+ seconds on stale/broken objects. This was called unconditionally on every navigator-object change (even when themes were disabled). Repeated blocks caused 6–7 watchdog freeze recoveries in 30 seconds, corrupting NVDA's speech pipeline state such that only a full system restart could recover. Replaced with `obj.windowText` which uses Win32 `GetWindowTextW` (fast, non-blocking). `windowTitleRegex` filtering in phonetic punctuation and frenzy rules continues to work correctly.
+### Round 37: main-thread COM freeze fix — 1 fix (documentation corrected in Round 40)
+- **`__init__.py event_becomeNavigatorObject` `getattr(obj, 'name', None)` COM hang** — CRITICAL: `obj.name` triggered a synchronous IAccessible COM call (`accName` → `comtypes._memberspec.__call__`) that blocked the main thread for 1–2+ seconds on stale/broken objects. This was called unconditionally on every navigator-object change (even when themes were disabled). Repeated blocks caused 6–7 watchdog freeze recoveries in 30 seconds, corrupting NVDA's speech pipeline state such that only a full system restart could recover. NOTE: the original claim that this was replaced with `obj.windowText` (Win32 `GetWindowTextW`) is INCORRECT — `windowText` is a property of `NVDAObjects.window.Window` subclasses only, not all `NVDAObjects.NVDAObject`, and never landed in committed code. The real mitigation (guarding the `obj.name` COM access behind an `enable_audio_themes`/phonetic-punctuation check so it is skipped when nothing consumes the title) is implemented in Round 40.
 
 ### Round 38 (committed): event handler hardening — 2 fixes
 - **`__init__.py _hook_caretMovementScriptHelper` missing themes guard** — CRITICAL: Every arrow key press in browse mode called `_snapshot_obj()` (which includes `obj.name` IAccessible COM call) even when audio themes were disabled. No `enable_audio_themes` or `active_theme` check existed before the COM accesses. Added themes guard with early return. Also restructured to check navigator identity *before* `treeInterceptor` COM access (saves one COM call when navigator hasn't changed). Added 80ms debounce matching `_onNavigationTimer`.
