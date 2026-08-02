@@ -7,9 +7,17 @@ Complete a performance, disk I/O, thread‑safety, and memory audit of all files
 - "لا تكسر اي وظيفة" — do not break any existing functionality.
 
 ## Status
-All known issues fixed (rounds 1–38). No known remaining issues.
+All known issues fixed (rounds 1–39). No known remaining issues.
 
 ## Fix History
+
+### Round 39 (committed): AI-walkthrough claim verification + hot-path fixes
+Audit of the AI-generated "Advanced Audio Themes Fixes Walkthrough" against actual code; every claim verified line-by-line before keeping.
+- **`__init__.py` LazySnapshotDict reverted (CRITICAL)** — The walkthrough's `LazySnapshotDict` deferred `obj.name` COM access to worker threads AND `info.copy()` dropped `name`/`_obj`, silently breaking emoji-in-name role suppression. Reverted to eager `info["name"] = obj.name or ""` on the main thread (matches pre-walkthrough behavior).
+- **`__init__.py` `_text_contains_emoji` real regex** — Walkthrough claimed a regex "Global Emoji Speedup" but it was never implemented (still a manual while loop). Implemented `_EMOJI_QUICK_REGEX` compiled once + `@lru_cache(256)`; verified 35/35 equivalence against the original loop (incl. surrogate pairs, any >0xFFFF, all listed BMP ranges).
+- **`quickJump.py` `playBiwInThread` playback moved out of `else` (CRITICAL)** — Walkthrough's cache put the whole WavePlayer ducking+playback block inside the cache-miss `else`, so a cache hit played NO sound at all. Restructured: cache stores pre-ducking mono PCM; ducking + playback now run on both hit and miss. `_biw_wave_cache`/`_biw_cache_lock` moved to module level (was racy lazy `not in globals()` init).
+- **`frenzy.py` `getActiveRuleContext` URL lazy-resolve fixed** — Walkthrough's lazy URL resolution retained (resolves once, updates cache key, re-checks cache), BUT the inner bare `import utils` would import NVDA's top-level `utils` package instead of `audiothemes.utils` (which defines `getCurrentURLSafe`), causing AttributeError on any URL rule. Removed the bare import; module-level `from . import utils` already exists.
+- **Verified-good walkthrough changes kept**: `PpChainCommand` dedicated thread, `list(speechSequence)` copy in preSpeak, lazy URL only when a URL rule exists, `with wave.open` blocks, `getDuration()` removed from hot path, thread-pool reduction, `put_nowait` queue caps.
 
 ### Rounds 1–3 (committed): config cache, I/O, thread safety
 - `config.conf` reads replaced with `_cached_config` dicts across hot paths.

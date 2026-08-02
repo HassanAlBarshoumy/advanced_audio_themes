@@ -1040,10 +1040,7 @@ def postProcessSynchronousCommands(speechSequence, symbolLevel):
                 else:
                     break
             chainCommand = PpChainCommand(chain)
-            duration = chainCommand.getDuration()
             newSequence.append(chainCommand)
-            # Removed BreakCommand to allow speech and audio to play simultaneously without delay
-            # newSequence.append(speech.commands.BreakCommand(duration))
         elif not isEmptyString(command):
             # Inline unmask: unwrap MaskedString to plain str in the same pass
             if isinstance(command, MaskedString):

@@ -41,6 +41,9 @@ from .addonConfig import getConfig
 
 _qj_output_device = None
 
+_biw_wave_cache = {}
+_biw_cache_lock = threading.Lock()
+
 def _qj_get_output_device():
     global _qj_output_device
     if _qj_output_device is None:
@@ -1093,12 +1096,26 @@ def playBiwInThread(bookmark=None, earcon=None, volume=None):
             utils.getSoundsPath(),
             earcon or bookmark.builtInWavFile,
         )
-        with wave.open(absPath,"r") as f:
-            if f.getsampwidth() != 2:
-                bits = f.getsampwidth() * 8
-                log.warning(f"BrowserNav: unsupported WAV format {bits}-bit: '{absPath}'")
-                return
-            buf =  f.readframes(f.getnframes())
+        
+        cache_key = (absPath, volume)
+        with _biw_cache_lock:
+            cached_data = _biw_wave_cache.get(cache_key)
+            if cached_data:
+                _biw_wave_cache[cache_key] = _biw_wave_cache.pop(cache_key) # LRU bump
+                
+        if cached_data:
+            buf, nchannels, framerate, sampwidth = cached_data
+        else:
+            with wave.open(absPath,"r") as f:
+                sampwidth = f.getsampwidth()
+                if sampwidth != 2:
+                    bits = sampwidth * 8
+                    log.warning(f"BrowserNav: unsupported WAV format {bits}-bit: '{absPath}'")
+                    return
+                nchannels = f.getnchannels()
+                framerate = f.getframerate()
+                buf = f.readframes(f.getnframes())
+                
             bufSize = len(buf)
             n = bufSize//2
             unpacked = struct.unpack(f"<{n}h", buf)
@@ -1106,33 +1123,39 @@ def playBiwInThread(bookmark=None, earcon=None, volume=None):
             for i in range(n):
                 unpacked[i] = int(unpacked[i] * volume/100)
             packed = struct.pack(f"<{n}h", *unpacked)
-            buf = ensure_mono(packed, f.getnchannels(), f.getframerate())
-            # Apply audio ducking
-            try:
-                from .. import frenzy
-                df = frenzy.get_ducking_factor("browsernav")
-                if df < 1.0:
-                    buf = frenzy.apply_ducking_to_pcm(buf, df, 2)
-            except Exception:
-                pass
-            outputDevice=_qj_get_output_device()
-            fileWavePlayer = nvwave.WavePlayer(
-                channels=f.getnchannels(),
-                samplesPerSec=f.getframerate(),
-                bitsPerSample=f.getsampwidth()*8,
-                outputDevice=outputDevice,
-                wantDucking=False,
-                purpose=nvwave.AudioPurpose.SOUNDS,
-            )
+            buf = ensure_mono(packed, nchannels, framerate)
+            
+            with _biw_cache_lock:
+                if len(_biw_wave_cache) > 20:
+                    _biw_wave_cache.pop(next(iter(_biw_wave_cache)))
+                _biw_wave_cache[cache_key] = (buf, nchannels, framerate, sampwidth)
+        # Apply audio ducking (both on cache hit and miss; the cached buffer is
+        # stored pre-ducking so the current ducking factor is always applied).
+        try:
+            from .. import frenzy
+            df = frenzy.get_ducking_factor("browsernav")
+            if df < 1.0:
+                buf = frenzy.apply_ducking_to_pcm(buf, df, 2)
+        except Exception:
+            pass
+        outputDevice=_qj_get_output_device()
+        fileWavePlayer = nvwave.WavePlayer(
+            channels=nchannels,
+            samplesPerSec=framerate,
+            bitsPerSample=sampwidth*8,
+            outputDevice=outputDevice,
+            wantDucking=False,
+            purpose=nvwave.AudioPurpose.SOUNDS,
+        )
+        try:
+            fileWavePlayer.stop()
+            fileWavePlayer.feed(buf)
+            fileWavePlayer.idle()
+        except Exception:
             try:
                 fileWavePlayer.stop()
-                fileWavePlayer.feed(buf)
-                fileWavePlayer.idle()
             except Exception:
-                try:
-                    fileWavePlayer.stop()
-                except Exception:
-                    pass
+                pass
     except Exception:
         pass
 

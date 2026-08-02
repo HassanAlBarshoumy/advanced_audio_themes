@@ -291,12 +291,12 @@ class PpWaveFileCommand(PpSynchronousCommand):
         f = None
         decoded = None
         try:
-            f = wave.open(self.fileName, "r")
-            if f.getsampwidth() == 2:
-                buf = f.readframes(f.getnframes())
-                import array
-                arr = array.array('h')
-                arr.frombytes(buf)
+            with wave.open(self.fileName, "r") as f:
+                if f.getsampwidth() == 2:
+                    buf = f.readframes(f.getnframes())
+                    import array
+                    arr = array.array('h')
+                    arr.frombytes(buf)
                 
                 # Apply volume with clamping
                 if self.volume != 100:

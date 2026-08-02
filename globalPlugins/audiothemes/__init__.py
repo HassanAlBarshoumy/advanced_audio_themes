@@ -27,6 +27,7 @@ import wx
 import config
 import globalPluginHandler
 import keyboardHandler
+import re
 from keyboardHandler import KeyboardInputGesture
 
 import scriptHandler
@@ -88,6 +89,16 @@ initSentenceNavConfiguration()
 
 from .navLayer import NavLayerMixin
 
+_EMOJI_QUICK_REGEX = re.compile(
+    u'[^\u0000-\uffff]'
+    u'|[\u2600-\u27bf]'
+    u'|[\u2b50\u2934\u2935]'
+    u'|[\u2b05-\u2b07]'
+    u'|[\u2b1b\u2b1c]'
+    u'|[\u3030\u303d\u3297\u3299]'
+    u'|[\ufe00-\ufe0f]'
+)
+
 @lru_cache(maxsize=256)
 def _text_contains_emoji(text):
     """Check if text contains any emoji characters."""
@@ -95,33 +106,7 @@ def _text_contains_emoji(text):
         return False
     if text.isascii():
         return False
-    i = 0
-    n = len(text)
-    while i < n:
-        cp = ord(text[i])
-        if 0xD800 <= cp <= 0xDBFF and i + 1 < n:
-            low = ord(text[i + 1])
-            if 0xDC00 <= low <= 0xDFFF:
-                cp = 0x10000 + (cp - 0xD800) * 0x400 + (low - 0xDC00)
-                i += 1
-        i += 1
-        if cp > 0xFFFF:
-            return True
-        if 0x2600 <= cp <= 0x27BF:
-            return True
-        if 0x2B50 == cp or 0x2934 == cp or 0x2935 == cp:
-            return True
-        if 0x2B05 <= cp <= 0x2B07:
-            return True
-        if 0x2B1B <= cp <= 0x2B1C:
-            return True
-        if 0x3030 == cp or 0x303D == cp or 0x3297 == cp or 0x3299 == cp:
-            return True
-        if 0xFE00 <= cp <= 0xFE0F:
-            return True
-        if 0x1F000 <= cp <= 0x1FFFF:
-            return True
-    return False
+    return _EMOJI_QUICK_REGEX.search(text) is not None
 
 import weakref
 _snapshot_cache = weakref.WeakKeyDictionary()
@@ -143,7 +128,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 return cached.copy()
         except Exception:
             pass
+
         info = {}
+        try:
+            info["name"] = obj.name or ""
+        except Exception:
+            info["name"] = ""
         try:
             info["role"] = obj.role
         except Exception:
@@ -172,10 +162,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             info["states"] = frozenset(obj.states)
         except Exception:
             info["states"] = frozenset()
-        try:
-            info["name"] = obj.name or ""
-        except Exception:
-            info["name"] = ""
         try:
             info["location"] = tuple(obj.location) if obj.location else None
         except Exception:

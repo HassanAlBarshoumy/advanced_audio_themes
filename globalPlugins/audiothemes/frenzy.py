@@ -508,11 +508,6 @@ def getActiveRuleContext(ruleList, appName, windowTitle, url):
     if not ruleList:
         return None
         
-    has_url_rule = any(len(rule.urlRegex) > 0 for rule in ruleList)
-    if has_url_rule and url is None:
-        import utils
-        url = utils.getCurrentURLSafe()
-        
     cache_key = (id(ruleList), appName, windowTitle, url)
     found, cached_val = _active_rule_cache.get(cache_key)
     if found:
@@ -524,8 +519,19 @@ def getActiveRuleContext(ruleList, appName, windowTitle, url):
             continue
         if len(rule.windowTitleRegex) > 0 and not rule._windowTitleRegex.search(windowTitle):
             continue
-        if len(rule.urlRegex) > 0 and (url is None or not rule._urlRegex.search(url)):
-            continue
+        if len(rule.urlRegex) > 0:
+            if url is None:
+                # `utils` here is audiothemes.utils (module-level `from . import utils`),
+                # NOT NVDA's top-level `utils` package. Avoid a bare `import utils`.
+                url = utils.getCurrentURLSafe()
+                # Update cache key since URL was just resolved
+                cache_key = (id(ruleList), appName, windowTitle, url)
+                # Check cache again with the resolved URL
+                found, cached_val = _active_rule_cache.get(cache_key)
+                if found:
+                    return cached_val
+            if url is None or not rule._urlRegex.search(url):
+                continue
         matched_rule = rule
         break
         
