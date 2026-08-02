@@ -7,11 +7,26 @@ Complete a performance, disk I/O, thread‑safety, and memory audit of all files
 - "لا تكسر اي وظيفة" — do not break any existing functionality.
 
 ## Status
-All known issues fixed (rounds 1–40). No known remaining issues.
+All known issues fixed (rounds 1–41). No known remaining issues.
 
 ## Fix History
 
-### Round 40 (uncommitted): targeted correctness + perf fixes — 9 fixes
+### Round 41 (uncommitted): watchdog freeze fix — blocking `obj.name` COM gated behind needs_window_title
+NVDA log showed 3 watchdog freeze recoveries during startup (2.035s, 0.716s, 0.770s). The first two were NVDA-internal (UIA `isUIAWindow`/`accParent` during foreground probing). The third was ours: MainThread blocked at `__init__.py:937` in `event_becomeNavigatorObject`:
+```
+File "__init__.py", line 937, in event_becomeNavigatorObject
+    self.handler._current_window_title = getattr(obj, 'name', None)
+File "NVDAObjects\IAccessible\__init__.pyc", line 970, in _get_name
+File "comtypes\_memberspec.pyc", line 629, in __call__
+```
+- **Root cause** — `obj.name` is a blocking IAccessible COM call (`accName`). Round 40's guard only checked `enable_audio_themes`/phonetic-punctuation, so it still fired on EVERY navigator-object change. But the title is only consumed by rules with non-empty `windowTitleRegex` (all default rules are `""`).
+- **`utils.py`** — added module-level `_needs_window_title` (default False) + `refresh_needs_window_title()` (scans `frenzy.roleRules/stateRules/formatRules/numericFormatRules/otherRules` and `pp.rulesByFrenzy` for any non-empty `windowTitleRegex`; sets the flag) + `needs_window_title()` getter. Lazily imports frenzy/pp inside the function (no circular import).
+- **`frenzy.py` `updateRules()`** — calls `utils.refresh_needs_window_title()` at the end. This is the single chokepoint for rule reloads (called from `phoneticPunctuation.reloadRules()` line 437 and `script_toggleStateVerbosity` line 1492).
+- **`__init__.py:939`** — `obj.name` now fetched only when `need_window_title and utils.needs_window_title()`, else `_current_window_title = None`. Default config: zero COM calls on navigator changes.
+- **`handler.py:configure()`** — added `utils.refresh_needs_window_title()` alongside the submodule refreshes, so profile switches and config changes re-evaluate the flag.
+- Verified: synthetic test (all-empty regexes → False/COM skipped; any non-empty → True/COM fetched; no rules → False); `py_compile` OK for all 4 edited files.
+
+### Round 40 (committed fdb730d): targeted correctness + perf fixes — 9 fixes
 - **browserNavEngine/__init__.py `utils.is_sound_suppressed` AttributeError (CRITICAL)** — Call sites at 534/1498 used `utils.is_sound_suppressed(...)` but `utils` there is `browserNavEngine/utils.py` (no such function). Added `from ..utils import is_sound_suppressed as _at_is_sound_suppressed` (line 54) and switched both call sites to `_at_is_sound_suppressed("browsernav")`.
 - **phoneticPunctuation.py emoji quick-regex missing BMP ranges** — `_emoji_quick_regex` was built only from FE00-FE0F + 1F000-1FFFF, missing BMP-only emoji (e.g. ☀\u2600, ❤\u2764). Now built programmatically from `_EMOJI_RANGES` + FE00-FE0F + 1F000-1FFFF (34 ranges, sorted). Verified PASS against test points.
 - **phoneticPunctuation.py `_suppress_role_sound_flag` sticky** — In `_processEmojiSequence` when `not has_emoji`, flag was never reset; now reset under `_suppress_role_sound_lock` (matches the disabled path).

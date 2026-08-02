@@ -478,6 +478,7 @@ def updateRules():
     formatRules = new_formatRules
     numericFormatRules = new_numericFormatRules
     otherRules = new_otherRules
+    utils.refresh_needs_window_title()
 
 class _LRUCache:
     """Lock-free reads, locked writes. Under CPython GIL, dict reads are atomic."""

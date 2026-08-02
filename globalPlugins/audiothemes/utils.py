@@ -362,6 +362,54 @@ def _load_suppressed_categories():
         with _suppressed_categories_lock:
             _suppressed_categories_dict = {}
 
+_needs_window_title = False
+
+def refresh_needs_window_title():
+    """Recompute whether any loaded rule uses a non-empty windowTitleRegex.
+
+    The main thread must never call obj.name (blocking IAccessible COM) unless
+    a rule can actually consume the window title. Default rules all use an
+    empty windowTitleRegex, so this stays False and the COM call is skipped.
+    """
+    global _needs_window_title
+    found = False
+    try:
+        from . import frenzy
+        from . import phoneticPunctuation as pp
+        for d in (
+            getattr(frenzy, 'roleRules', None) or {},
+            getattr(frenzy, 'stateRules', None) or {},
+            getattr(frenzy, 'formatRules', None) or {},
+            getattr(frenzy, 'numericFormatRules', None) or {},
+            getattr(frenzy, 'otherRules', None) or {},
+        ):
+            for lst in d.values():
+                for r in lst:
+                    if getattr(r, 'windowTitleRegex', ''):
+                        found = True
+                        break
+                if found:
+                    break
+            if found:
+                break
+        if not found:
+            rbf = getattr(pp, 'rulesByFrenzy', None) or {}
+            for lst in rbf.values():
+                for r in lst:
+                    if getattr(r, 'windowTitleRegex', ''):
+                        found = True
+                        break
+                if found:
+                    break
+    except Exception:
+        found = False
+    _needs_window_title = found
+
+def needs_window_title():
+    """True when at least one rule can consume the navigator window title."""
+    return _needs_window_title
+
+
 def is_sound_suppressed(category):
     """Return True if the given sound category should be suppressed
     because the foreground app is in the disabled_apps list.

@@ -1173,6 +1173,7 @@ class AudioThemesHandler:
             from . import utils
             utils._set_cached_output_mode(self._cached_config.get("output_mode", "stereo"))
             utils.refreshPpConfigCache()
+            utils.refresh_needs_window_title()
         except Exception:
             pass
         try:

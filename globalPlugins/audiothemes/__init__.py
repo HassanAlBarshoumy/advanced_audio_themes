@@ -933,7 +933,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     need_window_title = True
             except Exception:
                 pass
-            if need_window_title:
+            # obj.name is a blocking IAccessible COM call. Only fetch the window
+            # title when a loaded rule can actually consume it (non-empty
+            # windowTitleRegex), otherwise skip it entirely.
+            if need_window_title and utils.needs_window_title():
                 self.handler._current_window_title = getattr(obj, 'name', None)
             else:
                 self.handler._current_window_title = None
