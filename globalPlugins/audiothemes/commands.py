@@ -14,7 +14,6 @@ import speech.commands
 import threading
 import time
 import tones
-import wave
 
 from .utils import *
 
@@ -288,50 +287,13 @@ class PpWaveFileCommand(PpSynchronousCommand):
                 self._loaded = True
                 return
 
-        f = None
         decoded = None
         try:
-            with wave.open(self.fileName, "r") as f:
-                if f.getsampwidth() == 2:
-                    buf = f.readframes(f.getnframes())
-                    import array
-                    arr = array.array('h')
-                    arr.frombytes(buf)
-                
-                # Apply volume with clamping
-                if self.volume != 100:
-                    vol_mult = self.volume / 100.0
-                    arr = array.array('h', (max(-32768, min(32767, int(x * vol_mult))) for x in arr))
-                
-                if self.startAdjustment > 0:
-                    pos = self.startAdjustment * f.getframerate() // 1000
-                    pos *= f.getnchannels()
-                    arr = arr[pos:]
-
-                if self.endAdjustment > 0:
-                    end_pos = self.endAdjustment * f.getframerate() // 1000
-                    end_pos *= f.getnchannels()
-                    if end_pos < len(arr):
-                        arr = arr[:-end_pos]
-
-                self.buf = arr.tobytes()
-                self._channels = f.getnchannels()
-                self._sample_rate = f.getframerate()
-                self.fileWavePlayer = get_pooled_player(
-                    channels=self._channels,
-                    sample_rate=self._sample_rate,
-                    ducking=False
-                )
-                frames = f.getnframes()
-                rate = f.getframerate()
-                wavMillis = int(1000 * frames / rate)
-                result = wavMillis - self.startAdjustment - self.endAdjustment
-                self._duration = max(0, result)
-        except Exception:
-            pass
-        finally:
-            if f is not None:
-                f.close()
+            from .unspoken import wav_decode
+            decoded = wav_decode.decode_wav_to_float(self.fileName)
+        except Exception as e:
+            from logHandler import log
+            log.debugWarning(f"PpWaveFileCommand: native WAV decode failed for {self.fileName}: {e}")
 
         if self.buf is None:
             ext = os.path.splitext(self.fileName)[1].lower()

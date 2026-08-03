@@ -11,7 +11,6 @@ import queue
 import wave
 from array import array
 from collections import OrderedDict
-import struct
 import ctypes
 import config
 import speech
@@ -532,32 +531,10 @@ class UnspokenPlayer:
 				log.error(f"MP3 decode failed for {path}: {e}")
 		elif ext == 'wav':
 			try:
-				with wave.open(path, "rb") as wav_file:
-					frames = wav_file.readframes(wav_file.getnframes())
-					sample_width = wav_file.getsampwidth()
-					channels = wav_file.getnchannels()
-					sample_rate = wav_file.getframerate()
-					if sample_width == 2:
-						arr = array('h')
-						arr.frombytes(frames)
-						float_samples = array('f', [s / 32768.0 for s in arr])
-						loaded = (float_samples, sample_rate, channels)
-					elif sample_width == 1:
-						float_samples = array('f', [(s - 128) / 128.0 for s in frames])
-						loaded = (float_samples, sample_rate, channels)
-					elif sample_width == 3:
-						count = len(frames) // 3
-						float_samples = array('f', [0.0]) * count
-						for i in range(count):
-							offset = i * 3
-							three_bytes = frames[offset:offset+3]
-							if three_bytes[2] < 128:
-								padded = three_bytes + b'\x00'
-							else:
-								padded = three_bytes + b'\xff'
-							s = struct.unpack('<i', padded)[0]
-							float_samples[i] = s / 8388608.0
-						loaded = (float_samples, sample_rate, channels)
+				from . import wav_decode
+				loaded = wav_decode.decode_wav_to_float(path)
+				if loaded is None:
+					raise wave.Error("unsupported WAV format")
 			except wave.Error:
 				pass  # compressed WAV — FFmpeg fallback if enabled
 			except Exception as e:
@@ -576,6 +553,17 @@ class UnspokenPlayer:
 			return None
 
 		float_samples, sample_rate, channels = loaded
+
+		# Normalize channel count: downstream assumes mono (1) or stereo (2).
+		if channels > 2:
+			n = len(float_samples) // channels
+			mono = array('f', [0.0]) * n
+			for c in range(channels):
+				for i in range(n):
+					mono[i] += float_samples[i * channels + c]
+			inv = 1.0 / channels
+			float_samples = array('f', (s * inv for s in mono))
+			channels = 1
 
 		# Store raw float data; optional processing (trim, normalize, etc.)
 		# is deferred to first play via _ensure_processed().

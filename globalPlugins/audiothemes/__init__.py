@@ -320,6 +320,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # sound dispatch briefly after a stall instead of firing stale sounds.
         self._last_timer_tick = 0.0
         self._freeze_suppress_until = 0.0
+        # Deferred re-dispatch: the object whose sound was dropped because a
+        # freeze-suppression window opened right as it gained focus/navigator.
+        # Re-dispatched once the window passes (if no newer dispatch occurred).
+        self._pending_dispatch_obj = None
+        self._pending_dispatch_app = None
+        self._pending_dispatch_timer = None
         self._audio_beacon_location = None
         self._audio_beacon_desktop = None
         self._last_focus_is_editable = False
@@ -476,6 +482,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             if self._is_freeze_suppressed():
                 if _orig_exc is not None:
                     raise _orig_exc
+                try:
+                    self._schedule_pending_dispatch(api.getNavigatorObject(), self.handler._current_app_name)
+                except Exception:
+                    pass
                 return
             current_nav = api.getNavigatorObject()
             ti = getattr(current_nav, 'treeInterceptor', None) if current_nav else None
@@ -484,6 +494,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     self._last_navigator_object = current_nav
                     self._last_play_time = time.monotonic()
                     obj_info = self._snapshot_obj(current_nav)
+                    self._pending_dispatch_obj = None
                     utils.threadPool.add_task(self.playObject, obj_info)
                     utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
@@ -755,6 +766,38 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception:
             return False
 
+    def _schedule_pending_dispatch(self, obj, app_name=None):
+        """Record the most recent object whose sound was dropped because a
+        freeze-suppression window opened, and dispatch it once the window
+        passes -- unless a newer normal dispatch happened first."""
+        self._pending_dispatch_obj = obj
+        self._pending_dispatch_app = app_name
+        if self._pending_dispatch_timer is None:
+            self._pending_dispatch_timer = wx.CallLater(300, self._flush_pending_dispatch)
+
+    def _flush_pending_dispatch(self):
+        """Dispatch the deferred object now that the main thread has settled."""
+        self._pending_dispatch_timer = None
+        obj = self._pending_dispatch_obj
+        self._pending_dispatch_obj = None
+        if obj is None:
+            return
+        if self._is_freeze_suppressed():
+            # Still settling; retry shortly.
+            self._pending_dispatch_obj = obj
+            self._pending_dispatch_timer = wx.CallLater(100, self._flush_pending_dispatch)
+            return
+        try:
+            if not self.handler._cached_config.get("enable_audio_themes", True) or not self.handler.active_theme:
+                return
+            app = self._pending_dispatch_app
+            self._pending_dispatch_app = None
+            obj_info = self._snapshot_obj(obj, foreground_app=app)
+            utils.threadPool.add_task(self.playObject, obj_info)
+            utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
+        except Exception as e:
+            log.debugWarning(f"deferred focus dispatch: {e}")
+
     def _onNavigationTimer(self, event):
         """Check if the navigator object changed (e.g. arrow keys in browse mode)."""
         # Freeze resilience: the timer is expected every ~250ms. A gap much
@@ -872,6 +915,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 return
             if self._is_freeze_suppressed():
                 self._last_focus_is_editable = self._is_editable(obj)
+                self._schedule_pending_dispatch(obj, self.handler._current_app_name)
                 return
             obj_info = self._snapshot_obj(obj, foreground_app=self.handler._current_app_name)
             # Compute editable from snapshot dict instead of live COM object
@@ -880,6 +924,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             _s = obj_info.get("states", frozenset())
             _ectl = (controlTypes.Role.EDITABLETEXT, controlTypes.Role.TERMINAL, controlTypes.Role.RICHEDIT)
             self._last_focus_is_editable = (_r in _ectl or controlTypes.State.EDITABLE in _s) and controlTypes.State.READONLY not in _s
+            self._pending_dispatch_obj = None
             utils.threadPool.add_task(self.playObject, obj_info)
             utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
@@ -1007,6 +1052,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception:
             return
         if self._is_freeze_suppressed():
+            self._schedule_pending_dispatch(obj, self.handler._current_app_name)
             return
         self._last_play_time = time.monotonic()
         try:
@@ -1015,6 +1061,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self._last_navigator_object = obj
         try:
             obj_info = self._snapshot_obj(obj, foreground_app=self.handler._current_app_name)
+            self._pending_dispatch_obj = None
             utils.threadPool.add_task(self.playObject, obj_info)
             utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:

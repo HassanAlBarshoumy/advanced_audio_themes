@@ -1123,25 +1123,24 @@ def playBiwInThread(bookmark=None, earcon=None, volume=None):
         if cached_data:
             buf, nchannels, framerate, sampwidth = cached_data
         else:
-            with wave.open(absPath,"r") as f:
-                sampwidth = f.getsampwidth()
-                if sampwidth != 2:
-                    bits = sampwidth * 8
-                    log.warning(f"BrowserNav: unsupported WAV format {bits}-bit: '{absPath}'")
-                    return
-                nchannels = f.getnchannels()
-                framerate = f.getframerate()
-                buf = f.readframes(f.getnframes())
-                
-            bufSize = len(buf)
-            n = bufSize//2
-            unpacked = struct.unpack(f"<{n}h", buf)
-            unpacked = list(unpacked)
-            for i in range(n):
-                unpacked[i] = int(unpacked[i] * volume/100)
-            packed = struct.pack(f"<{n}h", *unpacked)
-            buf = ensure_mono(packed, nchannels, framerate)
-            
+            try:
+                from ..unspoken import wav_decode
+                decoded = wav_decode.decode_wav_to_float(absPath)
+            except Exception as e:
+                log.debugWarning(f"BrowserNav: WAV decode failed for '{absPath}': {e}")
+                decoded = None
+            if decoded is None:
+                log.warning(f"BrowserNav: unsupported WAV format: '{absPath}'")
+                return
+            float_samples, framerate, nchannels = decoded
+            import array as _array
+            int_arr = _array.array('h', (max(-32768, min(32767, int(s * 32767))) for s in float_samples))
+            if volume != 100:
+                vol_mult = volume / 100.0
+                int_arr = _array.array('h', (max(-32768, min(32767, int(x * vol_mult))) for x in int_arr))
+            buf = ensure_mono(int_arr.tobytes(), nchannels, framerate)
+            sampwidth = 2
+
             with _biw_cache_lock:
                 if len(_biw_wave_cache) > 20:
                     _biw_wave_cache.pop(next(iter(_biw_wave_cache)))
