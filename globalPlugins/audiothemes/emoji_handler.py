@@ -67,7 +67,7 @@ def refreshCachedConfig():
     _cached_json_configs = {}
     for key in ("emoji_prefix_text_per_category", "emoji_suffix_text_per_category",
                 "emoji_volume_per_category", "emoji_sound_position_per_category",
-                "emoji_custom_description_per_category"):
+                "emoji_custom_descriptions"):
         raw = _cached_emoji_config.get(key, "{}")
         try:
             _cached_json_configs[key] = json.loads(raw) if isinstance(raw, str) else raw
