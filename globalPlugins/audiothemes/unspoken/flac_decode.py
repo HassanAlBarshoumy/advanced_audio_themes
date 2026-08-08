@@ -5,7 +5,11 @@ from logHandler import log
 
 _X64_DIR = os.path.join(os.path.dirname(__file__), "lib", "x64")
 
-_flac = ctypes.CDLL(os.path.join(_X64_DIR, "libFLAC.dll"))
+try:
+    _flac = ctypes.CDLL(os.path.join(_X64_DIR, "libFLAC.dll"))
+except Exception as e:
+    log.error(f"Failed to load libFLAC.dll: {e}")
+    _flac = None
 
 FLAC__STREAM_DECODER_WRITE_CONTINUE = 0
 FLAC__STREAM_DECODER_END_OF_STREAM = 4
@@ -108,6 +112,9 @@ def _make_error_callback(ctx):
 
 
 def decode_flac_to_float(path):
+    if _flac is None:
+        log.error("FLAC decoder unavailable: libFLAC.dll failed to load")
+        return None
     dec = _flac.FLAC__stream_decoder_new()
     if not dec:
         log.error("FLAC__stream_decoder_new failed")
@@ -144,14 +151,13 @@ def decode_flac_to_float(path):
         rate = ctx.sample_rate
         channels = ctx.channels
 
-        scale = 1.0 / (1 << (ctx.bits_per_sample - 1))
+        bps = ctx.bits_per_sample or 16
+        if bps < 2:
+            bps = 16
+        scale = 1.0 / (1 << (bps - 1))
         float_samples = array.array('f', (s * scale for s in ctx.all_pcm))
-        if channels == 2:
-            n = len(float_samples) // 2
-            mono = array.array('f', ((float_samples[i * 2] + float_samples[i * 2 + 1]) * 0.5 for i in range(n)))
-            return (mono, rate, 1)
-        else:
-            return (float_samples, rate, channels)
+        # Preserve the original channel layout: stereo FLACs stay stereo.
+        return (float_samples, rate, channels)
 
     except Exception as e:
         log.error(f"Failed to decode FLAC {path}: {e}")

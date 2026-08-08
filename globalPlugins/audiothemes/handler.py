@@ -64,12 +64,12 @@ NATIVE_FORMATS = {"ogg", "wav", "mp3", "flac"}
 # Formats that require FFmpeg
 FFMPEG_ONLY_FORMATS = {"m4a", "aac", "opus", "wma", "mp2", "ac3"}
 
-SPECIAL_TYPING_FILES = frozenset({"enter.wav", "backspace.wav", "space.wav", "shift.wav", "ctrl.wav", "alt.wav", "win.wav"})
+SPECIAL_TYPING_FILES = frozenset({"enter", "backspace", "space", "shift", "ctrl", "alt", "win"})
 
 _SPECIAL_VK_FILE_MAP = {
-    0x0D: "enter.wav", 0x08: "backspace.wav", 0x20: "space.wav",
-    0x10: "shift.wav", 0x11: "ctrl.wav", 0x12: "alt.wav",
-    0x5B: "win.wav", 0x5C: "win.wav"
+    0x0D: "enter", 0x08: "backspace", 0x20: "space",
+    0x10: "shift", 0x11: "ctrl", 0x12: "alt",
+    0x5B: "win", 0x5C: "win"
 }
 
 def get_active_file_types():
@@ -115,6 +115,8 @@ audiothemes_config_defaults = {
     "output_mode": "string(default='stereo')",
     "ffmpeg_path": "string(default='')",
     "enable_ffmpeg": "boolean(default=False)",
+    "convert_target": "string(default='wav')",
+    "auto_convert_non_native": "boolean(default=True)",
     "dont_show_conflicts": "boolean(default=False)",
     "ducking_categories": "string(default='{\"theme_sounds\":true,\"typing_sounds\":true,\"earcons\":true,\"browsernav\":true,\"sentencenav\":true,\"textnav\":true,\"ui_beeps\":true}')",
     "disabled_apps_suppress_categories": "string(default='{\"theme_sounds\":true,\"typing_sounds\":true,\"earcons\":true,\"browsernav\":true,\"sentencenav\":true,\"textnav\":true,\"ui_beeps\":true}')",
@@ -437,6 +439,23 @@ for val, name in state_int_to_name.items():
 for member in SpecialProps:
     role_int_to_name[member.value] = member.name
 
+QUICKNAV_OFFSET = 20000
+QUICKNAV_PSEUDO_ROLES = {
+    QUICKNAV_OFFSET + 1: "unvisitedlink",
+    QUICKNAV_OFFSET + 2: "nonheading",
+    QUICKNAV_OFFSET + 3: "quote",
+    QUICKNAV_OFFSET + 4: "annotation",
+}
+_QUICKNAV_LABELS = {
+    "unvisitedlink": _("Unvisited Link"),
+    "nonheading": _("Non-Heading Element"),
+    "quote": _("Quotation"),
+    "annotation": _("Annotation"),
+}
+for _qval, _qname in QUICKNAV_PSEUDO_ROLES.items():
+    role_int_to_name[_qval] = _qname
+    theme_roles[_qval] = _QUICKNAV_LABELS[_qname]
+
 role_name_to_int = {v: k for k, v in role_int_to_name.items()}
 
 
@@ -479,6 +498,10 @@ class AudioTheme:
         controlTypes.Role.COMBOBOX,
         controlTypes.Role.TAB,
         controlTypes.Role.SLIDER,
+        QUICKNAV_OFFSET + 1,
+        QUICKNAV_OFFSET + 2,
+        QUICKNAV_OFFSET + 3,
+        QUICKNAV_OFFSET + 4,
     )
 
     def _auto_create_missing_sounds(self, new_sounds, available, player):
@@ -522,9 +545,12 @@ class AudioTheme:
                 rep_role = self.is_valid_audio_file(path)
                 if rep_role is not None:
                     try:
-                        new_sounds[rep_role] = player.make_sound_object(path)
+                        sound_obj = player.make_sound_object(path)
                     except Exception:
+                        sound_obj = None
                         log.warning(f"AudioThemes: failed to load sound for role {rep_role}: {path}")
+                    if sound_obj is not None:
+                        new_sounds[rep_role] = sound_obj
         except OSError:
             return
         self._auto_create_missing_sounds(new_sounds, available, player)
@@ -718,6 +744,7 @@ class AudioThemesHandler:
                 self.migrate_all_themes_to_named_files()
             except Exception as e:
                 log.error(f"AudioThemes: failed to migrate themes: {e}", exc_info=True)
+            self._auto_convert_non_native()
         try:
             import threading as _t
             _t.Thread(target=_deferred_migrate, daemon=True, name="ATMigrate").start()
@@ -942,6 +969,51 @@ class AudioThemesHandler:
             migrate_theme_to_named_files(theme.directory)
         config.conf["audiothemes"]["migrated_to_named_files"] = True
 
+    def _auto_convert_non_native(self):
+        """Convert FFmpeg-only theme sounds to the configured target format.
+
+        Runs on the deferred migration thread. Only files whose format has no
+        bundled native decoder (m4a/aac/opus/wma/mp2/ac3) are candidates; the
+        bundled stores are all WAV and are never touched. FFmpeg.exe is used
+        only to DECODE the source (if present) — the output (WAV/FLAC) is
+        written natively, permanently removing the FFmpeg dependency.
+        """
+        try:
+            if not self._cached_config.get("auto_convert_non_native", True):
+                return
+            target = self._cached_config.get("convert_target", "wav")
+            if not target:
+                try:
+                    target = config.conf["audiothemes"].get("convert_target", "wav")
+                except Exception:
+                    target = "wav"
+            if target not in ("wav", "flac"):
+                target = "wav"
+            if not os.path.isdir(THEMES_DIR):
+                return
+            allow_ffmpeg = False
+            try:
+                from .unspoken import ffmpeg_utils
+                allow_ffmpeg = ffmpeg_utils.get_ffmpeg_path() is not None
+            except Exception:
+                allow_ffmpeg = False
+            from .unspoken import audio_converter
+            converted, skipped, failed, errors = audio_converter.convert_all(
+                [THEMES_DIR], target_ext=target, allow_ffmpeg=allow_ffmpeg
+            )
+            for src, msg in errors:
+                log.warning(f"AudioThemes: auto-convert failed for {src}: {msg}")
+            if converted or failed or skipped:
+                log.info(
+                    f"AudioThemes: auto-convert done: {converted} converted, "
+                    f"{skipped} skipped, {failed} failed (target .{target})"
+                )
+        except Exception as e:
+            log.error(
+                f"AudioThemes: failed to auto-convert non-native theme sounds: {e}",
+                exc_info=True,
+            )
+
     def get_active_theme(self):
         if not config.conf["audiothemes"]["enable_audio_themes"]:
             log.debug("get_active_theme: themes disabled")
@@ -988,11 +1060,14 @@ class AudioThemesHandler:
                 if self.active_theme is not None:
                     self.active_theme.deactivate()
                 self.enabled = new_enabled
-                with _typing_dir_cache_lock:
-                    _typing_dir_cache.clear()
-                self._theme_cache = {}
             else:
                 self.enabled = new_enabled
+            # Always invalidate theme/typing caches so converted files
+            # (e.g. WAV->FLAC) are re-scanned even when the theme selection
+            # and enable state did not change.
+            with _typing_dir_cache_lock:
+                _typing_dir_cache.clear()
+            self._theme_cache = {}
 
             # Always re-parse app profiles (they may have changed independently)
             try:
@@ -1019,6 +1094,13 @@ class AudioThemesHandler:
                 self._ensure_player()
             except Exception:
                 log.debugWarning("AudioThemes: failed to initialize player during configure")
+            # Re-scan the active theme folder so converted files (e.g. WAV->FLAC)
+            # are picked up even when the theme selection did not change.
+            if self.player is not None:
+                try:
+                    self.active_theme.load(self.player)
+                except Exception:
+                    log.debugWarning("AudioThemes: failed to reload active theme during configure")
             if self.player is not None:
                 self.player.audio3d = user_config.get("audio3d", False)
                 self.player.use_in_say_all = user_config.get("use_in_say_all", True)
@@ -1179,6 +1261,8 @@ class AudioThemesHandler:
             "HRTF": unspoken_cfg.get("HRTF", False),
             "AudioCache": unspoken_cfg.get("AudioCache", True),
             "enable_ffmpeg": user_config.get("enable_ffmpeg", False),
+            "convert_target": user_config.get("convert_target", "wav"),
+            "auto_convert_non_native": user_config.get("auto_convert_non_native", True),
         }
         if self.player is not None:
             self.player._cached_config = self._cached_config
@@ -1409,22 +1493,36 @@ class AudioThemesHandler:
         if not any(sound_name.endswith('.' + ext) for ext in SUPPORTED_FILE_TYPES):
             sound_name += '.wav'
 
-        sound_path = os.path.join(theme.directory, sound_name)
+        available = getattr(theme, 'available_files', set())
 
-        # Check pre-indexed files in memory to eliminate Disk I/O
-        if sound_name.lower() in getattr(theme, 'available_files', set()):
-            try:
-                self.player.play_file(
-                    sound_path,
-                    volume=self._cached_config.get("volume", 50),
-                    audio3d=bool(angle_x or angle_y),
-                    angle_x=angle_x,
-                    angle_y=angle_y
-                )
-            except Exception:
-                return False
-            return True
-        return False
+        # Resolve the actual stored file. After a format conversion the sound
+        # may live under a different extension than ".wav" (e.g. button.flac),
+        # so match by filename stem against the indexed files when the exact
+        # requested name is absent.
+        resolved = sound_name.lower()
+        if resolved not in available:
+            stem = os.path.splitext(resolved)[0]
+            for ext in SUPPORTED_FILE_TYPES:
+                candidate = f"{stem}.{ext}"
+                if candidate in available:
+                    resolved = candidate
+                    break
+        if resolved not in available:
+            return False
+
+        sound_path = os.path.join(theme.directory, resolved)
+
+        try:
+            self.player.play_file(
+                sound_path,
+                volume=self._cached_config.get("volume", 50),
+                audio3d=bool(angle_x or angle_y),
+                angle_x=angle_x,
+                angle_y=angle_y
+            )
+        except Exception:
+            return False
+        return True
 
     def get_earcon_angles(self):
         try:
@@ -1554,10 +1652,19 @@ class AudioThemesHandler:
             if cache is None:
                 if os.path.isdir(typing_dir):
                     try:
-                        files = [f for f in os.listdir(typing_dir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
+                        files = [
+                            f for f in os.listdir(typing_dir)
+                            if os.path.splitext(f)[1].lower().lstrip('.') in SUPPORTED_FILE_TYPES
+                        ]
                     except OSError:
                         files = []
-                    cache = {'files': files, 'valid_choices': [f for f in files if f not in SPECIAL_TYPING_FILES]}
+                    cache = {
+                        'files': files,
+                        'valid_choices': [
+                            f for f in files
+                            if os.path.splitext(f)[0].lower() not in SPECIAL_TYPING_FILES
+                        ]
+                    }
                 else:
                     cache = {'files': [], 'valid_choices': []}
                 with _typing_dir_cache_lock:
@@ -1567,9 +1674,12 @@ class AudioThemesHandler:
             
             if cache['files']:
                 if vkCode is not None:
-                    expected_file = _SPECIAL_VK_FILE_MAP.get(vkCode)
-                    if expected_file and expected_file in cache['files']:
-                        sound_path = os.path.join(typing_dir, expected_file)
+                    expected_stem = _SPECIAL_VK_FILE_MAP.get(vkCode)
+                    if expected_stem:
+                        for f in cache['files']:
+                            if os.path.splitext(f)[0].lower() == expected_stem:
+                                sound_path = os.path.join(typing_dir, f)
+                                break
 
                 if not sound_path:
                     valid_choices = cache.get('valid_choices', cache['files'])

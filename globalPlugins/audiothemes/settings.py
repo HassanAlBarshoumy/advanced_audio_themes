@@ -462,7 +462,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         typingSoundsDir = os.path.join(os.path.dirname(__file__), "typingSounds", pack)
         if not os.path.isdir(typingSoundsDir): return
         try:
-            files = [f for f in os.listdir(typingSoundsDir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
+            files = [f for f in os.listdir(typingSoundsDir) if os.path.splitext(f)[1].lower().lstrip('.') in SUPPORTED_FILE_TYPES]
         except OSError:
             return
         if not files: return
@@ -490,7 +490,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         
         # Count sounds
         try:
-            files = [f for f in os.listdir(typingSoundsDir) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
+            files = [f for f in os.listdir(typingSoundsDir) if os.path.splitext(f)[1].lower().lstrip('.') in SUPPORTED_FILE_TYPES]
             count = len(files)
         except Exception:
             count = 0
@@ -692,7 +692,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         """Tab: Audio Formats and FFmpeg configuration."""
         sizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.ffmpegEnableCheckbox = wx.CheckBox(page, -1, _("Use FFmpeg for additional audio formats (MP3, FLAC, M4A, etc.)"))
+        self.ffmpegEnableCheckbox = wx.CheckBox(page, -1, _("Use FFmpeg to play additional audio formats (M4A, AAC, OPUS, WMA, MP2, AC3)"))
         sizer.Add(self.ffmpegEnableCheckbox, 0, wx.ALL, 5)
 
         self.ffmpegStatusText = wx.StaticText(page, -1, _("FFmpeg status: checking..."))
@@ -702,10 +702,39 @@ class AudioThemesSettingsPanel(SettingsPanel):
         sizer.Add(self.downloadFFmpegButton, 0, wx.ALL, 5)
         self.Bind(wx.EVT_BUTTON, self.onDownloadFFmpeg, self.downloadFFmpegButton)
 
+        sizer.Add(wx.StaticLine(page), 0, wx.EXPAND | wx.ALL, 5)
+
+        convertTitle = wx.StaticText(page, -1, _("Convert theme sounds:"))
+        sizer.Add(convertTitle, 0, wx.ALL, 5)
+
+        targetSizer = wx.BoxSizer(wx.HORIZONTAL)
+        targetLabel = wx.StaticText(page, -1, _("Target format:"))
+        self.convertTargetChoice = wx.Choice(
+            page, -1,
+            choices=[
+                _("WAV (compatible with everything)"),
+                _("FLAC (lossless, smaller)"),
+            ],
+        )
+        self.convertTargetChoice.SetSelection(0)
+        targetSizer.Add(targetLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        targetSizer.Add(self.convertTargetChoice, 0, wx.EXPAND, 0)
+        sizer.Add(targetSizer, 0, wx.EXPAND | wx.ALL, 5)
+
+        self.convertButton = wx.Button(page, -1, _("&Convert all theme sounds now"))
+        sizer.Add(self.convertButton, 0, wx.ALL, 5)
+        self.Bind(wx.EVT_BUTTON, self.onConvertThemeSounds, self.convertButton)
+
+        self.convertStatusText = wx.StaticText(page, -1, "")
+        sizer.Add(self.convertStatusText, 0, wx.ALL, 5)
+
         sizer.AddStretchSpacer()
         infoText = wx.StaticText(page, -1, _(
-            "FFmpeg enables support for many audio formats.\n"
-            "Without it, WAV, OGG, MP3, and FLAC are supported natively.\n"
+            "WAV, OGG, MP3, and FLAC are supported natively.\n"
+            "M4A, AAC, OPUS, WMA, MP2, and AC3 require FFmpeg to play.\n"
+            "Conversion permanently rewrites such files to WAV or FLAC inside\n"
+            "their theme folder, so FFmpeg is no longer needed for them.\n"
+            "FFmpeg is still required to decode the source during conversion.\n"
             "Download size: ~50MB, extracted: ~12MB."
         ))
         sizer.Add(infoText, 0, wx.ALL, 5)
@@ -2289,6 +2318,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
         audioConf = config.conf["audiothemes"]
         self.ffmpegEnableCheckbox.SetValue(audioConf.get("enable_ffmpeg", False))
         self._updateFFmpegStatus()
+        target = audioConf.get("convert_target", "wav")
+        self.convertTargetChoice.SetSelection(1 if target == "flac" else 0)
+        self.convertStatusText.SetLabel("")
 
     def _updateFFmpegStatus(self):
         try:
@@ -2326,6 +2358,161 @@ class AudioThemesSettingsPanel(SettingsPanel):
             wx.CallAfter(lambda: self.downloadFFmpegButton.Enable(True))
             wx.CallAfter(lambda: self.downloadFFmpegButton.SetLabel(
                 _("&Download and Install FFmpeg")))
+
+    def _selected_convert_target(self):
+        """Return the selected target format as a plain extension string."""
+        try:
+            sel = self.convertTargetChoice.GetSelection()
+        except Exception:
+            sel = 0
+        return ("wav", "flac")[sel] if 0 <= sel <= 1 else "wav"
+
+    def _count_convert_candidates(self, roots, candidate_exts):
+        """Return the number of candidate files under the given roots, for the
+        progress dialog's maximum value."""
+        total = 0
+        for root in roots:
+            if not os.path.isdir(root):
+                continue
+            for _dirpath, _dirs, files in os.walk(root):
+                for name in files:
+                    if os.path.splitext(name)[1].lower() in candidate_exts:
+                        total += 1
+        return total
+
+    def onConvertThemeSounds(self, event):
+        if getattr(self, "_converting", False):
+            return
+        self._converting = True
+        self.convertButton.Enable(False)
+        self.convertStatusText.SetLabel(_("Converting theme sounds..."))
+        target = self._selected_convert_target()
+        try:
+            config.conf["audiothemes"]["convert_target"] = target
+        except Exception:
+            pass
+        import threading
+        from .unspoken import audio_converter, ffmpeg_utils
+        roots = [THEMES_DIR] if os.path.isdir(THEMES_DIR) else []
+        total = self._count_convert_candidates(roots, audio_converter.ALL_AUDIO_EXTS)
+        # Show a modal progress dialog while the worker runs on a background
+        # thread so the user always sees that the conversion is in progress.
+        self._convert_progress_dlg = None
+        if total > 0:
+            try:
+                self._convert_progress_dlg = wx.ProgressDialog(
+                    _("Audio Theme Conversion"),
+                    _("Converting theme sounds to {target}...").format(target=target.upper()),
+                    maximum=total, parent=self,
+                    style=wx.PD_APP_MODAL | wx.PD_ESTIMATED_TIME | wx.PD_AUTO_HIDE
+                )
+            except Exception:
+                self._convert_progress_dlg = None
+        state = {"done": 0}
+
+        def report(src, ok, msg):
+            state["done"] += 1
+            try:
+                wx.CallAfter(self._update_convert_progress, state["done"], total, os.path.basename(src))
+            except Exception:
+                pass
+
+        def worker():
+            converted = 0
+            skipped = 0
+            failed = 0
+            errors = []
+            try:
+                allow_ffmpeg = ffmpeg_utils.get_ffmpeg_path() is not None
+                converted, skipped, failed, errors = audio_converter.convert_all(
+                    roots, target_ext=target, allow_ffmpeg=allow_ffmpeg,
+                    candidate_exts=audio_converter.ALL_AUDIO_EXTS,
+                    report=report
+                )
+            except Exception as e:
+                errors = [(THEMES_DIR, str(e))]
+            wx.CallAfter(self._onConvertDone, converted, skipped, failed, errors, target, total)
+        threading.Thread(target=worker, daemon=True).start()
+
+    def _update_convert_progress(self, done, total, current_name):
+        dlg = getattr(self, "_convert_progress_dlg", None)
+        if dlg is None:
+            return
+        try:
+            if total > 0:
+                dlg.Update(min(done, total), current_name)
+        except Exception:
+            try:
+                dlg.Destroy()
+            except Exception:
+                pass
+            self._convert_progress_dlg = None
+
+    def _onConvertDone(self, converted, skipped, failed, errors, target, total):
+        self._converting = False
+        dlg = getattr(self, "_convert_progress_dlg", None)
+        if dlg is not None:
+            try:
+                dlg.Destroy()
+            except Exception:
+                pass
+            self._convert_progress_dlg = None
+        try:
+            self.convertButton.Enable(True)
+        except Exception:
+            pass
+        # Show an explicit success/failure summary dialog.
+        summary = _(
+            "Conversion finished: {converted} converted, {skipped} skipped, "
+            "{failed} failed."
+        ).format(converted=converted, skipped=skipped, failed=failed)
+        try:
+            if errors:
+                detail = "; ".join(f"{a}: {b}" for a, b in errors[:5])
+                if len(errors) > 5:
+                    detail += _(" (and {n} more; see the NVDA log)").format(n=len(errors) - 5)
+                wx.MessageBox(
+                    _("{summary}\n\n{detail}").format(summary=summary, detail=detail),
+                    _("Audio Theme Conversion"), wx.OK | wx.ICON_WARNING, self
+                )
+            else:
+                wx.MessageBox(
+                    summary, _("Audio Theme Conversion"), wx.OK | wx.ICON_INFORMATION, self
+                )
+        except Exception:
+            pass
+        # Keep the status text as an accessible fallback.
+        if errors:
+            try:
+                self.convertStatusText.SetLabel(_(
+                    "Conversion done: {converted} converted, {skipped} skipped, "
+                    "{failed} failed. Details in the NVDA log."
+                ).format(converted=converted, skipped=skipped, failed=failed))
+            except Exception:
+                pass
+        else:
+            try:
+                self.convertStatusText.SetLabel(_(
+                    "Conversion done: {converted} converted, {skipped} skipped, "
+                    "{failed} failed."
+                ).format(converted=converted, skipped=skipped, failed=failed))
+            except Exception:
+                pass
+        # Ensure the handler's cached config reflects the selected target so the
+        # background auto-convert and the active theme reload use the same value,
+        # even if the user closes the dialog without pressing Save.
+        try:
+            from . import handler as _handler
+            if target in ("wav", "flac"):
+                _handler_config = getattr(_handler, "_instance_handler", None)
+                if _handler_config is not None:
+                    try:
+                        _handler_config._cached_config["convert_target"] = target
+                    except Exception:
+                        pass
+            _handler.audiotheme_changed.notify()
+        except Exception:
+            pass
 
     def _on_enable_themes_changed(self, event):
         show = event.IsChecked()
@@ -2745,6 +2932,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         # Audio Formats tab — FFmpeg
         conf["enable_ffmpeg"] = self.ffmpegEnableCheckbox.IsChecked()
+        conf["convert_target"] = self._selected_convert_target()
 
     def postSave(self):
         audiotheme_changed.notify()
@@ -2792,7 +2980,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             
         try:
             import os
-            files = [f for f in os.listdir(self.selected_theme.directory) if f.lower().endswith(('.wav', '.ogg', '.mp3'))]
+            files = [f for f in os.listdir(self.selected_theme.directory) if os.path.splitext(f)[1].lower().lstrip('.') in SUPPORTED_FILE_TYPES]
             theme_dict["count"] = len(files)
         except Exception:
             theme_dict["count"] = 0

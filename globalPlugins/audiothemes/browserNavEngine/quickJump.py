@@ -289,7 +289,12 @@ class QJAttribute(QJImmutable):
                     textValue = utils.NVDA2021Role(value).name
                 except ValueError:
                     textValue = value
-                value = getattr(controlTypes.Role, textValue)
+                try:
+                    value = getattr(controlTypes.Role, textValue)
+                except AttributeError:
+                    # A stale role name (e.g. EDIT) from an old bookmarks file:
+                    # keep the original numeric value.
+                    pass
             object.__setattr__(self, 'value', value)
         elif userString is not None:
             s = userString.strip()

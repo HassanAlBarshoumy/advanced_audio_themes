@@ -197,18 +197,22 @@ class AudioRule:
             return None
         type = self.getFrenzyType()
         s = self.frenzyValue
-        if type == FrenzyType.ROLE:
-            return getattr(controlTypes.Role, s)
-        elif type in [FrenzyType.STATE, FrenzyType.NEGATIVE_STATE]:
-            return getattr(controlTypes.State, s)
-        elif type == FrenzyType.FORMAT:
-            return getattr(TextFormat, s)
-        elif type == FrenzyType.NUMERIC_FORMAT:
-            return getattr(NumericTextFormat, s)
-        elif type == FrenzyType.OTHER_RULE:
-            return getattr(OtherRule, s)
-        else:
-            raise ValueError
+        try:
+            if type == FrenzyType.ROLE:
+                return getattr(controlTypes.Role, s)
+            elif type in [FrenzyType.STATE, FrenzyType.NEGATIVE_STATE]:
+                return getattr(controlTypes.State, s)
+            elif type == FrenzyType.FORMAT:
+                return getattr(TextFormat, s)
+            elif type == FrenzyType.NUMERIC_FORMAT:
+                return getattr(NumericTextFormat, s)
+            elif type == FrenzyType.OTHER_RULE:
+                return getattr(OtherRule, s)
+            else:
+                raise ValueError
+        except AttributeError:
+            # A stale role/state/format name from an old rules file (e.g. EDIT).
+            return None
 
     def getFrenzyValueStr(self):
         if self.frenzyValue is None or len(self.frenzyValue) == 0:

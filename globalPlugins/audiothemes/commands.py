@@ -38,6 +38,7 @@ _DEFAULT_COMMANDS_CONFIG = {
     "audio3d": False,
     "reverb": False,
     "enable_ffmpeg": False,
+    "output_mode": "stereo",
 }
 
 _commands_cached_config = dict(_DEFAULT_COMMANDS_CONFIG)
@@ -50,6 +51,7 @@ def refreshCommandsCachedConfig():
         "audio3d": ac.get("audio3d", _DEFAULT_COMMANDS_CONFIG["audio3d"]),
         "reverb": us.get("Reverb", _DEFAULT_COMMANDS_CONFIG["reverb"]),
         "enable_ffmpeg": ac.get("enable_ffmpeg", _DEFAULT_COMMANDS_CONFIG["enable_ffmpeg"]),
+        "output_mode": ac.get("output_mode", _DEFAULT_COMMANDS_CONFIG["output_mode"]),
     }
 
 _WAVE_PLAYER_POOL_MAX = 16
@@ -113,6 +115,11 @@ def _reverb_cache_put(key, value):
             _reverb_cache.pop(next(iter(_reverb_cache)))
         _reverb_cache[key] = value
 
+def _downmix_stereo_mono(arr):
+    """Downmix a stereo int16 array to a mono float array (0.5 L + 0.5 R)."""
+    n = len(arr) // 2
+    return array.array('f', ((arr[i * 2] + arr[i * 2 + 1]) * (0.5 / 32767.0) for i in range(n)))
+
 class PpSynchronousCommand(speech.commands.BaseCallbackCommand):
     def getDuration(self):
         raise NotImplementedError()
@@ -164,12 +171,15 @@ class PpBeepCommand(PpSynchronousCommand):
         try:
             reverb_enabled = _commands_cached_config.get("reverb", False)
             if reverb_enabled:
-                cache_key = ("beep", hz, length, left, right, _angle_x, _angle_y)
+                out_mode = _commands_cached_config.get("output_mode", "stereo")
+                cache_key = ("beep", hz, length, left, right, _angle_x, _angle_y, out_mode)
                 reverbed = None
                 with _reverb_cache_lock:
                     if cache_key in _reverb_cache:
                         reverbed = _reverb_cache[cache_key]
                 if reverbed is not None:
+                    # The reverbed cache entry is already mode-specific: mono
+                    # output centered the dry beep before reverb was applied.
                     rp = get_pooled_player(2, int(tones.SAMPLE_RATE), True)
                     rp.stop()
                     rp.feed(reverbed)
@@ -184,25 +194,31 @@ class PpBeepCommand(PpSynchronousCommand):
                 from .unspoken.steam_audio import get_steam_audio
                 steam_audio = get_steam_audio()
                 if steam_audio and getattr(steam_audio, "initialized", False):
-                    import array
-                    arr = array.array('h')
-                    arr.frombytes(buf.raw)
-                    # Beeps from generateBeep are stereo
-                    float_samples = [(arr[i] + arr[i+1]) / (2.0 * 32767.0) for i in range(0, len(arr), 2)]
-                    remainder = len(float_samples) % 1024
-                    if remainder != 0:
-                        float_samples.extend([0.0] * (1024 - remainder))
-                    processed = steam_audio.process_sound(float_samples, _angle_x, _angle_y)
-                    if processed:
-                        reverbed_generated = steam_audio.apply_reverb(processed)
-                        if reverbed_generated:
-                            _reverb_cache_put(cache_key, reverbed_generated)
-                            rp = get_pooled_player(2, int(tones.SAMPLE_RATE), True)
-                            rp.stop()
-                            rp.feed(reverbed_generated)
-                            rp.idle()
-                            self.reverbPlayer = rp
-                            return
+                    reverbed_generated = None
+                    if _angle_x == 0 and _angle_y == 0:
+                        # Centered beep: mono output mode applies only to the
+                        # dry beep (L==R), reverb output must stay stereo.
+                        dry_pcm = ensure_mono(buf.raw, 2, int(tones.SAMPLE_RATE))
+                        reverbed_generated = steam_audio.apply_reverb(dry_pcm)
+                    else:
+                        arr = array.array('h')
+                        arr.frombytes(buf.raw)
+                        # Beeps from generateBeep are stereo
+                        float_samples = _downmix_stereo_mono(arr)
+                        remainder = len(float_samples) % 1024
+                        if remainder != 0:
+                            float_samples.extend([0.0] * (1024 - remainder))
+                        processed = steam_audio.process_sound(float_samples, _angle_x, _angle_y)
+                        if processed:
+                            reverbed_generated = steam_audio.apply_reverb(processed)
+                    if reverbed_generated:
+                        _reverb_cache_put(cache_key, reverbed_generated)
+                        rp = get_pooled_player(2, int(tones.SAMPLE_RATE), True)
+                        rp.stop()
+                        rp.feed(reverbed_generated)
+                        rp.idle()
+                        self.reverbPlayer = rp
+                        return
         except Exception as e:
             from logHandler import log
             log.error(f"Failed to apply reverb to PpBeepCommand: {e}", exc_info=True)
@@ -215,11 +231,10 @@ class PpBeepCommand(PpSynchronousCommand):
         cur_sample_rate = int(tones.SAMPLE_RATE)
 
         _spatialized = False
-        if _audio3d and _handler and getattr(_handler.player, "steam_audio_active", False):
-            import array
+        if _audio3d and _handler and getattr(_handler.player, "steam_audio_active", False) and (_angle_x != 0 or _angle_y != 0):
             arr = array.array('h')
             arr.frombytes(audio_bytes)
-            float_samples = [(arr[i] + arr[i+1]) / (2.0 * 32767.0) for i in range(0, len(arr), 2)]
+            float_samples = _downmix_stereo_mono(arr)
             remainder = len(float_samples) % 1024
             if remainder:
                 float_samples.extend([0.0] * (1024 - remainder))
@@ -409,12 +424,15 @@ class PpWaveFileCommand(PpSynchronousCommand):
         try:
             reverb_enabled = _commands_cached_config.get("reverb", False)
             if reverb_enabled:
-                cache_key = ("wave", self.fileName, self.volume, self.startAdjustment, self.endAdjustment, _angle_x, _angle_y)
+                out_mode = _commands_cached_config.get("output_mode", "stereo")
+                cache_key = ("wave", self.fileName, self.volume, self.startAdjustment, self.endAdjustment, _angle_x, _angle_y, out_mode)
                 packed = None
                 with _reverb_cache_lock:
                     if cache_key in _reverb_cache:
                         packed = _reverb_cache[cache_key]
                 if packed is not None:
+                    # The reverbed cache entry is already mode-specific: mono
+                    # output centered the dry file before reverb was applied.
                     rp = get_pooled_player(2, self._sample_rate, False)
                     rp.stop()
                     rp.feed(_apply_ducking(packed, _ducking_factor))
@@ -425,27 +443,40 @@ class PpWaveFileCommand(PpSynchronousCommand):
                 from .unspoken.steam_audio import get_steam_audio
                 steam_audio = get_steam_audio()
                 if steam_audio and getattr(steam_audio, "initialized", False):
-                    import array
-                    arr = array.array('h')
-                    arr.frombytes(self.buf)
-                    if self._channels == 2:
-                        float_samples = [(arr[i] + arr[i+1]) / (2.0 * 32767.0) for i in range(0, len(arr), 2)]
+                    reverbed_generated = None
+                    if _angle_x == 0 and _angle_y == 0 and self._channels == 2:
+                        # Centered stereo file: mono output mode applies only to the
+                        # dry file (L==R), reverb output must stay stereo.
+                        dry_pcm = ensure_mono(self.buf, 2, self._sample_rate)
+                        reverbed_generated = steam_audio.apply_reverb(dry_pcm)
+                    elif _angle_x == 0 and _angle_y == 0 and self._channels == 1:
+                        # Centered mono file: upmix to stereo, then add reverb.
+                        arr = array.array('h')
+                        arr.frombytes(self.buf)
+                        mono_dup = array.array('h', (s for s in arr for _ in range(2)))
+                        reverbed_generated = steam_audio.apply_reverb(mono_dup.tobytes())
                     else:
-                        float_samples = [x / 32767.0 for x in arr]
-                    remainder = len(float_samples) % 1024
-                    if remainder != 0:
-                        float_samples.extend([0.0] * (1024 - remainder))
-                    processed = steam_audio.process_sound(float_samples, _angle_x, _angle_y)
-                    if processed:
-                        reverbed_generated = steam_audio.apply_reverb(processed)
-                        if reverbed_generated:
-                            _reverb_cache_put(cache_key, reverbed_generated)
-                            rp = get_pooled_player(2, self._sample_rate, False)
-                            rp.stop()
-                            rp.feed(_apply_ducking(reverbed_generated, _ducking_factor))
-                            rp.idle()
-                            self.fileWavePlayer = rp
-                            return
+                        # Off-center: downmix to mono, reposition, then add reverb.
+                        arr = array.array('h')
+                        arr.frombytes(self.buf)
+                        if self._channels == 2:
+                            float_samples = _downmix_stereo_mono(arr)
+                        else:
+                            float_samples = array.array('f', (x / 32767.0 for x in arr))
+                        remainder = len(float_samples) % 1024
+                        if remainder != 0:
+                            float_samples.extend([0.0] * (1024 - remainder))
+                        processed = steam_audio.process_sound(float_samples, _angle_x, _angle_y)
+                        if processed:
+                            reverbed_generated = steam_audio.apply_reverb(processed)
+                    if reverbed_generated:
+                        _reverb_cache_put(cache_key, reverbed_generated)
+                        rp = get_pooled_player(2, self._sample_rate, False)
+                        rp.stop()
+                        rp.feed(_apply_ducking(reverbed_generated, _ducking_factor))
+                        rp.idle()
+                        self.fileWavePlayer = rp
+                        return
         except Exception as e:
             from logHandler import log
             log.error(f"Failed to apply reverb to PpWaveFileCommand: {e}", exc_info=True)
@@ -457,14 +488,13 @@ class PpWaveFileCommand(PpSynchronousCommand):
         cur_sample_rate = self._sample_rate
 
         _spatialized = False
-        if _audio3d and _handler and getattr(_handler.player, "steam_audio_active", False):
-            import array
+        if _audio3d and _handler and getattr(_handler.player, "steam_audio_active", False) and (_angle_x != 0 or _angle_y != 0):
             arr = array.array('h')
             arr.frombytes(audio_bytes)
             if cur_channels == 2:
-                float_samples = [(arr[i] + arr[i+1]) / (2.0 * 32767.0) for i in range(0, len(arr), 2)]
+                float_samples = _downmix_stereo_mono(arr)
             else:
-                float_samples = [x / 32767.0 for x in arr]
+                float_samples = array.array('f', (x / 32767.0 for x in arr))
             remainder = len(float_samples) % 1024
             if remainder:
                 float_samples.extend([0.0] * (1024 - remainder))

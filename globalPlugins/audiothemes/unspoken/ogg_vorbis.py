@@ -6,10 +6,23 @@ from logHandler import log
 
 _X64_DIR = os.path.join(os.path.dirname(__file__), "lib", "x64")
 
-# Load DLLs with full path to resolve dependencies
-_ogg_lib = ctypes.CDLL(os.path.join(_X64_DIR, "libogg-0.dll"))
-_vorbis_lib = ctypes.CDLL(os.path.join(_X64_DIR, "libvorbis-0.dll"))
-_vorbisfile_lib = ctypes.CDLL(os.path.join(_X64_DIR, "libvorbisfile-3.dll"))
+# Load DLLs with full path to resolve dependencies.
+# Guard each load: a missing/corrupt DLL must not crash the whole addon.
+try:
+    _ogg_lib = ctypes.CDLL(os.path.join(_X64_DIR, "libogg-0.dll"))
+except Exception as e:
+    log.error(f"Failed to load libogg-0.dll: {e}")
+    _ogg_lib = None
+try:
+    _vorbis_lib = ctypes.CDLL(os.path.join(_X64_DIR, "libvorbis-0.dll"))
+except Exception as e:
+    log.error(f"Failed to load libvorbis-0.dll: {e}")
+    _vorbis_lib = None
+try:
+    _vorbisfile_lib = ctypes.CDLL(os.path.join(_X64_DIR, "libvorbisfile-3.dll"))
+except Exception as e:
+    log.error(f"Failed to load libvorbisfile-3.dll: {e}")
+    _vorbisfile_lib = None
 
 # --- vorbis_info struct ---
 class VorbisInfo(ctypes.Structure):
@@ -84,6 +97,9 @@ def decode_ogg_to_float(path):
     """Decode an OGG file to float32 PCM samples.
     Returns (float_array, sample_rate, channels) or None on failure.
     """
+    if _vorbisfile_lib is None or _vorbis_lib is None or _ogg_lib is None:
+        log.error("OGG decoder unavailable: vorbis DLLs failed to load")
+        return None
     vf = ctypes.create_string_buffer(OGG_VORBIS_FILE_SIZE)
     try:
         ret = ov_fopen(path, vf)

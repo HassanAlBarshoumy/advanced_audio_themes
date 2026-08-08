@@ -5,7 +5,11 @@ from logHandler import log
 
 _X64_DIR = os.path.join(os.path.dirname(__file__), "lib", "x64")
 
-_mpg123 = ctypes.CDLL(os.path.join(_X64_DIR, "libmpg123-0.dll"))
+try:
+    _mpg123 = ctypes.CDLL(os.path.join(_X64_DIR, "libmpg123-0.dll"))
+except Exception as e:
+    log.error(f"Failed to load libmpg123-0.dll: {e}")
+    _mpg123 = None
 
 MPG123_OK = 0
 MPG123_DONE = -11
@@ -36,6 +40,9 @@ _mpg123.mpg123_getformat.restype = ctypes.c_int
 
 
 def decode_mp3_to_float(path):
+    if _mpg123 is None:
+        log.error("MP3 decoder unavailable: libmpg123-0.dll failed to load")
+        return None
     mh = _mpg123.mpg123_new(None, None)
     if not mh:
         log.error("mpg123_new failed")
@@ -89,13 +96,9 @@ def decode_mp3_to_float(path):
         arr = array.array('h')
         arr.frombytes(bytes(all_pcm))
 
-        if channels.value == 2:
-            n = len(arr) // 2
-            float_samples = array.array('f', ((arr[i * 2] + arr[i * 2 + 1]) / 65536.0 for i in range(n)))
-            return (float_samples, rate.value, 1)
-        else:
-            float_samples = array.array('f', (s / 32768.0 for s in arr))
-            return (float_samples, rate.value, channels.value)
+        # Preserve the original channel layout: stereo MP3s stay stereo.
+        float_samples = array.array('f', (s / 32768.0 for s in arr))
+        return (float_samples, rate.value, channels.value)
 
     except Exception as e:
         log.error(f"Failed to decode MP3 {path}: {e}")

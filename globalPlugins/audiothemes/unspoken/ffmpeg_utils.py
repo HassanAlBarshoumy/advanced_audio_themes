@@ -42,37 +42,49 @@ def decode_with_ffmpeg(path):
     ffmpeg = get_ffmpeg_path()
     if not ffmpeg:
         return None
+    out_path = None
     try:
-        cmd = [ffmpeg, "-y", "-i", path,
+        # Decode to a temp file instead of a pipe: the polling loop below never
+        # drains stdout, so a pipe would fill up and deadlock ffmpeg for any
+        # real audio file (the pipe buffer fills in a few KB).
+        fd, out_path = tempfile.mkstemp(suffix=".wav")
+        os.close(fd)
+        cmd = [ffmpeg, "-y", "-nostdin", "-hide_banner", "-loglevel", "error",
+               "-i", path,
                "-f", "wav", "-acodec", "pcm_s16le",
-               "-ar", "44100", "-ac", "1", "pipe:1"]
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        start = time.time()
-        timeout = 5
-        while time.time() - start < timeout:
-            if proc.poll() is not None:
-                break
-            time.sleep(0.05)
-            try:
-                import wx
-                wx.YieldIfNeeded()
-            except Exception:
-                pass
-        else:
-            proc.kill()
-            proc.wait()
-            log.error(f"FFmpeg decode timed out (>={timeout}s) for {path}")
+               "-ar", "44100", out_path]
+        with open(out_path, "wb") as out_f:
+            proc = subprocess.Popen(
+                cmd,
+                stdout=out_f,
+                stderr=subprocess.PIPE,
+                stdin=subprocess.DEVNULL,
+            )
+            start = time.time()
+            timeout = 5
+            while time.time() - start < timeout:
+                if proc.poll() is not None:
+                    break
+                time.sleep(0.05)
+                try:
+                    import wx
+                    wx.YieldIfNeeded()
+                except Exception:
+                    pass
+            else:
+                proc.kill()
+                proc.wait()
+                log.error(f"FFmpeg decode timed out (>={timeout}s) for {path}")
+                return None
+            stderr = proc.communicate()[1]
+            if proc.returncode != 0:
+                err_text = stderr.decode('utf-8', errors='replace')[:200] if stderr else "unknown error"
+                log.error(f"FFmpeg decode failed for {path}: {err_text}")
+                return None
+        if not os.path.getsize(out_path):
             return None
-        stdout, stderr = proc.communicate()
-        if proc.returncode != 0:
-            err_text = stderr.decode('utf-8', errors='replace')[:200] if stderr else "unknown error"
-            log.error(f"FFmpeg decode failed for {path}: {err_text}")
-            return None
-        wav_data = stdout
-        if not wav_data:
-            return None
-        import wave, io
-        with wave.open(io.BytesIO(wav_data), "rb") as wf:
+        import wave
+        with wave.open(out_path, "rb") as wf:
             frames = wf.readframes(wf.getnframes())
             sample_rate = wf.getframerate()
             channels = wf.getnchannels()
@@ -82,7 +94,13 @@ def decode_with_ffmpeg(path):
             return (float_samples, sample_rate, channels)
     except Exception as e:
         log.error(f"FFmpeg decode error for {path}: {e}")
-    return None
+        return None
+    finally:
+        try:
+            if out_path and os.path.exists(out_path):
+                os.remove(out_path)
+        except Exception:
+            pass
 
 def download_ffmpeg(progress_callback=None):
     """Download and extract ffmpeg.exe with timeout and chunked progress.

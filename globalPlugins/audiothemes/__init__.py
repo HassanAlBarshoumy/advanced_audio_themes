@@ -955,7 +955,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 return
 
             nx = dx / float(desktop[2])
-            ny = dy / float(desktop[3])
+            # Screen y increases downward; the rest of the system maps the
+            # TOP of the screen to a POSITIVE angle_y (see unspoken.play(),
+            # _snapshot_obj, get_earcon_angles). Negate so a target ABOVE the
+            # beacon (smaller c_y) yields a positive angle_y, keeping the
+            # beacon's vertical axis consistent with every other path.
+            ny = -dy / float(desktop[3])
 
             # Try theme beacon sound first
             if self.handler.play_theme_sound("beacon", angle_x=nx * 90.0, angle_y=ny * 50.0):

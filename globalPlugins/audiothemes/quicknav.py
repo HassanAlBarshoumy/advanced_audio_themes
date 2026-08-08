@@ -8,6 +8,66 @@ from . import frenzy
 from . import utils
 from .handler import role_name_to_int
 
+# Container/document roles that are never a form control we want a themed
+# sound for. When the object at the caret is one of these, walk up to the
+# nearest real control (e.g. an editable combo box that a quick-nav "edit"
+# actually landed on).
+_QUICKNAV_SKIP_ROLES = None
+
+
+def _get_quicknav_skip_roles():
+    global _QUICKNAV_SKIP_ROLES
+    if _QUICKNAV_SKIP_ROLES is None:
+        skip = set()
+        for name in ("UNKNOWN", "DOCUMENT", "LANDMARK", "REGION", "GROUPING",
+                     "PARAGRAPH", "PANE", "WINDOW", "FRAME", "APPLICATION",
+                     "DIALOG", "ROOT_PANE", "TEXT_FRAME"):
+            role = getattr(controlTypes.Role, name, None)
+            if role is not None:
+                skip.add(int(role))
+        _QUICKNAV_SKIP_ROLES = skip
+    return _QUICKNAV_SKIP_ROLES
+
+
+def _actual_landed_role(new_selection):
+    """Best-effort real role of the element the browse-mode caret landed on.
+
+    A quick-nav "edit" (E) can land on an editable combo box, a search field,
+    a multi-line edit, etc. This inspects the object at the new caret and walks
+    up from generic containers until a concrete control role is found, so the
+    correct themed sound plays. Returns None when no concrete control is found.
+    """
+    if new_selection is None:
+        return None
+    try:
+        obj = new_selection.NVDAObjectAtStart
+    except Exception:
+        obj = None
+    skip = _get_quicknav_skip_roles()
+    doc_role = int(controlTypes.Role.DOCUMENT)
+    depth = 0
+    while obj is not None and depth < 8:
+        try:
+            role = getattr(obj, "role", None)
+            role_int = int(role) if role is not None else None
+        except Exception:
+            return None
+        if role_int is None or role_int in skip:
+            if role_int == doc_role:
+                return None
+            try:
+                obj = getattr(obj, "parent", None)
+            except Exception:
+                return None
+            depth += 1
+            continue
+        try:
+            return controlTypes.Role(role_int)
+        except Exception:
+            return None
+    return None
+
+
 class BrowseModeQuickNavInterceptor:
     def __init__(self, handler):
         self.handler = handler
@@ -63,7 +123,7 @@ class BrowseModeQuickNavInterceptor:
                     logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
             if new_selection:
                 if not old_info or old_info.compareEndPoints(new_selection, "startToStart") != 0:
-                    self._check_and_play_nav(itemType)
+                    self._check_and_play_nav(itemType, new_selection)
 
         self._patched_script_ref = patched_quick_nav_script
         setattr(BrowseModeTreeInterceptor, "_quickNavScript", patched_quick_nav_script)
@@ -74,7 +134,7 @@ class BrowseModeQuickNavInterceptor:
             if current_script == self._patched_script_ref:
                 setattr(BrowseModeTreeInterceptor, "_quickNavScript", self.orig_quick_nav_script)
 
-    def _check_and_play_nav(self, itemType: str) -> bool:
+    def _check_and_play_nav(self, itemType: str, new_selection=None) -> bool:
         played = False
         
         # 1. First check Audio Themes
@@ -82,43 +142,67 @@ class BrowseModeQuickNavInterceptor:
         cfg = getattr(self.handler, '_cached_config', None) or {}
         if cfg.get("enable_audio_themes", True) and self.handler.active_theme:
             self.handler.last_quicknav_time = time.monotonic()
+            theme = self.handler.active_theme
             role = None
-            if itemType.startswith("heading"):
-                role = controlTypes.Role.HEADING
-            elif itemType == "link":
-                role = controlTypes.Role.LINK
-            elif itemType == "visitedLink":
-                role = controlTypes.Role.LINK
-            elif itemType == "formField":
-                role = controlTypes.Role.EDIT
-            elif itemType == "table":
-                role = controlTypes.Role.TABLE
-            elif itemType == "list":
-                role = controlTypes.Role.LIST
+            sound_key = None
+
+            if itemType in ("formField", "edit", "editMultiline"):
+                # The element quick-nav actually landed on may be an editable
+                # combo box, a search field, a checkbox, a multi-line edit, etc.
+                # Prefer the REAL role of that element so the matching themed
+                # sound plays; fall back to the plain edit role when it cannot
+                # be resolved.
+                role = _actual_landed_role(new_selection)
+                if role is None:
+                    role = controlTypes.Role.EDITABLETEXT
+                sound_key = int(role)
             else:
-                try:
+                if itemType.startswith("heading"):
+                    role = controlTypes.Role.HEADING
+                elif itemType in ("link", "visitedLink"):
+                    role = controlTypes.Role.LINK
+                elif itemType in ("table", "list"):
                     role = getattr(controlTypes.Role, itemType.upper())
-                except AttributeError:
-                    pass
-                    
-            if role is not None:
-                theme = self.handler.active_theme
+                else:
+                    try:
+                        role = getattr(controlTypes.Role, itemType.upper())
+                    except AttributeError:
+                        role = None
+                # Resolve the sound key: exact lowercase name first (covers the
+                # pseudo quick-nav keys like unvisitedlink/nonheading/quote/annotation
+                # and role names), then fall back to the resolved role int.
                 sound_key = role_name_to_int.get(itemType.lower())
-                if sound_key is None:
-                    sound_key = role_name_to_int.get(itemType.upper(), role)
-                
+                if sound_key is None and role is not None:
+                    sound_key = role
+
+            if sound_key is None:
+                return played
+
+            with theme._lock:
+                sound_obj = theme.sounds.get(sound_key)
+
+            if sound_obj is None and itemType.startswith("heading"):
+                sound_key = role
                 with theme._lock:
                     sound_obj = theme.sounds.get(sound_key)
-                
-                if sound_obj is None and itemType.startswith("heading"):
-                    sound_key = role
+
+            if sound_obj is None and itemType in ("formField", "edit", "editMultiline"):
+                # The landed element's own sound is missing from this theme:
+                # use the plain edit sound as a stable fallback.
+                try:
+                    fallback_key = int(controlTypes.Role.EDITABLETEXT)
+                except Exception:
+                    fallback_key = role_name_to_int.get("editabledext")
+                if fallback_key is not None and fallback_key != sound_key:
                     with theme._lock:
-                        sound_obj = theme.sounds.get(sound_key)
-                        
-                if sound_obj is None:
-                    return played
-                obj_info = {"role": role, "name": itemType, "is_quicknav": True}
-                utils.threadPool.add_task(self.handler.play, obj_info, sound_key)
-                played = True
+                        sound_obj = theme.sounds.get(fallback_key)
+                    if sound_obj is not None:
+                        sound_key = fallback_key
+
+            if sound_obj is None:
+                return played
+            obj_info = {"role": role, "name": itemType, "is_quicknav": True}
+            utils.threadPool.add_task(self.handler.play, obj_info, sound_key)
+            played = True
 
         return played
