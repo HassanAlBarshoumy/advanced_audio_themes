@@ -68,6 +68,36 @@ def _actual_landed_role(new_selection):
     return None
 
 
+# Roles that make up the "button" family for quick-nav. B is supposed to land on
+# every kind of button (plain, toggle, menu, split, dropdown). A concrete
+# role outside this family is NOT the button the user pressed B for, so fall
+# back to the plain button sound instead of playing a container sound.
+_QUICKNAV_BUTTON_ROLES = None
+
+
+def _get_quicknav_button_roles():
+    global _QUICKNAV_BUTTON_ROLES
+    if _QUICKNAV_BUTTON_ROLES is None:
+        roles = set()
+        for name in ("BUTTON", "TOGGLEBUTTON", "MENUBUTTON", "SPLITBUTTON",
+                     "DROPDOWNBUTTON", "DROPDOWNBUTTONGRID"):
+            role = getattr(controlTypes.Role, name, None)
+            if role is not None:
+                roles.add(int(role))
+        _QUICKNAV_BUTTON_ROLES = roles
+    return _QUICKNAV_BUTTON_ROLES
+
+
+def _default_quicknav_role(itemType):
+    """Fallback role for quick-nav types whose sound resolves via the real
+    landed element: editable types default to EDITABLETEXT, button to BUTTON."""
+    if itemType in ("formField", "edit", "editMultiline"):
+        return controlTypes.Role.EDITABLETEXT
+    if itemType == "button":
+        return controlTypes.Role.BUTTON
+    return None
+
+
 class BrowseModeQuickNavInterceptor:
     def __init__(self, handler):
         self.handler = handler
@@ -146,15 +176,18 @@ class BrowseModeQuickNavInterceptor:
             role = None
             sound_key = None
 
-            if itemType in ("formField", "edit", "editMultiline"):
+            if itemType in ("formField", "edit", "editMultiline", "button"):
                 # The element quick-nav actually landed on may be an editable
-                # combo box, a search field, a checkbox, a multi-line edit, etc.
-                # Prefer the REAL role of that element so the matching themed
-                # sound plays; fall back to the plain edit role when it cannot
-                # be resolved.
+                # combo box, a search field, a checkbox, an editable combo box,
+                # a toggle/menu/split button, etc. Prefer the REAL role of that
+                # element so the matching themed sound plays. For "button" only
+                # the button family is accepted; anything else falls back to the
+                # plain button role.
                 role = _actual_landed_role(new_selection)
+                if itemType == "button" and role is not None and int(role) not in _get_quicknav_button_roles():
+                    role = None
                 if role is None:
-                    role = controlTypes.Role.EDITABLETEXT
+                    role = _default_quicknav_role(itemType)
                 sound_key = int(role)
             else:
                 if itemType.startswith("heading"):
@@ -186,13 +219,15 @@ class BrowseModeQuickNavInterceptor:
                 with theme._lock:
                     sound_obj = theme.sounds.get(sound_key)
 
-            if sound_obj is None and itemType in ("formField", "edit", "editMultiline"):
+            if sound_obj is None and itemType in ("formField", "edit", "editMultiline", "button"):
                 # The landed element's own sound is missing from this theme:
-                # use the plain edit sound as a stable fallback.
+                # use the default sound for this quick-nav family as a stable
+                # fallback (plain edit for editable types, plain button for B).
+                fallback_role = _default_quicknav_role(itemType)
                 try:
-                    fallback_key = int(controlTypes.Role.EDITABLETEXT)
+                    fallback_key = int(fallback_role)
                 except Exception:
-                    fallback_key = role_name_to_int.get("editabledext")
+                    fallback_key = role_name_to_int.get(fallback_role.name.lower()) if getattr(fallback_role, "name", None) else None
                 if fallback_key is not None and fallback_key != sound_key:
                     with theme._lock:
                         sound_obj = theme.sounds.get(fallback_key)

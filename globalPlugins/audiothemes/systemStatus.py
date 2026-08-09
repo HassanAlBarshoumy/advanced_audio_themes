@@ -85,6 +85,10 @@ user32.PostMessageW.argtypes = [
     ctypes.wintypes.HWND, ctypes.wintypes.UINT, WPARAM, LPARAM,
 ]
 user32.PostMessageW.restype = ctypes.wintypes.BOOL
+user32.DestroyWindow.argtypes = [ctypes.wintypes.HWND]
+user32.DestroyWindow.restype = ctypes.wintypes.BOOL
+user32.UnregisterClassW.argtypes = [ctypes.wintypes.LPCWSTR, ctypes.wintypes.HINSTANCE]
+user32.UnregisterClassW.restype = ctypes.wintypes.BOOL
 user32.GetMessageW.argtypes = [
     ctypes.wintypes.LPMSG, ctypes.wintypes.HWND, ctypes.wintypes.UINT, ctypes.wintypes.UINT,
 ]
@@ -121,6 +125,24 @@ class SYSTEM_POWER_STATUS(ctypes.Structure):
         ("BatteryLifeTime", ctypes.wintypes.DWORD),
         ("BatteryFullLifeTime", ctypes.wintypes.DWORD),
     ]
+
+# Each SystemStatusMonitor instance registers a WINDOW CLASS with a UNIQUE
+# name. RegisterClassExW registers the class for the whole process and the
+# registration survives the registering thread, so reusing one fixed name
+# ("AudioThemesSystemStatus") fails with ERROR_CLASS_ALREADY_EXISTS whenever a
+# second monitor instance is created in the same NVDA process (e.g. after the
+# "Reload plugins" gesture or an addon update) - the new monitor then dies
+# silently with "RegisterClassExW failed". Unique names avoid the conflict and
+# the class is unregistered when the monitor thread exits.
+_class_counter = 0
+_class_counter_lock = threading.Lock()
+
+
+def _next_window_class_name():
+    global _class_counter
+    with _class_counter_lock:
+        _class_counter += 1
+        return "AudioThemesSystemStatus_%d" % _class_counter
 
 class SystemStatusMonitor:
     _battery_timer_id = 1
@@ -173,7 +195,8 @@ class SystemStatusMonitor:
         wc.cbSize = ctypes.sizeof(WNDCLASSEXW)
         wc.lpfnWndProc = WNDPROC(self._window_proc)
         wc.hInstance = hinstance
-        wc.lpszClassName = "AudioThemesSystemStatus"
+        wc.lpszClassName = _next_window_class_name()
+        class_name = wc.lpszClassName
         atom = user32.RegisterClassExW(ctypes.byref(wc))
         if not atom:
             log.debugWarning("SystemStatusMonitor: RegisterClassExW failed")
@@ -208,7 +231,13 @@ class SystemStatusMonitor:
             user32.DispatchMessageW(ctypes.byref(msg))
 
         self._unregister_device_notifications()
-        self._hwnd = None
+        if self._hwnd:
+            user32.DestroyWindow(self._hwnd)
+            self._hwnd = None
+        try:
+            user32.UnregisterClassW(class_name, hinstance)
+        except Exception:
+            pass
 
     def _register_device_notifications(self):
         try:

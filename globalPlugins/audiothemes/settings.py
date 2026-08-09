@@ -18,7 +18,7 @@ import config
 import gui
 import nvwave
 
-from .handler import AudioThemesHandler, audiotheme_changed, THEMES_DIR, _get_blacklisted_roles, theme_roles, role_name_to_int, role_int_to_name, SpecialProps
+from .handler import AudioThemesHandler, audiotheme_changed, THEMES_DIR, _get_blacklisted_roles, theme_roles, role_name_to_int, role_int_to_name, SpecialProps, SUPPORTED_FILE_TYPES
 from .update_checker import check_for_updates
 from .frenzy import get_ducking_factor, _DEFAULT_DUCKING_CATEGORIES
 log = logging.getLogger(__name__)
@@ -29,8 +29,71 @@ try:
 except AttributeError:
     pass
 
-
 from gui.settingsDialogs import SettingsPanel
+
+# Theme preview: preferred stems and the order to prefer extensions when a
+# theme ships several formats of the same sound (WAV is the lightest and plays
+# through nvwave directly; FLAC/OGG/MP3/... go through the addon pipeline).
+_PREVIEW_STEMS = ("button", "link", "checkbox")
+_PREVIEW_EXT_PRIORITY = {ext: i for i, ext in enumerate(
+    ("wav", "flac", "ogg", "mp3", "m4a", "aac", "opus", "wma", "mp2", "ac3")
+)}
+
+
+def _pick_preview_file(theme_dir):
+    """Pick the audio file to preview for a theme directory.
+
+    Returns None when the directory is unreadable or contains no supported
+    audio file. Prefers a recognizable control sound (button/link/checkbox),
+    then WAV over other formats of the same sound, then any supported file.
+    """
+    try:
+        files = [f for f in os.listdir(theme_dir)
+                 if os.path.splitext(f)[1].lower().lstrip('.') in SUPPORTED_FILE_TYPES]
+    except OSError:
+        return None
+    if not files:
+        return None
+
+    def _sort_key(name):
+        ext = os.path.splitext(name)[1].lower().lstrip('.')
+        return (_PREVIEW_EXT_PRIORITY.get(ext, 99), name.lower())
+
+    files.sort(key=_sort_key)
+    for stem in _PREVIEW_STEMS:
+        for f in files:
+            if os.path.splitext(f)[0].lower() == stem:
+                return os.path.join(theme_dir, f)
+    return os.path.join(theme_dir, files[0])
+
+
+def _play_preview_audio(path):
+    """Play a preview audio file through the lightest available player.
+
+    WAV goes through NVDA's own player (fast). FLAC/OGG/MP3/... go through the
+    addon's native decode pipeline, because nvwave only understands WAV.
+    """
+    ext = os.path.splitext(path)[1].lower().lstrip('.')
+    if ext == "wav":
+        try:
+            nvwave.playWaveFile(path, asynchronous=True)
+            return
+        except Exception as e:
+            logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
+    try:
+        from . import GlobalPlugin as _at_plugin
+        handler = getattr(_at_plugin, "_instance_handler", None)
+        player = getattr(handler, "player", None) if handler is not None else None
+        if player is None and handler is not None and hasattr(handler, "_ensure_player"):
+            try:
+                player = handler._ensure_player()
+            except Exception:
+                player = None
+        if player is not None and hasattr(player, "play_file"):
+            player.play_file(path)
+    except Exception as e:
+        logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
+
 
 class DummyEvent:
     def __init__(self, is_checked):
@@ -472,7 +535,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             try:
                 for _ in range(3):
                     f = random.choice(files)
-                    nvwave.playWaveFile(os.path.join(typingSoundsDir, f), asynchronous=True)
+                    _play_preview_audio(os.path.join(typingSoundsDir, f))
                     _time.sleep(0.12)
             except Exception:
                 log.debug("Preview playback interrupted")
@@ -2504,7 +2567,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
         try:
             from . import handler as _handler
             if target in ("wav", "flac"):
-                _handler_config = getattr(_handler, "_instance_handler", None)
+                _handler_config = None
+                try:
+                    from . import GlobalPlugin as _at_plugin
+                    _handler_config = getattr(_at_plugin, "_instance_handler", None)
+                except Exception:
+                    _handler_config = None
                 if _handler_config is not None:
                     try:
                         _handler_config._cached_config["convert_target"] = target
@@ -2961,7 +3029,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
                 for snd in sounds_to_try:
                     p = os.path.join(theme_path, snd)
                     if os.path.exists(p):
-                        nvwave.playWaveFile(p, asynchronous=True)
+                        _play_preview_audio(p)
                         _time.sleep(0.3)
                         break
             except Exception as e:
@@ -3093,16 +3161,16 @@ class AudioThemesSettingsPanel(SettingsPanel):
     def _playThemePreview(self, theme):
         if getattr(self, '_suppressPreview', False):
             return
-        preview_names = ["button.ogg", "button.wav", "button.mp3", "button.flac", "link.ogg", "link.wav", "link.mp3", "link.flac", "checkbox.ogg", "checkbox.wav", "checkbox.mp3", "checkbox.flac"]
-        theme_dir = os.path.join(THEMES_DIR, theme.folder)
-        for name in preview_names:
-            path = os.path.join(theme_dir, name)
-            if os.path.exists(path):
-                try: nvwave.playWaveFile(path, asynchronous=True)
-                except Exception as e:
-                    import logging
-                    logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
+        try:
+            theme_dir = os.path.join(THEMES_DIR, theme.folder)
+            if not os.path.isdir(theme_dir):
                 return
+        except Exception:
+            return
+        candidate = _pick_preview_file(theme_dir)
+        if candidate is None:
+            return
+        _play_preview_audio(candidate)
 
     def _add_directory_to_zip(self, zipf, source_dir, archive_prefix):
         """Recursively add all files from source_dir into zipf under archive_prefix."""

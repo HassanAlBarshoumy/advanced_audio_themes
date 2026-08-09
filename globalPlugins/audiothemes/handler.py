@@ -502,6 +502,14 @@ class AudioTheme:
         QUICKNAV_OFFSET + 2,
         QUICKNAV_OFFSET + 3,
         QUICKNAV_OFFSET + 4,
+    ) + tuple(
+        role
+        for role in (
+            getattr(controlTypes.Role, name, None)
+            for name in ("TOGGLEBUTTON", "MENUBUTTON", "SPLITBUTTON",
+                         "DROPDOWNBUTTON", "DROPDOWNBUTTONGRID")
+        )
+        if role is not None
     )
 
     def _auto_create_missing_sounds(self, new_sounds, available, player):
