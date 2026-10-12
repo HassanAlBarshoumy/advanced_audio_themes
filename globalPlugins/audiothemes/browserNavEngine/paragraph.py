@@ -9,8 +9,6 @@ import textInfos
 import controlTypes
 import api
 
-from . import quickJump
-
 class ScriptError(RuntimeError):
     pass
 
@@ -97,6 +95,7 @@ class Paragraph(baseObject.AutoPropertyObject):
         return self.textInfo.getTextWithFields()
 
     def _get_attributes(self):
+        from . import quickJump
         result = {}
         for attr in quickJump.extractAttributesSet(self.textInfo):
             try:
@@ -108,9 +107,11 @@ class Paragraph(baseObject.AutoPropertyObject):
         return result
 
     def _get_roles(self):
+        from . import quickJump
         return self.attributes.get(quickJump.ParagraphAttribute.ROLE, [])
 
     def get_headingLevel(self):
+        from . import quickJump
         try:
             return max([
                 attr.value

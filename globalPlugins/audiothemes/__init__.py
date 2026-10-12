@@ -37,13 +37,22 @@ import gui
 import speech
 import controlTypes
 import globalCommands
-import eventHandler
 import ui
 import textInfos
 import logHandler
 log = logHandler.log
 
-from .handler import AudioThemesHandler, SpecialProps, role_int_to_name, showPendingConflicts, STATE_OFFSET
+from .handler import (
+    AudioThemesHandler,
+    SpecialProps,
+    role_int_to_name,
+    showPendingConflicts,
+    STATE_OFFSET,
+    conf_bool,
+    conf_str,
+    conf_int,
+    conf_toggle,
+)
 from .settings import AudioThemesSettingsPanel
 from .studio import AudioThemesStudioStartupDialog
 from .update_checker import check_for_updates_auto
@@ -77,7 +86,7 @@ import addonHandler
 try:
     addonHandler.initTranslation()
 except AttributeError:
-    pass
+    log.debug("AudioThemes: swallowed AttributeError in __init__")
 
 utils.initConfiguration()
 # pp.reloadRules() deferred to onPostNvdaStartup — avoids disk I/O + JSON parse + regex compile at import time.
@@ -127,7 +136,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             if cached is not None and cached.get("_extra_snd") == extra_snd and cached.get("_fg") == foreground_app:
                 return cached.copy()
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in __init__._snapshot_obj")
 
         info = {}
         try:
@@ -146,14 +155,14 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 if val is not None:
                     heading_level = int(val)
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in __init__._snapshot_obj")
             if heading_level is None or heading_level < 1 or heading_level > 9:
                 try:
                     val = obj.description
                     if val and val.isdigit():
                         heading_level = int(val)
                 except Exception:
-                    pass
+                    log.debug("AudioThemes: swallowed Exception in __init__._snapshot_obj")
             if heading_level is not None and heading_level >= 7:
                 h_key = _HEADING_LEVEL_MAP.get(heading_level)
                 if h_key is not None:
@@ -194,7 +203,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                         info["similarItemsInGroup"] = total
                         pos_valid = True
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in __init__._snapshot_obj")
             
             # Fallback for legacy objects that don't support positionInfo.
             # Tree-walking is avoided on UIA or VirtualBuffer elements to prevent 40s freezes.
@@ -284,12 +293,18 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             info["_fg"] = foreground_app
             _snapshot_cache[obj] = info.copy()
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in __init__._snapshot_obj")
         return info
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        log.info("Starting Advanced Audio Themes version 9.37")
+        # Read the version from the manifest instead of hard-coding it:
+        # a stale literal made the log disagree with manifest.ini (9.37 vs 9.43).
+        try:
+            _version = addonHandler.getCodeAddon().manifest.get("version", "?")
+        except Exception:
+            _version = "?"
+        log.info("Starting Advanced Audio Themes version %s" % _version)
         utils.threadPool.restart()
         self.handler = AudioThemesHandler()
         GlobalPlugin._instance_handler = self.handler
@@ -448,7 +463,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 _("Enable Audio Themes"),
                 _("Toggle audio themes on or off")
             )
-            self._tray_toggle_item.Check(config.conf["audiothemes"]["enable_audio_themes"])
+            self._tray_toggle_item.Check(conf_bool(config.conf["audiothemes"], "enable_audio_themes", True))
             tray.Bind(wx.EVT_MENU, self._on_toggle_from_menu, self._tray_toggle_item)
         except Exception:
             import logHandler
@@ -465,7 +480,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                         tray.menu.Remove(item)
                         setattr(self, attr, None)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in __init__._remove_tray_menu_items")
 
     def _hook_caretMovementScriptHelper(self, extraDetail, unit, direction, posConstant=textInfos.POSITION_CARET, *args, **kwargs):
         _orig_exc = None
@@ -485,7 +500,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 try:
                     self._schedule_pending_dispatch(api.getNavigatorObject(), self.handler._current_app_name)
                 except Exception:
-                    pass
+                    log.debug("AudioThemes: swallowed Exception in __init__._hook_caretMovementScriptHelper")
                 return
             current_nav = api.getNavigatorObject()
             ti = getattr(current_nav, 'treeInterceptor', None) if current_nav else None
@@ -564,7 +579,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             try:
                 self.removeGestureBinding(ident)
             except (LookupError, ValueError):
-                pass
+                log.debug("AudioThemes: swallowed LookupError|ValueError in __init__.finish")
 
     def noFinish(self):
         pass
@@ -693,7 +708,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     try:
                         cmds[sel](None)
                     except Exception:
-                        pass
+                        log.debug("AudioThemes: swallowed Exception in __init__.runDialog")
             dlg.Destroy()
             self._helpDialog = None
             self._helpPending = False
@@ -707,7 +722,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 with open(_crash_log_path, "a", encoding="utf-8") as f:
                     f.write(f"[{datetime.datetime.now().isoformat()}] {msg}\n")
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in __init__._crash_log")
         def _crash_log_exc(step, exc):
             _crash_log(f"ERROR in {step}: {exc}\n{traceback.format_exc()}")
         _crash_log("=== terminate() called ===")
@@ -796,7 +811,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             utils.threadPool.add_task(self.playObject, obj_info)
             utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
-            log.debugWarning(f"deferred focus dispatch: {e}")
+            log.warning(f"deferred focus dispatch (theme sound dropped): {e}")
 
     def _onNavigationTimer(self, event):
         """Check if the navigator object changed (e.g. arrow keys in browse mode)."""
@@ -813,6 +828,18 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             return
         if self._is_freeze_suppressed():
             return
+        # Playback health check (runs every 5s; the check throttles its own
+        # warning to 30s).  Every "a sound was wanted but dropped" path in this
+        # addon used to log below NVDA's default INFO level, so intermittent
+        # total theme-sound silence left no trace at all.
+        try:
+            if now - getattr(self, "_last_health_check", 0.0) >= 5.0:
+                self._last_health_check = now
+                _player = self.handler.player
+                if _player is not None:
+                    _player.check_playback_health()
+        except Exception:
+            log.debug("AudioThemes: swallowed Exception in check_playback_health dispatch")
         try:
             try:
                 if not self.handler._cached_config.get("enable_audio_themes", True) or not self.handler.active_theme:
@@ -863,8 +890,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         wx.CallAfter(do_open)
 
     def on_toggle_item_clicked(self, event):
-        enabled = not config.conf["audiothemes"]["enable_audio_themes"]
-        config.conf["audiothemes"]["enable_audio_themes"] = enabled
+        enabled = conf_toggle(config.conf["audiothemes"], "enable_audio_themes", True)
         self.handler.configure()
         if enabled:
             ui.message(_("Audio themes enabled"))
@@ -928,7 +954,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             utils.threadPool.add_task(self.playObject, obj_info)
             utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
-            log.debugWarning(f"event_gainFocus snapshot/dispatch: {e}")
+            log.warning(f"event_gainFocus snapshot/dispatch (theme sound dropped): {e}")
 
     def _play_beacon_sonar(self, obj_info):
         if not self._audio_beacon_location or not self.handler.active_theme:
@@ -1014,7 +1040,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 if utils.isPhoneticPunctuationEnabled():
                     need_window_title = True
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in __init__.event_becomeNavigatorObject")
             # obj.name is a blocking IAccessible COM call. Only fetch the window
             # title when a loaded rule can actually consume it (non-empty
             # windowTitleRegex), otherwise skip it entirely.
@@ -1044,7 +1070,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         try:
             self.handler._current_url = None
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in __init__.event_becomeNavigatorObject")
         try:
             nextHandler()
         except StopIteration:
@@ -1070,7 +1096,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             utils.threadPool.add_task(self.playObject, obj_info)
             utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
-            log.debugWarning(f"event_becomeNavigatorObject snapshot/dispatch: {e}")
+            log.warning(f"event_becomeNavigatorObject snapshot/dispatch (theme sound dropped): {e}")
 
     def event_valueChange(self, obj, nextHandler):
         try:
@@ -1084,7 +1110,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     except StopIteration:
                         raise
                     except Exception:
-                        pass
+                        log.debug("AudioThemes: swallowed Exception in __init__.event_valueChange")
                     return
                 self._last_progress_times[obj_key] = now
                 if len(self._last_progress_times) > 64:
@@ -1216,7 +1242,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                         elif vkCode == 0x59:  # Y
                             self._clipboard_mgr.announce("redo")
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in __init__._new_keyDownEvent")
         if self._original_keyDownEvent:
             return self._original_keyDownEvent(vkCode, scanCode, extended, injected)
         return True
@@ -1268,7 +1294,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
     @script(description=_("Increases the audio themes volume by 5 percent."), gestures=[])
     def script_increaseAudioThemesVolume(self, gesture):
-        vol = config.conf["audiothemes"]["volume"]
+        vol = conf_int(config.conf["audiothemes"], "volume", 20)
         new_vol = min(100, vol + 5)
         config.conf["audiothemes"]["volume"] = new_vol
         self.handler.configure()
@@ -1276,7 +1302,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
     @script(description=_("Decreases the audio themes volume by 5 percent."), gestures=[])
     def script_decreaseAudioThemesVolume(self, gesture):
-        vol = config.conf["audiothemes"]["volume"]
+        vol = conf_int(config.conf["audiothemes"], "volume", 20)
         new_vol = max(0, vol - 5)
         config.conf["audiothemes"]["volume"] = new_vol
         self.handler.configure()
@@ -1288,8 +1314,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         import ui
         isSameScript = getLastScriptRepeatCount()
         if isSameScript == 0:
-            enabled = not config.conf["audiothemes"]["enable_audio_themes"]
-            config.conf["audiothemes"]["enable_audio_themes"] = enabled
+            enabled = conf_toggle(config.conf["audiothemes"], "enable_audio_themes", True)
             if hasattr(self, '_tray_toggle_item') and self._tray_toggle_item:
                 self._tray_toggle_item.Check(enabled)
             self.handler.configure()
@@ -1298,8 +1323,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             else:
                 ui.message(_("Disable audio themes"))
         elif isSameScript == 1:
-            typing_enabled = not config.conf["audiothemes"]["typing_sounds"]
-            config.conf["audiothemes"]["typing_sounds"] = typing_enabled
+            typing_enabled = conf_toggle(config.conf["audiothemes"], "typing_sounds", True)
             self.handler.configure()
             if typing_enabled:
                 ui.message(_("Enable typing sounds"))
@@ -1315,7 +1339,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     obj_info = self._snapshot_obj(obj, foreground_app=self.handler._current_app_name)
                     utils.threadPool.add_task(self.playObject, obj_info)
             except Exception as e:
-                log.debugWarning(f"event_mouseMove snapshot: {e}")
+                log.warning(f"event_mouseMove snapshot (theme sound dropped): {e}")
         try:
             nextHandler()
         except StopIteration:
@@ -1350,7 +1374,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 except Exception as e:
                     log.debug(f"AudioThemes event_documentLoadComplete: {e}")
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in __init__.event_documentLoadComplete")
         try:
             nextHandler()
         except StopIteration:
@@ -1425,7 +1449,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self.handler.play(obj_info, snd, _pre_resolved_theme=theme)
 
         except Exception as e:
-            log.debugWarning(f"playObject failed: {e}")
+            log.warning(f"playObject failed (theme sound dropped): {e}")
             return
 
     def _unspoken_play_role(self, role_val, states, heading_level=None):
@@ -1448,7 +1472,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             }
             utils.threadPool.add_task(self.playObject, obj_info)
         except Exception as e:
-            log.debugWarning(f"_unspoken_play_role failed: {e}")
+            log.warning(f"_unspoken_play_role failed (theme sound dropped): {e}")
 
     def getOrder(self, obj_info, parrole=None, chrole=None):
         """Determine first/last item in any container from pre-extracted dict.
@@ -1595,7 +1619,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         try:
             self.handler.configure()
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in __init__.script_rotateSpeechOrder")
         ui.message(msg)
 
     @script(description=_("Speak current heading level."), gestures=['kb:NVDA+h'])
@@ -1610,7 +1634,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 if not focus.treeInterceptor.passThrough:
                     focus = focus.treeInterceptor
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in __init__.script_speakHeadingLevel")
         try:
             info = focus.makeTextInfo(textInfos.POSITION_CARET)
         except Exception:
@@ -1644,7 +1668,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             ui.message(_("No audio themes available"))
             return
             
-        current = config.conf["audiothemes"]["active_theme"]
+        current = conf_str(config.conf["audiothemes"], "active_theme", "Default")
         theme_names = [t.name for t in themes]
         if not theme_names:
             return
@@ -1669,7 +1693,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             ui.message(_("No typing sound packs available"))
             return
             
-        current = config.conf["audiothemes"]["typing_sound_pack"]
+        current = conf_str(config.conf["audiothemes"], "typing_sound_pack", "1blueSwitch")
         try:
             current_idx = packs.index(current)
         except ValueError:
@@ -1684,8 +1708,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
     @script(description=_("Toggles typing sounds on and off."), gestures=['kb:NVDA+alt+k'])
     def script_toggleTypingSounds(self, gesture):
-        typing_enabled = not config.conf["audiothemes"]["typing_sounds"]
-        config.conf["audiothemes"]["typing_sounds"] = typing_enabled
+        typing_enabled = conf_toggle(config.conf["audiothemes"], "typing_sounds", True)
         self.handler.configure()
         if typing_enabled:
             ui.message(_("Typing sounds enabled"))
@@ -1749,7 +1772,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         try:
             children.sort(key=lambda c: c.location[0] if c.location else 0)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in __init__.script_audioSonar")
         
         snapshots = []
         for child in children:
@@ -1777,43 +1800,37 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
     @script(description=_("Toggles audio ducking on and off."))
     def script_toggleAudioDucking(self, gesture):
-        enabled = not config.conf["audiothemes"]["audio_ducking_enabled"]
-        config.conf["audiothemes"]["audio_ducking_enabled"] = enabled
+        enabled = conf_toggle(config.conf["audiothemes"], "audio_ducking_enabled", False)
         self.handler.configure()
         ui.message(_("Audio ducking enabled") if enabled else _("Audio ducking disabled"))
 
     @script(description=_("Toggles emoji enhancement sounds on and off."), gestures=['kb:NVDA+alt+e'])
     def script_toggleEmojiSounds(self, gesture):
-        enabled = not config.conf["audiothemes"]["emoji_enabled"]
-        config.conf["audiothemes"]["emoji_enabled"] = enabled
+        enabled = conf_toggle(config.conf["audiothemes"], "emoji_enabled", True)
         self.handler.configure()
         ui.message(_("Emoji sounds enabled") if enabled else _("Emoji sounds disabled"))
 
     @script(description=_("Toggles app-specific audio profiles on and off."))
     def script_toggleAppProfiles(self, gesture):
-        enabled = not config.conf["audiothemes"]["app_profiles_enabled"]
-        config.conf["audiothemes"]["app_profiles_enabled"] = enabled
+        enabled = conf_toggle(config.conf["audiothemes"], "app_profiles_enabled", False)
         self.handler.configure()
         ui.message(_("App profiles enabled") if enabled else _("App profiles disabled"))
 
     @script(description=_("Toggles 3D spatial audio mode on and off."))
     def script_toggle3DAudio(self, gesture):
-        enabled = not config.conf["audiothemes"]["audio3d"]
-        config.conf["audiothemes"]["audio3d"] = enabled
+        enabled = conf_toggle(config.conf["audiothemes"], "audio3d", False)
         self.handler.configure()
         ui.message(_("3D audio enabled") if enabled else _("3D audio disabled"))
 
     @script(description=_("Toggles clipboard announcement sounds on and off."), gestures=['kb:NVDA+alt+c'])
     def script_toggleClipboard(self, gesture):
-        enabled = not config.conf["audiothemes"]["clipboard_enabled"]
-        config.conf["audiothemes"]["clipboard_enabled"] = enabled
+        enabled = conf_toggle(config.conf["audiothemes"], "clipboard_enabled", True)
         self.handler.configure()
         ui.message(_("Clipboard announcements enabled") if enabled else _("Clipboard announcements disabled"))
 
     @script(description=_("Toggles system status monitoring sounds on and off."))
     def script_toggleSystemStatus(self, gesture):
-        enabled = not config.conf["audiothemes"]["sys_status_enabled"]
-        config.conf["audiothemes"]["sys_status_enabled"] = enabled
+        enabled = conf_toggle(config.conf["audiothemes"], "sys_status_enabled", True)
         self.handler.configure()
         ui.message(_("System status sounds enabled") if enabled else _("System status sounds disabled"))
 
@@ -1835,8 +1852,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
     @script(description=_("Toggles speaking of object roles on and off."))
     def script_toggleSpeakRoles(self, gesture):
-        enabled = not config.conf["audiothemes"]["speak_roles"]
-        config.conf["audiothemes"]["speak_roles"] = enabled
+        enabled = conf_toggle(config.conf["audiothemes"], "speak_roles", True)
         self.handler.configure()
         ui.message(_("Speak roles enabled") if enabled else _("Speak roles disabled"))
 
@@ -1857,7 +1873,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
     @script(description=_("Cycles the audio output mode between stereo and mono."))
     def script_toggleOutputMode(self, gesture):
-        current = config.conf["audiothemes"]["output_mode"]
+        current = conf_str(config.conf["audiothemes"], "output_mode", "stereo")
         new_mode = "mono" if current == "stereo" else "stereo"
         config.conf["audiothemes"]["output_mode"] = new_mode
         self.handler.configure()

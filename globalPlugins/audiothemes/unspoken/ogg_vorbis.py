@@ -126,6 +126,6 @@ def decode_ogg_to_float(path):
         try:
             ov_clear(vf)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in unspoken.ogg_vorbis.decode_ogg_to_float")
         log.error(f"Failed to decode OGG {path}: {e}")
         return None

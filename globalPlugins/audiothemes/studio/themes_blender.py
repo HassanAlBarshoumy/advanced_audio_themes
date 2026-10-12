@@ -3,21 +3,22 @@
 
 # This file is covered by the GNU General Public License.
 
-from typing import Sequence, List
-from dataclasses import dataclass, field, asdict
+from typing import Sequence
+from dataclasses import dataclass
 from contextlib import suppress
 import os
 import shutil
 import wx
 import gui
 from ..unspoken import UnspokenPlayer
-from ..handler import AudioTheme, AudioThemesHandler, theme_roles, SUPPORTED_FILE_TYPES, get_active_file_types, role_int_to_name, state_name_to_int, STATE_OFFSET
+from ..handler import AudioTheme, AudioThemesHandler, theme_roles, get_active_file_types, role_int_to_name, state_name_to_int, STATE_OFFSET
 
 import addonHandler
+from logHandler import log
 try:
     addonHandler.initTranslation()
 except AttributeError:
-    pass
+    log.debug("AudioThemes: swallowed AttributeError in studio.themes_blender")
 
 class AudioDropTarget(wx.FileDropTarget):
     def __init__(self, dialog):
@@ -190,7 +191,7 @@ class ThemeBlenderDialog(BaseDialog):
             try:
                 self.player = UnspokenPlayer()
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in studio.themes_blender.__init__")
         super().__init__(title)
 
     def addControls(self, sizer, parent):

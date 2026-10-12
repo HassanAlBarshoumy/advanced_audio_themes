@@ -6,10 +6,11 @@
 
 import addonHandler
 from enum import Enum
+from logHandler import log
 try:
     addonHandler.initTranslation()
 except AttributeError:
-    pass
+    log.debug("AudioThemes: swallowed AttributeError in common")
 
 audioRuleBuiltInWave = "builtInWave"
 audioRuleWave = "wave"

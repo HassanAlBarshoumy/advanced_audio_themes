@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os,re,sys
+import os
 import json
 
 disablePatterns  =[

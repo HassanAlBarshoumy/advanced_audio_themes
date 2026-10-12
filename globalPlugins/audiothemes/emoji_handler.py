@@ -1,7 +1,6 @@
 import json
 import re
 import config
-import speech
 from functools import lru_cache
 from .handler import SpecialProps
 from . import emoji_cldr_data
@@ -310,11 +309,6 @@ def find_emojis(text):
     return matches
 
 
-def process_emoji_in_text(text):
-    emojis = find_emojis(text)
-    if not emojis:
-        return None
-    return emojis
 
 
 def is_emoji_enabled():
@@ -349,8 +343,6 @@ def get_emoji_sound_position():
     return _cached_emoji_config["emoji_sound_position"]
 
 
-def get_emoji_repeat():
-    return _cached_emoji_config["emoji_repeat"]
 
 
 CATEGORY_TO_PROP = {
@@ -378,9 +370,6 @@ def get_emoji_prefix_repeat():
     return _cached_emoji_config["emoji_prefix_repeat"]
 
 
-def is_emoji_sound_category_enabled(cat):
-    key = "emoji_sound_cat_" + CATEGORY_NAMES.get(cat, "smileys")
-    return _cached_emoji_config.get(key, True)
 
 
 def _get_json_config(key, default="{}"):

@@ -18,10 +18,8 @@ import threading
 from threading import Thread
 from threading import Lock, Condition
 import time
-import tones
 import types
 from virtualBuffers.gecko_ia2 import Gecko_ia2_TextInfo
-import weakref
 import ui
 import winUser
 import api
@@ -34,34 +32,6 @@ class FakeObjectForWeakMemoize:
 
 NoneObjectForWeakRef = FakeObjectForWeakMemoize()
 
-def weakMemoize(func, timeoutSecs=0):
-    cache = weakref.WeakKeyDictionary()
-
-    def memoized_func(*args):
-        arg = args[0]
-        if len(args) > 1:
-            raise Exception("Only supports single argument!")
-        if arg is None:
-            # Cannot create weak reference to None
-            arg = NoneObjectForWeakRef
-        timestamp,value = cache.get(arg, (None, None))
-        if (
-            value is not None
-            and (
-                timeoutSecs == 0
-                or time.time() - timestamp < timeoutSecs
-            )
-        ):
-            return value
-        result = func(*args)
-        timestamp = time.time()
-        cache.update({arg: (timestamp,result)})
-        return result
-
-    return memoized_func
-
-def weakMemoizeWithTimeout(timeoutSecs):
-    return lambda func: weakMemoize(func, timeoutSecs)
 
 def executeAsynchronously(gen):
     """
@@ -110,11 +80,19 @@ class ThreadPool:
         for _ in range(num_threads):
             Worker(self.tasks)
     def add_task(self, func, *args, **kargs):
-        """ Add a task to the queue """
+        """Add a task to the queue. Returns False if the task had to be dropped."""
         try:
             self.tasks.put_nowait((func, args, kargs))
+            return True
         except queue.Full:
-            log.error("AudioThemes ThreadPool: queue full after 30s timeout, task dropped")
+            # Queue full -> task dropped. Callers that wait on a future created for
+            # this task must learn about it, otherwise they block until their timeout.
+            try:
+                from ..utils import report_dropped_task
+                report_dropped_task("BrowserNav ThreadPool", func, self.tasks)
+            except Exception:
+                log.debug("AudioThemes: swallowed Exception in browserNavEngine.utils.add_task")
+            return False
     def map(self, func, args_list):
         """ Add a list of tasks to the queue """
         for args in args_list:
@@ -136,7 +114,6 @@ class _ThreadPoolProxy:
         return getattr(_get_threadPool(), name)
 
 threadPool = _ThreadPoolProxy()
-
 
 
 class Future:
@@ -440,7 +417,6 @@ def speakMessage(message):
         speech.speakTextInfo(message, reason=controlTypes.OutputReason.CARET)
     else:
         raise RuntimeError(f"speakMessage got unsupported argument of type {type(message)}.")
-    
 allModifiers = [
     winUser.VK_LCONTROL, winUser.VK_RCONTROL,
     winUser.VK_LSHIFT, winUser.VK_RSHIFT, winUser.VK_LMENU,

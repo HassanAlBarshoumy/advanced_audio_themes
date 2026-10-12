@@ -3,12 +3,8 @@
 #This file is covered by the GNU General Public License.
 #See the file LICENSE  for more details.
 
-import api
 import ctypes
 import gui
-import time
-import tones
-import ui
 import winUser
 import wx
 
@@ -22,25 +18,8 @@ def ephemeralCopyToClip(text: str):
         ephemeralFormat = ctypes.windll.user32.RegisterClipboardFormatW("ExcludeClipboardContentFromMonitorProcessing")
         ctypes.windll.user32.SetClipboardData(ephemeralFormat,None)
 
-def ephemeralCopyToClipAndRestore(text: str):
-    """
-    Allows to copy string to clipboard so that the string can later be pasted to an application.
-    This function will also restore previous state of clipboard on exit.
-    This function doesn't leave trace in clipboard history.
-    """
-    try:
-        oldClipboardValue = api.getClipData()
-    except OSError as e:
-        oldClipboardValue = ""
-    api.copyToClip(text)
-    try:
-        yield
-    finally:
-        api.copyToClip(oldClipboardValue)
-        
 TEXT_FORMAT = "Text"
 def deleteEntryFromClipboardHistory(textToDelete, maxEntries=10):
-    from .pywinsdk.relative import winsdk
     from .pywinsdk.relative.winsdk.windows.applicationmodel.datatransfer import Clipboard
     from .pywinsdk.relative.winsdk.windows.foundation import AsyncStatus
     

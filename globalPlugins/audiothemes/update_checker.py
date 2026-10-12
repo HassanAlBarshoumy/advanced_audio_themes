@@ -8,11 +8,12 @@ import addonHandler
 import config
 from urllib.request import urlopen, Request
 from urllib.error import URLError
+from logHandler import log
 
 try:
     addonHandler.initTranslation()
 except Exception:
-    pass
+    log.debug("AudioThemes: swallowed Exception in update_checker")
 try:
     _
 except NameError:
@@ -80,11 +81,6 @@ def get_latest_release(prerelease=False):
         return None, None, None
 
 
-def get_latest_version_info(prerelease=False):
-    tag, download_url, html_url = get_latest_release(prerelease)
-    if tag:
-        return tag, parse_version(tag), download_url, html_url
-    return None, None, None, None
 
 
 def download_addon(url, callback, parent=None):
@@ -134,7 +130,7 @@ def download_addon(url, callback, parent=None):
                 try:
                     os.unlink(path)
                 except Exception:
-                    pass
+                    log.debug("AudioThemes: swallowed Exception in update_checker._download")
             wx.CallAfter(_close_progress)
             wx.CallAfter(callback, False, None, str(e))
     threading.Thread(target=_download, daemon=True).start()
@@ -223,7 +219,7 @@ def check_for_updates_auto():
                 return
             wx.CallAfter(_notify, tag, download_url, html_url)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in update_checker._check_thread")
 
     def _notify(tag, download_url, html_url):
         result = wx.MessageBox(

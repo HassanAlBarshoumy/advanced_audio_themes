@@ -5,15 +5,13 @@
 
 import api
 import browseMode
-from collections import namedtuple, defaultdict
-from contextlib import ExitStack
+from collections import namedtuple
 import controlTypes
 from controlTypes import OutputReason
+import config
 import copy
 import core
-import dataclasses
 from dataclasses import dataclass
-import diffHandler
 import difflib as dl
 from enum import Enum
 import functools
@@ -53,16 +51,31 @@ def _qj_get_output_device():
             _qj_output_device = config.conf["audio"]["outputDevice"]
     return _qj_output_device
 
-def _qj_clear_output_device_cache():
+def refreshQjOutputDevice():
+    """Re-read the configured output device (was cached forever before)."""
     global _qj_output_device
-    _qj_output_device = None
+    new_od = None
+    try:
+        new_od = config.conf["speech"]["outputDevice"]
+    except KeyError:
+        try:
+            new_od = config.conf["audio"]["outputDevice"]
+        except KeyError:
+            new_od = None
+    old_od = _qj_output_device
+    _qj_output_device = new_od
+    if old_od is None or new_od is None or old_od == new_od:
+        return
+    # _biw_wave_cache holds decoded PCM (device-independent) - keep it.
+    log.info(f"AudioThemes: output device changed ({old_od!r} -> {new_od!r}) for BrowserNav sounds")
+
 import uuid
 import scriptHandler
 
 try:
     addonHandler.initTranslation()
 except AttributeError:
-    pass
+    log.debug("AudioThemes: swallowed AttributeError in browserNavEngine.quickJump")
 
 sonifyTextInfo = None # Due to import error we set this value from __init__
 
@@ -76,13 +89,11 @@ import operator
 import speech
 import types
 import ast
-import inspect
 
 try:
     REASON_CARET = controlTypes.REASON_CARET
 except AttributeError:
     REASON_CARET = controlTypes.OutputReason.CARET
-
 
 
 debug = False
@@ -294,7 +305,7 @@ class QJAttribute(QJImmutable):
                 except AttributeError:
                     # A stale role name (e.g. EDIT) from an old bookmarks file:
                     # keep the original numeric value.
-                    pass
+                    log.debug("AudioThemes: swallowed AttributeError in browserNavEngine.quickJump.__init__")
             object.__setattr__(self, 'value', value)
         elif userString is not None:
             s = userString.strip()
@@ -560,7 +571,6 @@ class QJBookmark(QJImmutable):
         return id(self)
 
 
-
 class QJSite(QJImmutable):
     domain: str
     urlMatch: URLMatch
@@ -721,7 +731,7 @@ def loadConfig():
     try:
         saveConfig(result)
     except Exception:
-        pass
+        log.debug("AudioThemes: swallowed Exception in browserNavEngine.quickJump.loadConfig")
     return result
 
 
@@ -844,45 +854,6 @@ def getSuppressOptions(url, config):
     }
     return options
 
-def getSuppressDescription(url, config):
-    sites = findSites(url, config)
-    if len(sites) == 0:
-        return False
-    mode = max([
-        site.suppressDescription
-        for site in sites
-    ])
-    return mode
-
-def getSuppressAriaLabel(url, config):
-    sites = findSites(url, config)
-    if len(sites) == 0:
-        return False
-    mode = max([
-        site.suppressAriaLabel
-        for site in sites
-    ])
-    return mode
-
-def getSuppressAriaLabelEditable(url, config):
-    sites = findSites(url, config)
-    if len(sites) == 0:
-        return False
-    mode = max([
-        site.suppressAriaLabelEditable
-        for site in sites
-    ])
-    return mode
-
-def getSuppressTreeLevel(url, config):
-    sites = findSites(url, config)
-    if len(sites) == 0:
-        return False
-    mode = max([
-        site.suppressTreeLevel
-        for site in sites
-    ])
-    return mode
 
 def getUrl(self=None, onlyFromCache=False):
     return api.getCurrentURL() or ""
@@ -963,7 +934,7 @@ def newReportLiveRegion(text: str, politeness: str):
         if interceptor is not None:
             url = getUrl(interceptor, onlyFromCache=True)
     except AttributeError:
-        pass
+        log.debug("AudioThemes: swallowed AttributeError in browserNavEngine.quickJump.newReportLiveRegion")
     if url is not None:
         if DebugBeepMode.ON_LIVE_REGION in getDebugBeepModes(url, globalConfig):
             tones.beep(500, 50)
@@ -998,23 +969,6 @@ def asyncAutoclick(self, asyncAutoclickCounterLocal, site):
         else:
             return
 
-def asyncBrowseMonitor(self):
-    """
-        This function is just for testing..
-        The idea was to spawn multiple async generators one for each browseMode objewct.
-        But there can bee too many of them at once. So for now switching to another design: we'll have only a single thread that would only monitor focused browseMode.
-    """
-    bref = weakref.ref(self)
-    del self
-    while True:
-        yield 1000
-        browse = bref()
-        try:
-            if browse is None:
-                tones.beep(2000, 2000)
-                return
-        finally:
-            del browse
 
 class AutoSpeakCacheEntry:
     enabled: bool
@@ -1132,7 +1086,7 @@ def playBiwInThread(bookmark=None, earcon=None, volume=None):
                 from ..unspoken import wav_decode
                 decoded = wav_decode.decode_wav_to_float(absPath)
             except Exception as e:
-                log.debugWarning(f"BrowserNav: WAV decode failed for '{absPath}': {e}")
+                log.warning(f"BrowserNav: WAV decode failed for '{absPath}': {e}")
                 decoded = None
             if decoded is None:
                 log.warning(f"BrowserNav: unsupported WAV format: '{absPath}'")
@@ -1158,7 +1112,7 @@ def playBiwInThread(bookmark=None, earcon=None, volume=None):
             if df < 1.0:
                 buf = frenzy.apply_ducking_to_pcm(buf, df, 2)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in browserNavEngine.quickJump.playBiwInThread")
         outputDevice=_qj_get_output_device()
         fileWavePlayer = nvwave.WavePlayer(
             channels=nchannels,
@@ -1176,68 +1130,17 @@ def playBiwInThread(bookmark=None, earcon=None, volume=None):
             try:
                 fileWavePlayer.stop()
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in browserNavEngine.quickJump.playBiwInThread")
     except Exception:
-        pass
-
-def getTextFast(info):
-    fields = info.getTextWithFields()
-    text = [s.rstrip("\r\n") for s in fields if isinstance(s, str)]
-    return "\r\n".join(text)
+        log.debug("AudioThemes: swallowed Exception in browserNavEngine.quickJump.playBiwInThread")
 
 
 wpdCache = weakref.WeakKeyDictionary()
 WPDCacheEntry = namedtuple('WPDCacheEntry', ['text'])
-def processWholePageDiff(browse, url):
-    entry = wpdCache.get(browse, None)
-    info = browse.makeTextInfo(textInfos.POSITION_ALL)
-    c1 = time.time()
-    #newText = info.clipboardText
-    newText = getTextFast(info)
-    c2 = time.time()
-    if entry is not None:
-        oldText = entry.text
-        linesToSpeak= []
-        kinds = {}
-        for line in diffAndExtractInterestingLines(oldText, newText):
-            if line[0] in "!+":
-                linesToSpeak.append(line[1:])
-            kind = line[0]
-            counter = kinds.get(kind, 0)
-            kinds[kind] = counter + 1
-        if len(linesToSpeak) > 0:
-
-            def speakLines(lines):
-                speech.speakText("\n".join(lines))
-            wx.CallAfter(speakLines, linesToSpeak)
-        playDiffEarcons(
-            add='+' in kinds,
-            modify='!' in kinds,
-            delete='-' in kinds,
-        )
-    wpdCache[browse] = WPDCacheEntry(text = newText)
 
 earconDelete = "3d/center.wav"
 earconModify = "3d/search-hit.wav"
 earconAdd = "3d/search-miss.wav"
-def playDiffEarcons(delete, modify, add):
-    if add or modify or delete:
-        try:
-            from .. import frenzy
-            df = frenzy.get_ducking_factor("browsernav")
-            if df < 1.0:
-                tones.beep(100, 5, left=int(25*df), right=int(25*df))
-            else:
-                tones.beep(100, 5)
-        except Exception:
-            tones.beep(100, 5)
-    if False:
-        if delete:
-            playBiw(earcon=earconDelete)
-        if modify:
-            playBiw(earcon=earconModify)
-        if add:
-            playBiw(earcon=earconAdd)
 
 
 class AdjustedTextInfo:
@@ -1488,13 +1391,13 @@ def extractAttributesSet(textInfo):
                 role = field.field['role']
                 result.add(QJAttribute(role=role))
             except KeyError:
-                pass
+                log.debug("AudioThemes: swallowed KeyError in browserNavEngine.quickJump.extractAttributesSet")
             if role == controlTypes.Role.HEADING:
                 try:
                     level = field.field['level']
                     result.add(QJAttribute(heading=level))
                 except KeyError:
-                    pass
+                    log.debug("AudioThemes: swallowed KeyError in browserNavEngine.quickJump.extractAttributesSet")
         elif field.command == 'formatChange':
             for key, pAttr in [
                 ("level", ParagraphAttribute.HEADING),
@@ -1511,7 +1414,7 @@ def extractAttributesSet(textInfo):
                         'value': str(field.field[key]).replace(" ", "_"),
                     }))
                 except KeyError:
-                    pass
+                    log.debug("AudioThemes: swallowed KeyError in browserNavEngine.quickJump.extractAttributesSet")
         else:
             pass
     return result
@@ -1938,7 +1841,7 @@ def _autoClick(self, gesture, bookmarks, site=None, automated=False, category=No
                 numSuccessfulClicks += 1
             except NotImplementedError as e:
                 # Not sure why this is occasionally thrown
-                pass
+                log.debug("AudioThemes: swallowed NotImplementedError in browserNavEngine.quickJump._autoClick")
         if numSuccessfulClicks == 0:
             if not automated:
                 endOfDocument(focusableErrorMsg or _("No bookmarks matched!"))
@@ -2146,7 +2049,11 @@ def scanLevelsSync(self, config, bookmarks):
                 # Computing it in thread pool for performance reasons.
                 innerFuture = utils.Future()
                 if isinstance(xLocation, textInfos.TextInfo):
-                    utils.threadPool.add_task(getIndentFunc, xLocation, documentHolder, innerFuture)
+                    if not utils.threadPool.add_task(getIndentFunc, xLocation, documentHolder, innerFuture):
+                        # The task was dropped because the pool queue is full.
+                        # Resolve the future now, otherwise _safe_get() below would
+                        # block for its entire 60 second timeout on this paragraph.
+                        innerFuture.set(None)
                 elif isinstance(xLocation, int):
                     innerFuture.set(xLocation)
                 else:
@@ -2317,7 +2224,6 @@ def _numericScriptKeystroke(self, gesture, direction, level, bookmarks):
         utils.executeAsynchronously(awaitNumberForNumericScript(self, bookmarks))
 
 
-
 def _runScriptBookmarks(self, gesture, bookmarks, isNumeric=False):
     level = None
     modifiers = None
@@ -2398,7 +2304,7 @@ def makeWebsiteSubmenu(self, frame):
             item,
         )
     except ValueError:
-        pass
+        log.debug("AudioThemes: swallowed ValueError in browserNavEngine.quickJump.makeWebsiteSubmenu")
     menuStr = _("Create new website with custom URL matching options")
     item = menu.Append(wx.ID_ANY, menuStr)
     frame.Bind(
@@ -3047,7 +2953,7 @@ class EditBookmarkDialog(wx.Dialog):
                     if fileName.lower().endswith((".wav", ".mp3")):
                         result.append(os.path.join(relDirName, fileName))
         except OSError:
-            pass
+            log.debug("AudioThemes: swallowed OSError in browserNavEngine.quickJump.getBuiltInWaveFiles")
         return result
 
     def getBiw(self):
@@ -3590,8 +3496,6 @@ class EditSiteDialog(wx.Dialog):
                 )
                 gui.messageBox(errorMsg, _("Site Entry Error"), wx.OK|wx.ICON_WARNING, self)
         file_dialog.Destroy()
-
-
 
 
     def getAutoClickCombo(self):

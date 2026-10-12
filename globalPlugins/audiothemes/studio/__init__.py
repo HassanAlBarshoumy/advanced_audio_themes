@@ -5,8 +5,6 @@
 
 
 import wx
-import config
-import gui
 from contextlib import contextmanager
 from tempfile import TemporaryDirectory
 from wx.adv import CommandLinkButton
@@ -14,10 +12,11 @@ from ..handler import AudioTheme, AudioThemesHandler, audiotheme_changed
 from .themes_blender import BaseDialog, ThemeBlenderDialog
 
 import addonHandler
+from logHandler import log
 try:
     addonHandler.initTranslation()
 except AttributeError:
-    pass
+    log.debug("AudioThemes: swallowed AttributeError in studio")
 
 
 # Translators: the welcome message of the audio theme studio dialog

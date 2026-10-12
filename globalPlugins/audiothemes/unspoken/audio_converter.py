@@ -171,7 +171,7 @@ def _encode_flac(path, samples, sample_rate, channels, compression=5):
 		try:
 			lib.FLAC__stream_encoder_delete(enc)
 		except Exception:
-			pass
+			log.debug("AudioThemes: swallowed Exception in unspoken.audio_converter._encode_flac")
 
 
 def _verify_file(path, fmt_ext=".wav"):
@@ -217,7 +217,7 @@ def convert_file(src_path, target_ext=".wav", delete_original=True, allow_ffmpeg
 						return (True, "skipped (target exists), original delete failed: %s" % e)
 				return (True, "converted (target already existed)")
 		except Exception:
-			pass
+			log.debug("AudioThemes: swallowed Exception in unspoken.audio_converter.convert_file")
 		return (True, "skipped (target already exists)")
 	decoded = _decode_any(src_path, allow_ffmpeg=allow_ffmpeg)
 	if decoded is None:
@@ -244,7 +244,7 @@ def convert_file(src_path, target_ext=".wav", delete_original=True, allow_ffmpeg
 		try:
 			os.remove(tmp_path)
 		except Exception:
-			pass
+			log.debug("AudioThemes: swallowed Exception in unspoken.audio_converter.convert_file")
 		return (False, "conversion error: %s" % e)
 	if delete_original:
 		try:
@@ -277,7 +277,7 @@ def convert_folder(root, target_ext=".wav", candidate_exts=None, delete_original
 				try:
 					report(src, ok, msg)
 				except Exception:
-					pass
+					log.debug("AudioThemes: swallowed Exception in unspoken.audio_converter.convert_folder")
 			if ok:
 				if msg.startswith("skipped"):
 					skipped += 1

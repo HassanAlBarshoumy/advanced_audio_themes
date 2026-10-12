@@ -190,20 +190,10 @@ def ensure_loaded():
     return _loaded
 
 
-def is_loaded():
-    return _loaded
 
 
-def get_emoji_group(emoji_char):
-    if not ensure_loaded():
-        return None
-    return _emoji_to_group.get(emoji_char)
 
 
-def get_emoji_name(emoji_char):
-    if not ensure_loaded():
-        return None
-    return _emoji_to_name.get(emoji_char)
 
 
 def get_emoji_category(emoji_char):
@@ -212,10 +202,6 @@ def get_emoji_category(emoji_char):
     return _emoji_to_category.get(emoji_char)
 
 
-def is_emoji(char):
-    if not ensure_loaded():
-        return False
-    return char in _emoji_set
 
 
 def get_all_emoji():
@@ -224,7 +210,3 @@ def get_all_emoji():
     return _emoji_set
 
 
-def get_all_mappings():
-    if not ensure_loaded():
-        return {}, {}, {}
-    return _emoji_to_group, _emoji_to_name, _emoji_to_category

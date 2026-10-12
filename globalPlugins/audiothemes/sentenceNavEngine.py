@@ -6,10 +6,11 @@
 # Integrated and adapted by Hassan AlBarshoumy
 
 import addonHandler
+from logHandler import log
 try:
     addonHandler.initTranslation()
 except AttributeError:
-    pass
+    log.debug("AudioThemes: swallowed AttributeError in sentenceNavEngine")
 import api
 import bisect
 import braille
@@ -17,9 +18,6 @@ import config
 import controlTypes
 import ctypes
 import functools
-import globalPluginHandler
-import gui
-from gui.settingsDialogs import SettingsPanel
 import json
 import NVDAHelper
 from NVDAObjects.window import winword
@@ -33,8 +31,6 @@ import struct
 import textInfos
 import tones
 import ui
-import wx
-from logHandler import log
 
 _cached_doc_formatting = {}
 _cached_sentencenav_config = {}
@@ -189,17 +185,17 @@ def countCharacters(textInfo):
     try:
         return len(textInfo.text)
     except AttributeError:
-        pass
+        log.debug("AudioThemes: swallowed AttributeError in sentenceNavEngine.countCharacters")
     try:
         myAssert(len(list(textInfo._getTextInfos())) == 1)
         return countCharacters(list(textInfo._getTextInfos())[0])
     except AttributeError:
-        pass
+        log.debug("AudioThemes: swallowed AttributeError in sentenceNavEngine.countCharacters")
     try:
         myAssert(textInfo._start == textInfo._end)
         return countCharacters(textInfo._start)
     except AttributeError:
-        pass
+        log.debug("AudioThemes: swallowed AttributeError in sentenceNavEngine.countCharacters")
     raise RuntimeError("Unable to count characters for %s" % str(textInfo))
 
 
@@ -250,7 +246,7 @@ def _getElementBoundaries(textInfo):
                         if pos not in boundaries:
                             boundaries.append(pos)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in sentenceNavEngine._getElementBoundaries")
     return sorted(set(boundaries))
 
 class Context:
@@ -365,7 +361,7 @@ def getRegex(lang):
     try:
         return regexCache[lang]
     except KeyError:
-        pass
+        log.debug("AudioThemes: swallowed KeyError in sentenceNavEngine.getRegex")
     regex = u""
     regex += nlb("\\b" + re_set(getSNConfig("capitalLetters", lang), allowRanges=True))
     for abbr in getSNConfig("exceptionalAbbreviations", lang).strip().split():
@@ -435,7 +431,7 @@ try:
     _sentence_nav_registrations.append(post_configReset.register(clearRegexCaches))
     _sentence_nav_registrations.append(post_configProfileSwitch.register(clearRegexCaches))
 except (ImportError, AttributeError):
-    pass
+    log.debug("AudioThemes: swallowed ImportError|AttributeError in sentenceNavEngine")
 
 def _unregister_sentence_nav_hooks():
     try:
@@ -444,9 +440,9 @@ def _unregister_sentence_nav_hooks():
             try:
                 action.unregister(clearRegexCaches)
             except (ValueError, AttributeError):
-                pass
+                log.debug("AudioThemes: swallowed ValueError|AttributeError in sentenceNavEngine._unregister_sentence_nav_hooks")
     except ImportError:
-        pass
+        log.debug("AudioThemes: swallowed ImportError in sentenceNavEngine._unregister_sentence_nav_hooks")
 
 
 # ──────────────────────────────────────────────
@@ -701,7 +697,7 @@ class SentenceNavMixin:
                 left = int(left * df)
                 right = int(right * df)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in sentenceNavEngine._sn_fancyBeep")
         beepLen = length
         freqs = self._sn_getChordFrequencies(chord)
         intSize = 8
@@ -800,7 +796,7 @@ class SentenceNavMixin:
                     if hasattr(focus, "_setCaret"):
                         focus._setCaret(newCaret)
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in sentenceNavEngine._sn_move")
             review.handleCaretMove(newCaret)
             braille.handler.handleCaretMove(focus)
             vision.handler.handleCaretMove(focus)
@@ -818,7 +814,7 @@ class SentenceNavMixin:
             if 'NvdaPythonConsoleUIOutputCtrl' in str(type(focus)):
                 return focus.script_moveToNextResult(gesture)
         except AttributeError:
-            pass
+            log.debug("AudioThemes: swallowed AttributeError in sentenceNavEngine.script_nextSentence")
         if self._sn_maybePassThrough(gesture):
             return
         regex = getRegex(getCurrentLanguage())
@@ -833,7 +829,7 @@ class SentenceNavMixin:
             if 'NvdaPythonConsoleUIOutputCtrl' in str(type(focus)):
                 return focus.script_moveToPrevResult(gesture)
         except AttributeError:
-            pass
+            log.debug("AudioThemes: swallowed AttributeError in sentenceNavEngine.script_previousSentence")
         if self._sn_maybePassThrough(gesture):
             return
         regex = getRegex(getCurrentLanguage())

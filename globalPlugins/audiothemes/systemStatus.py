@@ -5,7 +5,6 @@
 import ctypes
 import ctypes.wintypes
 import threading
-import time
 
 import wx
 
@@ -81,6 +80,12 @@ user32.RegisterDeviceNotificationW.argtypes = [
     ctypes.wintypes.HWND, ctypes.c_void_p, ctypes.wintypes.DWORD,
 ]
 user32.RegisterDeviceNotificationW.restype = ctypes.c_void_p
+# The handle returned by RegisterDeviceNotificationW is a 64-bit value on x64.
+# Without argtypes, ctypes would try to pass it as a C int and raise
+# "OverflowError: int too long to convert", which used to abort _run() before
+# the hidden window was destroyed and its class unregistered.
+user32.UnregisterDeviceNotification.argtypes = [ctypes.c_void_p]
+user32.UnregisterDeviceNotification.restype = ctypes.wintypes.BOOL
 user32.PostMessageW.argtypes = [
     ctypes.wintypes.HWND, ctypes.wintypes.UINT, WPARAM, LPARAM,
 ]
@@ -172,7 +177,7 @@ class SystemStatusMonitor:
                 conf["audiothemes"].get("sys_battery_check_interval", 30)
             ) * 1000
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in systemStatus._update_intervals_from_config")
 
     def start(self):
         if self._running:
@@ -237,7 +242,7 @@ class SystemStatusMonitor:
         try:
             user32.UnregisterClassW(class_name, hinstance)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in systemStatus._run")
 
     def _register_device_notifications(self):
         try:
@@ -276,9 +281,16 @@ class SystemStatusMonitor:
                 )
 
     def _unregister_device_notifications(self):
-        if self._usb_notify_handle:
-            user32.UnregisterDeviceNotification(self._usb_notify_handle)
-            self._usb_notify_handle = None
+        # Never let this fail the shutdown path: _run() still has to destroy the
+        # hidden window and unregister its window class after this call.
+        handle = self._usb_notify_handle
+        self._usb_notify_handle = None
+        if not handle:
+            return
+        try:
+            user32.UnregisterDeviceNotification(handle)
+        except Exception:
+            log.debug("AudioThemes: swallowed Exception in systemStatus._unregister_device_notifications")
 
     def _window_proc(self, hwnd, msg, wparam, lparam):
         try:

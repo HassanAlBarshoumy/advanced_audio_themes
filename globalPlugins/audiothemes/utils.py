@@ -19,7 +19,6 @@ import speech
 import speech.commands
 import threading
 from threading import Thread
-from . import common
 
 debug = False
 # Debug logging removed: no hardcoded paths in production builds.
@@ -50,6 +49,176 @@ def ensure_mono(audio_bytes, channels, sample_rate):
 	n = len(arr) // 2
 	result = array.array('h', (int((arr[i * 2] + arr[i * 2 + 1]) * 0.5) for i in range(n) for _ in range(2)))
 	return result.tobytes()
+
+
+# Rate-limited reporting of dropped sound tasks.
+# These drops used to be logged at DEBUG only, which is invisible at NVDA's default
+# INFO log level, so an overflowing queue produced "no sounds at all" with no trace
+# left in the log.  WARNING keeps them visible without flooding (one line / 2 seconds).
+_drop_report_lock = threading.Lock()
+_drop_report_last = 0.0
+_drop_report_count = 0
+
+
+def report_dropped_task(pool_name, func, tasks):
+    """Report a sound task that had to be dropped because a worker queue was full.
+
+    pool_name: human readable name of the queue (shown in the log).
+    func:      the callable that was dropped (may be None for buffer-only queues).
+    tasks:     the Queue the task could not be enqueued into (used for qsize()).
+    """
+    global _drop_report_last, _drop_report_count
+    if func is None:
+        name = "<audio buffer>"
+    else:
+        try:
+            name = (
+                getattr(func, "__qualname__", None)
+                or getattr(func, "__name__", None)
+                or repr(func)
+            )
+        except Exception:
+            name = "<unknown>"
+    with _drop_report_lock:
+        _drop_report_count += 1
+        now = time.monotonic()
+        if now - _drop_report_last < 2.0:
+            return
+        _drop_report_last = now
+        count = _drop_report_count
+    pending = 0
+    try:
+        pending = tasks.qsize()
+    except Exception:
+        pass
+    log.warning(
+        "%s: queue full - sound task %s dropped (%d dropped so far, %d still queued)"
+        % (pool_name, name, count, pending)
+    )
+
+
+# --- Base-profile config writes -------------------------------------------
+# NVDA's config.AggregatedSection.__setitem__ writes through to the MOST
+# recently activated configuration profile that contains the section, and if
+# NO profile contains the section it CREATES it in the most recently activated
+# profile (config/__init__.py _getUpdateSection).  Sections that exist in
+# nvda.ini (e.g. [audiothemes]) always land in nvda.ini, but a section that is
+# missing from nvda.ini (e.g. [browsernav], [unspoken]) is silently redirected
+# into the active configuration profile - and the value disappears again as
+# soon as that profile is deactivated or removed.  This is why the settings
+# dialog's BrowserNav volumes/options did not retain when a profile was
+# active.  write_config_to_base() writes straight into the base (nvda.ini)
+# profile so the value persists regardless of active profiles.
+
+
+def write_config_to_base(section, key, value):
+    """Persist *value* under *key* in *section* of the base nvda.ini config.
+
+    The base profile is config.conf.profiles[0]; NVDA always writes it back to
+    disk on config.save().  The aggregate section cache is cleared for *section*
+    so both NVDA's own leaf cache and the addon's runtime caches re-read the new
+    value.  Falls back to the standard aggregate write on any failure.
+    """
+    try:
+        base = config.conf.profiles[0]
+    except Exception:
+        base = None
+    if base is not None:
+        try:
+            sect = base.get(section)
+            if sect is None:
+                sect = base[section] = {}
+            sect[key] = value
+            try:
+                root = config.conf.rootSection
+                root._cache.pop(section, None)
+            except Exception:
+                pass
+            return True
+        except Exception:
+            try:
+                config.conf[section][key] = value
+            except Exception:
+                log.debug("AudioThemes: swallowed Exception in utils.write_config_to_base")
+            return False
+    try:
+        config.conf[section][key] = value
+    except Exception:
+        log.debug("AudioThemes: swallowed Exception in utils.write_config_to_base")
+    return False
+
+
+# --- Say All detection ----------------------------------------------------
+# SayAllHandler.isRunning() is only "a Say All reader object exists".  A Say
+# All that dies inside NVDA (speech.sayAll._onLineReached OSError in the log)
+# never calls stop(), so the reader can stay referenced and isRunning() stays
+# True.  Both theme-sound muting gates read it, so a crashed Say All silently
+# muted every theme sound while normal navigation kept working - and because
+# the gate logged nothing, it left no trace.
+# We therefore additionally require that Say All driven speech was produced
+# recently; once it stops, the gate opens again within SAY_ALL_STALE_AFTER.
+SAY_ALL_STALE_AFTER = 15.0
+
+_say_all_state_lock = threading.Lock()
+_last_say_all_speech = 0.0
+_first_say_all_seen = 0.0
+_last_non_sayall_speech = 0.0
+
+
+def note_say_all_speech(reason=None):
+    """Remember that NVDA just produced speech driven by a Say All."""
+    try:
+        if reason is None:
+            return
+        name = getattr(reason, "name", None)
+        if name != "SAYALL":
+            global _last_non_sayall_speech
+            with _say_all_state_lock:
+                _last_non_sayall_speech = time.monotonic()
+            return
+        global _last_say_all_speech
+        with _say_all_state_lock:
+            _last_say_all_speech = time.monotonic()
+    except Exception:
+        log.debug("AudioThemes: swallowed Exception in utils.note_say_all_speech")
+
+
+def say_all_running():
+    """True while a Say All is genuinely running.
+
+    Same as SayAllHandler.isRunning(), but also expires if Say All has stopped
+    producing speech for SAY_ALL_STALE_AFTER seconds, so a crashed/stuck Say
+    All can no longer keep theme sounds muted indefinitely.
+
+    Additionally, if non-SAYALL speech occurred after the last SAYALL speech,
+    treat the Say All as stale (gate opens immediately) to unlatch on navigation
+    after a crash.
+    """
+    try:
+        from speech.sayAll import SayAllHandler
+        running = SayAllHandler.isRunning()
+    except Exception:
+        running = False
+    now = time.monotonic()
+    global _first_say_all_seen, _last_non_sayall_speech, _last_say_all_speech
+    with _say_all_state_lock:
+        if not running:
+            _first_say_all_seen = 0.0
+            return False
+        if _last_non_sayall_speech > _last_say_all_speech and _last_non_sayall_speech <= now:
+            # Navigation/speech not from Say All happened after last SAYALL speech
+            return False
+        last = _last_say_all_speech
+        if last <= 0.0:
+            # No Say All driven speech recorded yet (Say All just started, or
+            # it ran before this hook existed). Fall back to when we first saw
+            # isRunning() == True so a stale value still expires.
+            if _first_say_all_seen <= 0.0:
+                _first_say_all_seen = now
+            last = _first_say_all_seen
+        else:
+            _first_say_all_seen = 0.0
+        return (now - last) <= SAY_ALL_STALE_AFTER
 
 
 # Sentinel object used to signal Worker threads to shut down cleanly.
@@ -142,9 +311,13 @@ class ThreadPool:
         try:
             # put_nowait raises queue.Full instantly instead of blocking the main NVDA thread
             self.tasks.put_nowait((func, args, kargs))
+            return True
         except queue.Full:
-            # Queue is full (User moved mouse/keyboard too fast) -> Drop gracefully without memory leak
-            pass
+            # Queue is full (user moved mouse/keyboard too fast) -> drop the task
+            # gracefully, but report it so silent sound loss stays diagnosable.
+            report_dropped_task("AudioThemes ThreadPool", func, self.tasks)
+            return False
+
     def map(self, func, args_list):
         """Enqueue one task per element in args_list."""
         for args in args_list:
@@ -160,7 +333,7 @@ class ThreadPool:
             try:
                 self.tasks.put(_WORKER_STOP, timeout=2.0)
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in utils.shutdown")
         if wait:
             for w in self._workers:
                 w.join(timeout=3.0)
@@ -208,13 +381,13 @@ def getConfig(key):
 	try:
 		return cache[key]
 	except KeyError:
-		pass
+		log.debug("AudioThemes: swallowed KeyError in utils.getConfig")
 	# Cache miss — acquire lock for the fallback path.
 	with _pp_config_lock:
 		try:
 			return _pp_config_cache[key]
 		except KeyError:
-			pass
+			log.debug("AudioThemes: swallowed KeyError in utils.getConfig")
 	try:
 		val = config.conf[phoneticPunctuationConfigKey].get(key)
 	except KeyError:
@@ -231,7 +404,7 @@ def setConfig(key, value):
 			config.conf[phoneticPunctuationConfigKey] = {}
 			config.conf[phoneticPunctuationConfigKey][key] = value
 		except Exception:
-			pass
+			log.debug("AudioThemes: swallowed Exception in utils.setConfig")
 	with _pp_config_lock:
 		_pp_config_cache[key] = value
 

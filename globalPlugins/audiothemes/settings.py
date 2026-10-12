@@ -9,25 +9,23 @@ import json
 import random
 import threading
 import zipfile
-import shutil
 import logging
 import time as _time
 
 import controlTypes
 import config
-import gui
 import nvwave
 
-from .handler import AudioThemesHandler, audiotheme_changed, THEMES_DIR, _get_blacklisted_roles, theme_roles, role_name_to_int, role_int_to_name, SpecialProps, SUPPORTED_FILE_TYPES
+from .handler import AudioThemesHandler, audiotheme_changed, THEMES_DIR, _get_blacklisted_roles, theme_roles, role_int_to_name, SpecialProps, SUPPORTED_FILE_TYPES, conf_str
 from .update_checker import check_for_updates
-from .frenzy import get_ducking_factor, _DEFAULT_DUCKING_CATEGORIES
+from .frenzy import _DEFAULT_DUCKING_CATEGORIES
 log = logging.getLogger(__name__)
 
 import addonHandler
 try:
     addonHandler.initTranslation()
 except AttributeError:
-    pass
+    log.debug("AudioThemes: swallowed AttributeError in settings")
 
 from gui.settingsDialogs import SettingsPanel
 
@@ -2034,17 +2032,17 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         conf = config.conf["audiothemes"]
         self.enableThemesCheckbox.SetValue(_b(conf.get("enable_audio_themes", True)))
-        self.play3dCheckbox.SetValue(_b(conf.get("audio3d", True)))
+        self.play3dCheckbox.SetValue(_b(conf.get("audio3d", False)))
         self.speakRoleCheckbox.SetValue(_b(conf.get("speak_roles", True)))
-        self.useInSayAllCheckbox.SetValue(_b(conf.get("use_in_say_all", False)))
-        self.useSynthVolumeCheckbox.SetValue(_b(conf.get("use_synth_volume", True)))
+        self.useInSayAllCheckbox.SetValue(_b(conf.get("use_in_say_all", True)))
+        self.useSynthVolumeCheckbox.SetValue(_b(conf.get("use_synth_volume", False)))
         self.volumeSlider.SetValue(_i(conf.get("volume", 100)))
         self.disabledAppsEdit.SetValue(conf.get("disabled_apps", ""))
         self.blacklisted_roles = _get_blacklisted_roles()
         self.autoUpdateCheckbox.SetValue(_b(conf.get("check_for_updates_auto", True)))
         self.prereleaseUpdateCheckbox.SetValue(_b(conf.get("check_for_updates_prerelease", False)))
         
-        duck_val = conf.get("audio_ducking_enabled", True)
+        duck_val = conf.get("audio_ducking_enabled", False)
         if isinstance(duck_val, str):
             duck_val = duck_val.lower() == 'true'
         self.audioDuckingCheckbox.SetValue(_b(bool(duck_val)))
@@ -2453,7 +2451,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         try:
             config.conf["audiothemes"]["convert_target"] = target
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in settings.onConvertThemeSounds")
         import threading
         from .unspoken import audio_converter, ffmpeg_utils
         roots = [THEMES_DIR] if os.path.isdir(THEMES_DIR) else []
@@ -2478,7 +2476,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             try:
                 wx.CallAfter(self._update_convert_progress, state["done"], total, os.path.basename(src))
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in settings.report")
 
         def worker():
             converted = 0
@@ -2508,7 +2506,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             try:
                 dlg.Destroy()
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in settings._update_convert_progress")
             self._convert_progress_dlg = None
 
     def _onConvertDone(self, converted, skipped, failed, errors, target, total):
@@ -2518,12 +2516,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
             try:
                 dlg.Destroy()
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in settings._onConvertDone")
             self._convert_progress_dlg = None
         try:
             self.convertButton.Enable(True)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in settings._onConvertDone")
         # Show an explicit success/failure summary dialog.
         summary = _(
             "Conversion finished: {converted} converted, {skipped} skipped, "
@@ -2543,7 +2541,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
                     summary, _("Audio Theme Conversion"), wx.OK | wx.ICON_INFORMATION, self
                 )
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in settings._onConvertDone")
         # Keep the status text as an accessible fallback.
         if errors:
             try:
@@ -2552,7 +2550,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
                     "{failed} failed. Details in the NVDA log."
                 ).format(converted=converted, skipped=skipped, failed=failed))
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in settings._onConvertDone")
         else:
             try:
                 self.convertStatusText.SetLabel(_(
@@ -2560,7 +2558,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
                     "{failed} failed."
                 ).format(converted=converted, skipped=skipped, failed=failed))
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in settings._onConvertDone")
         # Ensure the handler's cached config reflects the selected target so the
         # background auto-convert and the active theme reload use the same value,
         # even if the user closes the dialog without pressing Save.
@@ -2577,10 +2575,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
                     try:
                         _handler_config._cached_config["convert_target"] = target
                     except Exception:
-                        pass
+                        log.debug("AudioThemes: swallowed Exception in settings._onConvertDone")
             _handler.audiotheme_changed.notify()
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in settings._onConvertDone")
 
     def _on_enable_themes_changed(self, event):
         show = event.IsChecked()
@@ -2678,7 +2676,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         for theme in self.audio_themes:
             self.installedThemesChoice.Append(theme.name, theme)
         for theme in self.audio_themes:
-            if theme.folder == config.conf["audiothemes"]["active_theme"]:
+            if theme.folder == conf_str(config.conf["audiothemes"], "active_theme", "Default"):
                 self.installedThemesChoice.SetStringSelection(theme.name)
         self._on_enable_themes_changed(DummyEvent(self.enableThemesCheckbox.IsChecked()))
         self.volumeSlider.Enable(not self.useSynthVolumeCheckbox.IsChecked())
@@ -2902,27 +2900,33 @@ class AudioThemesSettingsPanel(SettingsPanel):
         if hasattr(self, "_app_profiles_cache"):
             conf["app_profiles"] = json.dumps(self._app_profiles_cache)
         
-        unspoken_conf = config.conf["unspoken"]
-        unspoken_conf["AudioCache"] = self.audioCacheCheckbox.GetValue()
-        unspoken_conf["SmartVolume"] = self.smartVolumeCheckbox.GetValue()
-        unspoken_conf["SmoothEnvelope"] = self.smoothEnvelopeCheckbox.GetValue()
-        unspoken_conf["SmoothPanning"] = self.smoothPanningCheckbox.GetValue()
-        unspoken_conf["TrimSilence"] = self.trimSilenceCheckbox.GetValue()
+        # Write audio-engine options into the BASE config (nvda.ini) directly.
+        # NVDA redirects writes for a section missing from nvda.ini into the
+        # most recently activated configuration profile (AggregatedSection.
+        # _getUpdateSection), silently dropping the option when that profile
+        # deactivates.  [unspoken] is absent from nvda.ini, so every write is
+        # routed through write_config_to_base().
+        from .utils import write_config_to_base as _wcfg
+        _wcfg("unspoken", "AudioCache", self.audioCacheCheckbox.GetValue())
+        _wcfg("unspoken", "SmartVolume", self.smartVolumeCheckbox.GetValue())
+        _wcfg("unspoken", "SmoothEnvelope", self.smoothEnvelopeCheckbox.GetValue())
+        _wcfg("unspoken", "SmoothPanning", self.smoothPanningCheckbox.GetValue())
+        _wcfg("unspoken", "TrimSilence", self.trimSilenceCheckbox.GetValue())
         slider_val = self.trimThresholdSlider.GetValue()
-        unspoken_conf["TrimSilenceThreshold"] = self._slider_to_threshold(slider_val)
-        unspoken_conf["NoiseGate"] = self.noiseGateCheckbox.GetValue()
-        unspoken_conf["NoiseGateThreshold"] = self._slider_to_noise_threshold(self.noiseThresholdSlider.GetValue())
-        unspoken_conf["NoiseGateAttack"] = self.noiseAttackSlider.GetValue()
-        unspoken_conf["NoiseGateRelease"] = self.noiseReleaseSlider.GetValue()
-        unspoken_conf["BassBoost"] = self.bassBoostCheckbox.GetValue()
-        unspoken_conf["BassBoostGain"] = self.bassGainSlider.GetValue()
-        unspoken_conf["BassBoostCutoff"] = self.bassCutoffSlider.GetValue()
-        unspoken_conf["Reverb"] = self.enableReverbCheckbox.IsChecked()
-        unspoken_conf["RoomSize"] = self.roomSizeSlider.GetValue()
-        unspoken_conf["Damping"] = self.dampingSlider.GetValue()
-        unspoken_conf["WetLevel"] = self.wetLevelSlider.GetValue()
-        unspoken_conf["DryLevel"] = self.dryLevelSlider.GetValue()
-        unspoken_conf["Width"] = self.widthSlider.GetValue()
+        _wcfg("unspoken", "TrimSilenceThreshold", self._slider_to_threshold(slider_val))
+        _wcfg("unspoken", "NoiseGate", self.noiseGateCheckbox.GetValue())
+        _wcfg("unspoken", "NoiseGateThreshold", self._slider_to_noise_threshold(self.noiseThresholdSlider.GetValue()))
+        _wcfg("unspoken", "NoiseGateAttack", self.noiseAttackSlider.GetValue())
+        _wcfg("unspoken", "NoiseGateRelease", self.noiseReleaseSlider.GetValue())
+        _wcfg("unspoken", "BassBoost", self.bassBoostCheckbox.GetValue())
+        _wcfg("unspoken", "BassBoostGain", self.bassGainSlider.GetValue())
+        _wcfg("unspoken", "BassBoostCutoff", self.bassCutoffSlider.GetValue())
+        _wcfg("unspoken", "Reverb", self.enableReverbCheckbox.IsChecked())
+        _wcfg("unspoken", "RoomSize", self.roomSizeSlider.GetValue())
+        _wcfg("unspoken", "Damping", self.dampingSlider.GetValue())
+        _wcfg("unspoken", "WetLevel", self.wetLevelSlider.GetValue())
+        _wcfg("unspoken", "DryLevel", self.dryLevelSlider.GetValue())
+        _wcfg("unspoken", "Width", self.widthSlider.GetValue())
         if self._rulesLoaded and hasattr(self._rulesPage, 'onSave'):
             self._rulesPage.onSave()
         if self._quickJumpLoaded and hasattr(self._quickJumpPage, 'onSave'):
@@ -2971,7 +2975,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # Clear phraseRegex if it's imported from the module
         
         # Clear the audio cache so normalization/smoothing/mono changes apply immediately
-        from .unspoken import sounds, sounds_lock, UnspokenPlayer
+        from .unspoken import sounds, sounds_lock
         with sounds_lock:
             sounds.clear()
         from .handler import AudioThemesHandler
@@ -2984,10 +2988,13 @@ class AudioThemesSettingsPanel(SettingsPanel):
                 player._play_file_cache.clear()
         
         # Miscellaneous tab — BrowserNav settings
-        bnConf = config.conf["browsernav"]
-        bnConf["crackleVolume"] = self.crackleVolumeSlider.GetValue()
-        bnConf["beepVolume"] = self.beepVolumeSlider.GetValue()
-        bnConf["skipChimeVolume"] = self.skipChimeVolumeSlider.GetValue()
+        # Same base-config treatment as the audio-engine block above:
+        # [browsernav] is absent from nvda.ini, so a plain aggregate write
+        # would land in the active configuration profile and be lost again on
+        # profile switch.
+        _wcfg("browsernav", "crackleVolume", self.crackleVolumeSlider.GetValue())
+        _wcfg("browsernav", "beepVolume", self.beepVolumeSlider.GetValue())
+        _wcfg("browsernav", "skipChimeVolume", self.skipChimeVolumeSlider.GetValue())
 
         # Miscellaneous tab — Navigation Layer settings
         conf["navLayerPassThrough"] = self.navLayerPassThroughCheckbox.GetValue()
@@ -3262,9 +3269,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
                                         import logging
                                         logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
                             if "unspoken" in settings_data:
+                                from .utils import write_config_to_base as _wcfg
                                 for k, v in settings_data["unspoken"].items():
                                     try:
-                                        config.conf["unspoken"][k] = v
+                                        _wcfg("unspoken", k, v)
                                     except Exception as e:
                                         import logging
                                         logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)

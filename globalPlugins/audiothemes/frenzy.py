@@ -5,40 +5,31 @@
 # Special thanks: Ahmed Sami
 # This file is covered by the GNU General Public License.
 
-import addonHandler
 from array import array
 try:
     import audioop
     _HAS_AUDIOOP = True
 except ImportError:
     _HAS_AUDIOOP = False
-import characterProcessing
 import config
 import collections
 import controlTypes
-from enum import Enum
 import globalPluginHandler
-import globalVars
 import json
 from logHandler import log
-import os
 import re
-from scriptHandler import script
 import speech
 import speech.commands
 import textInfos
 import threading
 import time
-import ui
-import wx
 
 from .common import *
 from .utils import *
 from . import utils
 from .commands import *
 
-from .commands import PpSynchronousCommand, PpWaveFileCommand
-from . import phoneticPunctuation as pp
+from .commands import PpSynchronousCommand
 from controlTypes import OutputReason
 from config.configFlags import ReportLineIndentation
 
@@ -74,7 +65,7 @@ _DEFAULT_FRENZY_CONFIG = {
     "announceFormat": "0",
     "roleAnnounceFormats": "{}",
     "blacklisted_roles": "[19]",
-    "audio_ducking_enabled": True,
+    "audio_ducking_enabled": False,
     "audio_ducking_volume": 30,
     "ducking_categories": "",
 }
@@ -128,7 +119,7 @@ def _get_blacklisted_roles():
                 _cached_blacklisted_roles_version = _frenzy_config_version
                 return _cached_blacklisted_roles
     except Exception:
-        pass
+        log.debug("AudioThemes: swallowed Exception in frenzy._get_blacklisted_roles")
     _cached_blacklisted_roles = [19]
     _cached_blacklisted_roles_version = _frenzy_config_version
     return _cached_blacklisted_roles
@@ -149,7 +140,7 @@ def new_getObjectPropertiesSpeech(
             if original_getObjectPropertiesSpeech is not None:
                 return original_getObjectPropertiesSpeech(obj, reason, _prefixSpeechCommand, **allowedProperties)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in frenzy.new_getObjectPropertiesSpeech")
         return []
 
 def _new_getObjectPropertiesSpeech_inner(
@@ -350,13 +341,13 @@ def monkeyUnpatch():
         try:
             _speech_time_handler.unregister()
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in frenzy.monkeyUnpatch")
         _speech_time_handler = None
     if _original_speak is not None:
         try:
             speech.speech.speak = _original_speak
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in frenzy.monkeyUnpatch")
         _original_speak = None
 
 roleRules = {}
@@ -400,7 +391,7 @@ def get_ducking_factor(category="theme_sounds", cached_config=None):
     try:
         if cached_config is None:
             cached_config = _frenzy_cached_config
-        if not cached_config.get("audio_ducking_enabled", True):
+        if not cached_config.get("audio_ducking_enabled", False):
             return 1.0
         dc_raw = cached_config.get("ducking_categories", "")
         with _ducking_categories_lock:
@@ -415,7 +406,7 @@ def get_ducking_factor(category="theme_sounds", cached_config=None):
         if time.time() - last_speech_time < 1.0:
             return cached_config.get("audio_ducking_volume", 30) / 100.0
     except Exception:
-        pass
+        log.debug("AudioThemes: swallowed Exception in frenzy.get_ducking_factor")
     return 1.0
 
 def apply_ducking_to_pcm(pcm_bytes, df, sample_width=2):
@@ -457,6 +448,9 @@ def apply_ducking_to_pcm(pcm_bytes, df, sample_width=2):
 
 def updateRules():
     global roleRules, stateRules, negativeStateRules, formatRules, numericFormatRules, otherRules
+    # Imported lazily (function scope): a module-level import would create an
+    # import cycle phoneticPunctuation <-> frenzy.
+    from . import phoneticPunctuation as pp
     
     def buildList(frenzyType):
         d = collections.defaultdict(list)
@@ -613,12 +607,12 @@ class FakeTextInfo:
         try:
             self.formatConfig["reportLineIndentation"] = formatConfig["reportLineIndentation"]
         except KeyError:
-            pass
+            log.debug("AudioThemes: swallowed KeyError in frenzy.getTextWithFields")
         # Also in MSWord in Legacy non-UIA mode somehow 'autoLanguageSwitching' gets changed, so tweaking it as well
         try:
             self.formatConfig ["autoLanguageSwitching"] = formatConfig["autoLanguageSwitching"]
         except KeyError:
-            pass
+            log.debug("AudioThemes: swallowed KeyError in frenzy.getTextWithFields")
         if formatConfig != self.formatConfig:
             #raise ValueError
             pass
@@ -742,7 +736,7 @@ def findAllControlFields(fields, role=controlTypes.Role.HEADING):
                     if field.field.get('role', None) == role:
                         yield i
                 except KeyError:
-                    pass
+                    log.debug("AudioThemes: swallowed KeyError in frenzy.findAllControlFields")
 
 def findAllFormatFieldBrackets(fields):
     currentStartIndex = None
@@ -891,7 +885,7 @@ def _new_getTextInfoSpeech_inner(
     try:
         newCache['fontSize'] = cache['fontSize']
     except KeyError:
-        pass
+        log.debug("AudioThemes: swallowed KeyError in frenzy._new_getTextInfoSpeech_inner")
     if processHeadings:
         headingStarts = list(findAllControlFields(fields))
         headingEnds = []
@@ -1056,7 +1050,7 @@ def _new_getTextInfoSpeech_inner(
                 try:
                     del newCache['fontSize']
                 except KeyError:
-                    pass
+                    log.debug("AudioThemes: swallowed KeyError in frenzy._new_getTextInfoSpeech_inner")
                 continue
             prevFontSize = newCache.get('fontSize', None)
             newCache['fontSize'] = fontSize
@@ -1128,7 +1122,7 @@ def _new_getTextInfoSpeech_inner(
         try:
             intervalsAndCommands.append(newCommands[i])
         except KeyError:
-            pass
+            log.debug("AudioThemes: swallowed KeyError in frenzy._new_getTextInfoSpeech_inner")
         previousIndex = i
     emptyIndex = 0
     allEmpty = nIntervals == len(emptyIntervals)
@@ -1265,13 +1259,19 @@ def new_getPropertiesSpeech(
     **propertyValues,
 ):
     try:
+        # Track Say All driven speech (see utils.say_all_running): a crashed
+        # Say All must not mute theme sounds forever.
+        try:
+            utils.note_say_all_speech(reason)
+        except Exception:
+            log.debug("AudioThemes: swallowed Exception in frenzy.new_getPropertiesSpeech")
         return _new_getPropertiesSpeech_inner(reason, **propertyValues)
     except Exception:
         try:
             if original_getPropertiesSpeech is not None:
                 return original_getPropertiesSpeech(reason, **propertyValues)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in frenzy.new_getPropertiesSpeech")
         return []
 
 def _new_getPropertiesSpeech_inner(
@@ -1309,7 +1309,7 @@ def _new_getPropertiesSpeech_inner(
                     headingLevelRules = formatRules.get(getattr(common.TextFormat, f'HEADING{lvl}'), [])
                     rule = getActiveRuleContext(headingLevelRules, appName, windowTitle, url)
                 except (ValueError, TypeError):
-                    pass
+                    log.debug("AudioThemes: swallowed ValueError|TypeError in frenzy._new_getPropertiesSpeech_inner")
             if rule is None:
                 rule = getActiveRuleContext(formatRules.get(common.TextFormat.HEADING, []), appName, windowTitle, url)
                 
@@ -1326,7 +1326,7 @@ def _new_getPropertiesSpeech_inner(
                     level = int(propertyValues.get('level', 1))
                     pre_numeric_cmd, post_numeric_cmd = num_rule.getNumericSpeechCommand(level)
                 except (ValueError, TypeError):
-                    pass
+                    log.debug("AudioThemes: swallowed ValueError|TypeError in frenzy._new_getPropertiesSpeech_inner")
 
         if rule is not None or has_numeric_rule:
             earcon_signature = f"{PROPERTY_SPEECH_SIGNATURE}{role.name}{PROPERTY_SPEECH_SIGNATURE}"
@@ -1492,13 +1492,18 @@ def new_getControlFieldSpeech(
     reason = None,
 ):
     try:
+        # Track Say All driven speech (see utils.say_all_running).
+        try:
+            utils.note_say_all_speech(reason)
+        except Exception:
+            log.debug("AudioThemes: swallowed Exception in frenzy.new_getControlFieldSpeech")
         return _new_getControlFieldSpeech_inner(attrs, ancestorAttrs, fieldType, formatConfig, extraDetail, reason)
     except Exception:
         try:
             if original_getControlFieldSpeech is not None:
                 return original_getControlFieldSpeech(attrs, ancestorAttrs, fieldType, formatConfig, extraDetail, reason)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in frenzy.new_getControlFieldSpeech")
         return ""
 
 def _new_getControlFieldSpeech_inner(
@@ -1524,11 +1529,11 @@ def _new_getControlFieldSpeech_inner(
                                     try:
                                         heading_level = int(attrs.get('level', 0) or 0)
                                     except (ValueError, TypeError):
-                                        pass
+                                        log.debug("AudioThemes: swallowed ValueError|TypeError in frenzy._new_getControlFieldSpeech_inner")
                                 plugin._unspoken_play_role(role_val, attrs.get('states', set()), heading_level=heading_level)
                         break
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in frenzy._new_getControlFieldSpeech_inner")
         return original_getControlFieldSpeech(attrs, ancestorAttrs, fieldType, formatConfig, extraDetail, reason)
         
     global ignore_get_properties_hook
@@ -1637,7 +1642,7 @@ def _new_getControlFieldSpeech_inner(
                         level = int(level)
                         rule = headingLevelRules.get(level, None)
                     except (ValueError, TypeError):
-                        pass
+                        log.debug("AudioThemes: swallowed ValueError|TypeError in frenzy._new_getControlFieldSpeech_inner")
                     
                     if rule is None:
                         rule = headingRule
@@ -1655,7 +1660,7 @@ def _new_getControlFieldSpeech_inner(
                             if pre_cmd is not None:
                                 result2.append(pre_cmd)
                         except (ValueError, TypeError):
-                            pass
+                            log.debug("AudioThemes: swallowed ValueError|TypeError in frenzy._new_getControlFieldSpeech_inner")
 
                 if rule is not None:
                     command = rule.speechCommand
@@ -1720,7 +1725,7 @@ def _new_getControlFieldSpeech_inner(
                             level = int(level)
                             rule = headingLevelRules.get(level, None)
                         except (ValueError, TypeError):
-                            pass
+                            log.debug("AudioThemes: swallowed ValueError|TypeError in frenzy._new_getControlFieldSpeech_inner")
                         if rule is None:
                             rule = headingRule
                     
@@ -1777,7 +1782,7 @@ def new_processAndLabelStates(
             if original_processAndLabelStates is not None:
                 return original_processAndLabelStates(role, states, reason, positiveStates, negativeStates, positiveStateLabelDict, negativeStateLabelDict)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in frenzy.new_processAndLabelStates")
         return []
 
 def _new_processAndLabelStates_inner(

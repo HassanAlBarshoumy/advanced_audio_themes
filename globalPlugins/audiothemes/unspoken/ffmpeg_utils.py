@@ -70,7 +70,7 @@ def decode_with_ffmpeg(path):
                     import wx
                     wx.YieldIfNeeded()
                 except Exception:
-                    pass
+                    log.debug("AudioThemes: swallowed Exception in unspoken.ffmpeg_utils.decode_with_ffmpeg")
             else:
                 proc.kill()
                 proc.wait()
@@ -100,7 +100,7 @@ def decode_with_ffmpeg(path):
             if out_path and os.path.exists(out_path):
                 os.remove(out_path)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in unspoken.ffmpeg_utils.decode_with_ffmpeg")
 
 def download_ffmpeg(progress_callback=None):
     """Download and extract ffmpeg.exe with timeout and chunked progress.
@@ -109,7 +109,6 @@ def download_ffmpeg(progress_callback=None):
     import urllib.request
     import urllib.error
     import zipfile
-    import io
     target_dir = _get_tools_dir()
     zip_path = os.path.join(tempfile.gettempdir(), "ffmpeg-essentials.zip")
     try:
@@ -158,4 +157,4 @@ def download_ffmpeg(progress_callback=None):
         try:
             os.remove(zip_path)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in unspoken.ffmpeg_utils.download_ffmpeg")

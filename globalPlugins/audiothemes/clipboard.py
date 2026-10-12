@@ -4,16 +4,16 @@
 
 import json
 import wx
-import config
 import ui
 
 from .handler import SpecialProps
 
 import addonHandler
+from logHandler import log
 try:
     addonHandler.initTranslation()
 except AttributeError:
-    pass
+    log.debug("AudioThemes: swallowed AttributeError in clipboard")
 try:
     _(u"")
 except NameError:

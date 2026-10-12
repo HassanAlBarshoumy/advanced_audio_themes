@@ -3,7 +3,6 @@
 #This file is covered by the GNU General Public License.
 #See the file LICENSE  for more details.
 
-import api
 import config
 import ctypes
 import functools
@@ -12,7 +11,6 @@ import NVDAHelper
 import nvwave
 import operator
 import os
-import queue
 import re
 import speech
 import struct
@@ -23,6 +21,7 @@ import wave
 
 from . addonConfig import *
 from ..utils import ensure_mono, is_sound_suppressed
+from logHandler import log
 
 _beeper_output_device = None
 
@@ -34,6 +33,33 @@ def _get_beeper_output_device():
         except KeyError:
             _beeper_output_device = config.conf["audio"]["outputDevice"]
     return _beeper_output_device
+
+def refreshBeeperOutputDevice():
+    """Re-read the configured output device so beepers use the current one.
+
+    The device used to be cached forever; after an output-device change the
+    beeper kept silent or played into the old (possibly gone) device.
+    """
+    global _beeper_output_device
+    new_od = None
+    try:
+        new_od = config.conf["speech"]["outputDevice"]
+    except KeyError:
+        try:
+            new_od = config.conf["audio"]["outputDevice"]
+        except KeyError:
+            new_od = None
+    old_od = _beeper_output_device
+    _beeper_output_device = new_od
+    if old_od is None or new_od is None or old_od == new_od:
+        return
+    try:
+        if getattr(beeper, "player", None) is not None:
+            beeper.player.close()
+            beeper.player = None
+    except Exception:
+        log.debug("AudioThemes: swallowed Exception in browserNavEngine.beeper.refreshBeeperOutputDevice")
+    log.info(f"AudioThemes: output device changed ({old_od!r} -> {new_od!r}) for BrowserNav beeper")
 
 class Beeper:
     BASE_FREQ = speech.IDT_BASE_FREQUENCY
@@ -67,7 +93,7 @@ class Beeper:
             from ..utils import threadPool
             threadPool.add_task(player.feed, data)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in browserNavEngine.beeper._feed_player")
 
 
 
@@ -81,7 +107,7 @@ class Beeper:
             if df < 1.0:
                 volume = int(volume * df)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in browserNavEngine.beeper.fancyCrackle")
         l = len(levels)
         coef = 10
         l = coef * math.log(
@@ -140,7 +166,7 @@ class Beeper:
                 left = int(left * df)
                 right = int(right * df)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in browserNavEngine.beeper.fancyBeep")
         beepLen = length
         freqs = self.getChordFrequencies(chord)
         intSize = 8 # bytes
@@ -257,7 +283,7 @@ def skippedParagraphChime():
                 if df < 1.0:
                     buf = frenzy.apply_ducking_to_pcm(buf, df)
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in browserNavEngine.beeper.playSkipParagraphChime")
             spcPlayer.feed(
                 ensure_mono(
                     adjustVolume(
@@ -270,6 +296,6 @@ def skippedParagraphChime():
             )
             spcPlayer.idle()
           except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in browserNavEngine.beeper.playSkipParagraphChime")
     threading.Thread(target=playSkipParagraphChime, daemon=True).start()
 

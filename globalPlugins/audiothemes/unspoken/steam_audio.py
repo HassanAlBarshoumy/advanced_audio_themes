@@ -7,7 +7,6 @@ import array
 import ctypes
 import os
 import platform
-import struct
 import threading
 from ctypes import c_bool, c_int, c_float, POINTER, byref
 

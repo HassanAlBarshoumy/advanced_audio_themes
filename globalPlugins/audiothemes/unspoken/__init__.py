@@ -14,7 +14,6 @@ from collections import OrderedDict
 import ctypes
 import config
 import speech
-from speech.sayAll import SayAllHandler
 from logHandler import log
 import nvwave
 from synthDriverHandler import synthChanged
@@ -242,36 +241,78 @@ def _apply_volume(float_samples, volume):
 	return array('f', [s * volume for s in float_samples])
 
 
+unspoken_config_defaults = {
+		"sayAll": "boolean(default=False)",
+		"speakRoles": "boolean(default=False)",
+		"noSounds": "boolean(default=False)",
+		"HRTF": "boolean(default=True)",
+		"volumeAdjust": "boolean(default=True)",
+		"Reverb": "boolean(default=False)",
+		"AdaptiveReverb": "boolean(default=True)",
+		"RoomSize": "integer(default=100, min=0, max=100)",
+		"Damping": "integer(default=0, min=0, max=100)",
+		"WetLevel": "integer(default=0, min=0, max=100)",
+		"DryLevel": "integer(default=30, min=0, max=100)",
+		"Width": "integer(default=100, min=0, max=100)",
+		"AudioCache": "boolean(default=True)",
+		"SmartVolume": "boolean(default=False)",
+		"SmoothEnvelope": "boolean(default=False)",
+		"SmoothPanning": "boolean(default=True)",
+		"TrimSilence": "boolean(default=True)",
+		"TrimSilenceThreshold": "float(default=0.01)",
+		"NoiseGate": "boolean(default=False)",
+		"NoiseGateThreshold": "float(default=0.02)",
+		"NoiseGateAttack": "integer(default=5, min=0, max=100)",
+		"NoiseGateRelease": "integer(default=50, min=0, max=500)",
+		"BassBoost": "boolean(default=False)",
+		"BassBoostGain": "integer(default=3, min=0, max=12)",
+		"BassBoostCutoff": "integer(default=200, min=50, max=500)",
+	}
+
+
+def registerUnspokenConfigSpec():
+	"""Publish the [unspoken] section spec to NVDA as early as possible.
+
+	NVDA's AggregatedSection remembers a section it could not find by caching the
+	KeyError itself, and only a profile switch ever clears that cache. Registering
+	the spec later - which is what UnspokenPlayer.__init__ used to do on its own -
+	is therefore useless as soon as anything has already tried, and failed, to read
+	config.conf["unspoken"]: every later read keeps raising, and that is exactly
+	what crashed the settings dialog. Running this at import time happens before
+	any such read (handler imports this module well before configure() runs), so
+	the poisoned cache entry can never be created in the first place.
+	"""
+	try:
+		if config.conf is None:
+			return
+		# A copy, so configobj validation cannot mutate the shared constant.
+		config.conf.spec["unspoken"] = dict(unspoken_config_defaults)
+	except Exception:
+		log.debug("AudioThemes: swallowed Exception in registerUnspokenConfigSpec")
+
+
+registerUnspokenConfigSpec()
+
+
+def _say_all_is_running():
+    """Say All really running (a crashed Say All no longer counts)."""
+    try:
+        from .. import utils as _at_utils
+        return _at_utils.say_all_running()
+    except Exception:
+        try:
+            from speech.sayAll import SayAllHandler
+            return SayAllHandler.isRunning()
+        except Exception:
+            return False
+
+
 class UnspokenPlayer:
 	def __init__(self, *args, **kwargs):
 		super(UnspokenPlayer, self).__init__(*args, **kwargs)
-		config.conf.spec["unspoken"] = {
-			"sayAll": "boolean(default=False)",
-			"speakRoles": "boolean(default=False)",
-			"noSounds": "boolean(default=False)",
-			"HRTF": "boolean(default=True)",
-			"volumeAdjust": "boolean(default=True)",
-			"Reverb": "boolean(default=False)",
-			"AdaptiveReverb": "boolean(default=True)",
-			"RoomSize": "integer(default=100, min=0, max=100)",
-			"Damping": "integer(default=0, min=0, max=100)",
-			"WetLevel": "integer(default=0, min=0, max=100)",
-			"DryLevel": "integer(default=30, min=0, max=100)",
-			"Width": "integer(default=100, min=0, max=100)",
-			"AudioCache": "boolean(default=True)",
-			"SmartVolume": "boolean(default=False)",
-			"SmoothEnvelope": "boolean(default=False)",
-			"SmoothPanning": "boolean(default=True)",
-			"TrimSilence": "boolean(default=True)",
-			"TrimSilenceThreshold": "float(default=0.01)",
-			"NoiseGate": "boolean(default=False)",
-			"NoiseGateThreshold": "float(default=0.02)",
-			"NoiseGateAttack": "integer(default=5, min=0, max=100)",
-			"NoiseGateRelease": "integer(default=50, min=0, max=500)",
-			"BassBoost": "boolean(default=False)",
-			"BassBoostGain": "integer(default=3, min=0, max=12)",
-			"BassBoostCutoff": "integer(default=200, min=50, max=500)",
-		}
+		# Re-assert the schema; idempotent, and it keeps a player created later
+		# working even if something replaced the spec in the meantime.
+		registerUnspokenConfigSpec()
 		log.debug("Initializing Steam Audio")
 		self.steam_audio = steam_audio.get_steam_audio()
 		self.steam_audio_active = True
@@ -295,12 +336,19 @@ class UnspokenPlayer:
 					width=unspoken_cfg["Width"] / 100.0,
 				)
 			except Exception:
-				pass
+				log.debug("AudioThemes: swallowed Exception in unspoken.__init__")
 
 		try:
 			self.create_wave_player()
 		except Exception:
-			pass
+			# Invisible at NVDA's default INFO level before: the addon would
+			# then stay loaded with self.wave_player missing and every theme
+			# sound silently dropped until the next configure().
+			log.error(
+				"AudioThemes: could not create the audio players - "
+				"theme sounds will stay silent until they are recreated",
+				exc_info=True,
+			)
 		self._last_played_object = None
 		self._last_played_time = 0
 		self._last_played_lock = threading.Lock()
@@ -318,7 +366,7 @@ class UnspokenPlayer:
 		# Processing config defaults; overwritten by handler.configure()
 		self._trim_silence = True
 		self._trim_silence_threshold = 0.01
-		self._smart_volume = True
+		self._smart_volume = False
 		self._smooth_envelope = False
 		self._noise_gate = False
 		self._noise_gate_threshold = 0.02
@@ -328,6 +376,23 @@ class UnspokenPlayer:
 		self._bass_boost_gain = 3.0
 		self._bass_boost_cutoff = 200.0
 		self._terminated = False
+		# --- Playback health / self-repair state -------------------------
+		# The audio worker talks to a native WASAPI device from a background
+		# thread.  If feed() starts failing (device hiccup, driver restart) or
+		# the players were never created, nothing used to repair them: theme
+		# sounds vanished with only an invisible log.debug line.  These fields
+		# let the main thread notice and rebuild the players, and let
+		# check_playback_health() report a genuine stall visibly.
+		self._playback_guard = threading.Lock()
+		self._feeding = False
+		self._repairing = False
+		self._feed_failed = False
+		self._last_repair_time = 0.0
+		self._last_request_time = 0.0
+		self._last_queue_time = 0.0
+		self._last_fed_time = 0.0
+		self._last_gate = ""
+		self._last_health_warn = 0.0
 		self._audio_worker_thread = threading.Thread(target=self._audio_worker, daemon=True)
 		self._audio_worker_thread.start()
 
@@ -370,10 +435,30 @@ class UnspokenPlayer:
 				if generation != self._generation:
 					self._audio_queue.task_done()
 					continue
+			# Claim the right to touch the native player.  The main thread only
+			# ever rebuilds a player while _repairing is set, so a player is
+			# never closed underneath feed() (and vice versa).
+			with self._playback_guard:
+				if self._repairing:
+					self._audio_queue.task_done()
+					continue
+				self._feeding = True
 			try:
 				player.feed(data)
+				self._last_fed_time = time.monotonic()
 			except Exception as e:
-				log.error(f"Failed to play audio in worker: {e}")
+				# WARNING (visible at NVDA's default INFO level) because this is
+				# exactly the "sound requested, nothing comes out" case.
+				log.warning(
+					f"AudioThemes: audio feed failed ({e}); the audio device "
+					f"players will be rebuilt before the next sound",
+					exc_info=True,
+				)
+				with self._playback_guard:
+					self._feed_failed = True
+			finally:
+				with self._playback_guard:
+					self._feeding = False
 			self._audio_queue.task_done()
 
 	@property
@@ -465,6 +550,126 @@ class UnspokenPlayer:
 		]
 		self._typing_player_index = 0
 		self._typing_player_lock = threading.Lock()
+		# NVDA's WavePlayer defaults to purpose=SPEECH, which arms
+		# leading-silence trimming.  NVDA documents that trimming "is by default
+		# enabled for speech audio, and disabled for non-speech audio", and it is
+		# toggled from NVDA's own speech events (_onPreSpeak).  So unrelated
+		# speech could arm/disarm trimming on these effect players and swallow
+		# whole sounds - intermittently, during ordinary navigation, and only for
+		# theme sounds (PP/beeper/browsernav players use purpose=SOUNDS and are
+		# unaffected).  These are effect players: never trim them.  purpose=SOUNDS
+		# is deliberately NOT used instead, because that would also apply NVDA's
+		# soundVolume (currently 10) to theme sounds.
+		for _p in list(self.typing_players) + [self.wave_player]:
+			try:
+				_p.enableTrimmingLeadingSilence(False)
+			except Exception:
+				log.debug("AudioThemes: swallowed Exception in unspoken.create_wave_player")
+
+	# Gates that suppress a sound on purpose.  check_playback_health() stays
+	# quiet for these; any other recorded gate means a sound was wanted but
+	# dropped.
+	_DESIGN_GATES = frozenset({
+		"themes-disabled", "no-sounds", "say-all", "app-disabled",
+		"typing-fast",
+	})
+
+	def _repair_player_if_needed(self):
+		"""Rebuild the wave players after a failed feed(), or if they are missing.
+
+		Called from the main thread just before queueing a sound.  It never
+		runs while the audio worker is inside feed(), so the native player is
+		never closed underneath it.  Throttled to one attempt per few seconds.
+		"""
+		try:
+			if self._terminated:
+				return
+			with self._playback_guard:
+				missing = (
+					getattr(self, "wave_player", None) is None
+					or getattr(self, "typing_players", None) is None
+				)
+				if not missing and not self._feed_failed:
+					return
+				if self._feeding:
+					return
+				now = time.monotonic()
+				if now - self._last_repair_time < 5.0:
+					return
+				self._last_repair_time = now
+				self._feed_failed = False
+				self._repairing = True
+			try:
+				for _name in ("wave_player", "typing_players"):
+					players = getattr(self, _name, None)
+					if not players:
+						continue
+					if not isinstance(players, (list, tuple)):
+						players = [players]
+					for _p in players:
+						try:
+							_p.close()
+						except Exception:
+							log.debug("AudioThemes: swallowed Exception in unspoken._repair_player_if_needed")
+				self.create_wave_player()
+				log.warning(
+					"AudioThemes: rebuilt the audio device players after a "
+					"playback failure - theme sounds resume"
+				)
+			except Exception:
+				log.error(
+					"AudioThemes: failed to rebuild the audio device players; "
+					"theme sounds will stay silent",
+					exc_info=True,
+				)
+				with self._playback_guard:
+					self._feed_failed = True
+			finally:
+				with self._playback_guard:
+					self._repairing = False
+		except Exception:
+			log.debug("AudioThemes: swallowed Exception in unspoken._repair_player_if_needed")
+
+	def check_playback_health(self):
+		"""Report a genuine playback stall in one throttled WARNING line.
+
+		Every silent-return path in this addon used to log at DEBUG/DEBUGWARNING,
+		which NVDA hides at its default INFO level - that is why "all theme
+		sounds went silent" could never be diagnosed.  This fires only when sounds
+		are actively being requested, none has been queued for a while, and we
+		are not sitting in a designed suppression gate.
+		"""
+		try:
+			if self._terminated:
+				return
+			if self._last_gate in self._DESIGN_GATES:
+				return
+			now = time.monotonic()
+			if now - self._last_request_time > 3.0:
+				return
+			if self._last_queue_time and (now - self._last_queue_time) < 10.0:
+				return
+			if now - self._last_health_warn < 30.0:
+				return
+			self._last_health_warn = now
+			with self._playback_guard:
+				feeding = self._feeding
+				feed_failed = self._feed_failed
+				repairing = self._repairing
+			try:
+				from speech.sayAll import SayAllHandler
+				say_all = SayAllHandler.isRunning()
+			except Exception:
+				say_all = False
+			log.warning(
+				"AudioThemes: sounds are requested but none reached the audio device "
+				f"(last gate={self._last_gate!r}, queued={self._audio_queue.qsize()}, "
+				f"player={'ok' if getattr(self, 'wave_player', None) else 'missing'}, "
+				f"feeding={feeding}, feed_failed={feed_failed}, repairing={repairing}, "
+				f"sayAllRunning={say_all})"
+			)
+		except Exception:
+			log.debug("AudioThemes: swallowed Exception in unspoken.check_playback_health")
 
 	def _ensure_processed(self, sound_data):
 		if sound_data.get("_processed"):
@@ -563,7 +768,7 @@ class UnspokenPlayer:
 				if loaded is None:
 					raise wave.Error("unsupported WAV format")
 			except wave.Error:
-				pass  # compressed WAV — FFmpeg fallback if enabled
+				log.debug("AudioThemes: swallowed Exception in unspoken.make_sound_object")  # compressed WAV — FFmpeg fallback if enabled
 			except Exception as e:
 				log.error(f"Failed to load {path}: {e}")
 
@@ -613,14 +818,14 @@ class UnspokenPlayer:
 			driver = speech.speech.getSynth()
 			base_vol = getattr(driver, "volume", 100) / 100.0  # nvda reports as percent.
 			base_vol = clamp(base_vol, 0.0, 1.0)
-			if self._cached_config.get("HRTF", False):
+			if self._cached_config.get("HRTF", True):
 				base_vol += 0.25
 				
 		# Apply Audio Ducking if NVDA recently spoke
 		try:
 			base_vol *= _frenzy.get_ducking_factor("theme_sounds", self._cached_config)
 		except Exception:
-			pass
+			log.debug("AudioThemes: swallowed Exception in unspoken._compute_volume")
 		return clamp(base_vol, 0.0, 1.5)
 
 	def _play_audio_data(self, audio_bytes):
@@ -629,8 +834,15 @@ class UnspokenPlayer:
 			gen = self._generation
 		try:
 			self._audio_queue.put_nowait((self.wave_player, audio_bytes, gen))
+			self._last_queue_time = time.monotonic()
 		except queue.Full:
-			pass
+			# The single audio worker cannot keep up (or playback is stalled): the
+			# buffer is dropped.  Report it at WARNING so this never stays invisible.
+			try:
+				from .. import utils as _at_utils
+				_at_utils.report_dropped_task("AudioThemes audio queue", None, self._audio_queue)
+			except Exception:
+				log.debug("AudioThemes: swallowed Exception in unspoken._play_audio_data")
 
 	def play(self, obj_info, sound):
 		"""
@@ -639,12 +851,17 @@ class UnspokenPlayer:
 		No COM objects are accessed here -- everything was pre-extracted.
 		"""
 		cfg = self._cached_config
+		self._last_request_time = time.monotonic()
 		if not cfg.get("enable_audio_themes", True):
+			self._last_gate = "themes-disabled"
 			return
 		if cfg.get("noSounds", False):
+			self._last_gate = "no-sounds"
 			return
-		if not obj_info.get("system_sound") and getattr(self, "use_in_say_all", False) and SayAllHandler.isRunning():
+		if not obj_info.get("system_sound") and getattr(self, "use_in_say_all", False) and _say_all_is_running():
+			self._last_gate = "say-all"
 			return
+		self._last_gate = ""
 
 		curtime = time.time()
 		# De-duplicate: skip if same name played < 50ms ago, unless it's a progress bar updating
@@ -814,16 +1031,23 @@ class UnspokenPlayer:
 				self._play_cache[cache_key] = final_audio
 
 		# Play the final audio
+		self._repair_player_if_needed()
+		if getattr(self, "wave_player", None) is None:
+			# Nothing to feed.  check_playback_health() reports the stall.
+			self._last_gate = "no-player"
+			return
 		try:
 			self.wave_player.stop()
 		except Exception:
-			pass
+			log.debug("AudioThemes: swallowed Exception in unspoken.play")
 		self._play_audio_data(final_audio)
 
 
 
 	def play_file(self, path, volume=None, audio3d=False, ch=None, vkCode=None, angle_x=0, angle_y=0, extended=None):
 		cfg = self._cached_config
+		self._last_request_time = time.monotonic()
+		self._last_gate = ""
 		from .. import frenzy as _frenzy
 		if volume is not None:
 			# Typing sounds use absolute volume
@@ -839,6 +1063,7 @@ class UnspokenPlayer:
 			velocity_multiplier = 1.0
 			if dt < 0.04:
 				# Drop sound if typing faster than 25 strokes/sec to prevent lag
+				self._last_gate = "typing-fast"
 				return
 			elif dt < 0.15:
 				velocity_multiplier = 1.2
@@ -854,7 +1079,7 @@ class UnspokenPlayer:
 			try:
 				final_volume *= _frenzy.get_ducking_factor("typing_sounds", self._cached_config)
 			except Exception:
-				pass
+				log.debug("AudioThemes: swallowed Exception in unspoken.play_file")
 		else:
 			final_volume = self._compute_volume()
 			is_typing_sound = False
@@ -972,20 +1197,27 @@ class UnspokenPlayer:
 				self._play_file_cache.popitem(last=False)
 			self._play_file_cache[cache_key] = final_audio
 
+		self._repair_player_if_needed()
 		if is_typing_sound:
+			if not getattr(self, "typing_players", None):
+				self._last_gate = "no-player"
+				return
 			with self._typing_player_lock:
 				player = self.typing_players[self._typing_player_index]
 				self._typing_player_index = (self._typing_player_index + 1) % len(self.typing_players)
 			try:
 				player.stop()
 			except Exception:
-				pass
+				log.debug("AudioThemes: swallowed Exception in unspoken.play_file")
 			self._play_typing_audio(player, final_audio)
 		else:
+			if getattr(self, "wave_player", None) is None:
+				self._last_gate = "no-player"
+				return
 			try:
 				self.wave_player.stop()
 			except Exception:
-				pass
+				log.debug("AudioThemes: swallowed Exception in unspoken.play_file")
 			self._play_audio_data(final_audio)
 
 	def _play_typing_audio(self, player, audio_bytes):
@@ -994,8 +1226,15 @@ class UnspokenPlayer:
 			gen = self._generation
 		try:
 			self._audio_queue.put_nowait((player, audio_bytes, gen))
+			self._last_queue_time = time.monotonic()
 		except queue.Full:
-			pass
+			# Same visibility rule as _play_audio_data: a dropped buffer must
+			# never be invisible at NVDA's default INFO log level.
+			try:
+				from .. import utils as _at_utils
+				_at_utils.report_dropped_task("AudioThemes audio queue", None, self._audio_queue)
+			except Exception:
+				log.debug("AudioThemes: swallowed Exception in unspoken._play_typing_audio")
 
 	def terminate(self):
 		# Signal termination FIRST — prevents on_synthChanged from creating new
@@ -1006,7 +1245,7 @@ class UnspokenPlayer:
 		try:
 			synthChanged.unregister(self.on_synthChanged)
 		except Exception:
-			pass
+			log.debug("AudioThemes: swallowed Exception in unspoken.terminate")
 		# Stop worker thread
 		if hasattr(self, "_audio_queue"):
 			self._audio_queue.put(None)
@@ -1019,7 +1258,7 @@ class UnspokenPlayer:
 				self.wave_player.close()
 			except Exception as e:
 			    log.error(f"AudioThemes Error: {e}", exc_info=True)
-		if hasattr(self, "typing_players"):
+		if getattr(self, "typing_players", None):
 			for p in self.typing_players:
 				try:
 					p.close()
@@ -1042,12 +1281,12 @@ class UnspokenPlayer:
 				self._audio_queue.get_nowait()
 				self._audio_queue.task_done()
 		except queue.Empty:
-			pass
+			log.debug("AudioThemes: swallowed Exception in unspoken.on_synthChanged")
 		try:
 			self.wave_player.close()
 		except Exception as e:
 			log.error(f"AudioThemes Error closing wave player: {e}", exc_info=True)
-		if hasattr(self, "typing_players"):
+		if getattr(self, "typing_players", None):
 			for p in self.typing_players:
 				try: p.close()
 				except Exception as e:

@@ -23,5 +23,9 @@ def getConfig(key):
     return val
 
 def setConfig(key, value):
-    config.conf["browsernav"][key] = value
+    # Write into the BASE config (nvda.ini) directly: [browsernav] is absent
+    # from nvda.ini, so a plain aggregate write would be redirected into the
+    # most recently activated configuration profile and lost on profile switch.
+    from ..utils import write_config_to_base
+    write_config_to_base("browsernav", key, value)
     _bne_cached_config[key] = value

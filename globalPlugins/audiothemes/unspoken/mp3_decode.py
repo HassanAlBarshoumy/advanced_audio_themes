@@ -107,8 +107,8 @@ def decode_mp3_to_float(path):
         try:
             _mpg123.mpg123_close(mh)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in unspoken.mp3_decode.decode_mp3_to_float")
         try:
             _mpg123.mpg123_delete(mh)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in unspoken.mp3_decode.decode_mp3_to_float")

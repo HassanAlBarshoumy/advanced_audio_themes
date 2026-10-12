@@ -5,7 +5,7 @@
 
 from enum import IntEnum
 from collections import OrderedDict
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from zipfile import ZipFile, ZIP_DEFLATED
 from uuid import uuid4
 import api
@@ -20,7 +20,7 @@ import config
 import controlTypes
 import extensionPoints
 from config import post_configSave, post_configReset, post_configProfileSwitch
-from .unspoken import UnspokenPlayer
+from .unspoken import UnspokenPlayer, unspoken_config_defaults
 import globalVars
 
 import NVDAObjects
@@ -33,7 +33,54 @@ from logHandler import log
 try:
     addonHandler.initTranslation()
 except AttributeError:
-    pass
+    log.debug("AudioThemes: swallowed AttributeError in handler")
+
+
+_at_utils_cache = None
+
+
+def _say_all_running():
+    """Say All genuinely running (a crashed/stuck Say All no longer counts).
+
+    SayAllHandler.isRunning() only means "a Say All reader object still
+    exists".  A Say All that dies inside NVDA never calls stop(), so the reader
+    can stay referenced and isRunning() stays True - which muted every theme
+    sound while normal navigation kept working, with nothing in the log.
+    utils.say_all_running() additionally requires recent Say All driven speech.
+    """
+    global _at_utils_cache
+    u = _at_utils_cache
+    if u is None:
+        try:
+            from . import utils as u
+            _at_utils_cache = u
+        except Exception:
+            u = None
+    if u is not None:
+        try:
+            return u.say_all_running()
+        except Exception:
+            pass
+    try:
+        return SayAllHandler.isRunning()
+    except Exception:
+        return False
+
+
+def _note_say_all_speech(reason):
+    """Record Say All driven speech so the muting gate can expire again."""
+    global _at_utils_cache
+    u = _at_utils_cache
+    if u is None:
+        try:
+            from . import utils as u
+            _at_utils_cache = u
+        except Exception:
+            return
+    try:
+        u.note_say_all_speech(reason)
+    except Exception:
+        log.debug("AudioThemes: swallowed Exception in handler._note_say_all_speech")
 
 THEMES_DIR = os.path.join(globalVars.appArgs.configPath, "audio-themes")
 INFO_FILE_NAME = "info.json"
@@ -78,7 +125,7 @@ def get_active_file_types():
         if conf.get("audiothemes", {}).get("enable_ffmpeg", False):
             return SUPPORTED_FILE_TYPES
     except Exception:
-        pass
+        log.debug("AudioThemes: swallowed Exception in handler.get_active_file_types")
     return OrderedDict((k, v) for k, v in SUPPORTED_FILE_TYPES.items() if k in NATIVE_FORMATS)
 # When the active audio theme is being changed
 audiotheme_changed = extensionPoints.Action()
@@ -111,7 +158,7 @@ audiothemes_config_defaults = {
     "navLayerPlaySounds": "boolean(default=True)",
     "navLayerEnabledModes": "string(default='')",
     "audio_ducking_enabled": "boolean(default=False)",
-    "audio_ducking_volume": "integer(default=6)",
+    "audio_ducking_volume": "integer(default=30)",
     "output_mode": "string(default='stereo')",
     "ffmpeg_path": "string(default='')",
     "enable_ffmpeg": "boolean(default=False)",
@@ -585,7 +632,7 @@ class AudioTheme:
                 key = int(fnrole)
                 return key
             except ValueError:
-                pass
+                log.debug("AudioThemes: swallowed ValueError in handler.is_valid_audio_file")
             key = role_name_to_int.get(fnrole.lower())
             if key is not None:
                 return key
@@ -659,7 +706,7 @@ def showPendingConflicts():
     try:
         addonHandler.initTranslation()
     except Exception:
-        pass
+        log.debug("AudioThemes: swallowed Exception in handler.showPendingConflicts")
     gui.mainFrame.prePopup()
     try:
         dlg = wx.Dialog(gui.mainFrame, title=_("Conflicting Add-ons"))
@@ -719,6 +766,215 @@ def showPendingConflicts():
 _typing_dir_cache = {}
 _typing_dir_cache_lock = threading.Lock()
 _is_sound_suppressed_cache = None
+
+
+def conf_bool(section, key, default=False):
+    """Read a boolean from an NVDA config section, never raising.
+
+    The addon registers its config spec only after NVDA has already loaded
+    (and validated) the config, so two hazards exist at read time:
+    * a key that is not present in nvda.ini raises KeyError on a bare
+      section[key] lookup, and
+    * a value that did come from nvda.ini is still the raw string
+      "True"/"False", because configobj never converted it (validation ran
+      before this section had a spec).
+    Normalising both here lets callers rely on plain truthiness.
+    """
+    try:
+        value = section.get(key, default)
+    except Exception:
+        value = default
+    if isinstance(value, str):
+        token = value.strip().lower()
+        if token in ("true", "1", "yes", "on"):
+            return True
+        if token in ("false", "0", "no", "off"):
+            return False
+        # Empty or a typo: behave as if the key were unset instead of silently
+        # forcing every toggle off.
+        return bool(default)
+    return bool(value)
+
+
+def conf_str(section, key, default=""):
+    """Read a string from an NVDA config section, never raising."""
+    try:
+        value = section.get(key, default)
+    except Exception:
+        return default
+    if value is None:
+        return default
+    return value if isinstance(value, str) else str(value)
+
+
+def conf_int(section, key, default=0):
+    """Read an integer from an NVDA config section, never raising."""
+    try:
+        value = section.get(key, default)
+    except Exception:
+        return default
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def conf_float(section, key, default=0.0):
+    """Read a float from an NVDA config section, never raising.
+
+    Replaces bare ``float(section.get(key, default))`` on the player-settings
+    path, where a hand-edited nvda.ini value such as ``abc`` would otherwise
+    raise ValueError and abort configure() half way through.
+    """
+    try:
+        value = section.get(key, default)
+    except Exception:
+        return default
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def conf_toggle(section, key, default=False):
+    """Flip a boolean flag in an NVDA config section and return its new value.
+
+    Replaces the `enabled = not section[key]` pattern, which raised KeyError
+    for keys that are not in nvda.ini yet and always evaluated to False for
+    values stored as the strings "True"/"False".
+    """
+    new_value = not conf_bool(section, key, default)
+    try:
+        section[key] = new_value
+    except Exception:
+        log.debug("AudioThemes: swallowed Exception in conf_toggle")
+    return new_value
+
+
+def _spec_default(spec_str, kind):
+    """Best-effort extraction of the default declared in a configobj spec string.
+
+    Used only when the value found in nvda.ini cannot be parsed, so that a
+    hand-edited or truncated entry degrades to the documented default (which is
+    what configobj's own validator would have done) instead of leaving an
+    untyped value behind for the hot paths to trip over.
+    """
+    i = spec_str.find("default")
+    if i < 0:
+        return None
+    j = spec_str.find("=", i)
+    if j < 0:
+        return None
+    rest = spec_str[j + 1:].lstrip()
+    if not rest:
+        return None
+    if rest[0] in ("'", '"'):
+        k = rest.find(rest[0], 1)
+        if k < 0:
+            return None
+        literal = rest[1:k]
+    else:
+        depth = 0
+        out = []
+        for ch in rest:
+            if ch == "(":
+                depth += 1
+            elif ch == ")":
+                if depth == 0:
+                    break
+                depth -= 1
+            elif ch == "," and depth == 0:
+                break
+            out.append(ch)
+        literal = "".join(out).strip()
+    if kind == "boolean":
+        token = literal.strip().lower()
+        if token in ("true", "1", "yes", "on"):
+            return True
+        if token in ("false", "0", "no", "off"):
+            return False
+        return None
+    if kind == "integer":
+        try:
+            return int(literal)
+        except ValueError:
+            return None
+    if kind == "float":
+        try:
+            return float(literal)
+        except ValueError:
+            return None
+    if kind == "string":
+        return literal
+    return None
+
+
+def normalize_config_section(section, spec):
+    """Coerce the raw strings held by configobj back into the declared types.
+
+    configobj stores every scalar from nvda.ini as a string, and NVDA validates
+    the config *before* addons register their specs — so an addon section is
+    never run through the validator.  A key such as ``enable_audio_themes`` is
+    therefore the string "True" rather than the bool True, and `not value` (any
+    non-empty string is truthy) or `value >= 1` (str vs int) misbehaves or
+    raises TypeError.
+
+    This walks the spec and rewrites **only the keys that are already present**
+    (so no defaults are materialised into nvda.ini on the next save) with their
+    properly typed value.  It is idempotent and never raises.
+    """
+    try:
+        items = list(spec.items())
+    except Exception:
+        return
+    for key, spec_str in items:
+        if not isinstance(spec_str, str):
+            continue
+        try:
+            if key not in section:
+                continue
+            value = section[key]
+        except Exception:
+            continue
+        if not isinstance(value, str):
+            continue
+        kind = spec_str.split("(", 1)[0].strip()
+        coerced = None
+        if kind == "boolean":
+            token = value.strip().lower()
+            if token in ("true", "1", "yes", "on"):
+                coerced = True
+            elif token in ("false", "0", "no", "off"):
+                coerced = False
+            else:
+                # Unrecognised text: leave it for conf_bool() to fall back on
+                # rather than silently rewriting it to False.
+                coerced = None
+        elif kind == "integer":
+            try:
+                coerced = int(value.strip())
+            except ValueError:
+                coerced = None
+        elif kind == "float":
+            try:
+                coerced = float(value.strip())
+            except ValueError:
+                coerced = None
+        elif kind == "string":
+            coerced = value
+        if coerced is None:
+            # Unparseable value (or a type we do not handle): fall back to the
+            # default declared in the spec — what configobj's validator would
+            # have done — so the key still ends up properly typed.  Only leave
+            # the raw value alone when even that cannot be determined.
+            coerced = _spec_default(spec_str, kind)
+            if coerced is None:
+                continue
+        try:
+            section[key] = coerced
+        except Exception:
+            log.debug("AudioThemes: swallowed Exception in normalize_config_section")
+
 
 class AudioThemesHandler:
     """Query and manage audio themes."""
@@ -784,12 +1040,15 @@ class AudioThemesHandler:
             try:
                 self._start_system_status_monitoring()
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in handler.__init__")
 
     def _hook_getSpeechTextForProperties(
         self, reason=NVDAObjects.controlTypes.OutputReason.QUERY, *args, **kwargs
     ):
         try:
+            # Remember Say All driven speech; the theme-sound muting gate uses
+            # it to expire instead of staying closed forever after a crash.
+            _note_say_all_speech(reason)
             role = kwargs.get("role", None)
             if role is not None:
                 player = self.player
@@ -820,7 +1079,7 @@ class AudioThemesHandler:
                                 suppress = False
                     except Exception as e:
                         log.error(f"AudioThemes Error: {e}", exc_info=True)
-                if player and player.use_in_say_all and SayAllHandler.isRunning():
+                if player and player.use_in_say_all and _say_all_running():
                     suppress = False
 
                 if suppress:
@@ -843,35 +1102,35 @@ class AudioThemesHandler:
             self.player = UnspokenPlayer()
             try:
                 user_config = config.conf["audiothemes"]
-                self.player.audio3d = user_config.get("audio3d", False)
-                self.player.use_in_say_all = user_config.get("use_in_say_all", False)
-                self.player.speak_roles = user_config.get("speak_roles", True)
-                self.player.use_synth_volume = user_config.get("use_synth_volume", True)
-                self.player.volume = user_config.get("volume", 50)
+                self.player.audio3d = conf_bool(user_config, "audio3d", False)
+                self.player.use_in_say_all = conf_bool(user_config, "use_in_say_all", True)
+                self.player.speak_roles = conf_bool(user_config, "speak_roles", True)
+                self.player.use_synth_volume = conf_bool(user_config, "use_synth_volume", False)
+                self.player.volume = conf_int(user_config, "volume", 50)
                 try:
                     unspoken_config = config.conf["unspoken"]
-                except KeyError:
+                except Exception:
                     unspoken_config = {}
-                self.player.reverb = unspoken_config.get("Reverb", False)
-                self.player.room_size = unspoken_config.get("RoomSize", 100)
-                self.player.damping = unspoken_config.get("Damping", 0)
-                self.player.wet_level = unspoken_config.get("WetLevel", 0)
-                self.player.dry_level = unspoken_config.get("DryLevel", 30)
-                self.player.width = unspoken_config.get("Width", 100)
-                self.player._trim_silence = unspoken_config.get("TrimSilence", True)
-                self.player._trim_silence_threshold = float(unspoken_config.get("TrimSilenceThreshold", 0.01))
-                self.player._smart_volume = unspoken_config.get("SmartVolume", True)
-                self.player._smooth_envelope = unspoken_config.get("SmoothEnvelope", False)
-                self.player._noise_gate = unspoken_config.get("NoiseGate", False)
-                self.player._noise_gate_threshold = float(unspoken_config.get("NoiseGateThreshold", 0.02))
-                self.player._noise_gate_attack = int(unspoken_config.get("NoiseGateAttack", 5))
-                self.player._noise_gate_release = int(unspoken_config.get("NoiseGateRelease", 50))
-                self.player._bass_boost = unspoken_config.get("BassBoost", False)
-                self.player._bass_boost_gain = float(unspoken_config.get("BassBoostGain", 3))
-                self.player._bass_boost_cutoff = float(unspoken_config.get("BassBoostCutoff", 200))
+                self.player.reverb = conf_bool(unspoken_config, "Reverb", False)
+                self.player.room_size = conf_int(unspoken_config, "RoomSize", 100)
+                self.player.damping = conf_int(unspoken_config, "Damping", 0)
+                self.player.wet_level = conf_int(unspoken_config, "WetLevel", 0)
+                self.player.dry_level = conf_int(unspoken_config, "DryLevel", 30)
+                self.player.width = conf_int(unspoken_config, "Width", 100)
+                self.player._trim_silence = conf_bool(unspoken_config, "TrimSilence", True)
+                self.player._trim_silence_threshold = conf_float(unspoken_config, "TrimSilenceThreshold", 0.01)
+                self.player._smart_volume = conf_bool(unspoken_config, "SmartVolume", False)
+                self.player._smooth_envelope = conf_bool(unspoken_config, "SmoothEnvelope", False)
+                self.player._noise_gate = conf_bool(unspoken_config, "NoiseGate", False)
+                self.player._noise_gate_threshold = conf_float(unspoken_config, "NoiseGateThreshold", 0.02)
+                self.player._noise_gate_attack = conf_int(unspoken_config, "NoiseGateAttack", 5)
+                self.player._noise_gate_release = conf_int(unspoken_config, "NoiseGateRelease", 50)
+                self.player._bass_boost = conf_bool(unspoken_config, "BassBoost", False)
+                self.player._bass_boost_gain = conf_float(unspoken_config, "BassBoostGain", 3)
+                self.player._bass_boost_cutoff = conf_float(unspoken_config, "BassBoostCutoff", 200)
                 self.player._cached_config = self._cached_config
             except Exception:
-                log.debugWarning("AudioThemes: failed to apply initial config to player", exc_info=True)
+                log.warning("AudioThemes: failed to apply initial config to player", exc_info=True)
         return self.player
 
     def ensure_themes_dir(self):
@@ -903,7 +1162,7 @@ class AudioThemesHandler:
                     try:
                         shutil.copytree(bundled_theme_path, target_theme_path)
                     except Exception as e:
-                        pass
+                        log.debug("AudioThemes: swallowed Exception in handler.ensure_themes_dir")
                         
         default_theme_path = os.path.join(THEMES_DIR, "Default")
         if os.path.isdir(default_theme_path):
@@ -926,7 +1185,7 @@ class AudioThemesHandler:
                         {"name": "Default", "author": "NVDA Contributers", "summary": "Default theme"}, f
                     )
             except OSError:
-                pass
+                log.debug("AudioThemes: swallowed OSError in handler.ensure_themes_dir")
 
     def close(self):
         if self.active_theme is not None:
@@ -942,18 +1201,18 @@ class AudioThemesHandler:
             try:
                 self.player.terminate()
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in handler.close")
             self.player = None
         if self._NVDA_getPropertiesSpeech is not None:
             try:
                 speech.speech.getPropertiesSpeech = self._NVDA_getPropertiesSpeech
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in handler.close")
         for action in getattr(self, '_registered_actions', ()):
             try:
                 action.unregister(self.configure)
             except (ValueError, AttributeError):
-                pass
+                log.debug("AudioThemes: swallowed ValueError|AttributeError in handler.close")
         with self._config_lock:
             self._theme_cache.clear()
             self._app_profiles_cache.clear()
@@ -964,7 +1223,7 @@ class AudioThemesHandler:
     def shouldNukeRoleSpeech(self):
         if self.player is None:
             return True
-        if self.player.use_in_say_all and SayAllHandler.isRunning():
+        if self.player.use_in_say_all and _say_all_running():
             return False
         if self.player.speak_roles:
             return False
@@ -1023,12 +1282,19 @@ class AudioThemesHandler:
             )
 
     def get_active_theme(self):
-        if not config.conf["audiothemes"]["enable_audio_themes"]:
+        try:
+            conf = config.conf["audiothemes"]
+        except KeyError:
+            conf = {}
+        if not conf_bool(conf, "enable_audio_themes", True):
             log.debug("get_active_theme: themes disabled")
             return
-        theme = self.get_theme_from_folder(config.conf["audiothemes"]["active_theme"])
+        theme = self.get_theme_from_folder(conf_str(conf, "active_theme", "Default"))
         if not theme:
-            config.conf["audiothemes"]["active_theme"] = "Default"
+            try:
+                conf["active_theme"] = "Default"
+            except Exception:
+                log.debug("AudioThemes: swallowed Exception in get_active_theme")
             theme = self.get_theme_from_folder("Default")
         if not theme:
             log.debug("get_active_theme: no theme found")
@@ -1040,16 +1306,50 @@ class AudioThemesHandler:
 
     def _migrate_config(self):
         try:
-            saved = config.conf["audiothemes"].get("config_version", 0)
+            conf = config.conf["audiothemes"]
         except Exception:
-            saved = 0
+            conf = {}
+        # conf_int(): config_version may still be the raw string "1" if
+        # normalization was skipped, and `'1' >= 1` raises TypeError.
+        saved = conf_int(conf, "config_version", 0)
         if saved >= CONFIG_VERSION:
             return
         if saved < 1:
             pass  # Placeholder for future migrations.
-        config.conf["audiothemes"]["config_version"] = CONFIG_VERSION
+        try:
+            conf["config_version"] = CONFIG_VERSION
+        except Exception:
+            log.debug("AudioThemes: swallowed Exception in _migrate_config")
+
+    def _normalize_config_types(self):
+        """Coerce raw nvda.ini strings back into the types the specs declare.
+
+        NVDA validates the config before addons register their specs, so the
+        [audiothemes]/[unspoken] sections are never validated and every value
+        that came from the file is still a string.  Running this first means
+        everything that follows (configure(), the toggle scripts, the settings
+        panel) sees real bools/ints/floats.
+        """
+        for name, spec in (
+            ("audiothemes", audiothemes_config_defaults),
+            ("unspoken", unspoken_config_defaults),
+        ):
+            try:
+                # The spec has to be in place BEFORE this first read of the
+                # session: NVDA remembers a section it could not find by caching
+                # the KeyError itself, and only a profile switch clears it.  So
+                # reading first and registering the schema afterwards would keep
+                # raising for the rest of the session - which is exactly what
+                # broke the settings dialog.
+                if name not in config.conf.spec:
+                    config.conf.spec[name] = dict(spec)
+                section = config.conf[name]
+            except Exception:
+                continue
+            normalize_config_section(section, spec)
 
     def configure(self, *args, **kwargs):
+        self._normalize_config_types()
         self._migrate_config()
         new_active_theme = None
         with self._config_lock:
@@ -1057,8 +1357,8 @@ class AudioThemesHandler:
                 user_config = config.conf["audiothemes"]
             except KeyError:
                 user_config = {}
-            new_enabled = user_config.get("enable_audio_themes", True)
-            new_theme_folder = user_config.get("active_theme") if new_enabled else None
+            new_enabled = conf_bool(user_config, "enable_audio_themes", True)
+            new_theme_folder = conf_str(user_config, "active_theme", "Default") if new_enabled else None
             old_theme_folder = self.active_theme.folder if self.active_theme else None
             theme_changed = (
                 new_enabled != self.enabled or
@@ -1092,7 +1392,18 @@ class AudioThemesHandler:
 
         # Theme loading outside the lock — avoids blocking get_theme_for_app()
         if theme_changed:
-            new_active_theme = self.get_active_theme()
+            try:
+                new_active_theme = self.get_active_theme()
+            except Exception:
+                # Never let a config read (KeyError/str-vs-bool) abort configure():
+                # that would leave self.active_theme unset and silence every
+                # role/navigation sound until the next successful configure().
+                log.error(
+                    "AudioThemes: failed to resolve the active theme, "
+                    "falling back to no theme",
+                    exc_info=True,
+                )
+                new_active_theme = None
             with self._config_lock:
                 self.active_theme = new_active_theme
             log.debug(f"configure: enabled={self.enabled} active_theme={'present' if self.active_theme else 'None'}")
@@ -1101,42 +1412,83 @@ class AudioThemesHandler:
             try:
                 self._ensure_player()
             except Exception:
-                log.debugWarning("AudioThemes: failed to initialize player during configure")
+                # Invisible before (debugWarning is below INFO): a failed player
+                # init left self.player None, so every theme sound was silently
+                # dropped with no trace at all in the log.
+                log.warning(
+                    "AudioThemes: failed to initialize the audio player during "
+                    "configure - theme sounds stay silent until the next save",
+                    exc_info=True,
+                )
             # Re-scan the active theme folder so converted files (e.g. WAV->FLAC)
             # are picked up even when the theme selection did not change.
             if self.player is not None:
                 try:
                     self.active_theme.load(self.player)
                 except Exception:
-                    log.debugWarning("AudioThemes: failed to reload active theme during configure")
+                    log.warning(
+                        "AudioThemes: failed to reload the active theme",
+                        exc_info=True,
+                    )
             if self.player is not None:
-                self.player.audio3d = user_config.get("audio3d", False)
-                self.player.use_in_say_all = user_config.get("use_in_say_all", True)
-                self.player.speak_roles = user_config.get("speak_roles", True)
-                self.player.use_synth_volume = user_config.get("use_synth_volume", False)
-                self.player.volume = user_config.get("volume", 20)
+                # Straight from configobj: a key that is absent raises, and a
+                # key that came from nvda.ini may still be the raw string
+                # "True"/"0.01".  conf_* never raises and normalises the type,
+                # so one malformed value can no longer abort configure() half
+                # way through (which would leave the player on stale settings
+                # and skip the cache rebuilds below).
                 try:
-                    unspoken_config = config.conf["unspoken"]
-                except KeyError:
-                    unspoken_config = {}
-                self.player.reverb = unspoken_config.get("Reverb", False)
-                self.player.room_size = unspoken_config.get("RoomSize", 100)
-                self.player.damping = unspoken_config.get("Damping", 0)
-                self.player.wet_level = unspoken_config.get("WetLevel", 0)
-                self.player.dry_level = unspoken_config.get("DryLevel", 30)
-                self.player.width = unspoken_config.get("Width", 100)
-                # Cache processing config on the player to avoid config.conf reads in _ensure_processed
-                self.player._trim_silence = unspoken_config.get("TrimSilence", True)
-                self.player._trim_silence_threshold = float(unspoken_config.get("TrimSilenceThreshold", 0.01))
-                self.player._smart_volume = unspoken_config.get("SmartVolume", True)
-                self.player._smooth_envelope = unspoken_config.get("SmoothEnvelope", False)
-                self.player._noise_gate = unspoken_config.get("NoiseGate", False)
-                self.player._noise_gate_threshold = float(unspoken_config.get("NoiseGateThreshold", 0.02))
-                self.player._noise_gate_attack = int(unspoken_config.get("NoiseGateAttack", 5))
-                self.player._noise_gate_release = int(unspoken_config.get("NoiseGateRelease", 50))
-                self.player._bass_boost = unspoken_config.get("BassBoost", False)
-                self.player._bass_boost_gain = float(unspoken_config.get("BassBoostGain", 3))
-                self.player._bass_boost_cutoff = float(unspoken_config.get("BassBoostCutoff", 200))
+                    self.player.audio3d = conf_bool(user_config, "audio3d", False)
+                    self.player.use_in_say_all = conf_bool(user_config, "use_in_say_all", True)
+                    self.player.speak_roles = conf_bool(user_config, "speak_roles", True)
+                    self.player.use_synth_volume = conf_bool(user_config, "use_synth_volume", False)
+                    self.player.volume = conf_int(user_config, "volume", 20)
+                    try:
+                        unspoken_config = config.conf["unspoken"]
+                    except Exception:
+                        unspoken_config = {}
+                    self.player.reverb = conf_bool(unspoken_config, "Reverb", False)
+                    self.player.room_size = conf_int(unspoken_config, "RoomSize", 100)
+                    self.player.damping = conf_int(unspoken_config, "Damping", 0)
+                    self.player.wet_level = conf_int(unspoken_config, "WetLevel", 0)
+                    self.player.dry_level = conf_int(unspoken_config, "DryLevel", 30)
+                    self.player.width = conf_int(unspoken_config, "Width", 100)
+                    # Cache processing config on the player to avoid config.conf reads in _ensure_processed
+                    self.player._trim_silence = conf_bool(unspoken_config, "TrimSilence", True)
+                    self.player._trim_silence_threshold = conf_float(unspoken_config, "TrimSilenceThreshold", 0.01)
+                    self.player._smart_volume = conf_bool(unspoken_config, "SmartVolume", False)
+                    self.player._smooth_envelope = conf_bool(unspoken_config, "SmoothEnvelope", False)
+                    self.player._noise_gate = conf_bool(unspoken_config, "NoiseGate", False)
+                    self.player._noise_gate_threshold = conf_float(unspoken_config, "NoiseGateThreshold", 0.02)
+                    self.player._noise_gate_attack = conf_int(unspoken_config, "NoiseGateAttack", 5)
+                    self.player._noise_gate_release = conf_int(unspoken_config, "NoiseGateRelease", 50)
+                    self.player._bass_boost = conf_bool(unspoken_config, "BassBoost", False)
+                    self.player._bass_boost_gain = conf_float(unspoken_config, "BassBoostGain", 3)
+                    self.player._bass_boost_cutoff = conf_float(unspoken_config, "BassBoostCutoff", 200)
+                except Exception:
+                    log.error("AudioThemes: failed to apply audio settings to the player", exc_info=True)
+        # Rebuild the hot-path config caches (disabled_apps + _cached_config)
+        # and republish them to the player/monitor instances.
+        self._rebuild_hot_path_caches(user_config)
+        # Refresh every dependent submodule cache; each refresh is isolated
+        # so one failure never skips the remaining refreshes.
+        self._refresh_dependent_caches()
+        # One INFO line per configure() so the log always shows the values that
+        # decide whether a sound is actually audible.  NVDA's default log level
+        # is INFO, so this is visible while log.debug is not — which is exactly
+        # why the "silent ducking" bug left no traces.
+        log.info(
+            f"AudioThemes: enabled={conf_bool(user_config, 'enable_audio_themes', True)} "
+            f"theme={self.active_theme.name if self.active_theme is not None else None} "
+            f"ducking={conf_bool(user_config, 'audio_ducking_enabled', False)} "
+            f"duckingVolume={conf_int(user_config, 'audio_ducking_volume', 30)} "
+            f"volume={conf_int(user_config, 'volume', 50)} "
+            f"mode={conf_str(user_config, 'output_mode', 'stereo')} "
+            f"audio3d={conf_bool(user_config, 'audio3d', False)} "
+            f"sayAll={conf_bool(user_config, 'use_in_say_all', True)}"
+        )
+
+    def _rebuild_hot_path_caches(self, user_config):
         self.disabled_apps = []
         raw_disabled = user_config.get("disabled_apps", "")
         if raw_disabled:
@@ -1237,7 +1589,7 @@ class AudioThemesHandler:
             "progress_pan_range": user_config.get("progress_pan_range", 180),
             "progress_pitch_shift": user_config.get("progress_pitch_shift", True),
             # Audio ducking config
-            "audio_ducking_enabled": user_config.get("audio_ducking_enabled", True),
+            "audio_ducking_enabled": user_config.get("audio_ducking_enabled", False),
             "audio_ducking_volume": user_config.get("audio_ducking_volume", 30),
             "ducking_categories": user_config.get("ducking_categories", ""),
             # Navigation Layer config
@@ -1252,21 +1604,21 @@ class AudioThemesHandler:
             "UnspokenReverb": unspoken_cfg.get("Reverb", False),
             "SmoothPanning": unspoken_cfg.get("SmoothPanning", True),
             "noSounds": unspoken_cfg.get("noSounds", False),
-            "TrimSilence": unspoken_cfg.get("TrimSilence", False),
-            "TrimSilenceThreshold": unspoken_cfg.get("TrimSilenceThreshold", -50),
+            "TrimSilence": unspoken_cfg.get("TrimSilence", True),
+            "TrimSilenceThreshold": unspoken_cfg.get("TrimSilenceThreshold", 0.01),
             "SmartVolume": unspoken_cfg.get("SmartVolume", False),
             "SmartVolumePeak": unspoken_cfg.get("SmartVolumePeak", 0.8),
             "SmoothEnvelope": unspoken_cfg.get("SmoothEnvelope", False),
             "SmoothEnvelopeAttack": unspoken_cfg.get("SmoothEnvelopeAttack", 5),
             "SmoothEnvelopeRelease": unspoken_cfg.get("SmoothEnvelopeRelease", 50),
             "NoiseGate": unspoken_cfg.get("NoiseGate", False),
-            "NoiseGateThreshold": unspoken_cfg.get("NoiseGateThreshold", -60),
-            "NoiseGateAttack": unspoken_cfg.get("NoiseGateAttack", 0.01),
-            "NoiseGateRelease": unspoken_cfg.get("NoiseGateRelease", 0.1),
+            "NoiseGateThreshold": unspoken_cfg.get("NoiseGateThreshold", 0.02),
+            "NoiseGateAttack": unspoken_cfg.get("NoiseGateAttack", 5),
+            "NoiseGateRelease": unspoken_cfg.get("NoiseGateRelease", 50),
             "BassBoost": unspoken_cfg.get("BassBoost", False),
-            "BassBoostGain": unspoken_cfg.get("BassBoostGain", 6),
-            "BassBoostCutoff": unspoken_cfg.get("BassBoostCutoff", 150),
-            "HRTF": unspoken_cfg.get("HRTF", False),
+            "BassBoostGain": unspoken_cfg.get("BassBoostGain", 3),
+            "BassBoostCutoff": unspoken_cfg.get("BassBoostCutoff", 200),
+            "HRTF": unspoken_cfg.get("HRTF", True),
             "AudioCache": unspoken_cfg.get("AudioCache", True),
             "enable_ffmpeg": user_config.get("enable_ffmpeg", False),
             "convert_target": user_config.get("convert_target", "wav"),
@@ -1276,48 +1628,60 @@ class AudioThemesHandler:
             self.player._cached_config = self._cached_config
         if self._system_monitor is not None:
             self._system_monitor._cached_config = self._cached_config
+
+    def _refresh_dependent_caches(self):
         try:
             from .emoji_handler import refreshCachedConfig as _refreshEmojiConfig
             _refreshEmojiConfig()
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in handler.configure")
         try:
             from .phoneticPunctuation import refreshCachedConfig as _refreshPpConfig
             _refreshPpConfig()
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in handler.configure")
         try:
             from .frenzy import refreshFrenzyCachedConfig
             refreshFrenzyCachedConfig()
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in handler.configure")
         try:
             from .commands import refreshCommandsCachedConfig
             refreshCommandsCachedConfig()
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in handler.configure")
+        try:
+            from .browserNavEngine.beeper import refreshBeeperOutputDevice
+            refreshBeeperOutputDevice()
+        except Exception:
+            log.debug("AudioThemes: swallowed Exception in handler.configure")
+        try:
+            from .browserNavEngine.quickJump import refreshQjOutputDevice
+            refreshQjOutputDevice()
+        except Exception:
+            log.debug("AudioThemes: swallowed Exception in handler.configure")
         try:
             from . import utils
             utils._set_cached_output_mode(self._cached_config.get("output_mode", "stereo"))
             utils.refreshPpConfigCache()
             utils.refresh_needs_window_title()
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in handler.configure")
         try:
             from . import sentenceNavEngine
             sentenceNavEngine._refresh_doc_formatting()
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in handler.configure")
         try:
             from .browserNavEngine import _bne_refresh_doc_formatting
             _bne_refresh_doc_formatting()
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in handler.configure")
         try:
             from .browserNavEngine.addonConfig import refreshBNEConfigCache
             refreshBNEConfigCache()
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in handler.configure")
         # Cache module references for _hook_getSpeechTextForProperties hot path
         try:
             from . import frenzy as _f
@@ -1325,7 +1689,7 @@ class AudioThemesHandler:
             self._frenzy_mod = _f
             self._utils_mod_cache = _u
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in handler.configure")
 
     def _start_system_status_monitoring(self):
         try:
@@ -1333,7 +1697,7 @@ class AudioThemesHandler:
             self._system_monitor = SystemStatusMonitor(self._play_system_sound, self._cached_config)
             self._system_monitor.start()
         except Exception as e:
-            log.debugWarning(f"Failed to start system status monitor: {e}")
+            log.warning(f"Failed to start system status monitor: {e}", exc_info=True)
 
     def _is_app_disabled_for_category(self, category):
         app_name = getattr(self, '_current_app_name', None)
@@ -1383,7 +1747,7 @@ class AudioThemesHandler:
         try:
             self.player.play({"name": str(sound_key.value), "role": 0, "system_sound": True, "volume_override": cfg.get("sys_status_volume", 20) / 100.0}, sound_obj)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in handler._play_system_sound")
 
     def play(self, obj_info, sound, _pre_resolved_theme=None):
         """
@@ -1392,14 +1756,20 @@ class AudioThemesHandler:
         """
         force_3d = obj_info.get("force_3d", False) if isinstance(obj_info, dict) else False
         if not force_3d and (not self.enabled or (self.active_theme is None)):
+            self._set_play_gate("themes-disabled")
             return
         try:
             player = self._ensure_player()
         except Exception:
-            log.debugWarning("AudioThemes: failed to initialize player")
+            # Invisible before (debugWarning is below INFO): this is the single
+            # most important failure path - no player means NO theme sound at
+            # all, for as long as it stays broken.
+            log.warning("AudioThemes: failed to initialize player", exc_info=True)
+            self._set_play_gate("player-init-failed")
             return
 
         if not force_3d and self._is_app_disabled_for_category("theme_sounds"):
+            self._set_play_gate("app-disabled")
             return
 
         if _pre_resolved_theme is not None:
@@ -1411,12 +1781,14 @@ class AudioThemesHandler:
                 theme = self.active_theme
 
         if not theme:
+            self._set_play_gate("no-theme")
             return
 
         sounds = theme.sounds
         sound_obj = sounds.get(sound)
         # System sounds must not fall back to any other sound
         if sound_obj is None and isinstance(obj_info, dict) and obj_info.get("system_sound"):
+            self._set_play_gate("missing-sound")
             return
         fl_cfg = self._cached_config
         if sound_obj is None and isinstance(obj_info, dict):
@@ -1450,11 +1822,30 @@ class AudioThemesHandler:
                 if target is not None:
                     sound_obj = sounds.get(target)
         if sound_obj is None:
+            self._set_play_gate("missing-sound")
             return
         try:
             self.player.play(obj_info, sound_obj)
         except Exception:
-            log.warning(f"AudioThemes: failed to play sound {getattr(sound, 'name', sound)}")
+            log.warning(
+                f"AudioThemes: failed to play sound {getattr(sound, 'name', sound)}",
+                exc_info=True,
+            )
+
+    def _set_play_gate(self, gate):
+        """Record why a sound request was dropped, for check_playback_health().
+
+        Every one of these returns used to be completely silent, so a theme
+        sound that never reached the device left no trace in the log.
+        """
+        try:
+            player = self.player
+            if player is None:
+                return
+            player._last_request_time = time.monotonic()
+            player._last_gate = gate
+        except Exception:
+            log.debug("AudioThemes: swallowed Exception in handler._set_play_gate")
 
     def get_theme_for_app(self, app_name):
         # Lock-free fast path: no profiles enabled (covers ~90% of calls).
@@ -1537,7 +1928,7 @@ class AudioThemesHandler:
             from . import _latest_earcon_angles
             return _latest_earcon_angles
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in handler.get_earcon_angles")
         try:
             focus = api.getFocusObject()
             obj = focus
@@ -1557,7 +1948,7 @@ class AudioThemesHandler:
                     desktop_max_x = desk_location[2] if desk_location else 1920
                     desktop_max_y = desk_location[3] if desk_location else 1080
                 except Exception:
-                    pass
+                    log.debug("AudioThemes: swallowed Exception in handler.get_earcon_angles")
             obj_x = location[0] + (location[2] / 2.0)
             obj_y = location[1] + (location[3] / 2.0)
             if desktop_max_x == 0 or desktop_max_y == 0:
@@ -1587,7 +1978,7 @@ class AudioThemesHandler:
                 sound_obj
             )
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in handler.play_clipboard_sound")
         return True
 
     def get_typing_pack_for_app(self, app_name):
@@ -1608,7 +1999,7 @@ class AudioThemesHandler:
         try:
             self._play_typing_sound_inner(ch, vkCode, extended)
         except Exception as e:
-            log.debugWarning(f"play_typing_sound failed: {e}", exc_info=True)
+            log.warning(f"play_typing_sound failed: {e}")
 
     def _play_typing_sound_inner(self, ch=None, vkCode=None, extended=None):
         if not self._cached_config.get("typing_sounds", True):
@@ -1808,7 +2199,7 @@ class AudioThemesHandler:
                 try:
                     os.rename(identified_path, target_path)
                 except OSError:
-                    pass
+                    log.debug("AudioThemes: swallowed OSError in handler.install_audio_themePackage")
 
     @classmethod
     def install_audio_themeFolder(cls, source_path):
@@ -1833,7 +2224,7 @@ class AudioThemesHandler:
                     info_data = json.loads(pack.read("info.json").decode("utf-8"))
                     pack_name = info_data.get("name", pack_name)
                 except Exception:
-                    pass
+                    log.debug("AudioThemes: swallowed Exception in handler.install_typing_soundPackage")
             elif len(pack.infolist()) > 0 and pack.infolist()[0].is_dir():
                 pack_name = pack.infolist()[0].orig_filename.strip("/")
             
@@ -1899,7 +2290,7 @@ class AudioThemesHandler:
             with open(file_path, "w", encoding="utf8") as f:
                 json.dump(data, f)
         except OSError:
-            pass
+            log.debug("AudioThemes: swallowed OSError in handler.write_info_file")
 
     @staticmethod
     def make_zip_file(output_filename, source_dir):

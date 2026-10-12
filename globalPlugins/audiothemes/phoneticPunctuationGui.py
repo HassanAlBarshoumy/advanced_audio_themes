@@ -5,8 +5,6 @@
 #See the file COPYING.txt for more details.
 
 import addonHandler
-import api
-import config
 import controlTypes
 import copy
 import core
@@ -21,7 +19,6 @@ import re
 import shutil
 import speech
 import speech.commands
-import threading
 import time
 import ui
 import wave
@@ -35,7 +32,7 @@ from . import common
 try:
     addonHandler.initTranslation()
 except AttributeError:
-    pass
+    log.debug("AudioThemes: swallowed AttributeError in phoneticPunctuationGui")
 
 class AudioRuleDialog(wx.Dialog):
     TYPE_LABELS = {
@@ -71,7 +68,7 @@ class AudioRuleDialog(wx.Dialog):
                     possibleFrenzyValues.append(state.displayString)
                     possibleFrenzyObjects.append(state)
                 except KeyError:
-                    pass
+                    log.debug("AudioThemes: swallowed KeyError in phoneticPunctuationGui.__init__")
             self.possibleFrenzyValues = possibleFrenzyValues
             self.possibleFrenzyObjects = possibleFrenzyObjects
         elif frenzyType        in [FrenzyType.NEGATIVE_STATE]:
@@ -83,7 +80,7 @@ class AudioRuleDialog(wx.Dialog):
                     possibleFrenzyValues.append(state.negativeDisplayString)
                     possibleFrenzyObjects.append(state)
                 except KeyError:
-                    pass
+                    log.debug("AudioThemes: swallowed KeyError in phoneticPunctuationGui.__init__")
             self.possibleFrenzyValues = possibleFrenzyValues
             self.possibleFrenzyObjects = possibleFrenzyObjects
         elif frenzyType        in [FrenzyType.TEXT, FrenzyType.CHARACTER]:
@@ -557,7 +554,7 @@ class AudioRuleDialog(wx.Dialog):
                 if tone is not None and 0 <= tone <= 50000:
                     good = True
             except (ValueError, TypeError):
-                pass
+                log.debug("AudioThemes: swallowed ValueError|TypeError in phoneticPunctuationGui.makeRule")
             if not good:
                 gui.messageBox(_("tone must be an integer between 0 and 50000"), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
                 self.toneTextCtrl.SetFocus()
@@ -569,7 +566,7 @@ class AudioRuleDialog(wx.Dialog):
                 if duration is not None and 0 <= duration <= 60000:
                     good = True
             except (ValueError, TypeError):
-                pass
+                log.debug("AudioThemes: swallowed ValueError|TypeError in phoneticPunctuationGui.makeRule")
             if not good:
                 gui.messageBox(_("duration must be an integer between 0 and 60000"), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
                 self.durationTextCtrl.SetFocus()
@@ -587,7 +584,7 @@ class AudioRuleDialog(wx.Dialog):
                     if -100 <= prosodyOffset <= 100:
                         good = True
             except ValueError:
-                pass
+                log.debug("AudioThemes: swallowed ValueError in phoneticPunctuationGui.makeRule")
             if not good:
                 gui.messageBox(_("prosody offset must be an integer between -100 and 100"), _("Dictionary Entry Error"), wx.OK|wx.ICON_WARNING, self)
                 self.prosodyOffsetTextCtrl.SetFocus()
@@ -1096,7 +1093,7 @@ class RulesDialog(SettingsPanel):
                 idx = self.frenzyRules.index(old_rule)
                 self.frenzyRules[idx] = new_rule
             except ValueError:
-                pass
+                log.debug("AudioThemes: swallowed ValueError in phoneticPunctuationGui.OnEditClick")
             self.rulesList.RefreshItem(editIndex)
             self.rulesList.SetFocus()
         entryDialog.Destroy()
@@ -1111,7 +1108,6 @@ class RulesDialog(SettingsPanel):
         entryDialog=AudioRuleDialog(self, frenzyType=self.frenzyType, disallowedFrenzyValues=disallowedFrenzyValues)
         
         # Create a deep copy of the selected rule
-        import copy
         new_rule = copy.copy(self.displayedRules[editIndex])
         
         # Append " - Copy" to the custom label or comment if applicable
@@ -1151,7 +1147,7 @@ class RulesDialog(SettingsPanel):
                 idx2 = self.frenzyRules.index(self.displayedRules[index])
                 self.frenzyRules[idx1], self.frenzyRules[idx2] = self.frenzyRules[idx2], self.frenzyRules[idx1]
             except ValueError:
-                pass
+                log.debug("AudioThemes: swallowed ValueError in phoneticPunctuationGui.OnMoveClick")
             self.rulesList.RefreshItem(index)
             self.rulesList.RefreshItem(newIndex)
             self.rulesList.Select(newIndex)
@@ -1171,7 +1167,7 @@ class RulesDialog(SettingsPanel):
             try:
                 self.frenzyRules.remove(old_rule)
             except ValueError:
-                pass
+                log.debug("AudioThemes: swallowed ValueError in phoneticPunctuationGui.OnRemoveClick")
             self.rulesList.SetItemCount(len(self.displayedRules))
             self.rulesList.Refresh()
             if index < len(self.displayedRules):

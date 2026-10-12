@@ -16,6 +16,7 @@ import time
 import tones
 
 from .utils import *
+from logHandler import log
 
 def _get_synchronous_player():
     return nvwave.WavePlayer(channels=2, samplesPerSec=int(tones.SAMPLE_RATE), bitsPerSample=16, outputDevice=_get_output_device(), wantDucking=True, purpose=nvwave.AudioPurpose.SOUNDS)
@@ -53,18 +54,56 @@ def refreshCommandsCachedConfig():
         "enable_ffmpeg": ac.get("enable_ffmpeg", _DEFAULT_COMMANDS_CONFIG["enable_ffmpeg"]),
         "output_mode": ac.get("output_mode", _DEFAULT_COMMANDS_CONFIG["output_mode"]),
     }
+    _refresh_commands_output_device()
 
 _WAVE_PLAYER_POOL_MAX = 16
 
 _cached_output_device = None
+
+def _read_output_device():
+    try:
+        return config.conf["speech"]["outputDevice"]
+    except KeyError:
+        try:
+            return config.conf["audio"]["outputDevice"]
+        except KeyError:
+            return None
+
+
 def _get_output_device():
     global _cached_output_device
     if _cached_output_device is None:
-        try:
-            _cached_output_device = config.conf["speech"]["outputDevice"]
-        except KeyError:
-            _cached_output_device = config.conf["audio"]["outputDevice"]
+        _cached_output_device = _read_output_device()
     return _cached_output_device
+
+
+def _refresh_commands_output_device():
+    """Re-read the configured output device; rebuild pooled players if it changed.
+
+    The device used to be cached forever, so after an output-device change the
+    pooled WavePlayers kept pointing at the old (possibly gone) device.
+    """
+    global _cached_output_device, _pp_sync_player
+    new_od = _read_output_device()
+    old_od = _cached_output_device
+    _cached_output_device = new_od
+    if old_od is None or new_od is None or old_od == new_od:
+        return
+    with _wave_player_pool_lock:
+        for p in list(_wave_player_pool.values()):
+            try:
+                p.close()
+            except Exception:
+                log.debug("AudioThemes: swallowed Exception in commands._refresh_commands_output_device")
+        _wave_player_pool.clear()
+    with _pp_player_lock:
+        if _pp_sync_player is not None:
+            try:
+                _pp_sync_player.close()
+            except Exception:
+                log.debug("AudioThemes: swallowed Exception in commands._refresh_commands_output_device")
+            _pp_sync_player = None
+    log.info(f"AudioThemes: output device changed ({old_od!r} -> {new_od!r}); rebuilt cached sound players")
 
 def get_pooled_player(channels, sample_rate, ducking=False):
     # global _wave_player_pool
@@ -86,7 +125,7 @@ def get_pooled_player(channels, sample_rate, ducking=False):
                 try:
                     evicted.close()
                 except Exception:
-                    pass
+                    log.debug("AudioThemes: swallowed Exception in commands.get_pooled_player")
         return _wave_player_pool[key]
 
 # Cache for reverbed audio (capped at 50 entries to prevent unbounded growth)
@@ -142,7 +181,7 @@ class PpBeepCommand(PpSynchronousCommand):
             self._runInner()
         except Exception as e:
             from logHandler import log
-            log.debugWarning(f"PpBeepCommand.run() failed: {e}", exc_info=True)
+            log.warning(f"PpBeepCommand.run() failed: {e}", exc_info=True)
 
     def _runInner(self):
         from NVDAHelper.localLib import generateBeep
@@ -308,7 +347,7 @@ class PpWaveFileCommand(PpSynchronousCommand):
             decoded = wav_decode.decode_wav_to_float(self.fileName)
         except Exception as e:
             from logHandler import log
-            log.debugWarning(f"PpWaveFileCommand: native WAV decode failed for {self.fileName}: {e}")
+            log.warning(f"PpWaveFileCommand: native WAV decode failed for {self.fileName}: {e}")
 
         if self.buf is None:
             ext = os.path.splitext(self.fileName)[1].lower()
@@ -389,7 +428,7 @@ class PpWaveFileCommand(PpSynchronousCommand):
             self._ensureLoaded()
         except Exception as e:
             from logHandler import log
-            log.debugWarning(f"PpWaveFileCommand.run() _ensureLoaded failed: {e}", exc_info=True)
+            log.warning(f"PpWaveFileCommand.run() _ensureLoaded failed: {e}", exc_info=True)
             return
         if not self._loaded:
             return
@@ -397,7 +436,7 @@ class PpWaveFileCommand(PpSynchronousCommand):
             self._runInner()
         except Exception as e:
             from logHandler import log
-            log.debugWarning(f"PpWaveFileCommand.run() failed: {e}", exc_info=True)
+            log.warning(f"PpWaveFileCommand.run() failed: {e}", exc_info=True)
 
     def _runInner(self):
         if self.startAdjustment < 0:
@@ -558,7 +597,7 @@ class PpChainCommand(PpSynchronousCommand):
             t.start()
         except Exception as e:
             from logHandler import log
-            log.debugWarning(f"PpChainCommand.run() failed: {e}", exc_info=True)
+            log.warning(f"PpChainCommand.run() failed: {e}", exc_info=True)
             with _current_chain_lock:
                 if currentChain is self:
                     currentChain = None
@@ -580,7 +619,7 @@ class PpChainCommand(PpSynchronousCommand):
                     time.sleep(sleepTime)
         except Exception as e:
             from logHandler import log
-            log.debugWarning(f"PpChainCommand.threadFunc() failed: {e}", exc_info=True)
+            log.warning(f"PpChainCommand.threadFunc() failed: {e}", exc_info=True)
         finally:
             with _current_chain_lock:
                 if currentChain is self:

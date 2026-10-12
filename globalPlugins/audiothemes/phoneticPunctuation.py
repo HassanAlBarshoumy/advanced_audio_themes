@@ -5,8 +5,6 @@
 # Special thanks: Ahmed Sami
 # This file is covered by the GNU General Public License.
 
-import addonHandler
-import api
 import characterProcessing
 import config
 import collections
@@ -17,23 +15,19 @@ from enum import Enum
 from functools import lru_cache
 import globalVars
 import gui
-from gui import guiHelper, nvdaControls
-from gui.settingsDialogs import SettingsPanel
 import json
 from logHandler import log
 import os
 import re
-from scriptHandler import script
 import speech
 import speech.commands
 import threading
-import tones
 import wx
 
 from .common import *
 from .utils import *
 from .commands import *
-from .emoji_handler import is_emoji_enabled, is_emoji_sound_enabled, is_emoji_prefix_enabled, get_emoji_prefix_text, get_emoji_suffix_text, get_emoji_position, get_emoji_sound_position, get_emoji_repeat, get_emoji_volume, find_emojis, is_category_enabled, get_special_prop_for_category, get_emoji_sound_repeat, get_emoji_prefix_repeat, is_emoji_sound_category_enabled, get_emoji_prefix_text_for_category, get_emoji_suffix_text_for_category, get_emoji_volume_for_category, get_emoji_sound_position_for_category, get_emoji_delay_before, get_emoji_delay_after, is_emoji_suppress_role_sound, is_emoji_blacklisted, get_emoji_custom_description, _EMOJI_RANGES
+from .emoji_handler import is_emoji_enabled, is_emoji_sound_enabled, is_emoji_prefix_enabled, get_emoji_prefix_text, get_emoji_suffix_text, get_emoji_position, get_emoji_sound_position, get_emoji_volume, find_emojis, is_category_enabled, get_special_prop_for_category, get_emoji_sound_repeat, get_emoji_prefix_repeat, get_emoji_prefix_text_for_category, get_emoji_suffix_text_for_category, get_emoji_volume_for_category, get_emoji_sound_position_for_category, get_emoji_delay_before, get_emoji_delay_after, is_emoji_suppress_role_sound, is_emoji_blacklisted, get_emoji_custom_description, _EMOJI_RANGES
 from .handler import SpecialProps
 from . import commands
 from . import frenzy
@@ -41,7 +35,6 @@ from . import utils as _utils_mod
 from config.configFlags import ReportLineIndentation
 import languageHandler
 import shutil
-import globalCommands
 
 
 # audioRuleTypes and audioRule* constants are imported from .common via wildcard import above.
@@ -515,7 +508,7 @@ def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
     try:
         _utils_mod._reset_pp_enabled_cache()
     except Exception:
-        pass
+        log.debug("AudioThemes: swallowed Exception in phoneticPunctuation.preSpeak")
     try:
         if not isPhoneticPunctuationEnabled():
             return originalSpeechSpeechSpeak(speechSequence, symbolLevel=symbolLevel, *args, **kwargs)
@@ -818,9 +811,8 @@ def preCancelSpeech(*args, **kwargs):
         if isPhoneticPunctuationEnabled():
             commands.terminateCurrentChain()
     except Exception:
-        pass
+        log.debug("AudioThemes: swallowed Exception in phoneticPunctuation.preCancelSpeech")
     originalSpeechCancel(*args, **kwargs)
-    
 
 def preProcessSpeechSymbols(locale, text, level):
     if not cached_passThrough_regex:
@@ -855,50 +847,6 @@ def preProcessSpeechSymbols(locale, text, level):
         return originalProcessSpeechSymbols(locale, text, level)
 
 
-highLevelSpeakFunctionNames = {
-    speech.speech: [
-        #'speakMessage',
-        #'speakSsml',
-        #'speakSpelling',
-        #'speakObjectProperties',
-        #'speakObject',
-        #'speakText',
-        #'speakPreselectedText',
-        #'speakSelectionMessage',
-        'speakTextInfo',
-    ],
-    globalCommands.GlobalCommands: [
-        #'script_navigatorObject_current',
-        #'script_reportCurrentFocus',
-    ],
-}
-originalHighLevelSpeakFunctions = {}
-def monkeyPatchRestoreProsodyInAllHighLevelSpeakFunctions():
-    def createFunctor(targetFunction, functionName):
-        def functor(*args, **kwargs):
-            return targetFunction(*args, **kwargs)
-        return functor
-    
-    for module, functionNames in highLevelSpeakFunctionNames.items():
-        originalHighLevelSpeakFunctions[module] = {}
-        for functionName in functionNames:
-            try:
-                function = getattr(module, functionName)
-            except AttributeError:
-                continue
-            originalHighLevelSpeakFunctions[module][functionName] = function
-            replacementFunctor = createFunctor(function, functionName)
-            setattr(module, functionName, replacementFunctor)
-            if module == speech.speech:
-                setattr(speech, functionName, replacementFunctor)
-
-def monkeyUnpatchRestoreProsodyInAllHighLevelSpeakFunctions():
-    for module, d in originalHighLevelSpeakFunctions.items():
-        for functionName, originalFunction in d.items():
-            setattr(module, functionName, originalFunction)
-            if module == speech.speech:
-                setattr(speech, functionName, originalFunction)
-    
 def injectMonkeyPatches():
     global originalSpeechSpeechSpeak, originalSpeechCancel, originalProcessSpeechSymbols
     
@@ -909,7 +857,7 @@ def injectMonkeyPatches():
     try:
         speech.sayAll.SayAllHandler.speechWithoutPausesInstance.speak = speech.speech.speak
     except Exception:
-        pass
+        log.debug("AudioThemes: swallowed Exception in phoneticPunctuation.injectMonkeyPatches")
     
     if originalSpeechCancel is None:
         originalSpeechCancel = speech.speech.cancelSpeech
@@ -927,7 +875,7 @@ def injectMonkeyPatches():
             config.post_configProfileSwitch.register(reloadRules)
             config.post_configProfileSwitch._atm_reload_registered = True
     except AttributeError:
-        pass # Not available in older NVDA versions
+        log.debug("AudioThemes: swallowed AttributeError in phoneticPunctuation.injectMonkeyPatches") # Not available in older NVDA versions
     
     try:
         frenzy.monkeyPatch()
@@ -948,8 +896,6 @@ def injectMonkeyPatches():
     if original_getSelectionMessageSpeech is None:
         original_getSelectionMessageSpeech = speech.speech._getSelectionMessageSpeech
     speech.speech._getSelectionMessageSpeech = new_getSelectionMessageSpeech
-    
-    #monkeyPatchRestoreProsodyInAllHighLevelSpeakFunctions()
 
 def restoreMonkeyPatches():
     # global originalSpeechSpeechSpeak, originalSpeechCancel
@@ -963,7 +909,7 @@ def restoreMonkeyPatches():
         try:
             speech.sayAll.SayAllHandler.speechWithoutPausesInstance.speak = speech.speech.speak
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in phoneticPunctuation.restoreMonkeyPatches")
     if originalSpeechCancel is not None:
         speech.speech.cancelSpeech = originalSpeechCancel
         speech.cancelSpeech = speech.speech.cancelSpeech
@@ -1000,12 +946,12 @@ def restoreMonkeyPatches():
         import config
         config.post_configProfileSwitch.unregister(reloadRules)
     except (AttributeError, ValueError):
-        pass
+        log.debug("AudioThemes: swallowed AttributeError|ValueError in phoneticPunctuation.restoreMonkeyPatches")
     from core import postNvdaStartup
     try:
         postNvdaStartup.unregister(onPostNvdaStartup)
     except (AttributeError, ValueError):
-        pass
+        log.debug("AudioThemes: swallowed AttributeError|ValueError in phoneticPunctuation.restoreMonkeyPatches")
 
 
 def processRule(speechSequence, rule, symbolLevel, language):
@@ -1099,14 +1045,6 @@ def eloquenceFix(speechSequence, hasNonEmptyString=None):
             indicesToRemove.append(i)
     return [speechSequence[i] for i in range(len(speechSequence)) if i not in indicesToRemove]
 
-def unmaskMaskedStrings(sequence):
-    result = []
-    for item in sequence:
-        if isinstance(item, MaskedString):
-            result.append(item.s)
-        else:
-            result.append(item)
-    return result
 
 prosodyStacks = collections.defaultdict(lambda: [])
 prosodyOffsets = collections.defaultdict(lambda: 0)

@@ -5,14 +5,14 @@ import json
 import threading
 import os
 import tempfile
-import gui
 from ..handler import AudioThemesHandler, get_active_file_types
 
 import addonHandler
+from logHandler import log
 try:
     addonHandler.initTranslation()
 except AttributeError:
-    pass
+    log.debug("AudioThemes: swallowed AttributeError in studio.themes_store")
 import config
 
 STORE_URL = "https://raw.githubusercontent.com/HassanAlBarshoumy/AudioThemesStore/main/store.json"
@@ -240,7 +240,7 @@ class ThemesStoreDialog(wx.Dialog):
                     threading.Timer(5.0, lambda p=tmp_path: os.remove(p) if os.path.exists(p) else None).start()
                     tmp_path = None  # hand ownership to timer
                 except Exception:
-                    pass
+                    log.debug("AudioThemes: swallowed Exception in studio.themes_store.DownloadAndPreview")
                 if not self._closed:
                     wx.CallAfter(self.statusLabel.SetLabel, _("Preview finished."))
                     wx.CallAfter(self.previewBtn.Enable)
@@ -306,9 +306,9 @@ class ThemesStoreDialog(wx.Dialog):
                 if tp and os.path.exists(tp):
                     os.remove(tp)
             except PermissionError:
-                pass
+                log.debug("AudioThemes: swallowed PermissionError in studio.themes_store.DownloadAndPreview")
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in studio.themes_store.DownloadAndPreview")
     def OnClose(self, event):
         self._closed = True
         self.Destroy()

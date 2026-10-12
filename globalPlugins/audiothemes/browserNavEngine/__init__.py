@@ -10,10 +10,11 @@
 # https://github.com/mltony/nvda-indent-nav/
 
 import addonHandler
+from logHandler import log
 try:
     addonHandler.initTranslation()
 except AttributeError:
-    pass
+    log.debug("AudioThemes: swallowed AttributeError in browserNavEngine")
 import api
 import browseMode
 from contextlib import ExitStack
@@ -21,41 +22,29 @@ import controlTypes
 import config
 from . constants import *
 import core
-import ctypes
 import cursorManager
 import documentBase
 import editableText
-import functools
-import globalPluginHandler
 import gui
 from gui.settingsDialogs import SettingsPanel
 import inputCore
 import itertools
 import keyboardHandler
-from logHandler import log
-import math
-import nvwave
 import NVDAHelper
 import operator
-import os
 import re
 import scriptHandler
 from scriptHandler import script
 import speech
-import struct
-import sys
 import textInfos
 import threading
 import time
 import tones
-import types
 import ui
 from . import utils
 from ..utils import is_sound_suppressed as _at_is_sound_suppressed
 from virtualBuffers.gecko_ia2 import Gecko_ia2_TextInfo
 import virtualBuffers
-import wave
-import weakref
 import winUser
 import wx
 
@@ -78,7 +67,6 @@ from .editor import EditTextDialog
 
 from comtypes import COMError
 import NVDAObjects.IAccessible
-import IAccessibleHandler
 from NVDAObjects.UIA import UIA
 import UIAHandler
 import globalVars
@@ -103,18 +91,6 @@ except AttributeError:
 
 
 
-def pairUpOld(iterator):
-    second = "Hello world!"
-    while second is not None:
-        try:
-            first = iterator.__next__()
-        except StopIteration:
-            return
-        try:
-            second = iterator.__next__()
-        except StopIteration:
-            second = None
-        yield first, second
 
 def pairUp(l):
     for i in range(0, len(l), 2):
@@ -153,7 +129,7 @@ browseModeGestures = {
 try:
     addonHandler.initTranslation()
 except AttributeError:
-    pass
+    log.debug("AudioThemes: swallowed AttributeError in browserNavEngine")
 initConfiguration()
 
 class SettingsDialog(SettingsPanel):
@@ -250,17 +226,23 @@ class SettingsDialog(SettingsPanel):
         )
 
     def onSave(self):
-        config.conf["browsernav"]["crackleVolume"] = self.crackleVolumeSlider.Value
-        config.conf["browsernav"]["beepVolume"] = self.beepVolumeSlider.Value
-        config.conf["browsernav"]["noNextTextChimeVolume"] = self.noNextTextChimeVolumeSlider.Value
-        config.conf["browsernav"]["noNextTextMessage"] = self.noNextTextMessageCheckbox.Value
-        config.conf["browsernav"]["useFontFamily"] = self.useFontFamilyCheckBox.Value
-        config.conf["browsernav"]["useColor"] = self.useColorCheckBox.Value
-        config.conf["browsernav"]["useBackgroundColor"] = self.useBackgroundColorCheckBox.Value
-        config.conf["browsernav"]["useBoldItalic"] = self.useBoldItalicCheckBox.Value
-        config.conf["browsernav"]["tableNavigateToCell"] = self.tableNavigateToCellCheckBox.Value
-        config.conf["browsernav"]["skipChimeVolume"] = self.skipChimeVolumeSlider.Value
-        config.conf["browsernav"]["verticalAlignmentMargin"] = self.verticalMarginSpinControl.GetValue()
+        # Write into the BASE config (nvda.ini) directly.  [browsernav] is
+        # absent from nvda.ini, so a plain aggregate write would be redirected
+        # into the most recently activated configuration profile
+        # (AggregatedSection._getUpdateSection) and lost again on profile
+        # switch.
+        from ..utils import write_config_to_base as _wcfg
+        _wcfg("browsernav", "crackleVolume", self.crackleVolumeSlider.Value)
+        _wcfg("browsernav", "beepVolume", self.beepVolumeSlider.Value)
+        _wcfg("browsernav", "noNextTextChimeVolume", self.noNextTextChimeVolumeSlider.Value)
+        _wcfg("browsernav", "noNextTextMessage", self.noNextTextMessageCheckbox.Value)
+        _wcfg("browsernav", "useFontFamily", self.useFontFamilyCheckBox.Value)
+        _wcfg("browsernav", "useColor", self.useColorCheckBox.Value)
+        _wcfg("browsernav", "useBackgroundColor", self.useBackgroundColorCheckBox.Value)
+        _wcfg("browsernav", "useBoldItalic", self.useBoldItalicCheckBox.Value)
+        _wcfg("browsernav", "tableNavigateToCell", self.tableNavigateToCellCheckBox.Value)
+        _wcfg("browsernav", "skipChimeVolume", self.skipChimeVolumeSlider.Value)
+        _wcfg("browsernav", "verticalAlignmentMargin", self.verticalMarginSpinControl.GetValue())
 
 
 def getMode():
@@ -602,7 +584,7 @@ def preCaretMovementScriptHelper(self, gesture,unit, direction=None,posConstant=
         try:
             sonifyTextInfo(self.selection)
         except Exception:
-            pass
+            log.debug("AudioThemes: swallowed Exception in browserNavEngine.preCaretMovementScriptHelper")
 
 def preQuickNavScript(self,gesture, itemType, direction, errorMessage, readUnit, *args, **kwargs):
     try:
@@ -639,7 +621,7 @@ def preQuickNavScript(self,gesture, itemType, direction, errorMessage, readUnit,
     try:
         sonifyTextInfo(self.selection, oldTextInfo=oldSelection, includeCrackle=True)
     except Exception:
-        pass
+        log.debug("AudioThemes: swallowed Exception in browserNavEngine.preQuickNavScript")
     return result
 
 def preTableScriptHelper(self, *args, **kwargs):
@@ -651,20 +633,9 @@ def preTableScriptHelper(self, *args, **kwargs):
     try:
         sonifyTextInfo(self.selection)
     except Exception:
-        pass
+        log.debug("AudioThemes: swallowed Exception in browserNavEngine.preTableScriptHelper")
     return result
 
-selectionHistory = {}
-selectionHistoryLock = threading.Lock()
-def purgeSelectionHistory():
-    # Purge expired entries
-    global selectionHistory
-    with selectionHistoryLock:
-        selectionHistory = {
-            k:v
-            for k,v in selectionHistory.items()
-            if k() is not None
-        }
 def pre_set_selection(self, info):
     try:
         sh = self.selectionHistory
@@ -685,7 +656,7 @@ class SelectionHistory:
         try:
             del self.entries[self.ptr + 1:]
         except IndexError:
-            pass
+            log.debug("AudioThemes: swallowed IndexError in browserNavEngine.append")
         info = info.copy()
         info.expand(textInfos.UNIT_PARAGRAPH)
         self.entries.append(info._startOffset)
@@ -728,12 +699,12 @@ def browserNavPopup(selfself,gesture):
             try:
                 menu.Destroy()
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in browserNavEngine.browserNavPopup")
         if frame is not None:
             try:
                 frame.Destroy()
             except Exception:
-                pass
+                log.debug("AudioThemes: swallowed Exception in browserNavEngine.browserNavPopup")
 
 def getFocusedURL():
     focus = api.getFocusObject()
@@ -762,7 +733,7 @@ def getFocusedURL():
             try:
                 return document.IAccessibleObject.accValue(0)
             except COMError:
-                pass
+                log.debug("AudioThemes: swallowed COMError in browserNavEngine.getFocusedURL")
         return None
     else:
         return None
@@ -903,12 +874,12 @@ class BrowserNavMixin:
                 try:
                     del api.getCurrentURL
                 except AttributeError:
-                    pass
+                    log.debug("AudioThemes: swallowed AttributeError in browserNavEngine.terminateBrowserNav")
         with suppress(Exception):
             try:
                 del api.postFocusOrURLChange
             except AttributeError:
-                pass
+                log.debug("AudioThemes: swallowed AttributeError in browserNavEngine.terminateBrowserNav")
         # Restore editableText class patches
         with suppress(Exception):
             if _original_editInBrowserNav is not None:
@@ -917,12 +888,12 @@ class BrowserNavMixin:
                 try:
                     del editableText.EditableText.script_editInBrowserNav
                 except AttributeError:
-                    pass
+                    log.debug("AudioThemes: swallowed AttributeError in browserNavEngine.terminateBrowserNav")
         with suppress(Exception):
             try:
                 del editableText.EditableText._EditableText__gestures['kb:NVDA+E']
             except KeyError:
-                pass
+                log.debug("AudioThemes: swallowed KeyError in browserNavEngine.terminateBrowserNav")
         with suppress(Exception):
             from core import postNvdaStartup
             postNvdaStartup.unregister(_installExecuteGesturePatch)

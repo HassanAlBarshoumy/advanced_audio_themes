@@ -5,19 +5,18 @@ import ui
 import keyboardHandler
 import api
 import tones
-import config
 import threading
 import winUser
 import inputCore
 from speech.sayAll import SayAllHandler
 from scriptHandler import script
-from globalCommands import commands
 import addonHandler
+from logHandler import log
 
 try:
     addonHandler.initTranslation()
 except AttributeError:
-    pass
+    log.debug("AudioThemes: swallowed AttributeError in navLayer")
 
 class NavLayerMixin:
     """
@@ -252,7 +251,7 @@ class NavLayerMixin:
             try:
                 self.removeGestureBinding(ident)
             except (LookupError, ValueError):
-                pass
+                log.debug("AudioThemes: swallowed LookupError|ValueError in navLayer._doNavLayerExit")
         
         SayAllHandler.stop()
         self._playNavTone(800, 50)
