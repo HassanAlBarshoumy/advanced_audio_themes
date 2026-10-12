@@ -388,7 +388,24 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # Translators: checkbox for whether state sounds suppress the role sound
         self.stateSoundsSuppressCheckbox = wx.CheckBox(themePanel, -1, _("State sounds suppress the role sound"))
         themeSizer.Add(self.stateSoundsSuppressCheckbox, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
-        
+
+        # Mouse hover + arrow navigation switches (borrowed from NavigationSounds)
+        # Translators: checkbox to toggle playing theme sounds when hovering with the mouse
+        self.mouseSoundsCheckbox = wx.CheckBox(themePanel, -1, _("Play theme sounds when hovering with the mouse"))
+        mouseDelaySizer = wx.BoxSizer(wx.HORIZONTAL)
+        # Translators: label for the mouse hover delay spinner
+        mouseDelayLabel = wx.StaticText(themePanel, -1, _("Mouse hover delay (ms):"))
+        self.mouseHoverDelaySpin = wx.SpinCtrl(themePanel, -1, min=0, max=2000, initial=0, name=_("Mouse hover delay"))
+        mouseDelaySizer.Add(mouseDelayLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+        mouseDelaySizer.Add(self.mouseHoverDelaySpin, 0, wx.LEFT, 10)
+        # Translators: checkbox to toggle playing theme sounds while navigating with the arrow keys
+        self.arrowNavSoundsCheckbox = wx.CheckBox(themePanel, -1, _("Play theme sounds during arrow navigation"))
+        themeSizer.AddMany([
+            (self.mouseSoundsCheckbox, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10),
+            (mouseDelaySizer, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10),
+            (self.arrowNavSoundsCheckbox, 0, wx.ALL, 10),
+        ])
+
         themeSizer.Fit(themePanel)
         
         # Application Blacklist
@@ -513,6 +530,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
             lambda e: self._update_typing_controls(),
             self.typingSoundsCheckbox,
         )
+        self.Bind(
+            wx.EVT_CHECKBOX,
+            lambda e: self._update_mouse_controls(),
+            self.mouseSoundsCheckbox,
+        )
         self.Bind(wx.EVT_BUTTON, self.onExportConfig, self.exportConfigButton)
         self.Bind(wx.EVT_BUTTON, self.onImportConfig, self.importConfigButton)
         self.Bind(wx.EVT_BUTTON, self.onCheckUpdates, self.checkUpdatesButton)
@@ -606,6 +628,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.typingPackCombobox.Enable(enabled)
         self.aboutTypingSoundsButton.Enable(enabled)
         self.typingSoundsVolumeSlider.Enable(enabled)
+
+    def _update_mouse_controls(self, event=None):
+        enabled = self.mouseSoundsCheckbox.GetValue()
+        self.mouseHoverDelaySpin.Enable(enabled)
 
     def setupAudioEnginePage(self, page):
         """Tab 1.5: Audio Engine Advanced Configuration"""
@@ -2192,6 +2218,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # State sounds toggle
         self.stateSoundsSuppressCheckbox.SetValue(conf.get("state_sounds_suppress_role", False))
 
+        # Mouse hover + arrow navigation switches
+        self.mouseSoundsCheckbox.SetValue(_b(conf.get("mouse_sounds_enabled", True)))
+        self.mouseHoverDelaySpin.SetValue(_i(conf.get("mouse_hover_delay", 0), 0))
+        self.arrowNavSoundsCheckbox.SetValue(_b(conf.get("arrow_nav_sounds", True)))
+        self._update_mouse_controls()
+
         # First/Last Item tab
         self.flEnableCheckbox.SetValue(_b(conf.get("universal_fl_enabled", True)))
         fl_mode_map = {"smart": 0, "strict": 1, "any_sibling": 2}
@@ -2816,6 +2848,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         # State sounds toggle
         conf["state_sounds_suppress_role"] = self.stateSoundsSuppressCheckbox.GetValue()
+
+        # Mouse hover + arrow navigation switches
+        conf["mouse_sounds_enabled"] = self.mouseSoundsCheckbox.GetValue()
+        conf["mouse_hover_delay"] = self.mouseHoverDelaySpin.GetValue()
+        conf["arrow_nav_sounds"] = self.arrowNavSoundsCheckbox.GetValue()
 
         # First/Last Item tab
         conf["universal_fl_enabled"] = self.flEnableCheckbox.GetValue()

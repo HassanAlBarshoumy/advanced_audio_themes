@@ -175,6 +175,11 @@ audiothemes_config_defaults = {
     "general_fallback": "string(default='role')",
     "general_fallback_role_name": "string(default='listitem')",
     "state_sounds_suppress_role": "boolean(default=False)",
+    # Mouse hover + arrow navigation sound switches (borrowed from NavigationSounds).
+    # Defaults preserve the pre-existing behaviour (sounds on, no hover delay).
+    "mouse_sounds_enabled": "boolean(default=True)",
+    "mouse_hover_delay": "integer(default=0, min=0, max=2000)",
+    "arrow_nav_sounds": "boolean(default=True)",
     "universal_fl_enabled": "boolean(default=True)",
     "fl_enabled_roles": "string(default='[\"listitem\",\"treeviewitem\",\"menuitem\",\"tab\"]')",
     "fl_solo_behavior": "string(default='first')",
@@ -1528,6 +1533,9 @@ class AudioThemesHandler:
             "fl_detection_mode": user_config.get("fl_detection_mode", "smart"),
             "fl_solo_behavior": user_config.get("fl_solo_behavior", "first"),
             "state_sounds_suppress_role": user_config.get("state_sounds_suppress_role", False),
+            "mouse_sounds_enabled": user_config.get("mouse_sounds_enabled", True),
+            "mouse_hover_delay": user_config.get("mouse_hover_delay", 0),
+            "arrow_nav_sounds": user_config.get("arrow_nav_sounds", True),
             "emoji_suppress_role_sound": user_config.get("emoji_suppress_role_sound", False),
             "firstlast_fallback": user_config.get("firstlast_fallback", "role"),
             "first_fallback_role_name": user_config.get("first_fallback_role_name", "listitem"),

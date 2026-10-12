@@ -325,6 +325,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception:
             log.error("AudioThemes: Failed to add settings panel", exc_info=True)
         self._previous_mouse_object = None
+        self._mouse_hover_timer = None  # debounce timer for delayed mouse-hover sounds
         self._last_navigator_object = None
         self._last_play_time = 0  # debounce: monotonic timestamp of last dispatch
         self._last_focused_obj = None   # for gainFocus / becomeNavigator dedup
@@ -491,6 +492,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 _orig_exc = e
         try:
             if not self.handler._cached_config.get("enable_audio_themes", True) or not self.handler.active_theme:
+                if _orig_exc is not None:
+                    raise _orig_exc
+                return
+            if not self.handler._cached_config.get("arrow_nav_sounds", True):
                 if _orig_exc is not None:
                     raise _orig_exc
                 return
@@ -748,6 +753,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         with suppress(Exception):
             self._navigation_timer.Stop()
         with suppress(Exception):
+            if self._mouse_hover_timer is not None:
+                self._mouse_hover_timer.Stop()
+                self._mouse_hover_timer = None
+        with suppress(Exception):
             self.quicknav_interceptor.terminate()
         try:
             self.handler.close()
@@ -849,6 +858,16 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             current_nav = api.getNavigatorObject()
             if current_nav and current_nav != getattr(self, "_last_navigator_object", None):
                 self._last_navigator_object = current_nav
+                # This timer is the ONLY producer of theme sounds for
+                # arrow-key navigation inside a virtual buffer (see the
+                # comment where the timer is created). `arrow_nav_sounds`
+                # therefore has to gate here - the legacy
+                # speech._caretMovementScriptHelper hook no longer exists in
+                # current NVDA, so gating it alone had no effect. The
+                # navigator is still tracked above so re-enabling the option
+                # does not fire a stale sound for a position already passed.
+                if not self.handler._cached_config.get("arrow_nav_sounds", True):
+                    return
                 ti = current_nav.treeInterceptor
                 if ti and not ti.passThrough:
                     # Debounce: skip if last dispatch was < 80ms ago.
@@ -1335,9 +1354,25 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         if obj is not self._previous_mouse_object:
             self._previous_mouse_object = obj
             try:
-                if self.handler._cached_config.get("enable_audio_themes", True) and self.handler.active_theme:
+                cfg = self.handler._cached_config
+                if (cfg.get("enable_audio_themes", True)
+                        and self.handler.active_theme
+                        and cfg.get("mouse_sounds_enabled", True)):
                     obj_info = self._snapshot_obj(obj, foreground_app=self.handler._current_app_name)
-                    utils.threadPool.add_task(self.playObject, obj_info)
+                    delay = cfg.get("mouse_hover_delay", 0) or 0
+                    if delay > 0:
+                        # Borrowed from NavigationSounds: only the object the
+                        # pointer rests on for `delay` ms plays; every new object
+                        # cancels the previous pending timer.
+                        timer = getattr(self, "_mouse_hover_timer", None)
+                        if timer is not None:
+                            try:
+                                timer.Stop()
+                            except Exception:
+                                log.debug("AudioThemes: swallowed Exception in __init__.event_mouseMove")
+                        self._mouse_hover_timer = wx.CallLater(delay, self._play_mouse_hover_sound, obj_info)
+                    else:
+                        utils.threadPool.add_task(self.playObject, obj_info)
             except Exception as e:
                 log.warning(f"event_mouseMove snapshot (theme sound dropped): {e}")
         try:
@@ -1346,6 +1381,19 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             raise
         except Exception as e:
             log.debugWarning(f"event_mouseMove nextHandler: {e}")
+
+    def _play_mouse_hover_sound(self, obj_info):
+        """Play a deferred mouse-hover sound once the hover delay has elapsed."""
+        self._mouse_hover_timer = None
+        try:
+            cfg = self.handler._cached_config
+            if not cfg.get("mouse_sounds_enabled", True):
+                return
+            if not (cfg.get("enable_audio_themes", True) and self.handler.active_theme):
+                return
+            utils.threadPool.add_task(self.playObject, obj_info)
+        except Exception as e:
+            log.debug(f"AudioThemes: _play_mouse_hover_sound failed: {e}")
     def event_show(self, obj, nextHandler):
         try:
             if getattr(obj, "role", None) == controlTypes.Role.HELPBALLOON:
