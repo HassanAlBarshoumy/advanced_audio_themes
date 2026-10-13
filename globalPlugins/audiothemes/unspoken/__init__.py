@@ -858,7 +858,11 @@ class UnspokenPlayer:
 		if cfg.get("noSounds", False):
 			self._last_gate = "no-sounds"
 			return
-		if not obj_info.get("system_sound") and getattr(self, "use_in_say_all", False) and _say_all_is_running():
+		# The "Speak roles during say all" option (use_in_say_all) mirrors the
+		# handler role-speech gates: True keeps announcements during say-all, so
+		# it must also KEEP theme sounds. Only a user who explicitly cleared it
+		# (False) gets theme sounds muted while say-all is genuinely running.
+		if not obj_info.get("system_sound") and not getattr(self, "use_in_say_all", True) and _say_all_is_running():
 			self._last_gate = "say-all"
 			return
 		self._last_gate = ""
