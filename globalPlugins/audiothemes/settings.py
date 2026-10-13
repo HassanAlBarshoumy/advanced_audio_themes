@@ -400,10 +400,24 @@ class AudioThemesSettingsPanel(SettingsPanel):
         mouseDelaySizer.Add(self.mouseHoverDelaySpin, 0, wx.LEFT, 10)
         # Translators: checkbox to toggle playing theme sounds while navigating with the arrow keys
         self.arrowNavSoundsCheckbox = wx.CheckBox(themePanel, -1, _("Play theme sounds during arrow navigation"))
+        # Same-object dedup + navigation-noise filters (borrowed from NavigationSounds)
+        # Translators: label for the duplicate-event suppression spinner
+        dedupSizer = wx.BoxSizer(wx.HORIZONTAL)
+        dedupLabel = wx.StaticText(themePanel, -1, _("Suppress repeated sounds for the same element (ms, 0 = off):"))
+        self.sameObjectDedupSpin = wx.SpinCtrl(themePanel, -1, min=0, max=2000, initial=250, name=_("Same-element sound suppression"))
+        dedupSizer.Add(dedupLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+        dedupSizer.Add(self.sameObjectDedupSpin, 0, wx.LEFT, 10)
+        # Translators: checkbox to silence theme sounds while extending a selection
+        self.suppressSelectingCheckbox = wx.CheckBox(themePanel, -1, _("Silence theme sounds while selecting text (Shift + arrow keys)"))
+        # Translators: checkbox to silence theme sounds for container elements
+        self.suppressContainerCheckbox = wx.CheckBox(themePanel, -1, _("Silence theme sounds for container elements (documents, panes, windows)"))
         themeSizer.AddMany([
             (self.mouseSoundsCheckbox, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10),
             (mouseDelaySizer, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10),
             (self.arrowNavSoundsCheckbox, 0, wx.ALL, 10),
+            (dedupSizer, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10),
+            (self.suppressSelectingCheckbox, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10),
+            (self.suppressContainerCheckbox, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10),
         ])
 
         themeSizer.Fit(themePanel)
@@ -2222,6 +2236,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.mouseSoundsCheckbox.SetValue(_b(conf.get("mouse_sounds_enabled", True)))
         self.mouseHoverDelaySpin.SetValue(_i(conf.get("mouse_hover_delay", 0), 0))
         self.arrowNavSoundsCheckbox.SetValue(_b(conf.get("arrow_nav_sounds", True)))
+        dedup_ms = _i(conf.get("dedupe_same_object_ms", 250), 250)
+        dedup_ms = max(0, min(2000, dedup_ms))
+        self.sameObjectDedupSpin.SetValue(dedup_ms)
+        self.suppressSelectingCheckbox.SetValue(_b(conf.get("suppress_sounds_while_selecting", True)))
+        self.suppressContainerCheckbox.SetValue(_b(conf.get("suppress_container_role_sounds", True)))
         self._update_mouse_controls()
 
         # First/Last Item tab
@@ -2853,6 +2872,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
         conf["mouse_sounds_enabled"] = self.mouseSoundsCheckbox.GetValue()
         conf["mouse_hover_delay"] = self.mouseHoverDelaySpin.GetValue()
         conf["arrow_nav_sounds"] = self.arrowNavSoundsCheckbox.GetValue()
+        conf["dedupe_same_object_ms"] = self.sameObjectDedupSpin.GetValue()
+        conf["suppress_sounds_while_selecting"] = self.suppressSelectingCheckbox.GetValue()
+        conf["suppress_container_role_sounds"] = self.suppressContainerCheckbox.GetValue()
 
         # First/Last Item tab
         conf["universal_fl_enabled"] = self.flEnableCheckbox.GetValue()

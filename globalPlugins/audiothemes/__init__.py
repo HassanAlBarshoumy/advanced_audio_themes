@@ -48,6 +48,7 @@ from .handler import (
     role_int_to_name,
     showPendingConflicts,
     STATE_OFFSET,
+    state_sort_key,
     conf_bool,
     conf_str,
     conf_int,
@@ -78,6 +79,16 @@ _HEADING_LEVEL_MAP = {
     8: SpecialProps.heading8,
     9: SpecialProps.heading9,
 }
+
+# Container roles never produce state sounds nor navigation dispatch
+# (borrowed from NavigationSounds). A document/pane/window is not a
+# navigational target; a "focused"/"checked" sound for it is noise.
+_CONTAINER_ROLES = frozenset(
+    _r for _r in (
+        getattr(controlTypes.Role, _n, None)
+        for _n in ("DOCUMENT", "WINDOW", "PANE", "APPLICATION", "UNKNOWN")
+    ) if _r is not None
+)
 
 import api
 import winUser
@@ -326,8 +337,14 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             log.error("AudioThemes: Failed to add settings panel", exc_info=True)
         self._previous_mouse_object = None
         self._mouse_hover_timer = None  # debounce timer for delayed mouse-hover sounds
+        self._mouse_hover_obj = None  # the object whose hover sound is pending (for getMouseObject re-check)
         self._last_navigator_object = None
         self._last_play_time = 0  # debounce: monotonic timestamp of last dispatch
+        # Same-object dedup: the last element we actually played a sound for
+        # and when. Repeats within dedupe_same_object_ms are suppressed
+        # (Electron/Chromium re-send focus/caret events for one element).
+        self._last_dedup_obj = None
+        self._last_dedup_time = 0.0
         self._last_focused_obj = None   # for gainFocus / becomeNavigator dedup
         self._last_focus_time = 0.0
         self._last_progress_times = {}  # debounce: {obj_id: timestamp} for progress bars
@@ -756,6 +773,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             if self._mouse_hover_timer is not None:
                 self._mouse_hover_timer.Stop()
                 self._mouse_hover_timer = None
+            self._mouse_hover_obj = None
         with suppress(Exception):
             self.quicknav_interceptor.terminate()
         try:
@@ -870,6 +888,27 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     return
                 ti = current_nav.treeInterceptor
                 if ti and not ti.passThrough:
+                    fl_cfg = self.handler._cached_config or {}
+                    # Container roles are not navigational targets (borrowed
+                    # from NavigationSounds): no theme sound for documents,
+                    # panes, windows, applications or unknown objects.
+                    if fl_cfg.get("suppress_container_role_sounds", True):
+                        try:
+                            if current_nav.role in _CONTAINER_ROLES:
+                                return
+                        except Exception:
+                            pass
+                    # Skip selection extensions (shift+arrows): sounds follow
+                    # caret moves only (borrowed from NavigationSounds).
+                    if fl_cfg.get("suppress_sounds_while_selecting", True):
+                        try:
+                            _sel = ti.makeTextInfo(textInfos.POSITION_SELECTION)
+                            if _sel is not None and not _sel.isCollapsed:
+                                return
+                        except Exception:
+                            pass
+                    if self._is_same_object_duplicate(current_nav):
+                        return
                     # Debounce: skip if last dispatch was < 80ms ago.
                     now = time.monotonic()
                     if now - getattr(self, "_last_play_time", 0) < 0.08:
@@ -970,6 +1009,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             _ectl = (controlTypes.Role.EDITABLETEXT, controlTypes.Role.TERMINAL, controlTypes.Role.RICHEDIT)
             self._last_focus_is_editable = (_r in _ectl or controlTypes.State.EDITABLE in _s) and controlTypes.State.READONLY not in _s
             self._pending_dispatch_obj = None
+            if self._is_same_object_duplicate(obj):
+                return
             utils.threadPool.add_task(self.playObject, obj_info)
             utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
@@ -1370,8 +1411,13 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                                 timer.Stop()
                             except Exception:
                                 log.debug("AudioThemes: swallowed Exception in __init__.event_mouseMove")
+                        self._mouse_hover_obj = obj
                         self._mouse_hover_timer = wx.CallLater(delay, self._play_mouse_hover_sound, obj_info)
                     else:
+                        # No delay: nothing is pending; drop any stale hover
+                        # reference so a leftover timer from an earlier
+                        # delay>0 configuration falls back to plain playback.
+                        self._mouse_hover_obj = None
                         utils.threadPool.add_task(self.playObject, obj_info)
             except Exception as e:
                 log.warning(f"event_mouseMove snapshot (theme sound dropped): {e}")
@@ -1385,12 +1431,25 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     def _play_mouse_hover_sound(self, obj_info):
         """Play a deferred mouse-hover sound once the hover delay has elapsed."""
         self._mouse_hover_timer = None
+        hover_obj = self._mouse_hover_obj
+        self._mouse_hover_obj = None
         try:
             cfg = self.handler._cached_config
             if not cfg.get("mouse_sounds_enabled", True):
                 return
             if not (cfg.get("enable_audio_themes", True) and self.handler.active_theme):
                 return
+            # Borrowed from NavigationSounds: re-check where the pointer is
+            # NOW. If it has moved to another element during the delay, the
+            # object we snapshotted is no longer what is under the mouse, so
+            # its sound must not play.
+            if hover_obj is not None:
+                try:
+                    current_mouse = api.getMouseObject()
+                except Exception:
+                    current_mouse = hover_obj
+                if current_mouse is not None and current_mouse is not hover_obj:
+                    return
             utils.threadPool.add_task(self.playObject, obj_info)
         except Exception as e:
             log.debug(f"AudioThemes: _play_mouse_hover_sound failed: {e}")
@@ -1429,6 +1488,27 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             raise
         except Exception as e:
             log.debugWarning(f"event_documentLoadComplete nextHandler: {e}")
+    def _is_same_object_duplicate(self, obj):
+        """True when obj is the same element we last played a sound for within
+        the configured dedup window (default 250ms). Electron/Chromium re-send
+        focus and caret events for one element with 100-400ms spacing, so a
+        plain time-only throttle let duplicates through while this window never
+        blocks a genuinely different element. 0 disables the feature."""
+        try:
+            window = (self.handler._cached_config or {}).get("dedupe_same_object_ms", 250) or 0
+            if window <= 0:
+                self._last_dedup_obj = obj
+                return False
+            now = time.monotonic()
+            if obj is not None and obj is getattr(self, "_last_dedup_obj", None):
+                if now - getattr(self, "_last_dedup_time", 0.0) < window / 1000.0:
+                    return True
+            self._last_dedup_obj = obj
+            self._last_dedup_time = now
+            return False
+        except Exception:
+            return False
+
     def playObject(self, obj_info):
         """
         Resolve the sound for an object and play it.
@@ -1452,23 +1532,32 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
             # --- State-based sound ------------------------------------------
             if theme and current_states:
-                if suppress_role:
-                    # Old behavior: first matching state sound breaks, role sound skipped
-                    theme_sounds = theme.sounds
-                    for state in current_states:
-                        state_snd = state + STATE_OFFSET
-                        has_state_snd = state_snd in theme_sounds
-                        if has_state_snd:
-                            self.handler.play(obj_info, state_snd, _pre_resolved_theme=theme)
-                            break
-                else:
-                    # New behavior: play ALL matching state sounds, then role sound
-                    theme_sounds = theme.sounds
-                    for state in current_states:
-                        state_snd = state + STATE_OFFSET
-                        has_state_snd = state_snd in theme_sounds
-                        if has_state_snd:
-                            self.handler.play(obj_info, state_snd, _pre_resolved_theme=theme)
+                # Container roles never produce state sounds (borrowed from
+                # NavigationSounds): a "focused"/"checked" sound for a
+                # document/pane/window is noise, not navigation feedback.
+                suppress_container = fl_cfg.get("suppress_container_role_sounds", True)
+                if not (suppress_container and obj_info.get("role", 0) in _CONTAINER_ROLES):
+                    # Deterministic order (borrowed from NavigationSounds):
+                    # iterate states by _STATE_PRIORITY instead of relying on
+                    # frozenset iteration order.
+                    ordered_states = sorted(current_states, key=state_sort_key)
+                    if suppress_role:
+                        # Old behavior: first matching state sound breaks, role sound skipped
+                        theme_sounds = theme.sounds
+                        for state in ordered_states:
+                            state_snd = state + STATE_OFFSET
+                            has_state_snd = state_snd in theme_sounds
+                            if has_state_snd:
+                                self.handler.play(obj_info, state_snd, _pre_resolved_theme=theme)
+                                break
+                    else:
+                        # New behavior: play ALL matching state sounds, then role sound
+                        theme_sounds = theme.sounds
+                        for state in ordered_states:
+                            state_snd = state + STATE_OFFSET
+                            has_state_snd = state_snd in theme_sounds
+                            if has_state_snd:
+                                self.handler.play(obj_info, state_snd, _pre_resolved_theme=theme)
 
             # --- Emoji role sound suppression ---
             emoji_suppress = fl_cfg.get("emoji_suppress_role_sound", False)

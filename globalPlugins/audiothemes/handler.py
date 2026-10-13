@@ -180,6 +180,10 @@ audiothemes_config_defaults = {
     "mouse_sounds_enabled": "boolean(default=True)",
     "mouse_hover_delay": "integer(default=0, min=0, max=2000)",
     "arrow_nav_sounds": "boolean(default=True)",
+    # Same-object dedup + navigation-noise filters (borrowed from NavigationSounds).
+    "dedupe_same_object_ms": "integer(default=250, min=0, max=2000)",
+    "suppress_sounds_while_selecting": "boolean(default=True)",
+    "suppress_container_role_sounds": "boolean(default=True)",
     "universal_fl_enabled": "boolean(default=True)",
     "fl_enabled_roles": "string(default='[\"listitem\",\"treeviewitem\",\"menuitem\",\"tab\"]')",
     "fl_solo_behavior": "string(default='first')",
@@ -474,6 +478,33 @@ else:
         if name.startswith("STATE_"):
             state_int_to_name[value] = name.replace("STATE_", "").lower()
 state_name_to_int = {v: k for k, v in state_int_to_name.items()}
+
+# Deterministic state-sound ordering (borrowed from NavigationSounds).
+# When several states of an element have matching sounds, pick the most
+# meaningful one in this order instead of relying on set-iteration order.
+_STATE_PRIORITY = (
+    "CHECKED",
+    "PRESSED",
+    "SELECTED",
+    "FOCUSED",
+    "HALFCHECKED",
+    "EXPANDED",
+    "COLLAPSED",
+    "HASPOPUP",
+    "READONLY",
+    "REQUIRED",
+    "PROTECTED",
+)
+
+
+def state_sort_key(state):
+    """Sort key for controlTypes.State values: _STATE_PRIORITY order first, then name."""
+    try:
+        name = controlTypes.State(state).name
+    except (ValueError, TypeError):
+        name = str(state).upper()
+    order = _STATE_PRIORITY.index(name) if name in _STATE_PRIORITY else len(_STATE_PRIORITY)
+    return (order, name)
 
 for state_val, state_label in getattr(controlTypes, "stateLabels", {}).items():
     theme_roles[state_val + STATE_OFFSET] = state_label
@@ -1536,6 +1567,9 @@ class AudioThemesHandler:
             "mouse_sounds_enabled": user_config.get("mouse_sounds_enabled", True),
             "mouse_hover_delay": user_config.get("mouse_hover_delay", 0),
             "arrow_nav_sounds": user_config.get("arrow_nav_sounds", True),
+            "dedupe_same_object_ms": user_config.get("dedupe_same_object_ms", 250),
+            "suppress_sounds_while_selecting": user_config.get("suppress_sounds_while_selecting", True),
+            "suppress_container_role_sounds": user_config.get("suppress_container_role_sounds", True),
             "emoji_suppress_role_sound": user_config.get("emoji_suppress_role_sound", False),
             "firstlast_fallback": user_config.get("firstlast_fallback", "role"),
             "first_fallback_role_name": user_config.get("first_fallback_role_name", "listitem"),

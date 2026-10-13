@@ -151,6 +151,16 @@ class BrowseModeQuickNavInterceptor:
                     logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
             if new_selection:
                 if not old_info or old_info.compareEndPoints(new_selection, "startToStart") != 0:
+                    # Borrowed from NavigationSounds: no sound when the move
+                    # extends a selection (shift+arrows); sounds follow caret
+                    # moves only.
+                    suppress_select = (self.handler._cached_config or {}).get("suppress_sounds_while_selecting", True)
+                    if suppress_select:
+                        try:
+                            if not new_selection.isCollapsed:
+                                return
+                        except Exception:
+                            pass
                     self._check_and_play_nav(itemType, new_selection)
 
         self._patched_script_ref = patched_quick_nav_script
