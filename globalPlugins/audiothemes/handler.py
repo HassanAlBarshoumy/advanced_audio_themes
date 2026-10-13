@@ -506,6 +506,135 @@ def state_sort_key(state):
     order = _STATE_PRIORITY.index(name) if name in _STATE_PRIORITY else len(_STATE_PRIORITY)
     return (order, name)
 
+
+# --- Archive import safety (zip-bomb + path-traversal guards) ---------------
+# Theme / typing packages are downloaded in-app from a store, so the files
+# must not be trusted: a crafted zip could otherwise fill the disk, walk out
+# of the extraction root, or (worse) make the package name escape
+# typingSounds and delete an arbitrary directory via shutil.rmtree. Every
+# extract now goes through these caps and helpers.
+ARCHIVE_MAX_ENTRIES = 2000
+ARCHIVE_MAX_TOTAL_BYTES = 64 * 1024 * 1024      # 64 MB uncompressed
+ARCHIVE_MAX_FILE_BYTES = 32 * 1024 * 1024       # 32 MB per file
+# A full .atcfg export can legitimately contain every theme + typing pack and
+# is a file the user explicitly chose, so it gets a much larger total cap.
+ARCHIVE_CONFIG_MAX_ENTRIES = 20000
+ARCHIVE_CONFIG_MAX_TOTAL_BYTES = 512 * 1024 * 1024
+
+
+def is_safe_archive_name(name):
+    """True when an archive entry name cannot escape the extraction root."""
+    if not name or "\x00" in name:
+        return False
+    normalized = name.replace("\\", "/")
+    if normalized.startswith("/"):
+        return False
+    if len(normalized) >= 2 and normalized[0].isalpha() and normalized[1] == ":":
+        return False  # Windows drive letter (C:)
+    if any(part == ".." for part in normalized.split("/")):
+        return False
+    return True
+
+
+def is_within(base_dir, path):
+    """True when path is base_dir itself or a descendant of it."""
+    base = os.path.abspath(base_dir)
+    candidate = os.path.abspath(path)
+    return candidate == base or candidate.startswith(base + os.sep)
+
+
+def safe_archive_target(dest_dir, rel_name):
+    """Absolute extraction path for rel_name under dest_dir, or None if unsafe."""
+    if not is_safe_archive_name(rel_name):
+        return None
+    try:
+        return os.path.abspath(os.path.join(dest_dir, rel_name.replace("\\", "/")))
+    except Exception:
+        return None
+
+
+def validate_archive(pack, max_entries=ARCHIVE_MAX_ENTRIES,
+                     max_total_bytes=ARCHIVE_MAX_TOTAL_BYTES,
+                     max_file_bytes=ARCHIVE_MAX_FILE_BYTES):
+    """Validate a ZipFile against zip-bomb and traversal limits.
+
+    Returns the infolist; raises ValueError on any violation. Declared header
+    sizes are checked here and the actual bytes are capped again while
+    extracting (safe_extract_archive), so a forged header cannot slip through.
+    """
+    infolist = pack.infolist()
+    if len(infolist) > max_entries:
+        raise ValueError(f"archive has too many entries ({len(infolist)} > {max_entries})")
+    total = 0
+    for info in infolist:
+        if not is_safe_archive_name(info.filename):
+            raise ValueError(f"unsafe archive entry: {info.filename!r}")
+        declared = getattr(info, "file_size", 0) or 0
+        if declared > max_file_bytes:
+            raise ValueError(f"archive entry too large: {info.filename!r}")
+        total += declared
+        if total > max_total_bytes:
+            raise ValueError("archive is too large (uncompressed)")
+    return infolist
+
+
+def safe_extract_archive(pack, dest_dir, allowed_prefix=None, skip_existing=False,
+                         max_file_bytes=ARCHIVE_MAX_FILE_BYTES):
+    """Extract pack into dest_dir, rejecting traversal and capping file size.
+
+    With allowed_prefix, only entries under that prefix are extracted and the
+    prefix is stripped (the config-import directory semantics). Returns the
+    number of files written.
+    """
+    dest_root = os.path.abspath(dest_dir)
+    prefix = None
+    if allowed_prefix:
+        prefix = allowed_prefix.replace("\\", "/").rstrip("/") + "/"
+    written = 0
+    for info in pack.infolist():
+        name = info.filename
+        if not is_safe_archive_name(name):
+            continue
+        normalized = name.replace("\\", "/")
+        if prefix is not None:
+            if not normalized.startswith(prefix):
+                continue
+            rel = normalized[len(prefix):]
+        else:
+            rel = normalized
+        if not rel or rel.endswith("/"):
+            target = safe_archive_target(dest_root, rel) if rel else None
+            if target:
+                os.makedirs(target, exist_ok=True)
+            continue
+        target = safe_archive_target(dest_root, rel)
+        if target is None or not is_within(dest_root, target):
+            continue
+        if skip_existing and os.path.exists(target):
+            continue
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        count = 0
+        try:
+            with pack.open(info) as src, open(target, "wb") as dst:
+                while True:
+                    chunk = src.read(1024 * 1024)
+                    if not chunk:
+                        break
+                    count += len(chunk)
+                    if count > max_file_bytes:
+                        raise ValueError(f"archive entry exceeded size limit: {info.filename!r}")
+                    dst.write(chunk)
+        except Exception:
+            # Never leave a half-written / oversized file behind.
+            try:
+                os.remove(target)
+            except OSError:
+                pass
+            raise
+        written += 1
+    return written
+
+
 for state_val, state_label in getattr(controlTypes, "stateLabels", {}).items():
     theme_roles[state_val + STATE_OFFSET] = state_label
 
@@ -2189,9 +2318,16 @@ class AudioThemesHandler:
 
     @staticmethod
     def _sanitize_folder_name(name):
-        name = name.strip().replace(" ", "_")
+        name = str(name).strip().replace(" ", "_")
         keep = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-.")
-        return "".join(c if c in keep else "_" for c in name).strip("_") or "Theme"
+        cleaned = "".join(c if c in keep else "_" for c in name)
+        # A folder name must never resolve outside its parent. Collapse any run
+        # of dots and drop leading/trailing dots and underscores so that ".",
+        # ".." and hidden/traversal names can no longer be produced.
+        while ".." in cleaned:
+            cleaned = cleaned.replace("..", ".")
+        cleaned = cleaned.strip("._")
+        return cleaned or "Theme"
 
     @classmethod
     def install_audio_themePackage(cls, theme_pack):
@@ -2199,15 +2335,21 @@ class AudioThemesHandler:
         identified_path = os.path.join(THEMES_DIR, uuid4().hex).lower()
         try:
             with ZipFile(theme_pack, "r") as pack:
-                infolist = pack.infolist()
+                infolist = validate_archive(pack)
                 if not infolist:
-                    return
+                    return False
                 if infolist[0].is_dir():
                     cls._install_legacy(pack, identified_path)
                 else:
-                    pack.extractall(path=identified_path)
-        except Exception:
-            return
+                    safe_extract_archive(pack, identified_path)
+        except Exception as e:
+            log.warning(f"AudioThemes: theme package rejected ({e})")
+            try:
+                if os.path.isdir(identified_path):
+                    shutil.rmtree(identified_path)
+            except Exception:
+                log.debug("AudioThemes: swallowed Exception cleaning rejected theme package")
+            return False
         info_file = os.path.join(identified_path, INFO_FILE_NAME)
         if not os.path.exists(info_file):
             folder_name = os.path.basename(os.path.normpath(theme_pack))
@@ -2215,26 +2357,32 @@ class AudioThemesHandler:
                 folder_name = folder_name[:-4]
             safe_name = cls._sanitize_folder_name(folder_name)
             target_path = os.path.join(THEMES_DIR, safe_name)
+            if not is_within(THEMES_DIR, target_path):
+                return False
             if os.path.isdir(target_path):
                 shutil.rmtree(target_path)
             if safe_name != os.path.basename(identified_path):
                 try:
                     os.rename(identified_path, target_path)
                 except OSError:
-                    return
+                    return False
             info = {"name": folder_name, "author": "Unknown", "summary": folder_name}
             cls.write_info_file(os.path.join(target_path, INFO_FILE_NAME), info)
-            return
+            return True
         try:
             theme_info = cls.load_info_file(info_file)
         except Exception:
-            return
-        theme_name = theme_info.get("name", "").strip()
+            return False
+        if not isinstance(theme_info, dict):
+            theme_info = {}
+        theme_name = str(theme_info.get("name", "")).strip()
         if theme_name:
             safe_name = cls._sanitize_folder_name(theme_name)
             if theme_name.lower() == "default":
                 safe_name = "Default"
             target_path = os.path.join(THEMES_DIR, safe_name)
+            if not is_within(THEMES_DIR, target_path):
+                return False
             if os.path.isdir(target_path):
                 shutil.rmtree(target_path)
             if safe_name != os.path.basename(identified_path):
@@ -2242,49 +2390,84 @@ class AudioThemesHandler:
                     os.rename(identified_path, target_path)
                 except OSError:
                     log.debug("AudioThemes: swallowed OSError in handler.install_audio_themePackage")
+        return True
 
     @classmethod
     def install_audio_themeFolder(cls, source_path):
         cls._invalidate_themes_cache()
-        folder_name = os.path.basename(os.path.normpath(source_path))
-        safe_name = cls._sanitize_folder_name(folder_name)
-        target_path = os.path.join(THEMES_DIR, safe_name)
-        if os.path.isdir(target_path):
-            shutil.rmtree(target_path)
-        shutil.copytree(source_path, target_path)
-        info_file = os.path.join(target_path, INFO_FILE_NAME)
-        if not os.path.isfile(info_file):
-            info = {"name": folder_name, "author": "Unknown", "summary": folder_name}
-            cls.write_info_file(info_file, info)
+        try:
+            folder_name = os.path.basename(os.path.normpath(source_path))
+            safe_name = cls._sanitize_folder_name(folder_name)
+            target_path = os.path.join(THEMES_DIR, safe_name)
+            if not is_within(THEMES_DIR, target_path):
+                return False
+            if os.path.isdir(target_path):
+                shutil.rmtree(target_path)
+            shutil.copytree(source_path, target_path)
+            info_file = os.path.join(target_path, INFO_FILE_NAME)
+            if not os.path.isfile(info_file):
+                info = {"name": folder_name, "author": "Unknown", "summary": folder_name}
+                cls.write_info_file(info_file, info)
+            return True
+        except Exception as e:
+            log.warning(f"AudioThemes: theme folder rejected ({e})")
+            return False
 
     @classmethod
     def install_typing_soundPackage(cls, pack_path):
         pack_name = "Imported_" + uuid4().hex[:8]
-        with ZipFile(pack_path, "r") as pack:
-            if "info.json" in pack.namelist():
-                try:
-                    info_data = json.loads(pack.read("info.json").decode("utf-8"))
-                    pack_name = info_data.get("name", pack_name)
-                except Exception:
-                    log.debug("AudioThemes: swallowed Exception in handler.install_typing_soundPackage")
-            elif len(pack.infolist()) > 0 and pack.infolist()[0].is_dir():
-                pack_name = pack.infolist()[0].orig_filename.strip("/")
-            
-            addon_dir = os.path.dirname(__file__)
-            typing_dir = os.path.join(addon_dir, "typingSounds", pack_name)
-            
-            if os.path.exists(typing_dir):
-                shutil.rmtree(typing_dir)
-            os.makedirs(typing_dir)
-            pack.extractall(path=typing_dir)
-            
-            contents = os.listdir(typing_dir)
-            if len(contents) == 1:
-                inner_path = os.path.join(typing_dir, contents[0])
-                if os.path.isdir(inner_path):
-                    for item in os.listdir(inner_path):
-                        shutil.move(os.path.join(inner_path, item), typing_dir)
-                    os.rmdir(inner_path)
+        try:
+            with ZipFile(pack_path, "r") as pack:
+                infolist = validate_archive(pack)
+                if not infolist:
+                    return False
+                names = pack.namelist()
+                info_name = "info.json" if "info.json" in names else None
+                if info_name is None:
+                    # A pack may wrap everything in a single folder
+                    # (navigation-sounds style): read info.json from there.
+                    for n in names:
+                        parts = n.split("/", 1)
+                        if len(parts) == 2 and parts[1] == "info.json":
+                            info_name = n
+                            break
+                if info_name is not None:
+                    try:
+                        info_data = json.loads(pack.read(info_name).decode("utf-8"))
+                        raw_name = info_data.get("name", pack_name) if isinstance(info_data, dict) else pack_name
+                        if isinstance(raw_name, str) and raw_name.strip():
+                            pack_name = raw_name
+                    except Exception:
+                        log.debug("AudioThemes: swallowed Exception in handler.install_typing_soundPackage")
+                elif infolist and infolist[0].is_dir():
+                    pack_name = infolist[0].orig_filename.strip("/")
+
+                addon_dir = os.path.dirname(__file__)
+                typing_root = os.path.abspath(os.path.join(addon_dir, "typingSounds"))
+                safe_name = cls._sanitize_folder_name(pack_name)
+                typing_dir = os.path.abspath(os.path.join(typing_root, safe_name))
+                # The old code fed the raw package name into shutil.rmtree, so
+                # a crafted name like ".." could delete an arbitrary directory.
+                # Never let the resolved directory escape typingSounds.
+                if typing_dir == typing_root or not is_within(typing_root, typing_dir):
+                    typing_dir = os.path.join(typing_root, "Imported_" + uuid4().hex[:8])
+
+                if os.path.exists(typing_dir):
+                    shutil.rmtree(typing_dir)
+                os.makedirs(typing_dir)
+                safe_extract_archive(pack, typing_dir)
+
+                contents = os.listdir(typing_dir)
+                if len(contents) == 1:
+                    inner_path = os.path.join(typing_dir, contents[0])
+                    if os.path.isdir(inner_path):
+                        for item in os.listdir(inner_path):
+                            shutil.move(os.path.join(inner_path, item), typing_dir)
+                        os.rmdir(inner_path)
+            return True
+        except Exception as e:
+            log.warning(f"AudioThemes: typing sound package rejected ({e})")
+            return False
 
     @classmethod
     def _install_legacy(cls, pack, final_dst):

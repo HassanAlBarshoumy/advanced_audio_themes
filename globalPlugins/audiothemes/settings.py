@@ -16,7 +16,7 @@ import controlTypes
 import config
 import nvwave
 
-from .handler import AudioThemesHandler, audiotheme_changed, THEMES_DIR, _get_blacklisted_roles, theme_roles, role_int_to_name, SpecialProps, SUPPORTED_FILE_TYPES, conf_str
+from .handler import AudioThemesHandler, audiotheme_changed, THEMES_DIR, _get_blacklisted_roles, theme_roles, role_int_to_name, SpecialProps, SUPPORTED_FILE_TYPES, conf_str, validate_archive, safe_extract_archive, ARCHIVE_CONFIG_MAX_ENTRIES, ARCHIVE_CONFIG_MAX_TOTAL_BYTES, ARCHIVE_MAX_FILE_BYTES
 from .update_checker import check_for_updates
 from .frenzy import _DEFAULT_DUCKING_CATEGORIES
 log = logging.getLogger(__name__)
@@ -3210,9 +3210,14 @@ class AudioThemesSettingsPanel(SettingsPanel):
         if dlg.ShowModal() == wx.ID_OK and hasattr(dlg, 'result') and dlg.result:
             action, path = dlg.result
             if action == "zip":
-                AudioThemesHandler.install_audio_themePackage(path)
+                ok = AudioThemesHandler.install_audio_themePackage(path)
             else:
-                AudioThemesHandler.install_audio_themeFolder(path)
+                ok = AudioThemesHandler.install_audio_themeFolder(path)
+            if not ok:
+                wx.MessageBox(
+                    _("The selected file could not be installed as an audio theme.\nIt may be corrupted, unsafe, or not a valid theme package."),
+                    _("Error"), style=wx.ICON_ERROR
+                )
             self._maintain_state()
         dlg.Destroy()
 
@@ -3248,16 +3253,18 @@ class AudioThemesSettingsPanel(SettingsPanel):
                 arc_name = os.path.join(archive_prefix, os.path.relpath(full_path, source_dir))
                 zipf.write(full_path, arc_name)
 
-    def _extract_directory_from_zip(self, zipf, archive_prefix, dest_dir):
-        """Extract all files matching archive_prefix/* from zipf into dest_dir."""
-        prefix = archive_prefix.rstrip("/") + "/"
-        for entry in zipf.namelist():
-            if entry.startswith(prefix) and not entry.endswith("/"):
-                rel = entry[len(prefix):]
-                dest_path = os.path.join(dest_dir, rel)
-                os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-                with zipf.open(entry) as src, open(dest_path, "wb") as dst:
-                    dst.write(src.read())
+    def _extract_directory_from_zip(self, zipf, archive_prefix, dest_dir, skip_existing=False):
+        """Extract all files matching archive_prefix/* from zipf into dest_dir.
+
+        Delegates to the handler archive helpers so path traversal is rejected
+        and every file is size-capped (imported archives are not trusted).
+        Returns the number of files written."""
+        try:
+            return safe_extract_archive(zipf, dest_dir, allowed_prefix=archive_prefix,
+                                        skip_existing=skip_existing)
+        except Exception as e:
+            log.error(f"AudioThemes: unsafe or unreadable archive ({archive_prefix}): {e}")
+            return 0
 
     def onExportConfig(self, event):
         from .phoneticPunctuation import rulesFileName
@@ -3313,6 +3320,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
             if filename:
                 try:
                     with zipfile.ZipFile(filename, "r") as zipf:
+                        # Reject zip bombs and traversal before touching the disk.
+                        validate_archive(zipf,
+                                         max_entries=ARCHIVE_CONFIG_MAX_ENTRIES,
+                                         max_total_bytes=ARCHIVE_CONFIG_MAX_TOTAL_BYTES,
+                                         max_file_bytes=ARCHIVE_MAX_FILE_BYTES)
                         files = zipf.namelist()
                         # 1. Rules
                         if "earconsAndSpeechRules.json" in files:
@@ -3355,15 +3367,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
                                 self._extract_directory_from_zip(zipf, "audio-themes", THEMES_DIR)
                             else:
                                 # Only extract themes that don't already exist
-                                prefix = "audio-themes/"
-                                for entry in files:
-                                    if entry.startswith(prefix) and not entry.endswith("/"):
-                                        rel = entry[len(prefix):]
-                                        dest_path = os.path.join(THEMES_DIR, rel)
-                                        if not os.path.exists(dest_path):
-                                            os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-                                            with zipf.open(entry) as src, open(dest_path, "wb") as dst:
-                                                dst.write(src.read())
+                                self._extract_directory_from_zip(
+                                    zipf, "audio-themes", THEMES_DIR, skip_existing=True)
                         # 4. Typing sounds
                         has_typing = any(n.startswith("typingSounds/") for n in files)
                         if has_typing:

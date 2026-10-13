@@ -191,13 +191,19 @@ class ThemesStoreDialog(wx.Dialog):
     def InstallFinished(self, tmp_path, pkg_type):
         try:
             if pkg_type == "typing_pack":
-                AudioThemesHandler.install_typing_soundPackage(tmp_path)
-                self.statusLabel.SetLabel(_("Typing pack installation successful!"))
-                wx.MessageBox(_("Typing sound pack successfully installed."), _("Success"), wx.ICON_INFORMATION)
+                if AudioThemesHandler.install_typing_soundPackage(tmp_path):
+                    self.statusLabel.SetLabel(_("Typing pack installation successful!"))
+                    wx.MessageBox(_("Typing sound pack successfully installed."), _("Success"), wx.ICON_INFORMATION)
+                else:
+                    self.statusLabel.SetLabel(_("Installation failed."))
+                    wx.MessageBox(_("The downloaded typing sound pack could not be installed.\nIt may be corrupted, unsafe, or not a valid typing pack."), _("Error"), wx.ICON_ERROR)
             else:
-                AudioThemesHandler.install_audio_themePackage(tmp_path)
-                self.statusLabel.SetLabel(_("Installation successful!"))
-                wx.MessageBox(_("Audio theme successfully installed. You can now select it from the themes menu."), _("Success"), wx.ICON_INFORMATION)
+                if AudioThemesHandler.install_audio_themePackage(tmp_path):
+                    self.statusLabel.SetLabel(_("Installation successful!"))
+                    wx.MessageBox(_("Audio theme successfully installed. You can now select it from the themes menu."), _("Success"), wx.ICON_INFORMATION)
+                else:
+                    self.statusLabel.SetLabel(_("Installation failed."))
+                    wx.MessageBox(_("The downloaded audio theme could not be installed.\nIt may be corrupted, unsafe, or not a valid theme package."), _("Error"), wx.ICON_ERROR)
         except Exception as e:
             self.statusLabel.SetLabel(_("Error during installation."))
         finally:
