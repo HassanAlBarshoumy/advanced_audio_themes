@@ -2,11 +2,17 @@
 #
 #   * every push to master and every pull request: consistency check,
 #     syntax check of every shipped Python source and a real package build;
-#   * the built advanced_audio_themes-<version>.nvda-addon is uploaded as a
-#     downloadable artifact (Actions -> the run -> Artifacts) together with its
-#     SHA-256 checksum, so a package can be produced without a local toolchain.
+#   * every push to master ALSO publishes the GitHub Release for the version in
+#     manifest.ini and attaches the built .nvda-addon plus its SHA-256: an
+#     existing release for that version is refreshed in place, so the Releases
+#     page always carries the newest master build;
+#   * the built package is uploaded as a downloadable artifact as well
+#     (Actions -> the run -> Artifacts), so a package can be produced without a
+#     local toolchain.
 #
-# Releases (tag, GitHub Release, attached asset) are handled by release.yml.
+# Releases with a NEW version number (bump, tag, optional notes) are handled by
+# release.yml. This workflow never changes the version; it only republishes the
+# build of whatever manifest.ini already says.
 name: Build add-on
 
 on:
@@ -27,6 +33,10 @@ jobs:
     name: Build .nvda-addon
     # Pinned: the ubuntu-latest label migrates to Ubuntu 26 after 2026-10-19.
     runs-on: ubuntu-24.04
+    # Needed to create the tag and refresh the release on master pushes; the
+    # release steps themselves are skipped for pull_request runs.
+    permissions:
+      contents: write
     steps:
       - name: Check out the repository
         uses: actions/checkout@v7
@@ -58,3 +68,31 @@ jobs:
             ${{ steps.build.outputs.filename }}.sha256
           if-no-files-found: error
           retention-days: 30
+
+      # Always publish a release for the version that was just built. Every push
+      # to master refreshes the same release, so the newest passing build is
+      # always on the Releases page - nobody needs to build locally.
+      - name: Publish the GitHub Release for this version
+        # Master only: never from a pull request. A manual run on master
+        # publishes too, so "build on GitHub" and "release on GitHub" always
+        # happen together.
+        if: github.ref == 'refs/heads/master' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.build.outputs.version }}
+          FILENAME: ${{ steps.build.outputs.filename }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          TAG="v$VERSION"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists: refreshing its assets from $COMMIT."
+            gh release upload "$TAG" "$FILENAME" "$FILENAME.sha256" --clobber
+          else
+            echo "Creating release $TAG from $COMMIT."
+            gh release create "$TAG" "$FILENAME" "$FILENAME.sha256" \
+              --target "$COMMIT" \
+              --title "$TAG" \
+              --notes "Built automatically from master (commit $COMMIT). This release is refreshed on every push to master."
+          fi
+          echo "Release $TAG now carries $FILENAME."
