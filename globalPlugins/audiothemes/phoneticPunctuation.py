@@ -231,7 +231,9 @@ class AudioRule:
     def getSpeechCommand(self):
         if self.ruleType in [audioRuleBuiltInWave, audioRuleWave]:
             if self.ruleType == audioRuleBuiltInWave:
-                wavFile = os.path.join(getSoundsPath(), self.builtInWavFile)
+                wavFile = resolveSoundsRelPath(self.builtInWavFile) or os.path.join(
+                    getSoundsPath(), self.builtInWavFile
+                )
             else:
                 wavFile = self.wavFile
             return PpWaveFileCommand(

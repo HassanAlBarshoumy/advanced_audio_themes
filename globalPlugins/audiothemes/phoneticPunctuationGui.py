@@ -692,23 +692,29 @@ class AudioRuleDialog(wx.Dialog):
         speech.cancelSpeech()
         speech.speak(utterance)
     def getBiwCategories(self):
-        soundsPath = getSoundsPath()
-        try:
-            return [o for o in os.listdir(soundsPath)
-                if os.path.isdir(os.path.join(soundsPath,o))
-            ]
-        except OSError:
-            return []
+        # Wave packs shared with the browser navigation engine are stored only
+        # once (under sounds\browsernav), so both places are listed here.
+        categories = set()
+        for basePath in (getSoundsPath(), getBrowsernavSoundsPath()):
+            try:
+                for entry in os.listdir(basePath):
+                    if os.path.isdir(os.path.join(basePath, entry)):
+                        categories.add(entry)
+            except OSError:
+                continue
+        return sorted(categories)
 
     def getBuiltInWaveFilesInCategory(self):
-        soundsPath = getSoundsPath()
         category = self.getBiwCategory()
         if not category:
             return []
+        categoryPath = resolveSoundsCategoryPath(category)
+        if not categoryPath:
+            return []
         ext = ".wav"
         try:
-            return [o for o in os.listdir(os.path.join(soundsPath, category))
-                if not os.path.isdir(os.path.join(soundsPath, category, o))
+            return [o for o in os.listdir(categoryPath)
+                if not os.path.isdir(os.path.join(categoryPath, o))
                     and o.lower().endswith(ext)
             ]
         except OSError:
@@ -754,9 +760,10 @@ class AudioRuleDialog(wx.Dialog):
 
 
     def onBiw(self, evt):
-        soundsPath = getSoundsPath()
         biw = self.getBiw()
-        fullPath = os.path.join(soundsPath, biw)
+        if not biw:
+            return
+        fullPath = resolveSoundsRelPath(biw) or os.path.join(getSoundsPath(), biw)
         nvwave.playWaveFile(fullPath)
 
     def getBiwCategory(self):

@@ -35,6 +35,13 @@ EXCLUDE_FILES = {
 }
 EXCLUDE_SUFFIXES = (".nvda-addon", ".sha256", ".pyc", ".pyo", ".py~", ".log")
 
+# Tracked paths that must never be packaged even when they exist on disk.
+# The x86 copies of the Steam Audio engine are dead weight: NVDA has shipped
+# 64-bit only since 2023.1, this add-on requires >= 2024.1, and the loader in
+# unspoken/steam_audio.py always resolves lib/x64 first. Keeping the guard here
+# means re-adding the binaries cannot silently put ~16 MB back into the package.
+EXCLUDE_PATHS = ("globalPlugins/audiothemes/unspoken/lib/x86",)
+
 REQUIRED_MANIFEST_KEYS = ("name", "summary", "version", "author")
 
 
@@ -74,7 +81,11 @@ def addon_name_and_version():
 
 def should_exclude(relative_path):
 	"""Tell whether a path inside the add-on directory must stay out of the package."""
-	parts = relative_path.replace("\\", "/").split("/")
+	normalised_path = relative_path.replace("\\", "/")
+	for excluded_path in EXCLUDE_PATHS:
+		if normalised_path == excluded_path or normalised_path.startswith(excluded_path + "/"):
+			return True
+	parts = normalised_path.split("/")
 	for part in parts:
 		if part in EXCLUDE_DIRS:
 			return True
@@ -101,7 +112,10 @@ def build():
 	output_path = os.path.join(ADDON_DIR, file_name)
 
 	entries = 0
-	with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as package:
+	# LZMA shrinks the package by roughly a quarter compared with deflate: the
+	# bulk of the add-on is WAV audio and the Steam Audio DLL, and NVDA installs
+	# add-ons with Python's zipfile module, which reads LZMA natively.
+	with zipfile.ZipFile(output_path, "w", zipfile.ZIP_LZMA) as package:
 		for folder, sub_folders, files in os.walk(ADDON_DIR):
 			# Prune instead of filtering afterwards: ".git" can hold thousands
 			# of files and we must never even walk into it.

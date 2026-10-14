@@ -265,13 +265,15 @@ class Worker(Thread):
 
 class ThreadPool:
     """
-    Pool of threads consuming tasks from an unbounded queue.
+    Pool of threads consuming tasks from a bounded queue.
 
     Key fixes vs. the original:
-    * Queue is now **unbounded** — a bounded Queue with capacity == num_threads
-      would block the NVDA main thread whenever all workers were busy, causing
-      the watchdog freezes observed in the log.
-    * add_task() is non-blocking by design (no timeout on put).
+    * Queue is **bounded** (maxsize=30) and add_task() drops the task when the
+      queue is full -- a bounded queue with capacity == num_threads would block
+      the NVDA main thread whenever all workers were busy, causing the watchdog
+      freezes observed in the log.
+    * add_task() is non-blocking by design (no timeout on put) and returns a
+      bool: False means the task was refused because the queue was full.
     * shutdown() sends a stop sentinel to every worker so they exit cleanly
       when the add-on is unloaded.
     """
@@ -425,6 +427,60 @@ _sounds_path_cache = os.path.join(
 
 def getSoundsPath():
     return _sounds_path_cache
+
+# The browser navigation sounds live in a sub folder of the built-in sounds.
+# Several wave packs (3d, chimes, classic, pan-chimes, punctuation) are shared
+# between the browser navigation engine and the earcon rules, and are stored
+# ONLY once, under "sounds\\browsernav". The helpers below resolve a stored
+# relative path (for example "classic\\news.wav") against both locations so old
+# saved rules keep working and nothing is duplicated inside the package.
+_browsernav_sounds_path_cache = os.path.join(_sounds_path_cache, "browsernav")
+
+def getBrowsernavSoundsPath():
+    return _browsernav_sounds_path_cache
+
+def _soundsSearchPaths():
+    return (_sounds_path_cache, _browsernav_sounds_path_cache)
+
+def resolveSoundsCategoryPath(category):
+    """Return the folder that holds the wave files of a built-in sound category.
+
+    The main sounds folder wins; the browser navigation sounds folder is used as
+    a fall back, so removing the duplicated packs never hides a category.
+    """
+    if not category:
+        return None
+    fallbackPath = None
+    for basePath in _soundsSearchPaths():
+        candidatePath = os.path.join(basePath, category)
+        if not os.path.isdir(candidatePath):
+            continue
+        if fallbackPath is None:
+            fallbackPath = candidatePath
+        try:
+            entries = os.listdir(candidatePath)
+        except OSError:
+            continue
+        for entry in entries:
+            if not entry.lower().endswith(".wav"):
+                continue
+            if os.path.isfile(os.path.join(candidatePath, entry)):
+                return candidatePath
+    return fallbackPath
+
+def resolveSoundsRelPath(relPath):
+    """Return the full path of a stored built-in wave file, or None if missing."""
+    if not relPath:
+        return None
+    try:
+        cleanRelPath = str(relPath).replace("/", os.sep)
+    except Exception:
+        return None
+    for basePath in _soundsSearchPaths():
+        candidatePath = os.path.join(basePath, cleanRelPath)
+        if os.path.isfile(candidatePath):
+            return candidatePath
+    return None
 
 _cached_blacklist_string = None
 _cached_blacklist_set = set()
