@@ -22,6 +22,7 @@ from functools import lru_cache, wraps
 import ctypes
 import _ctypes
 import time
+import threading
 import tones
 import wx
 import config
@@ -362,6 +363,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self._pending_dispatch_timer = None
         self._audio_beacon_location = None
         self._audio_beacon_desktop = None
+        self._sonar_sweep_active = False
         self._last_focus_is_editable = False
         # Defer menu item creation — the main window may not be ready yet
         wx.CallAfter(self._add_tray_menu_items)
@@ -754,6 +756,12 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 self._mouse_hover_timer = None
             self._mouse_hover_obj = None
         with suppress(Exception):
+            if self._pending_dispatch_timer is not None:
+                self._pending_dispatch_timer.Stop()
+                self._pending_dispatch_timer = None
+            self._pending_dispatch_obj = None
+            self._pending_dispatch_app = None
+        with suppress(Exception):
             self.quicknav_interceptor.terminate()
         try:
             self.handler.close()
@@ -815,7 +823,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self._pending_dispatch_app = None
             obj_info = self._snapshot_obj(obj, foreground_app=app)
             utils.threadPool.add_task(self.playObject, obj_info)
-            utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
+            # Only queue the beacon when one is actually placed: this avoids
+            # spending a slot on the single shared audio worker for nothing.
+            if self._audio_beacon_location:
+                utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
             log.warning(f"deferred focus dispatch (theme sound dropped): {e}")
 
@@ -908,7 +919,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self._last_play_time = now
             obj_info = self._snapshot_obj(landed_obj)
             utils.threadPool.add_task(self.playObject, obj_info)
-            utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
+            # Only queue the beacon when one is actually placed: this avoids
+            # spending a slot on the single shared audio worker for nothing.
+            if self._audio_beacon_location:
+                utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
             log.debug(f"AudioThemes swallowed Exception in _dispatch_browse_nav: {e}", exc_info=True)
 
@@ -1171,7 +1185,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             if self._is_same_object_duplicate(obj):
                 return
             utils.threadPool.add_task(self.playObject, obj_info)
-            utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
+            # Only queue the beacon when one is actually placed: this avoids
+            # spending a slot on the single shared audio worker for nothing.
+            if self._audio_beacon_location:
+                utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
             log.warning(f"event_gainFocus snapshot/dispatch (theme sound dropped): {e}")
 
@@ -1313,7 +1330,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             obj_info = self._snapshot_obj(obj, foreground_app=self.handler._current_app_name)
             self._pending_dispatch_obj = None
             utils.threadPool.add_task(self.playObject, obj_info)
-            utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
+            # Only queue the beacon when one is actually placed: this avoids
+            # spending a slot on the single shared audio worker for nothing.
+            if self._audio_beacon_location:
+                utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
         except Exception as e:
             log.warning(f"event_becomeNavigatorObject snapshot/dispatch (theme sound dropped): {e}")
 
@@ -2048,6 +2068,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
     @script(description=_("Audio Sonar: Sweeps the active window to create an audio map of its elements."), gestures=['kb:NVDA+Alt+r'])
     def script_audioSonar(self, gesture):
+        # A sweep is already running: ignore the repeat press instead of
+        # interrupting it (and skip the COM collection work entirely).
+        if self._sonar_sweep_active:
+            return
         obj = api.getForegroundObject()
         if not obj:
             return
@@ -2085,14 +2109,30 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 snapshots.append(obj_info)
             except Exception as e:
                 log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+        # Claim the sweep slot now that we are about to dispatch the sounds
+        # (guarded above, so a rapid double press can never start two sweeps).
+        self._sonar_sweep_active = True
+
         def sweep():
-            for obj_info in snapshots:
-                try:
-                    self.playObject(obj_info)
-                    time.sleep(0.04)
-                except Exception as e:
-                    log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-        utils.threadPool.add_task(sweep)
+            try:
+                for obj_info in snapshots:
+                    try:
+                        self.playObject(obj_info)
+                        time.sleep(0.04)
+                    except Exception as e:
+                        log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
+            finally:
+                self._sonar_sweep_active = False
+        # Run on a short-lived daemon thread instead of the shared audio worker:
+        # the 40ms-per-element pacing would otherwise block every theme sound
+        # for up to N*40ms (e.g. ~1.2s for a 30-element window).
+        try:
+            threading.Thread(target=sweep, daemon=True, name="AudioThemesSonar").start()
+        except Exception:
+            # If the pool also refuses the task the sweep never runs, so release
+            # the guard instead of leaving sonar permanently disabled.
+            if not utils.threadPool.add_task(sweep):
+                self._sonar_sweep_active = False
 
     @script(description=_("Toggles audio ducking on and off."))
     def script_toggleAudioDucking(self, gesture):
