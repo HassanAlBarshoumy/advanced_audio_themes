@@ -4,3 +4,5 @@
 __pycache__/
 AGENTS.md
 globalPlugins/shutdown_crash.log
+*.sha256
+dist/

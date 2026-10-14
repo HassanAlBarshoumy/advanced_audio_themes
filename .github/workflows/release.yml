@@ -1,0 +1,214 @@
+# Cut an add-on release: bump the version, tag it, build the package and
+# publish a GitHub Release with the .nvda-addon attached.
+#
+# Two ways in:
+#   1. "Run workflow" (Actions -> Release add-on) and give the new version.
+#      The version is written to manifest.ini and buildVars.py, committed to
+#      master, tagged and released.
+#   2. Push a v<x.y> tag yourself; it is built and released as it is.
+#
+# Constraints coming from the add-on's own update checker
+# (globalPlugins/audiothemes/update_checker.py):
+#   * the tag must look like v9.44 - it is compared numerically with the
+#     installed version, so a tag such as v9.44-beta is silently ignored;
+#   * the release must carry an asset whose name ends with ".nvda-addon";
+#     the checksum file (*.nvda-addon.sha256) is deliberately not "*.nvda-addon"
+#     so it can never be mistaken for the package;
+#   * a release marked as pre-release is only seen by users who enabled the
+#     pre-release update channel.
+#
+# Why building and publishing live in this same workflow: the tag is pushed
+# with the automatic GITHUB_TOKEN, and GitHub does not start other workflows in
+# response to such a push, so a separate tag-triggered workflow would stay idle.
+name: Release add-on
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "New version, for example 9.44 (written to manifest.ini and buildVars.py)"
+        required: true
+        type: string
+      last_tested_nvda:
+        description: "Optional: also set lastTestedNVDAVersion, for example 2026.3"
+        required: false
+        type: string
+      notes:
+        description: "Optional release notes; leave empty to let GitHub generate them"
+        required: false
+        type: string
+      prerelease:
+        description: "Mark the release as a pre-release (only visible to the pre-release update channel)"
+        required: false
+        type: boolean
+        default: false
+      keep_tag:
+        description: "The tag already exists (a previous run failed): do not recreate it, just rebuild and refresh the release"
+        required: false
+        type: boolean
+        default: false
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    name: Bump version and tag
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out master
+        uses: actions/checkout@v7
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Set up Python 3.13 (the interpreter NVDA 2026.x ships)
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Write the new version
+        env:
+          NEW_VERSION: ${{ inputs.version }}
+          LAST_TESTED: ${{ inputs.last_tested_nvda }}
+        run: |
+          python scripts/addon_version.py set "$NEW_VERSION"
+          if [ -n "$LAST_TESTED" ]; then
+            python scripts/addon_version.py set-last-tested "$LAST_TESTED"
+          fi
+          python scripts/addon_version.py check
+
+      - name: Commit and tag
+        env:
+          NEW_VERSION: ${{ inputs.version }}
+          KEEP_TAG: ${{ inputs.keep_tag }}
+        run: |
+          set -euo pipefail
+          TAG="v$NEW_VERSION"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.ini buildVars.py
+          if git diff --cached --quiet; then
+            echo "Nothing to commit: the version is already $NEW_VERSION."
+          else
+            git commit -m "chore(release): bump version to $NEW_VERSION"
+            git push origin master
+          fi
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            if [ "$KEEP_TAG" = "true" ]; then
+              echo "::warning::tag $TAG already exists and is kept; the release is rebuilt from master."
+            else
+              echo "::error::tag $TAG already exists. Choose another version, or re-run this workflow with 'keep_tag' enabled to rebuild that release."
+              exit 1
+            fi
+          else
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi
+
+  build:
+    name: Build .nvda-addon
+    needs: bump
+    if: always() && (needs.bump.result == 'success' || needs.bump.result == 'skipped')
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+      version: ${{ steps.build.outputs.version }}
+    steps:
+      - name: Check out the released revision
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'push' && github.ref || 'master' }}
+          fetch-depth: 0
+
+      - name: Set up Python 3.13 (the interpreter NVDA 2026.x ships)
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Verify that manifest.ini and buildVars.py agree
+        run: python scripts/addon_version.py check
+
+      - name: Syntax-check every Python source
+        run: python -m compileall -q installTasks.py build_addon.py scripts globalPlugins
+
+      - name: Build the package
+        id: build
+        run: python build_addon.py
+
+      - name: Work out the release tag
+        id: tag
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          VERSION: ${{ steps.build.outputs.version }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "push" ]; then
+            TAG="$REF_NAME"
+          else
+            TAG="v$VERSION"
+          fi
+          if [ "$TAG" != "v$VERSION" ]; then
+            echo "::error::tag $TAG does not match the built version $VERSION"
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Write the SHA-256 checksum
+        run: sha256sum "${{ steps.build.outputs.filename }}" > "${{ steps.build.outputs.filename }}.sha256"
+
+      - name: Upload the package
+        uses: actions/upload-artifact@v7
+        with:
+          name: nvda-addon
+          path: |
+            *.nvda-addon
+            *.nvda-addon.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish the GitHub Release
+    needs: [bump, build]
+    if: always() && needs.build.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the built package
+        uses: actions/download-artifact@v8
+        with:
+          name: nvda-addon
+          path: dist
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.build.outputs.tag }}
+          NOTES: ${{ inputs.notes }}
+          PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          set -euo pipefail
+          ls -l dist
+          CREATE_ARGS=(--title "$TAG")
+          if [ -n "$NOTES" ]; then
+            CREATE_ARGS+=(--notes "$NOTES")
+          else
+            CREATE_ARGS+=(--generate-notes)
+          fi
+          if [ "$PRERELEASE" = "true" ]; then
+            CREATE_ARGS+=(--prerelease)
+          fi
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; refreshing its assets."
+            gh release upload "$TAG" dist/* --clobber
+          else
+            gh release create "$TAG" dist/* "${CREATE_ARGS[@]}"
+          fi

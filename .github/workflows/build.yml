@@ -1,0 +1,59 @@
+# Continuous integration for the add-on.
+#
+#   * every push to master and every pull request: consistency check,
+#     syntax check of every shipped Python source and a real package build;
+#   * the built advanced_audio_themes-<version>.nvda-addon is uploaded as a
+#     downloadable artifact (Actions -> the run -> Artifacts) together with its
+#     SHA-256 checksum, so a package can be produced without a local toolchain.
+#
+# Releases (tag, GitHub Release, attached asset) are handled by release.yml.
+name: Build add-on
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build .nvda-addon
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python 3.13 (the interpreter NVDA 2026.x ships)
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Verify that manifest.ini and buildVars.py agree
+        run: python scripts/addon_version.py check
+
+      - name: Syntax-check every Python source
+        run: python -m compileall -q installTasks.py build_addon.py scripts globalPlugins
+
+      - name: Build the package
+        id: build
+        run: python build_addon.py
+
+      - name: Write the SHA-256 checksum
+        run: sha256sum "${{ steps.build.outputs.filename }}" > "${{ steps.build.outputs.filename }}.sha256"
+
+      - name: Upload the package
+        uses: actions/upload-artifact@v7
+        with:
+          name: advanced_audio_themes-${{ steps.build.outputs.version }}
+          path: |
+            ${{ steps.build.outputs.filename }}
+            ${{ steps.build.outputs.filename }}.sha256
+          if-no-files-found: error
+          retention-days: 30
