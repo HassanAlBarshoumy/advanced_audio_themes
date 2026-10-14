@@ -61,7 +61,8 @@ jobs:
   bump:
     name: Bump version and tag
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    # Pinned: the ubuntu-latest label migrates to Ubuntu 26 after 2026-10-19.
+    runs-on: ubuntu-24.04
     steps:
       - name: Check out master
         uses: actions/checkout@v7
@@ -117,7 +118,7 @@ jobs:
     name: Build .nvda-addon
     needs: bump
     if: always() && (needs.bump.result == 'success' || needs.bump.result == 'skipped')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
       version: ${{ steps.build.outputs.version }}
@@ -179,7 +180,7 @@ jobs:
     name: Publish the GitHub Release
     needs: [bump, build]
     if: always() && needs.build.result == 'success'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Download the built package
         uses: actions/download-artifact@v8
