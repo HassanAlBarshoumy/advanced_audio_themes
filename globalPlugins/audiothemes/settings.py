@@ -389,6 +389,13 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.stateSoundsSuppressCheckbox = wx.CheckBox(themePanel, -1, _("State sounds suppress the role sound"))
         themeSizer.Add(self.stateSoundsSuppressCheckbox, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
 
+        # Speak states toggle (borrowed from NavigationSounds' "say states").
+        # Translators: label for a checkbox to toggle the speaking of object states
+        self.speakStatesCheckbox = wx.CheckBox(
+            themePanel, -1, _("Speak states such as checked, expanded, selected etc.")
+        )
+        themeSizer.Add(self.speakStatesCheckbox, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10)
+
         # Mouse hover + arrow navigation switches (borrowed from NavigationSounds)
         # Translators: checkbox to toggle playing theme sounds when hovering with the mouse
         self.mouseSoundsCheckbox = wx.CheckBox(themePanel, -1, _("Play theme sounds when hovering with the mouse"))
@@ -2257,6 +2264,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         # State sounds toggle
         self.stateSoundsSuppressCheckbox.SetValue(conf.get("state_sounds_suppress_role", False))
+        self.speakStatesCheckbox.SetValue(_b(conf.get("speak_states", True)))
 
         # Mouse hover + arrow navigation switches
         self.mouseSoundsCheckbox.SetValue(_b(conf.get("mouse_sounds_enabled", True)))
@@ -2897,6 +2905,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         # State sounds toggle
         conf["state_sounds_suppress_role"] = self.stateSoundsSuppressCheckbox.GetValue()
+        conf["speak_states"] = self.speakStatesCheckbox.GetValue()
 
         # Mouse hover + arrow navigation switches
         conf["mouse_sounds_enabled"] = self.mouseSoundsCheckbox.GetValue()

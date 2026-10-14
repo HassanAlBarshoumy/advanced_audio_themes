@@ -137,6 +137,9 @@ audiothemes_config_defaults = {
     "audio3d": "boolean(default=False)",
     "use_in_say_all": "boolean(default=True)",
     "speak_roles": "boolean(default=True)",
+    # Borrowed from NavigationSounds ("sayStates"): when off, a control state
+    # that already has a theme sound is no longer announced in speech.
+    "speak_states": "boolean(default=True)",
     "use_synth_volume": "boolean(default=False)",
     "volume": "integer(default=20)",
     "migrated_to_named_files": "boolean(default=False)",
@@ -485,6 +488,12 @@ else:
         if name.startswith("STATE_"):
             state_int_to_name[value] = name.replace("STATE_", "").lower()
 state_name_to_int = {v: k for k, v in state_int_to_name.items()}
+
+# Theme-sound keys that represent control states (STATE_OFFSET + state value).
+# Used by the "speak states" option, borrowed from NavigationSounds' "sayStates":
+# a state that already has a theme sound must not also be announced.  Derived
+# from state_int_to_name so it stays exact regardless of the State value range.
+_STATE_SOUND_KEYS = frozenset(v + STATE_OFFSET for v in state_int_to_name)
 
 # Deterministic state-sound ordering (borrowed from NavigationSounds).
 # When several states of an element have matching sounds, pick the most
@@ -1170,6 +1179,9 @@ class AudioThemesHandler:
         self._cached_config = {}  # populated by configure()
         self._theme_cache = {}  # populated by configure()
         self._app_profiles_cache = {}  # populated by configure()
+        # Memoised {theme.sounds identity -> frozenset of state sound keys} for
+        # the "speak states" option; AudioTheme.load() replaces .sounds wholesale.
+        self._state_sound_cache = {"sounds": None, "keys": frozenset()}
         self._frenzy_mod = None  # populated by configure()
         self._utils_mod_cache = None  # populated by configure()
         self._system_monitor = None
@@ -1217,6 +1229,25 @@ class AudioThemesHandler:
             except Exception:
                 log.debug("AudioThemes: swallowed Exception in handler.__init__")
 
+    def _state_sound_keys(self, theme):
+        """Frozenset of the theme's sound keys that represent control states.
+
+        Memoised by ``theme.sounds`` identity: ``AudioTheme.load()`` replaces
+        the dict wholesale on every reload, so the identity check is exact and
+        costs one comparison on the speech hot path.  Borrowed from
+        NavigationSounds' "sayStates" (state speech suppression).
+        """
+        sounds = getattr(theme, "sounds", None)
+        if not sounds:
+            return frozenset()
+        cache = self._state_sound_cache
+        if cache.get("sounds") is sounds:
+            return cache["keys"]
+        keys = frozenset(k for k in sounds if k in _STATE_SOUND_KEYS)
+        cache["sounds"] = sounds
+        cache["keys"] = keys
+        return keys
+
     def _hook_getSpeechTextForProperties(
         self, reason=NVDAObjects.controlTypes.OutputReason.QUERY, *args, **kwargs
     ):
@@ -1224,6 +1255,38 @@ class AudioThemesHandler:
             # Remember Say All driven speech; the theme-sound muting gate uses
             # it to expire instead of staying closed forever after a crash.
             _note_say_all_speech(reason)
+
+            # Borrowed from NavigationSounds ("sayStates"): when the user turns
+            # "speak states" off, a control state that already has a theme sound
+            # is not also announced - the sound alone carries the information.
+            # The default (True) leaves NVDA's speech untouched.  During Say All
+            # the use_in_say_all option decides, exactly like role suppression
+            # below.
+            if not self._cached_config.get("speak_states", True):
+                states = kwargs.get("states", None)
+                if states:
+                    player = self.player
+                    if not (player is not None and player.use_in_say_all and _say_all_running()):
+                        try:
+                            theme = self.get_theme_for_app(getattr(self, "_current_app_name", None))
+                            if theme is not None:
+                                state_keys = self._state_sound_keys(theme)
+                                if state_keys:
+                                    to_remove = set()
+                                    for state in states:
+                                        try:
+                                            if (int(state) + STATE_OFFSET) in state_keys:
+                                                to_remove.add(state)
+                                        except (TypeError, ValueError):
+                                            continue
+                                    if to_remove:
+                                        if isinstance(states, (set, frozenset)):
+                                            kwargs["states"] = states - to_remove
+                                        elif isinstance(states, list):
+                                            kwargs["states"] = [s for s in states if s not in to_remove]
+                        except Exception as e:
+                            log.debug(f"AudioThemes: state speech suppression skipped: {e}")
+
             role = kwargs.get("role", None)
             if role is not None:
                 player = self.player
@@ -1703,6 +1766,7 @@ class AudioThemesHandler:
             "fl_detection_mode": user_config.get("fl_detection_mode", "smart"),
             "fl_solo_behavior": user_config.get("fl_solo_behavior", "first"),
             "state_sounds_suppress_role": user_config.get("state_sounds_suppress_role", False),
+            "speak_states": user_config.get("speak_states", True),
             "mouse_sounds_enabled": user_config.get("mouse_sounds_enabled", True),
             "mouse_hover_delay": user_config.get("mouse_hover_delay", 0),
             "arrow_nav_sounds": user_config.get("arrow_nav_sounds", True),
