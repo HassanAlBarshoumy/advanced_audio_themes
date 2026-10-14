@@ -400,6 +400,30 @@ class AudioThemesSettingsPanel(SettingsPanel):
         mouseDelaySizer.Add(self.mouseHoverDelaySpin, 0, wx.LEFT, 10)
         # Translators: checkbox to toggle playing theme sounds while navigating with the arrow keys
         self.arrowNavSoundsCheckbox = wx.CheckBox(themePanel, -1, _("Play theme sounds during arrow navigation"))
+        # Event-driven navigation engine (browse mode) + optional physical-caret
+        # sounds inside text fields.
+        browseEngineSizer = wx.BoxSizer(wx.HORIZONTAL)
+        # Translators: label for the browser navigation engine choice
+        browseEngineLabel = wx.StaticText(themePanel, -1, _("Browser navigation engine:"))
+        # Translators: choices for the browser navigation engine
+        self.browseNavEngineChoice = wx.Choice(
+            themePanel, -1,
+            choices=[_("Event-driven (recommended)"), _("Polling timer (legacy)")],
+            name=_("Browser navigation engine"),
+        )
+        browseEngineSizer.Add(browseEngineLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+        browseEngineSizer.Add(self.browseNavEngineChoice, 0, wx.LEFT, 10)
+        # Translators: label for the text-field caret sound choice
+        caretSizer = wx.BoxSizer(wx.HORIZONTAL)
+        caretLabel = wx.StaticText(themePanel, -1, _("Sounds when the caret moves in text fields:"))
+        # Translators: choices for the text-field caret sounds
+        self.caretNavSoundsChoice = wx.Choice(
+            themePanel, -1,
+            choices=[_("Off"), _("Per field"), _("Per field and line")],
+            name=_("Caret move sounds"),
+        )
+        caretSizer.Add(caretLabel, 0, wx.ALIGN_CENTER_VERTICAL)
+        caretSizer.Add(self.caretNavSoundsChoice, 0, wx.LEFT, 10)
         # Same-object dedup + navigation-noise filters (borrowed from NavigationSounds)
         # Translators: label for the duplicate-event suppression spinner
         dedupSizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -415,6 +439,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
             (self.mouseSoundsCheckbox, 0, wx.TOP | wx.LEFT | wx.RIGHT, 10),
             (mouseDelaySizer, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10),
             (self.arrowNavSoundsCheckbox, 0, wx.ALL, 10),
+            (browseEngineSizer, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10),
+            (caretSizer, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10),
             (dedupSizer, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10),
             (self.suppressSelectingCheckbox, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10),
             (self.suppressContainerCheckbox, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 10),
@@ -2236,6 +2262,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.mouseSoundsCheckbox.SetValue(_b(conf.get("mouse_sounds_enabled", True)))
         self.mouseHoverDelaySpin.SetValue(_i(conf.get("mouse_hover_delay", 0), 0))
         self.arrowNavSoundsCheckbox.SetValue(_b(conf.get("arrow_nav_sounds", True)))
+        _engine_map = {"auto": 0, "timer": 1}
+        self.browseNavEngineChoice.SetSelection(_engine_map.get(conf.get("browse_nav_engine", "auto"), 0))
+        _caret_map = {"off": 0, "field": 1, "field_line": 2}
+        self.caretNavSoundsChoice.SetSelection(_caret_map.get(conf.get("caret_nav_sounds", "off"), 0))
         dedup_ms = _i(conf.get("dedupe_same_object_ms", 250), 250)
         dedup_ms = max(0, min(2000, dedup_ms))
         self.sameObjectDedupSpin.SetValue(dedup_ms)
@@ -2872,6 +2902,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
         conf["mouse_sounds_enabled"] = self.mouseSoundsCheckbox.GetValue()
         conf["mouse_hover_delay"] = self.mouseHoverDelaySpin.GetValue()
         conf["arrow_nav_sounds"] = self.arrowNavSoundsCheckbox.GetValue()
+        conf["browse_nav_engine"] = ("auto", "timer")[max(0, min(1, self.browseNavEngineChoice.GetSelection()))]
+        conf["caret_nav_sounds"] = ("off", "field", "field_line")[max(0, min(2, self.caretNavSoundsChoice.GetSelection()))]
         conf["dedupe_same_object_ms"] = self.sameObjectDedupSpin.GetValue()
         conf["suppress_sounds_while_selecting"] = self.suppressSelectingCheckbox.GetValue()
         conf["suppress_container_role_sounds"] = self.suppressContainerCheckbox.GetValue()

@@ -134,9 +134,18 @@ class BrowseModeQuickNavInterceptor:
                     logging.getLogger("audiothemes").error(f"AudioThemes Error: {e}", exc_info=True)
             old_info = selection.copy() if selection else None
 
-            self.orig_quick_nav_script(
-                instance, gesture, *args, **kwargs
-            )
+            # The original quick-nav script moves the caret via
+            # document._set_selection, which fires post_browseModeMove *during*
+            # this call (before last_quicknav_time is set below). Suppress the
+            # browse-mode event for the duration so the quick-nav sound is not
+            # played twice.
+            try:
+                self.handler._suppress_nav_event = True
+                self.orig_quick_nav_script(
+                    instance, gesture, *args, **kwargs
+                )
+            finally:
+                self.handler._suppress_nav_event = False
 
             try:
                 new_selection = instance.selection

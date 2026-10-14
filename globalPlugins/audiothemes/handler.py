@@ -180,6 +180,13 @@ audiothemes_config_defaults = {
     "mouse_sounds_enabled": "boolean(default=True)",
     "mouse_hover_delay": "integer(default=0, min=0, max=2000)",
     "arrow_nav_sounds": "boolean(default=True)",
+    # Event-driven browse-mode navigation: "auto" uses the NVDA
+    # post_browseModeMove vision extension point (with the timer as a safety
+    # net); "timer" forces the legacy polling behaviour.
+    "browse_nav_engine": "string(default='auto')",
+    # Optional physical-caret sounds inside editable text: "off" (default),
+    # "field" (sound per caret context), "field_line" (also a cue per line).
+    "caret_nav_sounds": "string(default='off')",
     # Same-object dedup + navigation-noise filters (borrowed from NavigationSounds).
     "dedupe_same_object_ms": "integer(default=250, min=0, max=2000)",
     "suppress_sounds_while_selecting": "boolean(default=True)",
@@ -1157,6 +1164,9 @@ class AudioThemesHandler:
         # Initialize debounce state to avoid hasattr in hot paths
         self._last_typing_time = 0.0
         self._last_typing_vk = 0
+        # Set while the quick-nav script runs, so the browse-mode event it
+        # triggers does not double-play the quick-nav sound.
+        self._suppress_nav_event = False
         self._cached_config = {}  # populated by configure()
         self._theme_cache = {}  # populated by configure()
         self._app_profiles_cache = {}  # populated by configure()
@@ -1696,6 +1706,8 @@ class AudioThemesHandler:
             "mouse_sounds_enabled": user_config.get("mouse_sounds_enabled", True),
             "mouse_hover_delay": user_config.get("mouse_hover_delay", 0),
             "arrow_nav_sounds": user_config.get("arrow_nav_sounds", True),
+            "browse_nav_engine": user_config.get("browse_nav_engine", "auto"),
+            "caret_nav_sounds": user_config.get("caret_nav_sounds", "off"),
             "dedupe_same_object_ms": user_config.get("dedupe_same_object_ms", 250),
             "suppress_sounds_while_selecting": user_config.get("suppress_sounds_while_selecting", True),
             "suppress_container_role_sounds": user_config.get("suppress_container_role_sounds", True),

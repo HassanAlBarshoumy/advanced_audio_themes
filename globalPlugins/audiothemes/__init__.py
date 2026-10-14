@@ -35,6 +35,7 @@ from scriptHandler import script
 import NVDAObjects
 import gui
 import speech
+import eventHandler
 import controlTypes
 import globalCommands
 import ui
@@ -369,13 +370,37 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # Delayed 15 seconds to let the add-on fully initialize first
         wx.CallLater(15000, check_for_updates_auto)
 
-        # Browse-mode navigation timer: polls the navigator object every 180ms.
-        # This is the ONLY way to detect arrow-key movement inside a virtual
-        # buffer (browse mode), because NVDA does not fire event_gainFocus or
-        # event_becomeNavigatorObject during virtual-buffer caret moves.
+        # Browse-mode navigation: the primary source is now the vision
+        # extension point `post_browseModeMove`, which NVDA fires on every
+        # virtual-caret move (browseMode -> CursorManager._set_selection ->
+        # vision.handler.handleCaretMove). The 250ms timer is kept as a
+        # playback health check and as a safety net for apps whose browse mode
+        # does not go through CursorManager.
         self._navigation_timer = wx.Timer()
         self._navigation_timer.Bind(wx.EVT_TIMER, self._onNavigationTimer)
         self._navigation_timer.Start(250)
+
+        # Event-driven navigation state (vision extension points).
+        # NOTE: the extension points are attributes of the single
+        # vision.handler instance (vision.visionHandlerExtensionPoints.
+        # EventExtensionPoints), NOT module-level names.
+        self._browse_move_ep = None
+        self._browse_move_handler = self._on_post_browseModeMove
+        self._has_browse_move_ep = False
+        self._last_browse_move_event = 0.0
+        self._caret_move_ep = None
+        self._caret_move_handler = self._on_post_caretMove
+        self._has_caret_move_ep = False
+        self._registered_ep = None
+        self._last_caret_obj = None
+        self._last_caret_line = None
+        self._last_caret_cue_time = 0.0
+        # Register both extension points; each handler gates itself on the
+        # live config, so changing a setting takes effect at once without
+        # re-registration. The vision handler rebuilds its extension-points
+        # object whenever a vision provider is terminated, so the timer
+        # re-checks (cheap identity test) and re-registers when that happens.
+        self._ensure_nav_event_registration()
 
         # Phonetic Punctuation Initialization
         try:
@@ -389,15 +414,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception:
             log.error("AudioThemes: Failed to hook keyboard", exc_info=True)
         
-        # Restore caretMovementScriptHelper hook for arrow keys
-        self.orig_caretMovementScriptHelper = None
-        try:
-            import speech
-            if hasattr(speech, "_caretMovementScriptHelper"):
-                self.orig_caretMovementScriptHelper = speech._caretMovementScriptHelper
-                speech._caretMovementScriptHelper = self._hook_caretMovementScriptHelper
-        except Exception as e:
-            log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
         # ── BrowserNav initialization ──
         # Wire up all BrowserNav monkey patches, browse-mode keystrokes,
         # QuickJump system, and URL tracking.
@@ -500,44 +516,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception:
             log.debug("AudioThemes: swallowed Exception in __init__._remove_tray_menu_items")
 
-    def _hook_caretMovementScriptHelper(self, extraDetail, unit, direction, posConstant=textInfos.POSITION_CARET, *args, **kwargs):
-        _orig_exc = None
-        if self.orig_caretMovementScriptHelper:
-            try:
-                self.orig_caretMovementScriptHelper(extraDetail, unit, direction, posConstant, *args, **kwargs)
-            except Exception as e:
-                _orig_exc = e
-        try:
-            if not self.handler._cached_config.get("enable_audio_themes", True) or not self.handler.active_theme:
-                if _orig_exc is not None:
-                    raise _orig_exc
-                return
-            if not self.handler._cached_config.get("arrow_nav_sounds", True):
-                if _orig_exc is not None:
-                    raise _orig_exc
-                return
-            if self._is_freeze_suppressed():
-                if _orig_exc is not None:
-                    raise _orig_exc
-                try:
-                    self._schedule_pending_dispatch(api.getNavigatorObject(), self.handler._current_app_name)
-                except Exception:
-                    log.debug("AudioThemes: swallowed Exception in __init__._hook_caretMovementScriptHelper")
-                return
-            current_nav = api.getNavigatorObject()
-            ti = getattr(current_nav, 'treeInterceptor', None) if current_nav else None
-            if ti and not ti.passThrough:
-                if current_nav != getattr(self, "_last_navigator_object", None):
-                    self._last_navigator_object = current_nav
-                    self._last_play_time = time.monotonic()
-                    obj_info = self._snapshot_obj(current_nav)
-                    self._pending_dispatch_obj = None
-                    utils.threadPool.add_task(self.playObject, obj_info)
-                    utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
-        except Exception as e:
-            log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
-        if _orig_exc is not None:
-            raise _orig_exc
     def _rebindInstanceGestures(self):
         # ── SentenceNav & TextNav Initialization ──
         # Bind gestures explicitly to ensure NVDA's ScriptableObject metaclass 
@@ -763,10 +741,11 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception as e:
             _crash_log_exc("_unhook_keyboard", e)
         with suppress(Exception):
-            if self.orig_caretMovementScriptHelper:
-                import speech
-                if hasattr(speech, "_caretMovementScriptHelper"):
-                    speech._caretMovementScriptHelper = self.orig_caretMovementScriptHelper
+            if getattr(self, "_browse_move_ep", None) is not None and getattr(self, "_browse_move_handler", None) is not None:
+                self._browse_move_ep.unregister(self._browse_move_handler)
+        with suppress(Exception):
+            if getattr(self, "_caret_move_ep", None) is not None and getattr(self, "_caret_move_handler", None) is not None:
+                self._caret_move_ep.unregister(self._caret_move_handler)
         with suppress(Exception):
             self._navigation_timer.Stop()
         with suppress(Exception):
@@ -840,8 +819,205 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         except Exception as e:
             log.warning(f"deferred focus dispatch (theme sound dropped): {e}")
 
+    def _ensure_nav_event_registration(self):
+        """(Re)register the vision navigation extension points.
+
+        The extension points live on the single `vision.handler` instance.
+        NVDA rebuilds that object whenever a vision provider is terminated
+        (visionHandler.terminateProvider), which silently drops any direct
+        registration. This re-checks (a cheap identity test) and re-registers
+        when the object has changed. Safe to call repeatedly."""
+        try:
+            import vision
+        except Exception:
+            return
+        ep = getattr(getattr(vision, "handler", None), "extensionPoints", None)
+        if ep is None:
+            return
+        if ep is getattr(self, "_registered_ep", None):
+            return
+        try:
+            if self._browse_move_handler is None:
+                self._browse_move_handler = self._on_post_browseModeMove
+            if self._caret_move_handler is None:
+                self._caret_move_handler = self._on_post_caretMove
+            self._browse_move_ep = ep.post_browseModeMove
+            self._browse_move_ep.register(self._browse_move_handler)
+            self._caret_move_ep = ep.post_caretMove
+            self._caret_move_ep.register(self._caret_move_handler)
+            self._registered_ep = ep
+            self._has_browse_move_ep = True
+            self._has_caret_move_ep = True
+        except Exception:
+            log.debug("AudioThemes: registering navigation events failed", exc_info=True)
+
+    def _dispatch_browse_nav(self, landed_obj, tree_interceptor=None, dedupe_mode="browse", require_browse=False):
+        """Shared gate: decide and play the theme sound for a navigation move.
+
+        dedupe_mode:
+            "browse" - time-window duplicate check (virtual-caret navigation).
+            "none"   - the caller has already applied its own duplicate check
+                       (the physical-caret feature tracks object identity).
+        require_browse:
+            True for browse-mode moves (the move must be inside a browse-mode
+            tree interceptor that is not in focus/pass-through mode).
+        """
+        try:
+            cfg = self.handler._cached_config or {}
+            if not cfg.get("enable_audio_themes", True) or not self.handler.active_theme:
+                return
+            if landed_obj is None:
+                return
+            ti = tree_interceptor
+            if ti is None:
+                try:
+                    ti = landed_obj.treeInterceptor
+                except Exception:
+                    ti = None
+            if require_browse and (not ti or getattr(ti, "passThrough", False)):
+                return
+            # Container roles are not navigational targets: no theme sound for
+            # documents, panes, windows, applications or unknown objects.
+            if cfg.get("suppress_container_role_sounds", True):
+                try:
+                    if landed_obj.role in _CONTAINER_ROLES:
+                        return
+                except Exception:
+                    pass
+            # Skip selection extensions (shift+arrows): sounds follow caret
+            # moves only.
+            if cfg.get("suppress_sounds_while_selecting", True) and ti is not None:
+                try:
+                    _sel = ti.makeTextInfo(textInfos.POSITION_SELECTION)
+                    if _sel is not None and not _sel.isCollapsed:
+                        return
+                except Exception:
+                    pass
+            if dedupe_mode == "browse":
+                if self._is_same_object_duplicate(landed_obj):
+                    return
+            # dedupe_mode == "none": the caller already guaranteed uniqueness
+            # (the physical-caret feature tracks the object identity itself;
+            # _last_caret_obj is owned by _on_post_caretMove).
+            now = time.monotonic()
+            if now - getattr(self, "_last_play_time", 0) < 0.08:
+                return
+            last_qn = getattr(self.handler, "last_quicknav_time", 0)
+            if last_qn and now - last_qn < 0.3:
+                return
+            self._last_play_time = now
+            obj_info = self._snapshot_obj(landed_obj)
+            utils.threadPool.add_task(self.playObject, obj_info)
+            utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
+        except Exception as e:
+            log.debug(f"AudioThemes swallowed Exception in _dispatch_browse_nav: {e}", exc_info=True)
+
+    def _on_post_browseModeMove(self, obj=None, **kwargs):
+        """Vision extension point: fires on every browse-mode virtual-caret
+        move (browseMode -> CursorManager._set_selection). `obj` is the browse
+        mode tree interceptor."""
+        try:
+            # Recorded even when suppressed/disabled so the timer's safety net
+            # knows the event source is alive.
+            self._last_browse_move_event = time.monotonic()
+            if getattr(self.handler, "_suppress_nav_event", False):
+                return
+            cfg = self.handler._cached_config or {}
+            if cfg.get("browse_nav_engine", "auto") != "auto":
+                return
+            if not cfg.get("arrow_nav_sounds", True):
+                return
+            if obj is None or not hasattr(obj, "passThrough"):
+                return
+            landed = None
+            try:
+                info = obj.makeTextInfo(textInfos.POSITION_CARET)
+                landed = (getattr(info, "focusableNVDAObjectAtStart", None)
+                          or getattr(info, "NVDAObjectAtStart", None))
+            except Exception:
+                landed = None
+            if landed is None:
+                try:
+                    landed = api.getNavigatorObject()
+                except Exception:
+                    landed = None
+            self._dispatch_browse_nav(landed, obj, dedupe_mode="browse", require_browse=True)
+        except Exception as e:
+            log.debug(f"AudioThemes swallowed Exception in _on_post_browseModeMove: {e}", exc_info=True)
+
+    def _on_post_caretMove(self, obj=None, **kwargs):
+        """Vision extension point: fires when the physical caret moves in the
+        focused object (editable text etc.). Optional, gated by
+        caret_nav_sounds: "off" (default) | "field" | "field_line"."""
+        try:
+            if getattr(self.handler, "_suppress_nav_event", False):
+                return
+            cfg = self.handler._cached_config or {}
+            mode = cfg.get("caret_nav_sounds", "off")
+            if mode == "off" or obj is None:
+                return
+            # VisionHandler.handleGainFocus also calls handleCaretMove for
+            # objects with navigable text, which would duplicate the sound the
+            # gain-focus handler is already playing. NVDA's own event_caret
+            # uses the same guard.
+            try:
+                if eventHandler.isPendingEvents("gainFocus"):
+                    return
+            except Exception:
+                pass
+            if not cfg.get("enable_audio_themes", True) or not self.handler.active_theme:
+                return
+            # Tier 1: a new caret context (object identity change) -> role sound.
+            # Identity is tracked on `obj` (the object whose caret moved), which
+            # is stable, and matches the gain-focus seed so entering a field
+            # does not double-play the sound focus already played.
+            # _last_caret_obj is owned here; the dispatcher is told the caller
+            # already deduped (dedupe_mode="none") so the first dispatch is
+            # never suppressed.
+            if obj is not getattr(self, "_last_caret_obj", None):
+                self._last_caret_obj = obj
+                self._last_caret_line = None
+                self._dispatch_browse_nav(obj, None, dedupe_mode="none", require_browse=False)
+                return
+            # Tier 2 ("field_line"): a new line inside the same object -> cue.
+            if mode == "field_line":
+                line_key = None
+                try:
+                    info = obj.makeTextInfo(textInfos.POSITION_CARET)
+                    info.expand(textInfos.UNIT_LINE)
+                    line_key = getattr(info, "bookmark", None)
+                except Exception:
+                    line_key = None
+                last_line = getattr(self, "_last_caret_line", None)
+                if line_key is not None and last_line is not None and line_key != last_line:
+                    self._play_caret_line_cue(obj)
+                self._last_caret_line = line_key
+        except Exception as e:
+            log.debug(f"AudioThemes swallowed Exception in _on_post_caretMove: {e}", exc_info=True)
+
+    def _play_caret_line_cue(self, obj):
+        """Short, quiet tick when the caret crosses a line inside the same
+        object (caret_nav_sounds == "field_line"). Kept very short and quiet
+        so it never competes with the synthesised speech."""
+        try:
+            if not self.handler.active_theme:
+                return
+            if not (self.handler._cached_config or {}).get("enable_audio_themes", True):
+                return
+            now = time.monotonic()
+            if now - getattr(self, "_last_caret_cue_time", 0.0) < 0.06:
+                return
+            self._last_caret_cue_time = now
+            tones.beep(660, 20, left=12, right=12)
+        except Exception as e:
+            log.debug(f"AudioThemes swallowed Exception in _play_caret_line_cue: {e}", exc_info=True)
+
     def _onNavigationTimer(self, event):
         """Check if the navigator object changed (e.g. arrow keys in browse mode)."""
+        # Self-heal the event registration if NVDA rebuilt the vision
+        # extension-points object (done whenever a vision provider is
+        # terminated). Cheap identity check; no-op in the common case.
+        self._ensure_nav_event_registration()
         # Freeze resilience: the timer is expected every ~250ms. A gap much
         # larger than that means the main thread was stalled (e.g. by another
         # addon's UIA polling). When the thread recovers, queued timer ticks
@@ -876,49 +1052,28 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             current_nav = api.getNavigatorObject()
             if current_nav and current_nav != getattr(self, "_last_navigator_object", None):
                 self._last_navigator_object = current_nav
-                # This timer is the ONLY producer of theme sounds for
-                # arrow-key navigation inside a virtual buffer (see the
-                # comment where the timer is created). `arrow_nav_sounds`
-                # therefore has to gate here - the legacy
-                # speech._caretMovementScriptHelper hook no longer exists in
-                # current NVDA, so gating it alone had no effect. The
-                # navigator is still tracked above so re-enabling the option
-                # does not fire a stale sound for a position already passed.
+                # `arrow_nav_sounds` gates all arrow-key navigation dispatch.
+                # The navigator is still tracked above, so re-enabling the
+                # option does not fire a stale sound for a position already
+                # passed. The legacy speech._caretMovementScriptHelper hook no
+                # longer exists in current NVDA, so the gate lives here.
                 if not self.handler._cached_config.get("arrow_nav_sounds", True):
                     return
-                ti = current_nav.treeInterceptor
-                if ti and not ti.passThrough:
-                    fl_cfg = self.handler._cached_config or {}
-                    # Container roles are not navigational targets (borrowed
-                    # from NavigationSounds): no theme sound for documents,
-                    # panes, windows, applications or unknown objects.
-                    if fl_cfg.get("suppress_container_role_sounds", True):
-                        try:
-                            if current_nav.role in _CONTAINER_ROLES:
-                                return
-                        except Exception:
-                            pass
-                    # Skip selection extensions (shift+arrows): sounds follow
-                    # caret moves only (borrowed from NavigationSounds).
-                    if fl_cfg.get("suppress_sounds_while_selecting", True):
-                        try:
-                            _sel = ti.makeTextInfo(textInfos.POSITION_SELECTION)
-                            if _sel is not None and not _sel.isCollapsed:
-                                return
-                        except Exception:
-                            pass
-                    if self._is_same_object_duplicate(current_nav):
-                        return
-                    # Debounce: skip if last dispatch was < 80ms ago.
-                    now = time.monotonic()
-                    if now - getattr(self, "_last_play_time", 0) < 0.08:
-                        return
-                    if getattr(self.handler, "last_quicknav_time", 0) and now - self.handler.last_quicknav_time < 0.3:
-                        return
-                    self._last_play_time = now
-                    obj_info = self._snapshot_obj(current_nav)
-                    utils.threadPool.add_task(self.playObject, obj_info)
-                    utils.threadPool.add_task(self._play_beacon_sonar, obj_info)
+                # Safety net: when the browse-mode event source is registered
+                # and has fired within the last 3s, the event handler owns
+                # dispatch and the timer stays a fallback (an app whose browse
+                # mode does not go through CursorManager, or the user set
+                # browse_nav_engine == "timer").
+                if (self.handler._cached_config.get("browse_nav_engine", "auto") == "auto"
+                        and self._has_browse_move_ep
+                        and (now - getattr(self, "_last_browse_move_event", 0.0)) < 3.0):
+                    return
+                ti = None
+                try:
+                    ti = current_nav.treeInterceptor
+                except Exception:
+                    ti = None
+                self._dispatch_browse_nav(current_nav, ti, dedupe_mode="browse", require_browse=True)
         except Exception as e:
             log.debug(f"AudioThemes Swallowed Exception: {e}", exc_info=True)
     def on_studio_item_clicked(self, event):
@@ -974,7 +1129,11 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self._last_focused_obj = obj
         self._last_focus_time = time.monotonic()
         self._last_play_time = self._last_focus_time
-        # Also sync navigator tracking so the 180ms timer doesn't double-fire
+        # Seed the physical-caret tracker so the optional caret feature does
+        # not repeat the sound this focus event is already playing.
+        self._last_caret_obj = obj
+        self._last_caret_line = None
+        # Also sync navigator tracking so the 250ms timer doesn't double-fire
         try:
             self._last_navigator_object = api.getNavigatorObject()
         except Exception:
