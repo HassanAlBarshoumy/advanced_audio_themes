@@ -6,7 +6,11 @@ itself reads - so the built file name can never disagree with the manifest.
 When the script runs inside GitHub Actions it also publishes ``name``,
 ``version``, ``filename`` and ``path`` as step outputs through ``$GITHUB_OUTPUT``.
 
-Usage:
+Standing user rule: this add-on is NEVER built locally - every build happens
+on GitHub Actions. The script enforces that: it refuses to run outside a
+workflow job and exits with code 2.
+
+Usage (GitHub Actions only):
     python build_addon.py
 """
 
@@ -19,6 +23,34 @@ sys.dont_write_bytecode = True
 
 ADDON_DIR = os.path.dirname(os.path.abspath(__file__))
 MANIFEST_PATH = os.path.join(ADDON_DIR, "manifest.ini")
+
+# Every workflow job on GitHub Actions sets GITHUB_ACTIONS=true. Any other
+# environment means someone is running the packager on their own machine,
+# which the standing user rule forbids.
+GITHUB_ACTIONS_ENV = "GITHUB_ACTIONS"
+
+LOCAL_BUILD_REFUSAL = (
+	"Refusing to build locally: this add-on is built on GitHub Actions only "
+	"(standing user rule - no local builds, now or in the future).\n"
+	"  Build    : gh workflow run build.yml\n"
+	"  Download : gh run download <run-id> -n advanced_audio_themes-<version>\n"
+	"  Release  : gh workflow run release.yml -f version=<x.y>"
+)
+
+
+class LocalBuildRefused(Exception):
+	"""Raised when the packager is invoked outside GitHub Actions."""
+
+
+def enforce_ci_only_build():
+	"""Abort unless running inside a GitHub Actions workflow job.
+
+	There is deliberately no local override: the user wants every build of
+	this add-on produced on GitHub, never on this machine.
+	"""
+	if os.environ.get(GITHUB_ACTIONS_ENV) == "true":
+		return
+	raise LocalBuildRefused(LOCAL_BUILD_REFUSAL)
 
 # Development-only files and folders: never shipped inside the package.
 EXCLUDE_DIRS = {".git", ".github", "__pycache__", "scripts", "dist", "build"}
@@ -107,6 +139,7 @@ def write_github_outputs(**outputs):
 
 def build():
 	"""Create ``<name>-<version>.nvda-addon`` next to this script."""
+	enforce_ci_only_build()
 	name, version = addon_name_and_version()
 	file_name = "%s-%s.nvda-addon" % (name, version)
 	output_path = os.path.join(ADDON_DIR, file_name)
@@ -145,6 +178,9 @@ def build():
 def main():
 	try:
 		build()
+	except LocalBuildRefused as refusal:
+		print(str(refusal), file=sys.stderr)
+		return 2
 	except BuildError as error:
 		print("Build failed: %s" % error, file=sys.stderr)
 		return 1

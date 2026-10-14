@@ -1,3 +1,16 @@
+# Non-negotiable user rules
+
+## Rule 1 - Never build the add-on locally, now or in the future (permanent)
+User statement: «لا اريد اي بناء للاضافة يتم محليا البناء كله اريده على جيتهاب الآن ومستقبلا ولا اريدك ان تنسى ذلك ابدا».
+Meaning: every build of this add-on happens on GitHub Actions only. Never build locally, never package a `.nvda-addon` on this machine, never treat a locally produced package as usable.
+
+- `build_addon.py` enforces this itself: it refuses to run unless `GITHUB_ACTIONS=true` (the environment GitHub sets inside every workflow job) and exits with code 2 plus a clear message otherwise. No local override flag was added on purpose.
+- To build: push to `master` or open a PR (both trigger `.github/workflows/build.yml`), or run it manually with `gh workflow run build.yml`.
+- To download the built package: `gh run download <run-id> -n advanced_audio_themes-<version>`.
+- To release (version bump, tag, GitHub Release asset): `gh workflow run release.yml` (manual, takes the new version) or push a `v<x.y>` tag. See `.github/workflows/release.yml`.
+- Never commit a built package: `.nvda-addon`, `.sha256`, `dist/`, `build/` stay untracked (`.gitignore`).
+- Do not write any new script whose purpose is to build locally.
+
 # Summary
 
 ## Objective
