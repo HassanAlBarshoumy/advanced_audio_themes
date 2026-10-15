@@ -5,9 +5,9 @@ User statement: «لا اريد اي بناء للاضافة يتم محليا �
 Meaning: every build of this add-on happens on GitHub Actions only. Never build locally, never package a `.nvda-addon` on this machine, never treat a locally produced package as usable.
 
 - `build_addon.py` enforces this itself: it refuses to run unless `GITHUB_ACTIONS=true` (the environment GitHub sets inside every workflow job) and exits with code 2 plus a clear message otherwise. No local override flag was added on purpose.
-- To build: push to `master` or open a PR (both trigger `.github/workflows/build.yml`), or run it manually with `gh workflow run build.yml`.
+- To build: run it by hand — `Actions -> Build add-on -> Run workflow` on `master`, or `gh workflow run build.yml --ref master`. NOTHING builds automatically: a push to `master` and a pull request trigger NOTHING (no build, no release). This is deliberate (user rule).
 - To download the built package: `gh run download <run-id> -n advanced_audio_themes-<version>`.
-- Releasing is automatic: every push to `master` builds and then creates or refreshes the GitHub Release `v<version>`, attaching the `.nvda-addon` and its `.sha256` (same run, `build.yml`). An existing release for that version is refreshed in place, so the newest master build is always on the Releases page. No local build is ever needed.
+- There is NO build without a release: every manual run of `build.yml` on `master` builds and then creates or refreshes the GitHub Release `v<version>`, attaching the `.nvda-addon` and its `.sha256` (same run). An existing release for that version is refreshed in place. A run from any branch other than `master` is skipped by the job's `if`, so a package can never be produced without a release.
 - To release a NEW version: `gh workflow run release.yml` (bumps `manifest.ini` + `buildVars.py`, tags, builds, publishes) or push a `v<x.y>` tag. See `.github/workflows/release.yml`.
 - Never commit a built package: `.nvda-addon`, `.sha256`, `dist/`, `build/` stay untracked (`.gitignore`).
 - Do not write any new script whose purpose is to build locally.

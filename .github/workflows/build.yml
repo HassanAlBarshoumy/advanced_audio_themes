@@ -1,28 +1,25 @@
-# Continuous integration for the add-on.
+# Manual build-and-release for the add-on.
 #
-#   * every push to master and every pull request: consistency check,
-#     syntax check of every shipped Python source and a real package build;
-#   * every push to master ALSO publishes the GitHub Release for the version in
-#     manifest.ini and attaches the built .nvda-addon plus its SHA-256: an
-#     existing release for that version is refreshed in place, so the Releases
-#     page always carries the newest master build;
-#   * the built package is uploaded as a downloadable artifact as well
-#     (Actions -> the run -> Artifacts), so a package can be produced without a
-#     local toolchain.
+# There is NO automatic build. Nothing runs on push, on pull request or on a
+# schedule: a package is produced only when it is asked for by hand.
 #
-# Releases with a NEW version number (bump, tag, optional notes) are handled by
-# release.yml. This workflow never changes the version; it only republishes the
-# build of whatever manifest.ini already says.
+#   Actions -> Build add-on -> Run workflow   (select the master branch)
+#   gh workflow run build.yml --ref master
+#
+# A build is never produced without a release: the run builds the package from
+# whatever manifest.ini says and then creates or refreshes the GitHub Release
+# for that version, attaching the built .nvda-addon and its SHA-256 checksum.
+#
+# Releasing a NEW version number (bump manifest.ini + buildVars.py, tag it) is
+# handled by release.yml. This workflow never changes the version; it only
+# rebuilds and republishes whatever manifest.ini already says.
 name: Build add-on
 
 on:
-  push:
-    branches: [master]
-  pull_request:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: build-${{ github.ref }}
@@ -30,13 +27,13 @@ concurrency:
 
 jobs:
   build:
-    name: Build .nvda-addon
+    name: Build .nvda-addon and publish its release
+    # A build only ever happens together with a release, and releases are cut
+    # from master, so a run from any other branch is skipped rather than
+    # producing a package that has nowhere to be published.
+    if: github.ref == 'refs/heads/master'
     # Pinned: the ubuntu-latest label migrates to Ubuntu 26 after 2026-10-19.
     runs-on: ubuntu-24.04
-    # Needed to create the tag and refresh the release on master pushes; the
-    # release steps themselves are skipped for pull_request runs.
-    permissions:
-      contents: write
     steps:
       - name: Check out the repository
         uses: actions/checkout@v7
@@ -69,14 +66,10 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      # Always publish a release for the version that was just built. Every push
-      # to master refreshes the same release, so the newest passing build is
-      # always on the Releases page - nobody needs to build locally.
+      # A build always ends in a release: the version is not changed here, the
+      # release for whatever manifest.ini says is created, or refreshed in
+      # place when it already exists.
       - name: Publish the GitHub Release for this version
-        # Master only: never from a pull request. A manual run on master
-        # publishes too, so "build on GitHub" and "release on GitHub" always
-        # happen together.
-        if: github.ref == 'refs/heads/master' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.build.outputs.version }}
@@ -93,6 +86,6 @@ jobs:
             gh release create "$TAG" "$FILENAME" "$FILENAME.sha256" \
               --target "$COMMIT" \
               --title "$TAG" \
-              --notes "Built automatically from master (commit $COMMIT). This release is refreshed on every push to master."
+              --notes "Built on request from master (commit $COMMIT)."
           fi
           echo "Release $TAG now carries $FILENAME."
