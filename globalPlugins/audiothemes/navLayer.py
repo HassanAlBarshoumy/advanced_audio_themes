@@ -28,7 +28,7 @@ class NavLayerMixin:
 
     def _playNavTone(self, pitch, duration):
         nlConf = self._get_nl_cache()
-        if nlConf.get("navLayerPlaySounds", True):
+        if nlConf.get("navLayerPlaySounds", False):
             tones.beep(pitch, duration)
 
     _ALL_MODES = [
@@ -83,7 +83,7 @@ class NavLayerMixin:
         nlConf = self._get_nl_cache()
         import json
         try:
-            enabled_ids = json.loads(nlConf.get("navLayerEnabledModes", "[]"))
+            enabled_ids = json.loads(nlConf.get("navLayerEnabledModes", '["character","word","line","sentence","paragraph"]'))
         except Exception:
             enabled_ids = []
             
@@ -100,7 +100,7 @@ class NavLayerMixin:
         if self._navLayerActive:
             script_func = super().getScript(gesture)
             nlConf = self._get_nl_cache()
-            passThrough = nlConf.get("navLayerPassThrough", True)
+            passThrough = nlConf.get("navLayerPassThrough", False)
             
             if not script_func or not getattr(script_func, "__name__", "").startswith("script_navLayer"):
                 if passThrough:
@@ -118,7 +118,7 @@ class NavLayerMixin:
 
     def _resetNavLayerTimer(self):
         nlConf = self._get_nl_cache()
-        timeoutEnabled = nlConf.get("navLayerTimeout", True)
+        timeoutEnabled = nlConf.get("navLayerTimeout", False)
         
         if self._navLayerTimer:
             self._navLayerTimer.cancel()

@@ -6,7 +6,7 @@ from .handler import SpecialProps
 from . import emoji_cldr_data
 
 _DEFAULT_EMOJI_CONFIG = {
-    "emoji_enabled": True,
+    "emoji_enabled": False,
     "emoji_sound": True,
     "emoji_prefix": True,
     "emoji_prefix_text": "emoji",

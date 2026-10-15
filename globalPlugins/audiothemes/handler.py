@@ -146,20 +146,20 @@ audiothemes_config_defaults = {
     "disabled_apps": "string(default='')",
     "default_theme_deleted": "boolean(default=False)",
     "blacklisted_roles": "string(default='[19]')",
-    "typing_sounds": "boolean(default=True)",
+    "typing_sounds": "boolean(default=False)",
     "typing_sounds_edit_only": "boolean(default=True)",
     "typing_sounds_volume": "integer(default=10)",
     "typing_sound_pack": "string(default='1blueSwitch')",
-    "typing_sounds_spatial": "boolean(default=True)",
-    "typing_sounds_spatial_smart": "boolean(default=True)",
+    "typing_sounds_spatial": "boolean(default=False)",
+    "typing_sounds_spatial_smart": "boolean(default=False)",
     "announceFormat": "string(default='0')",
-    "roleAnnounceFormats": "string(default='{\"5\": \"sc\"}')",
+    "roleAnnounceFormats": "string(default='{}')",
     "app_profiles": "string(default='{}')",
     "app_profiles_enabled": "boolean(default=True)",
-    "navLayerPassThrough": "boolean(default=True)",
-    "navLayerTimeout": "boolean(default=True)",
-    "navLayerPlaySounds": "boolean(default=True)",
-    "navLayerEnabledModes": "string(default='')",
+    "navLayerPassThrough": "boolean(default=False)",
+    "navLayerTimeout": "boolean(default=False)",
+    "navLayerPlaySounds": "boolean(default=False)",
+    "navLayerEnabledModes": "string(default='[\"character\",\"word\",\"line\",\"sentence\",\"paragraph\"]')",
     "audio_ducking_enabled": "boolean(default=False)",
     "audio_ducking_volume": "integer(default=30)",
     "output_mode": "string(default='stereo')",
@@ -175,12 +175,12 @@ audiothemes_config_defaults = {
     "firstlast_fallback": "string(default='role')",
     "first_fallback_role_name": "string(default='listitem')",
     "last_fallback_role_name": "string(default='listitem')",
-    "general_fallback": "string(default='role')",
+    "general_fallback": "string(default='silence')",
     "general_fallback_role_name": "string(default='listitem')",
-    "state_sounds_suppress_role": "boolean(default=False)",
+    "state_sounds_suppress_role": "boolean(default=True)",
     # Mouse hover + arrow navigation sound switches (borrowed from NavigationSounds).
     # Defaults preserve the pre-existing behaviour (sounds on, no hover delay).
-    "mouse_sounds_enabled": "boolean(default=True)",
+    "mouse_sounds_enabled": "boolean(default=False)",
     "mouse_hover_delay": "integer(default=0, min=0, max=2000)",
     "arrow_nav_sounds": "boolean(default=True)",
     # Event-driven browse-mode navigation: "auto" uses the NVDA
@@ -196,12 +196,12 @@ audiothemes_config_defaults = {
     "suppress_container_role_sounds": "boolean(default=True)",
     "universal_fl_enabled": "boolean(default=True)",
     "fl_enabled_roles": "string(default='[\"listitem\",\"treeviewitem\",\"menuitem\",\"tab\"]')",
-    "fl_solo_behavior": "string(default='first')",
-    "fl_detection_mode": "string(default='smart')",
+    "fl_solo_behavior": "string(default='none')",
+    "fl_detection_mode": "string(default='strict')",
     "progress_pan_mode": "string(default='progress')",
     "progress_pan_range": "integer(default=180, min=45, max=180)",
     "progress_pitch_shift": "boolean(default=True)",
-    "sys_status_enabled": "boolean(default=True)",
+    "sys_status_enabled": "boolean(default=False)",
     "sys_status_volume": "integer(default=20)",
     "sys_ac_enabled": "boolean(default=True)",
     "sys_battery_enabled": "boolean(default=True)",
@@ -214,7 +214,7 @@ audiothemes_config_defaults = {
     "sys_network_check_interval": "integer(default=15, min=5, max=300)",
     "sys_battery_check_interval": "integer(default=30, min=5, max=300)",
     "sys_all_usb": "boolean(default=True)",
-    "emoji_enabled": "boolean(default=True)",
+    "emoji_enabled": "boolean(default=False)",
     "emoji_sound": "boolean(default=True)",
     "emoji_prefix": "boolean(default=True)",
     "emoji_prefix_text": "string(default='emoji')",
@@ -262,7 +262,7 @@ audiothemes_config_defaults = {
     # Per-category sound position (JSON map)
     "emoji_sound_position_per_category": "string(default='{}')",
     # Clipboard Announcements
-    "clipboard_enabled": "boolean(default=False)",
+    "clipboard_enabled": "boolean(default=True)",
     "clipboard_announce_mode": "string(default='both')",
     "clipboard_volume": "integer(default=20, min=0, max=100)",
     "clipboard_delay": "integer(default=50, min=0, max=500)",
@@ -1355,7 +1355,7 @@ class AudioThemesHandler:
                 self.player.wet_level = conf_int(unspoken_config, "WetLevel", 0)
                 self.player.dry_level = conf_int(unspoken_config, "DryLevel", 30)
                 self.player.width = conf_int(unspoken_config, "Width", 100)
-                self.player._trim_silence = conf_bool(unspoken_config, "TrimSilence", True)
+                self.player._trim_silence = conf_bool(unspoken_config, "TrimSilence", False)
                 self.player._trim_silence_threshold = conf_float(unspoken_config, "TrimSilenceThreshold", 0.01)
                 self.player._smart_volume = conf_bool(unspoken_config, "SmartVolume", False)
                 self.player._smooth_envelope = conf_bool(unspoken_config, "SmoothEnvelope", False)
@@ -1692,7 +1692,7 @@ class AudioThemesHandler:
                     self.player.dry_level = conf_int(unspoken_config, "DryLevel", 30)
                     self.player.width = conf_int(unspoken_config, "Width", 100)
                     # Cache processing config on the player to avoid config.conf reads in _ensure_processed
-                    self.player._trim_silence = conf_bool(unspoken_config, "TrimSilence", True)
+                    self.player._trim_silence = conf_bool(unspoken_config, "TrimSilence", False)
                     self.player._trim_silence_threshold = conf_float(unspoken_config, "TrimSilenceThreshold", 0.01)
                     self.player._smart_volume = conf_bool(unspoken_config, "SmartVolume", False)
                     self.player._smooth_envelope = conf_bool(unspoken_config, "SmoothEnvelope", False)
@@ -1763,11 +1763,11 @@ class AudioThemesHandler:
             "universal_fl_enabled": user_config.get("universal_fl_enabled", True),
             "fl_enabled_roles": fl_roles_raw,
             "fl_enabled_roles_set": fl_enabled_roles_set,
-            "fl_detection_mode": user_config.get("fl_detection_mode", "smart"),
-            "fl_solo_behavior": user_config.get("fl_solo_behavior", "first"),
-            "state_sounds_suppress_role": user_config.get("state_sounds_suppress_role", False),
+            "fl_detection_mode": user_config.get("fl_detection_mode", "strict"),
+            "fl_solo_behavior": user_config.get("fl_solo_behavior", "none"),
+            "state_sounds_suppress_role": user_config.get("state_sounds_suppress_role", True),
             "speak_states": user_config.get("speak_states", True),
-            "mouse_sounds_enabled": user_config.get("mouse_sounds_enabled", True),
+            "mouse_sounds_enabled": user_config.get("mouse_sounds_enabled", False),
             "mouse_hover_delay": user_config.get("mouse_hover_delay", 0),
             "arrow_nav_sounds": user_config.get("arrow_nav_sounds", True),
             "browse_nav_engine": user_config.get("browse_nav_engine", "auto"),
@@ -1779,12 +1779,12 @@ class AudioThemesHandler:
             "firstlast_fallback": user_config.get("firstlast_fallback", "role"),
             "first_fallback_role_name": user_config.get("first_fallback_role_name", "listitem"),
             "last_fallback_role_name": user_config.get("last_fallback_role_name", "listitem"),
-            "general_fallback": user_config.get("general_fallback", "role"),
+            "general_fallback": user_config.get("general_fallback", "silence"),
             "general_fallback_role_name": user_config.get("general_fallback_role_name", "listitem"),
             "blacklisted_roles": blr_parsed,
             # Theme/app hot-path config
             "volume": user_config.get("volume", 50),
-            "typing_sounds": user_config.get("typing_sounds", True),
+            "typing_sounds": user_config.get("typing_sounds", False),
             "typing_sounds_edit_only": user_config.get("typing_sounds_edit_only", False),
             "typing_sounds_volume": user_config.get("typing_sounds_volume", 10),
             "typing_sound_pack": user_config.get("typing_sound_pack", "1blueSwitch"),
@@ -1840,18 +1840,18 @@ class AudioThemesHandler:
             "audio_ducking_volume": user_config.get("audio_ducking_volume", 30),
             "ducking_categories": user_config.get("ducking_categories", ""),
             # Navigation Layer config
-            "navLayerPassThrough": user_config.get("navLayerPassThrough", True),
-            "navLayerTimeout": user_config.get("navLayerTimeout", True),
-            "navLayerPlaySounds": user_config.get("navLayerPlaySounds", True),
-            "navLayerEnabledModes": user_config.get("navLayerEnabledModes", ""),
+            "navLayerPassThrough": user_config.get("navLayerPassThrough", False),
+            "navLayerTimeout": user_config.get("navLayerTimeout", False),
+            "navLayerPlaySounds": user_config.get("navLayerPlaySounds", False),
+            "navLayerEnabledModes": user_config.get("navLayerEnabledModes", '["character","word","line","sentence","paragraph"]'),
             # unspoken player config (rarely changes mid-session)
             "output_mode": user_config.get("output_mode", "stereo"),
-            "typing_sounds_spatial": user_config.get("typing_sounds_spatial", True),
-            "typing_sounds_spatial_smart": user_config.get("typing_sounds_spatial_smart", True),
+            "typing_sounds_spatial": user_config.get("typing_sounds_spatial", False),
+            "typing_sounds_spatial_smart": user_config.get("typing_sounds_spatial_smart", False),
             "UnspokenReverb": unspoken_cfg.get("Reverb", False),
-            "SmoothPanning": unspoken_cfg.get("SmoothPanning", True),
+            "SmoothPanning": unspoken_cfg.get("SmoothPanning", False),
             "noSounds": unspoken_cfg.get("noSounds", False),
-            "TrimSilence": unspoken_cfg.get("TrimSilence", True),
+            "TrimSilence": unspoken_cfg.get("TrimSilence", False),
             "TrimSilenceThreshold": unspoken_cfg.get("TrimSilenceThreshold", 0.01),
             "SmartVolume": unspoken_cfg.get("SmartVolume", False),
             "SmartVolumePeak": unspoken_cfg.get("SmartVolumePeak", 0.8),
@@ -1959,7 +1959,7 @@ class AudioThemesHandler:
         return _is_sound_suppressed_cache(category)
 
     def _play_system_sound(self, sound_key):
-        if not self._cached_config.get("sys_status_enabled", True):
+        if not self._cached_config.get("sys_status_enabled", False):
             return
         if not self.enabled or self.active_theme is None or self.player is None:
             return
@@ -2249,7 +2249,7 @@ class AudioThemesHandler:
             log.warning(f"play_typing_sound failed: {e}")
 
     def _play_typing_sound_inner(self, ch=None, vkCode=None, extended=None):
-        if not self._cached_config.get("typing_sounds", True):
+        if not self._cached_config.get("typing_sounds", False):
             return
         if not self.enabled or (self.active_theme is None) or self.player is None:
             return

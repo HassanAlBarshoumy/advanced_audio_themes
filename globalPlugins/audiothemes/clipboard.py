@@ -45,7 +45,7 @@ class ClipboardManager:
 
     def announce(self, action_id):
         conf = self._clip_conf()
-        if not conf.get("clipboard_enabled", False):
+        if not conf.get("clipboard_enabled", True):
             return
         entry = ACTION_MAP.get(action_id)
         if entry is None:

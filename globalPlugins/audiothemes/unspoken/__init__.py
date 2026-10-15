@@ -257,8 +257,8 @@ unspoken_config_defaults = {
 		"AudioCache": "boolean(default=True)",
 		"SmartVolume": "boolean(default=False)",
 		"SmoothEnvelope": "boolean(default=False)",
-		"SmoothPanning": "boolean(default=True)",
-		"TrimSilence": "boolean(default=True)",
+		"SmoothPanning": "boolean(default=False)",
+		"TrimSilence": "boolean(default=False)",
 		"TrimSilenceThreshold": "float(default=0.01)",
 		"NoiseGate": "boolean(default=False)",
 		"NoiseGateThreshold": "float(default=0.02)",
@@ -364,7 +364,7 @@ class UnspokenPlayer:
 		self._last_typing_time = 0.0
 		self._cached_config = {}  # overwritten by handler.configure()
 		# Processing config defaults; overwritten by handler.configure()
-		self._trim_silence = True
+		self._trim_silence = False
 		self._trim_silence_threshold = 0.01
 		self._smart_volume = False
 		self._smooth_envelope = False
@@ -915,7 +915,7 @@ class UnspokenPlayer:
 			if "progress_angle" in obj_info:
 				angle_x = obj_info["progress_angle"]
 				angle_y = 0.0
-			elif cfg.get("SmoothPanning", True) and hasattr(self, '_last_angle_x'):
+			elif cfg.get("SmoothPanning", False) and hasattr(self, '_last_angle_x'):
 				dx = abs(angle_x - self._last_angle_x)
 				dy = abs(angle_y - self._last_angle_y)
 				if max(dx, dy) < 30.0:
@@ -1101,8 +1101,8 @@ class UnspokenPlayer:
 			angle_x = 0
 			angle_y = 0
 		if is_typing_sound and not is_mono:
-			is_spatial = cfg.get("typing_sounds_spatial", True)
-			is_smart = cfg.get("typing_sounds_spatial_smart", True)
+			is_spatial = cfg.get("typing_sounds_spatial", False)
+			is_smart = cfg.get("typing_sounds_spatial_smart", False)
 			if is_spatial:
 				if is_smart and (ch or vkCode is not None):
 					if vkCode is not None:

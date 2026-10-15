@@ -2151,8 +2151,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.audioCacheCheckbox.SetValue(_b(unspoken_conf.get("AudioCache", True)))
         self.smartVolumeCheckbox.SetValue(_b(unspoken_conf.get("SmartVolume", False)))
         self.smoothEnvelopeCheckbox.SetValue(_b(unspoken_conf.get("SmoothEnvelope", False)))
-        self.smoothPanningCheckbox.SetValue(_b(unspoken_conf.get("SmoothPanning", True)))
-        trim_sil = unspoken_conf.get("TrimSilence", True)
+        self.smoothPanningCheckbox.SetValue(_b(unspoken_conf.get("SmoothPanning", False)))
+        trim_sil = unspoken_conf.get("TrimSilence", False)
         if isinstance(trim_sil, str):
             trim_sil = trim_sil.lower() == "true"
         self.trimSilenceCheckbox.SetValue(_b(bool(trim_sil)))
@@ -2219,8 +2219,8 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         self.typingSoundsCheckbox.SetValue(_b(conf.get("typing_sounds", False)))
         self.typingSoundsEditOnlyCheckbox.SetValue(_b(conf.get("typing_sounds_edit_only", True)))
-        self.typingSoundsSpatialCheckbox.SetValue(_b(conf.get("typing_sounds_spatial", True)))
-        self.typingSoundsSmartSpatialCheckbox.SetValue(_b(conf.get("typing_sounds_spatial_smart", True)))
+        self.typingSoundsSpatialCheckbox.SetValue(_b(conf.get("typing_sounds_spatial", False)))
+        self.typingSoundsSmartSpatialCheckbox.SetValue(_b(conf.get("typing_sounds_spatial_smart", False)))
         
         self.typingSoundsCheckbox.Bind(wx.EVT_CHECKBOX, self._update_typing_controls)
         self.typingSoundsSpatialCheckbox.Bind(wx.EVT_CHECKBOX, self._update_typing_controls)
@@ -2252,7 +2252,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         # General fallback
         gf_map = {"role": 0, "silence": 1, "first_available": 2, "custom_role": 3}
-        gf_val = conf.get("general_fallback", "role")
+        gf_val = conf.get("general_fallback", "silence")
         gf_idx = gf_map.get(gf_val, 0)
         self.generalFallbackChoice.SetSelection(gf_idx)
         g_name = conf.get("general_fallback_role_name", "listitem")
@@ -2263,11 +2263,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.generalRoleChoice.Show(show_gf_custom)
 
         # State sounds toggle
-        self.stateSoundsSuppressCheckbox.SetValue(conf.get("state_sounds_suppress_role", False))
+        self.stateSoundsSuppressCheckbox.SetValue(conf.get("state_sounds_suppress_role", True))
         self.speakStatesCheckbox.SetValue(_b(conf.get("speak_states", True)))
 
         # Mouse hover + arrow navigation switches
-        self.mouseSoundsCheckbox.SetValue(_b(conf.get("mouse_sounds_enabled", True)))
+        self.mouseSoundsCheckbox.SetValue(_b(conf.get("mouse_sounds_enabled", False)))
         self.mouseHoverDelaySpin.SetValue(_i(conf.get("mouse_hover_delay", 0), 0))
         self.arrowNavSoundsCheckbox.SetValue(_b(conf.get("arrow_nav_sounds", True)))
         _engine_map = {"auto": 0, "timer": 1}
@@ -2284,7 +2284,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # First/Last Item tab
         self.flEnableCheckbox.SetValue(_b(conf.get("universal_fl_enabled", True)))
         fl_mode_map = {"smart": 0, "strict": 1, "any_sibling": 2}
-        fl_mode_val = conf.get("fl_detection_mode", "smart")
+        fl_mode_val = conf.get("fl_detection_mode", "strict")
         self.flModeChoice.SetSelection(fl_mode_map.get(fl_mode_val, 0))
         fl_roles_raw = conf.get("fl_enabled_roles", "all")
         if fl_roles_raw == "all":
@@ -2298,11 +2298,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
             except Exception:
                 self._fl_enabled_roles_list = []
         solo_map = {"first": 0, "last": 1, "none": 2}
-        solo_val = conf.get("fl_solo_behavior", "first")
+        solo_val = conf.get("fl_solo_behavior", "none")
         self.flSoloChoice.SetSelection(solo_map.get(solo_val, 0))
 
         # System Status tab
-        self.sysStatusEnableCheckbox.SetValue(_b(conf.get("sys_status_enabled", True)))
+        self.sysStatusEnableCheckbox.SetValue(_b(conf.get("sys_status_enabled", False)))
         self.sysStatusVolumeSlider.SetValue(_i(conf.get("sys_status_volume", 20)))
         self.sysAllUsbCheckbox.SetValue(_b(conf.get("sys_all_usb", True)))
         self.sysAcEnableCheckbox.SetValue(_b(conf.get("sys_ac_enabled", True)))
@@ -2317,7 +2317,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.sysBatteryIntervalSpin.SetValue(_i(conf.get("sys_battery_check_interval", 30), 30))
 
         # Clipboard tab
-        self.clipboardEnableCheckbox.SetValue(_b(conf.get("clipboard_enabled", False)))
+        self.clipboardEnableCheckbox.SetValue(_b(conf.get("clipboard_enabled", True)))
         mode_map = {"both": 0, "speech": 1, "sound": 2}
         mode_val = conf.get("clipboard_announce_mode", "both")
         self.clipboardModeChoice.SetSelection(mode_map.get(mode_val, 0))
@@ -2327,7 +2327,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self._on_clipboard_enabled_changed(DummyEvent(self.clipboardEnableCheckbox.IsChecked()))
 
         # Emoji tab
-        self.emojiEnableCheckbox.SetValue(_b(conf.get("emoji_enabled", True)))
+        self.emojiEnableCheckbox.SetValue(_b(conf.get("emoji_enabled", False)))
         self.emojiSoundCheckbox.SetValue(_b(conf.get("emoji_sound", True)))
         snd_pos_map = {"before": 0, "after": 1, "both": 2, "none": 3}
         snd_pos_val = conf.get("emoji_sound_position", "before")
@@ -2447,13 +2447,13 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         # Miscellaneous tab — Navigation Layer settings
         nlConf = config.conf.get("audiothemes", {})
-        self.navLayerPassThroughCheckbox.SetValue(_b(nlConf.get("navLayerPassThrough", True)))
-        self.navLayerTimeoutCheckbox.SetValue(_b(nlConf.get("navLayerTimeout", True)))
-        self.navLayerPlaySoundsCheckbox.SetValue(_b(nlConf.get("navLayerPlaySounds", True)))
+        self.navLayerPassThroughCheckbox.SetValue(_b(nlConf.get("navLayerPassThrough", False)))
+        self.navLayerTimeoutCheckbox.SetValue(_b(nlConf.get("navLayerTimeout", False)))
+        self.navLayerPlaySoundsCheckbox.SetValue(_b(nlConf.get("navLayerPlaySounds", False)))
 
         import json
         try:
-            enabled_ids = json.loads(nlConf.get("navLayerEnabledModes", "[]"))
+            enabled_ids = json.loads(nlConf.get("navLayerEnabledModes", '["character","word","line","sentence","paragraph"]'))
         except Exception:
             enabled_ids = []
         if not enabled_ids:
@@ -2899,7 +2899,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         gf_map = {0: "role", 1: "silence", 2: "first_available", 3: "custom_role"}
         sel = self.generalFallbackChoice.GetSelection()
         if sel != wx.NOT_FOUND:
-            conf["general_fallback"] = gf_map.get(sel, "role")
+            conf["general_fallback"] = gf_map.get(sel, "silence")
         if self.generalRoleChoice.GetSelection() != wx.NOT_FOUND:
             conf["general_fallback_role_name"] = self.fl_names[self.generalRoleChoice.GetSelection()]
 
@@ -2921,7 +2921,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         conf["universal_fl_enabled"] = self.flEnableCheckbox.GetValue()
         fl_mode_map = {0: "smart", 1: "strict", 2: "any_sibling"}
         sel = self.flModeChoice.GetSelection()
-        conf["fl_detection_mode"] = fl_mode_map.get(sel, "smart")
+        conf["fl_detection_mode"] = fl_mode_map.get(sel, "strict")
         if self.flScopeAll.GetValue():
             conf["fl_enabled_roles"] = "all"
         else:
@@ -2931,7 +2931,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             conf["fl_enabled_roles"] = json.dumps(enabled_list)
         solo_map = {0: "first", 1: "last", 2: "none"}
         sel = self.flSoloChoice.GetSelection()
-        conf["fl_solo_behavior"] = solo_map.get(sel, "first")
+        conf["fl_solo_behavior"] = solo_map.get(sel, "none")
 
         # System Status tab
         conf["sys_status_enabled"] = self.sysStatusEnableCheckbox.GetValue()

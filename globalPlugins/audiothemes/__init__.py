@@ -197,7 +197,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # --- getOrder data (parent / previous / next roles) ---
         # Only fetch when first/last detection is active (avoids 3 expensive
         # UIA COM tree walks per snapshot on complex windows).
-        fl_mode = fl_cfg.get("fl_detection_mode", "smart")
+        fl_mode = fl_cfg.get("fl_detection_mode", "strict")
         if fl_cfg.get("enable_audio_themes", True) and fl_mode != "off":
             try:
                 info["parent_role"] = obj.parent.role if obj.parent else None
@@ -1447,7 +1447,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         cfg = handler._cached_config if handler is not None else {}
         # Play advanced typing sounds for non-characters
         try:
-            if not injected and cfg.get("typing_sounds", True):
+            if not injected and cfg.get("typing_sounds", False):
                 # Check edit only
                 play = True
                 if cfg.get("typing_sounds_edit_only", False):
@@ -1491,7 +1491,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         if handler is not None:
             try:
                 cfg = handler._cached_config
-                if cfg.get("typing_sounds", True):
+                if cfg.get("typing_sounds", False):
                     vk = getattr(self, "_last_vkCode", None)
                     ext = getattr(self, "_last_extended", None)
                     if cfg.get("typing_sounds_edit_only", False):
@@ -1562,7 +1562,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             else:
                 ui.message(_("Disable audio themes"))
         elif isSameScript == 1:
-            typing_enabled = conf_toggle(config.conf["audiothemes"], "typing_sounds", True)
+            typing_enabled = conf_toggle(config.conf["audiothemes"], "typing_sounds", False)
             self.handler.configure()
             if typing_enabled:
                 ui.message(_("Enable typing sounds"))
@@ -1577,7 +1577,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 cfg = self.handler._cached_config
                 if (cfg.get("enable_audio_themes", True)
                         and self.handler.active_theme
-                        and cfg.get("mouse_sounds_enabled", True)):
+                        and cfg.get("mouse_sounds_enabled", False)):
                     obj_info = self._snapshot_obj(obj, foreground_app=self.handler._current_app_name)
                     delay = cfg.get("mouse_hover_delay", 0) or 0
                     if delay > 0:
@@ -1614,7 +1614,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self._mouse_hover_obj = None
         try:
             cfg = self.handler._cached_config
-            if not cfg.get("mouse_sounds_enabled", True):
+            if not cfg.get("mouse_sounds_enabled", False):
                 return
             if not (cfg.get("enable_audio_themes", True) and self.handler.active_theme):
                 return
@@ -1707,7 +1707,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             current_states = obj_info.get("states", frozenset())
 
             fl_cfg = getattr(self.handler, '_cached_config', None) or {}
-            suppress_role = fl_cfg.get("state_sounds_suppress_role", False)
+            suppress_role = fl_cfg.get("state_sounds_suppress_role", True)
 
             # --- State-based sound ------------------------------------------
             if theme and current_states:
@@ -1844,7 +1844,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         next_role = obj_info.get("next_role")
         prev_same_role = obj_info.get("prev_same_role")
         next_same_role = obj_info.get("next_same_role")
-        fl_mode = fl_cfg.get("fl_detection_mode", "smart")
+        fl_mode = fl_cfg.get("fl_detection_mode", "strict")
 
         # Fast path using positionInfo if available
         idx = obj_info.get("indexInGroup")
@@ -1881,7 +1881,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # Solo items: no siblings at all (regardless of mode)
         has_any_adjacent = prev_role is not None or next_role is not None
         if is_first and is_last and not has_any_adjacent:
-            solo = fl_cfg.get("fl_solo_behavior", "first")
+            solo = fl_cfg.get("fl_solo_behavior", "none")
             if solo == "first":
                 return SpecialProps.first
             elif solo == "last":
@@ -2024,7 +2024,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
     @script(description=_("Toggles typing sounds on and off."), gestures=['kb:NVDA+alt+k'])
     def script_toggleTypingSounds(self, gesture):
-        typing_enabled = conf_toggle(config.conf["audiothemes"], "typing_sounds", True)
+        typing_enabled = conf_toggle(config.conf["audiothemes"], "typing_sounds", False)
         self.handler.configure()
         if typing_enabled:
             ui.message(_("Typing sounds enabled"))
@@ -2142,7 +2142,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
     @script(description=_("Toggles emoji enhancement sounds on and off."), gestures=['kb:NVDA+alt+e'])
     def script_toggleEmojiSounds(self, gesture):
-        enabled = conf_toggle(config.conf["audiothemes"], "emoji_enabled", True)
+        enabled = conf_toggle(config.conf["audiothemes"], "emoji_enabled", False)
         self.handler.configure()
         ui.message(_("Emoji sounds enabled") if enabled else _("Emoji sounds disabled"))
 
@@ -2166,7 +2166,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
     @script(description=_("Toggles system status monitoring sounds on and off."))
     def script_toggleSystemStatus(self, gesture):
-        enabled = conf_toggle(config.conf["audiothemes"], "sys_status_enabled", True)
+        enabled = conf_toggle(config.conf["audiothemes"], "sys_status_enabled", False)
         self.handler.configure()
         ui.message(_("System status sounds enabled") if enabled else _("System status sounds disabled"))
 
