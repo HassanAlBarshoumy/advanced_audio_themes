@@ -2451,7 +2451,6 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.navLayerTimeoutCheckbox.SetValue(_b(nlConf.get("navLayerTimeout", False)))
         self.navLayerPlaySoundsCheckbox.SetValue(_b(nlConf.get("navLayerPlaySounds", False)))
 
-        import json
         try:
             enabled_ids = json.loads(nlConf.get("navLayerEnabledModes", '["character","word","line","sentence","paragraph"]'))
         except Exception:

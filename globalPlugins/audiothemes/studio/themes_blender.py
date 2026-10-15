@@ -11,7 +11,7 @@ import shutil
 import wx
 import gui
 from ..unspoken import UnspokenPlayer
-from ..handler import AudioTheme, AudioThemesHandler, theme_roles, get_active_file_types, role_int_to_name, state_name_to_int, STATE_OFFSET
+from ..handler import AudioTheme, AudioThemesHandler, theme_roles, get_active_file_types, role_int_to_name, role_name_to_int, state_name_to_int, STATE_OFFSET
 
 import addonHandler
 from logHandler import log
@@ -368,7 +368,6 @@ class ThemeBlenderDialog(BaseDialog):
                     continue
                 role_val = role_name_to_int.get(name.lower())
                 if role_val is not None and role_val not in existing_roles:
-                    role_label = theme_roles[role_val]
                     matched.append(SoundFileInfo(
                         role=role_val,
                         src=os.path.join(root, fname),
@@ -380,7 +379,6 @@ class ThemeBlenderDialog(BaseDialog):
                     if state_val is not None:
                         state_role = state_val + STATE_OFFSET
                         if state_role not in existing_roles:
-                            role_label = theme_roles.get(state_role, name)
                             matched.append(SoundFileInfo(
                                 role=state_role,
                                 src=os.path.join(root, fname),

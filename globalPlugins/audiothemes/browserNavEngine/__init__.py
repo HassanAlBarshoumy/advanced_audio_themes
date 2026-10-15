@@ -68,7 +68,6 @@ from .editor import EditTextDialog
 from comtypes import COMError
 import NVDAObjects.IAccessible
 from NVDAObjects.UIA import UIA
-import UIAHandler
 import globalVars
 from gui import nvdaControls
 import extensionPoints
@@ -543,17 +542,9 @@ def sonifyTextInfoImpl(textInfo, lastTextInfo, includeCrackle):
             return
         if textInfo.compareEndPoints(lastTextInfo, 'startToStart') > 0:
             t1,t2 = t2,t1
-        if False:
-            # Old method, more precise, but seems to be causing a deadlock within NVDA with very low frequency - once every couple of days, so very difficult to debug
-            span = t1.copy()
-            span.setEndPoint(t2, 'endToEnd')
-            if span._endOffset - span._startOffset > 100000:
-                paragraphs = 50
-            else:
-                paragraphs = len(list(span.getTextInChunks(textInfos.UNIT_PARAGRAPH)))
-        else:
-            # new simplified way:
-            paragraphs = (t2._endOffset - t1._startOffset) // 20
+        # new simplified way (the old, more precise way was abandoned: it caused a rare NVDA deadlock,
+        # roughly once every couple of days, so it was very hard to debug):
+        paragraphs = (t2._endOffset - t1._startOffset) // 20
         paragraphs = max(0, paragraphs - 2)
         initialDelay = 0 if beepVolume==0 else 50
         beeper.simpleCrackle(paragraphs, volume=getConfig("crackleVolume"), initialDelay=initialDelay)
@@ -709,14 +700,12 @@ def browserNavPopup(selfself,gesture):
 def getFocusedURL():
     focus = api.getFocusObject()
     if isinstance(focus, UIA):
-        if False:
-            # UIA Chromium or Edge
-            # Unfortunately, there appears to be no easy way to obtain URL directly from UIA. Code below for document constnat identifier just returns some numeric constant.
-            # Googling returns ways to find address bar and read URL from it.
-            # We will keep it in mind for the future if current way changes.
-            # However, we prefer falling back to IA2 since address bar is not necessarily visible.
-            # using def _get_documentConstantIdentifier from NVDAObjects/UIA/chromium.py
-            return obj.parent._getUIACacheablePropertyValue(UIAHandler.UIA_AutomationIdPropertyId)
+        # UIA Chromium or Edge:
+        # Unfortunately, there appears to be no easy way to obtain URL directly from UIA - the discarded approach
+        # returned obj.parent._getUIACacheablePropertyValue(UIAHandler.UIA_AutomationIdPropertyId), i.e. only a
+        # numeric document-constant identifier, not a URL. Googling returns ways to find the address bar and read
+        # the URL from it; we keep that in mind for the future if the current way changes.
+        # However, we prefer falling back to IA2 since the address bar is not necessarily visible.
         # Retrieve topmost IA2 object in the window
         obj = utils.getIA2DocumentInThread()
         if obj is None:
@@ -1110,15 +1099,8 @@ class BrowserNavMixin:
     #blacklistKeys = {"_startOfNode", "_endOfNode"}
     whitelistKeys = "color,font-family,font-size,bold,italic,strikethrough,underline".split(",")
     def compareFormatFields(self, f1, f2):
-        if False:
-          for key in set(f1.keys()).union(set(f2.keys())).difference(self.blacklistKeys):
-            try:
-                if f1[key] != f2[key]:
-                    mylog(f"Inequality during comparison; key={key} f1={f1[key]} f2={f2[key]}")
-                    return False
-            except KeyError:
-                mylog(f"KeyError during comparison; key={key} f1={key in f1} f2={key in f2}")
-                return False
+        # Note: the old blacklist-based comparison was disabled because it relied on self.blacklistKeys, which no
+        # longer exists (see the commented-out definition above); only the whitelist below is used.
         for key in self.whitelistKeys:
             if key not in f1 and key not in f2:
                 continue
@@ -1513,33 +1495,11 @@ class BrowserNavMixin:
                     kbdControlHome.send()
                     goToPosition(cursorLine, cursorColumn)
                   # Step 3.4: Wait for clipbord to be updated to make sure we can flush clipboard
-                    if False:
-                        if  hasChanged and not shortTextMode:
-                            while True:
-                                yield 1
-                                if time.time() > timeout:
-                                    raise EditBoxUpdateError(_("Timed out during single-character control+C stage"))
-                                try:
-                                    newText = api.getClipData()
-                                except PermissionError:
-                                    continue
-                                if text != newText:
-                                    break
-                        else:
-                            # For very short texts just sleep a bit longer
-                            yield 100
+                  # (disabled: this wait/sleep step is intentionally skipped)
                 finally:
-                    if False:
-                      # Step 3.3. Sleep for a bit more just to make sure things have propagated - in short text mode only.
-                      # Apparently if we don't sleep, then either the previous value with ` would be used sometimes,
-                      # or it will paste the original contents of clipboard.
-                        if  hasChanged and shortTextMode:
-                            core.callLater(
-                                500,
-                                self.endInjectingKeystrokes
-                            )
-                        else:
-                            self.endInjectingKeystrokes()
+                    # Step 3.3. the sleep-to-propagate delay was disabled: it used to defer endInjectingKeystrokes in
+                    # short-text mode (without it, the previous value with ` was sometimes used, or the original
+                    # clipboard contents got pasted). The disabled implementation is preserved in the git history.
                     def watchAndRestoreClipboard():
                         if not hasChanged:
                             return
@@ -1567,9 +1527,7 @@ class BrowserNavMixin:
                                 )
                             ):
                                 # Bingo! First char has appeared in clipboard. Restoring original clipboard state and exiting
-                                result = clipboard.deleteEntryFromClipboardHistory(firstChar, maxEntries=1)
-                                if False and result:
-                                    core.callLater(1000, tones.beep, 100, 1000)
+                                clipboard.deleteEntryFromClipboardHistory(firstChar, maxEntries=1)
                                 self.endInjectingKeystrokes()
                                 return
                             else:
@@ -1678,10 +1636,8 @@ class BrowserNavMixin:
                 # Sleep for testing - otherwise clipboard history doesn't even notice new item
                 #time.sleep(1)
                 #core.callLater(1000, clipboard.deleteEntryFromClipboardHistory, data)
-                result = clipboard.deleteEntryFromClipboardHistory(data, maxEntries=1)
+                clipboard.deleteEntryFromClipboardHistory(data, maxEntries=1)
                 # self.endInjectingKeystrokes() will be called outside 
-                if False and  result:
-                    core.callLater(1000, tones.beep, 1000, 1000)
                 return data
             wx.Yield()
             time.sleep(10/1000)

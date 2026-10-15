@@ -139,7 +139,6 @@ class Beeper:
 
     NOTES = "A,B,H,C,C#,D,D#,E,F,F#,G,G#".split(",")
     NOTE_RE = re.compile("[A-H][#]?")
-    BASE_FREQ = 220
     def getChordFrequencies(self, chord):
         prev = -1
         result = []

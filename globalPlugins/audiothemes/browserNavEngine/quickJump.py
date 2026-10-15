@@ -2467,7 +2467,7 @@ def getBrowseModeDefaultKeystrokeByFunc(funcName):
         return result
     else:
         return "N/A"
-    quickJumpForward
+
 def getDefaultKeystroke(category):
     categoriesToFuncNames = {
         BookmarkCategory.QUICK_JUMP: "quickJumpForward",
@@ -2614,11 +2614,7 @@ class EditBookmarkDialog(wx.Dialog):
         self.availableAttributesListBox.control.Bind(wx.EVT_CHAR, self.onChar)
         if paragraphInfo is None:
             self.availableAttributesListBox.control.Disable()
-      # enable Autospeak checkbox
-        if False:
-            labelText = _("Automatically detect and speak changes to this bookmark")
-            self.autoSpeakEnabledCheckBox=sHelper.addItem(wx.CheckBox(self,label=labelText))
-            self.autoSpeakEnabledCheckBox.SetValue(self.bookmark.enableAutoSpeak)
+      # Autospeak checkbox (disabled upstream)
       # Translators:  AutospeakMode comboBox
         labelText = _("AutoSpeak mode")
         self.autoSpeakModeComboBox = guiHelper.LabeledControlHelper(
@@ -3288,30 +3284,8 @@ class EditSiteDialog(wx.Dialog):
             min=1, max=10000,
             initial=self.site.autoClickContinuousDelay,
         )
-      # Translators: label for enable recurrent autoSpeak
-        if False:
-            Text = _("Enable recurrent auto speak of ")
-            self.autoSpeakCheckBox=sHelper.addItem(wx.CheckBox(self,label=Text))
-            self.autoSpeakCheckBox.Bind(wx.EVT_CHECKBOX,self.onRecurrent)
-            self.autoSpeakCheckBox.SetValue(self.site.autoSpeak)
-      # Translators:  autoSpeak combo box
-        if False:
-            text = _("Perform autoSpeak (live region) for:")
-            self.autoSpeakOptions = [
-                None,
-                BookmarkCategory.QUICK_SPEAK,
-                BookmarkCategory.QUICK_SPEAK_2,
-            ]
-            self.autoSpeakComboBox = guiHelper.LabeledControlHelper(
-                self,
-                text,
-                wx.Choice,
-                choices=[BookmarkCategoryShortNames.get(option, _("Disabled"))  for option in self.autoSpeakOptions],
-            )
-            self.autoSpeakComboBox.control.Bind(wx.EVT_CHOICE,self.onAutoSpeakCombo)
-            self.autoSpeakComboBox.control.SetSelection(self.autoClickOptions.index(
-                self.site.autoSpeakCategory if self.    site.autoSpeak else None
-            ))
+      # Translators: label for enable recurrent autoSpeak (disabled upstream)
+      # Translators:  autoSpeak combo box (disabled upstream)
       # Suppress descriptions checkbox
         Text = _("Suppress descriptions")
         self.suppressDescriptionCheckBox=sHelper.addItem(wx.CheckBox(self,label=Text))
@@ -3513,12 +3487,6 @@ class EditSiteDialog(wx.Dialog):
             else:
                 control.Enable()
         self.onRecurrent(event)
-
-    def getAutoSpeakCombo(self):
-        return self.autoSpeakOptions[self.autoSpeakComboBox.control.GetSelection()]
-
-    def onAutoSpeakCombo(self, event):
-        pass
 
     def onRecurrent(self, event):
         enabled = self.recurrentCheckBox.Value

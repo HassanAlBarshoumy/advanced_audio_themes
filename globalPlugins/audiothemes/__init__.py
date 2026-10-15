@@ -476,7 +476,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         if state:
             ui.message(_("Audio themes enabled"))
         else:
-            import ui
             ui.message(_("Audio themes disabled"))
 
     def _add_tray_menu_items(self):
