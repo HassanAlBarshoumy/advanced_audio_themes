@@ -348,8 +348,7 @@ ppRulesFileName = os.path.join(globalVars.appArgs.configPath, "phoneticPunctuati
 defaultRulesFileName = os.path.join(os.path.dirname(__file__), "defaultEarconsAndSpeechRules.json")
 _rules_lock = threading.Lock()
 def reloadRules():
-    global rulesByFrenzy, characterRules, allProsodies
-    initialAttempt = rulesByFrenzy == None
+    global rulesByFrenzy, characterRules, allProsodies, cached_passThrough_regex
     if not os.path.exists(rulesFileName):
         if os.path.exists(ppRulesFileName):
             shutil.copy(ppRulesFileName, rulesFileName)
@@ -425,7 +424,6 @@ def reloadRules():
     else:
         new_cached_passThrough_regex = None
 
-    # global _rules_lock, cached_passThrough_regex
     with _rules_lock:
         rulesByFrenzy = newRulesByFrenzy
         allProsodies = newAllProsodies

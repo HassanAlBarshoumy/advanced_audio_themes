@@ -862,7 +862,8 @@ class UnspokenPlayer:
 		# handler role-speech gates: True keeps announcements during say-all, so
 		# it must also KEEP theme sounds. Only a user who explicitly cleared it
 		# (False) gets theme sounds muted while say-all is genuinely running.
-		if not obj_info.get("system_sound") and not getattr(self, "use_in_say_all", True) and _say_all_is_running():
+		is_system = obj_info.get("system_sound") if isinstance(obj_info, dict) else False
+		if not is_system and not getattr(self, "use_in_say_all", True) and _say_all_is_running():
 			self._last_gate = "say-all"
 			return
 		self._last_gate = ""
@@ -871,7 +872,6 @@ class UnspokenPlayer:
 		# De-duplicate: skip if same name played < 50ms ago, unless it's a progress bar updating
 		obj_name = obj_info.get("name", "") if isinstance(obj_info, dict) else ""
 		is_progress = "progress_angle" in obj_info if isinstance(obj_info, dict) else False
-		is_system = obj_info.get("system_sound") if isinstance(obj_info, dict) else False
 		with self._last_played_lock:
 			if not is_progress and self._last_played_object and (curtime - self._last_played_time < 0.05 and obj_name == self._last_played_object.get("name", "")):
 				return

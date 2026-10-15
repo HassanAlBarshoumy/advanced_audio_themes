@@ -36,7 +36,21 @@ if CURRENT_VERSION is None:
 def parse_version(v):
     try:
         parts = v.lstrip("v").split(".")
-        return tuple(int(p) for p in parts)
+        result = []
+        saw_digit = False
+        for part in parts:
+            digits = ""
+            for ch in part:
+                if ch.isdigit():
+                    digits += ch
+                else:
+                    break
+            if digits:
+                saw_digit = True
+            result.append(int(digits) if digits else 0)
+        if not saw_digit:
+            return (0, 0, 0)
+        return tuple(result)
     except (ValueError, AttributeError):
         return (0, 0, 0)
 
@@ -65,6 +79,7 @@ def get_latest_release(prerelease=False):
             return tag, _find_asset(data), data.get("html_url", "")
         releases = _fetch_json(LIST_API)
         best = None
+        best_published = ""
         for rel in releases:
             if rel.get("draft", False):
                 continue
@@ -72,8 +87,10 @@ def get_latest_release(prerelease=False):
             url = _find_asset(rel)
             if not url:
                 continue
-            published = rel.get("published_at", "")
-            best = (tag, url, published, rel.get("html_url", ""))
+            published = rel.get("published_at") or rel.get("created_at") or ""
+            if best is None or published > best_published:
+                best = (tag, url, published, rel.get("html_url", ""))
+                best_published = published
         if best:
             return best[0], best[1], best[3]
         return None, None, None
