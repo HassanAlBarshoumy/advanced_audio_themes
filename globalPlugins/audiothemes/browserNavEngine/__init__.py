@@ -1294,8 +1294,6 @@ class BrowserNavMixin:
         if appName == 'nvda':
             ui.message(_("Cannot edit in this window."))
             return
-        fastChromeMode = appName == 'chrome'
-        slowFirefoxMode = appName == 'firefox'
         url = api.getCurrentURL()
         hackerRankMode =  re.search(r"^https://www.hackerrank.com/", url or "") is not None
         googleCollabMode =  re.search(r"^https://colab.research.google.com/", url or "") is not None
@@ -1645,7 +1643,7 @@ class BrowserNavMixin:
     def popupEditTextDialog(self, text, cursorLine, cursorColumn, onTextComplete):
         gui.mainFrame.prePopup()
         d = EditTextDialog(gui.mainFrame, text, cursorLine, cursorColumn, onTextComplete)
-        result = d.Show()
+        d.Show()
         gui.mainFrame.postPopup()
         # d is non-modal; it will be destroyed when the user closes it
 

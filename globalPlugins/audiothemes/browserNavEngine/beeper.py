@@ -175,7 +175,6 @@ class Beeper:
             bufSize -= (bufSize % intSize)
         player = self._ensure_player()
         player.stop()
-        bbs = []
         result = [0] * (bufSize//intSize)
         for freq in freqs:
             buf = ctypes.create_string_buffer(bufSize)

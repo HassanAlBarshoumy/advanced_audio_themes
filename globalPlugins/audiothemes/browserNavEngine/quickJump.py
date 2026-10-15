@@ -993,7 +993,6 @@ def onVirtualBufferUpdate(browse):
         except KeyError:
             state = AutoSpeakState(isVirtualBufferUpdated=False, isAutoSpeakHandlerRunning=False)
             AutoSpeakStates[browse] = state
-        flag = state.isVirtualBufferUpdated
         isRunning = state.isAutoSpeakHandlerRunning
         state.isVirtualBufferUpdated = True
         if isRunning:
@@ -1215,7 +1214,6 @@ def getKeystrokeFromGesture(gesture):
 originalGetAlternativeScript = None
 def postGetAlternativeScript(self,gesture,script):
     result = originalGetAlternativeScript(self,gesture,script)
-    bookmarkExecuted = False
     keystroke = getKeystrokeFromGesture(gesture)
     url = getUrl(self, onlyFromCache=True)
     if url is None:
@@ -1547,12 +1545,6 @@ def runScriptAndApplyOffset(textInfo, match, skipClutterBookmarks=None, level=No
             _message = message
             _xLocation = xLocation
             raise QuickJumpMatchPerformedException
-        execLocals = {
-            'p': p,
-            't': t,
-            'match': match,
-            #'allowGeneratorScripts': bookmark.category == BookmarkCategory.SCRIPT,
-        }
         #thisExecGlobals = dict(**execGlobals)
         try:
             #exec(bookmark.bytecode, thisExecGlobals, execLocals)
@@ -1676,7 +1668,7 @@ def _quickJump(self, gesture, bookmarks, direction, errorMsg):
     textInfo = self.makeTextInfo(textInfos.POSITION_CARET)
     textInfo.collapse()
     textInfo.expand(textInfos.UNIT_PARAGRAPH)
-    originalParagraph = textInfo.copy()
+    textInfo.copy()
     distance = 0
     adjustedDistance = 0
     while True:
@@ -1722,7 +1714,6 @@ def caretMovementWithAutoSkip(self, gesture,unit, direction=None,posConstant=tex
     if self.isTextSelectionAnchoredAtStart and not oldInfo.isCollapsed:
         info.move(textInfos.UNIT_CHARACTER,-1)
     info.expand(unit)
-    text = info.text
     info.collapse()
     for i in range(100):
         result = info.move(unit,direction)
@@ -1730,7 +1721,6 @@ def caretMovementWithAutoSkip(self, gesture,unit, direction=None,posConstant=tex
             break
         expandInfo = info.copy()
         expandInfo.expand(unit)
-        expandText = expandInfo.text
         if isSkipClutterEnabledForThisUnit(unit) and shouldSkipClutter(expandInfo, bookmarks):
             skipped = True
             continue
@@ -1839,7 +1829,7 @@ def _autoClick(self, gesture, bookmarks, site=None, automated=False, category=No
             try:
                 focusable.doAction()
                 numSuccessfulClicks += 1
-            except NotImplementedError as e:
+            except NotImplementedError:
                 # Not sure why this is occasionally thrown
                 log.debug("AudioThemes: swallowed NotImplementedError in browserNavEngine.quickJump._autoClick")
         if numSuccessfulClicks == 0:
@@ -2031,7 +2021,6 @@ def scanLevelsSync(self, config, bookmarks):
     futures = []
     direction = 1
     try:
-        category = BookmarkCategory.HIERARCHICAL
         mylog(f"sltf bookmarks={len(bookmarks)} url=?")
         if len(bookmarks) == 0:
             return HierarchicalLevelsInfo([])
@@ -2872,7 +2861,7 @@ class EditBookmarkDialog(wx.Dialog):
         title = title % self.bookmark.getDisplayName()
         while not _good and not _cancel:
             d = EditTextDialog(self, _snippet, _cursorLine, _cursorColumn, onTextComplete, title=title)
-            result = d.ShowModal()
+            d.ShowModal()
         if _good:
             self.snippet = _snippet
             self.cursorLine, self.cursorColumn = _cursorLine, _cursorColumn
@@ -2979,7 +2968,7 @@ class EditBookmarkDialog(wx.Dialog):
         self.biwList.control.SetSelection(biwIndex)
 
     def onBiw(self, evt):
-        soundsPath = utils.getSoundsPath()
+        utils.getSoundsPath()
         biw = self.getBiw()
         #fullPath = os.path.join(soundsPath, biw)
         #nvwave.playWaveFile(fullPath)
@@ -2993,8 +2982,8 @@ class EditBookmarkDialog(wx.Dialog):
         return cats[sel]
 
     def onBiwCategory(self, evt):
-        soundsPath = utils.getSoundsPath()
-        category = self.getBiwCategory()
+        utils.getSoundsPath()
+        self.getBiwCategory()
         self.biwList.control.SetItems(self.getBuiltInWaveFilesInCategory())
 
     def onOk(self,evt):
@@ -3016,7 +3005,7 @@ class BookmarksListDialog(
         self.site = site
         self.bookmarks = list(site.bookmarks)
         self.config = config
-        mainSizer=wx.BoxSizer(wx.VERTICAL)
+        wx.BoxSizer(wx.VERTICAL)
         sHelper = guiHelper.BoxSizerHelper(self, orientation=wx.VERTICAL)
       # Bookmarks table
         rulesText = _("&Bookmarks")
@@ -3072,8 +3061,7 @@ class BookmarksListDialog(
     def onListItemFocused(self, evt):
         if self.rulesList.GetSelectedItemCount()!=1:
             return
-        index=self.rulesList.GetFirstSelected()
-        bookmark = self.bookmarks[index]
+        self.rulesList.GetFirstSelected()
 
     def OnAddClick(self,evt):
         entryDialog=EditBookmarkDialog(
@@ -3624,7 +3612,6 @@ def importImpl(self, sites, site):
         elif result == wx.ID_YES + 2:
             # Rename
             d = site.asDict()
-            oldName = site.name
             existingNames = set([s.name for s in sites])
             name = None
             for i in range(2,   100):
@@ -3672,7 +3659,7 @@ class WebsiteStoreDialog(
         super().__init__(parent,title=title)
         self.j = j
         self.sites = list(j['websites'].values())
-        mainSizer=wx.BoxSizer(wx.VERTICAL)
+        wx.BoxSizer(wx.VERTICAL)
         sHelper = guiHelper.BoxSizerHelper(self, orientation=wx.VERTICAL)
       # websites table
         label = _("&Websites")
@@ -3690,7 +3677,7 @@ class WebsiteStoreDialog(
         self.sitesList.Bind(wx.EVT_LIST_ITEM_FOCUSED, self.onListItemFocused)
         self.sitesList.ItemCount = len(self.sites)
 
-        bHelper = sHelper.addItem(guiHelper.ButtonHelper(orientation=wx.HORIZONTAL))
+        sHelper.addItem(guiHelper.ButtonHelper(orientation=wx.HORIZONTAL))
       # Description edit field
         self.textCtrl = wx.TextCtrl(self, style=wx.TE_MULTILINE|wx.TE_DONTWRAP)
         sHelper.addItem(self.textCtrl)
@@ -3792,8 +3779,7 @@ class SettingsDialog(SettingsPanel):
     def onListItemFocused(self, evt):
         if self.sitesList.GetSelectedItemCount()!=1:
             return
-        index=self.sitesList.GetFirstSelected()
-        site = self.config.sites[index]
+        self.sitesList.GetFirstSelected()
 
     def OnAddClick(self,evt):
         entryDialog=EditSiteDialog(self, knownSites=self.config.sites, config=self.config)

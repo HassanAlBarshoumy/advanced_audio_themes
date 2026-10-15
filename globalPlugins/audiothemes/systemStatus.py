@@ -245,10 +245,6 @@ class SystemStatusMonitor:
             log.debug("AudioThemes: swallowed Exception in systemStatus._run")
 
     def _register_device_notifications(self):
-        try:
-            from .handler import SpecialProps
-        except Exception:
-            return
         use_all_usb = self._cached_config.get("sys_all_usb", True)
 
         # Register for USB device interface notifications (all USB devices)
@@ -415,10 +411,6 @@ class SystemStatusMonitor:
         except Exception:
             return
         try:
-            INTERNET_CONNECTION_MODEM = 1
-            INTERNET_CONNECTION_LAN = 2
-            INTERNET_CONNECTION_PROXY = 4
-            INTERNET_CONNECTION_RAS = 8
             flags = ctypes.wintypes.DWORD(0)
             result = ctypes.windll.wininet.InternetGetConnectedState(
                 ctypes.byref(flags), 0

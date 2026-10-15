@@ -138,7 +138,6 @@ class BaseDialog(wx.Dialog):
         self.addControls(sizer, panel)
         buttons = self.getButtons(panel)
         if buttons is not None:
-            line = wx.StaticLine(panel, -1, size=(20, -1), style=wx.LI_HORIZONTAL)
             #sizer.Add(
                 #line, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.TOP, 10
             #)

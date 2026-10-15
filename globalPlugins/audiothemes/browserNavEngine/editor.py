@@ -24,7 +24,7 @@ class GoToLineDialog(wx.Dialog):
         # Translators: Title of Go To Line dialog
         title_string = _("Go to line")
         super(GoToLineDialog, self).__init__(parent, title=title_string)
-        mainSizer = wx.BoxSizer(wx.VERTICAL)
+        wx.BoxSizer(wx.VERTICAL)
         sHelper = gui.guiHelper.BoxSizerHelper(self, orientation=wx.VERTICAL)
         #sHelper = gui.guiHelper.BoxSizerHelper(self, sizer=settingsSizer)
         self.lineNumEdit = gui.guiHelper.LabeledControlHelper(self, _("Go to line:"), wx.TextCtrl).control
@@ -56,7 +56,7 @@ class RegexSearchDialog(wx.Dialog):
     def __init__(self, parent):
         title_string = _("Regex search")
         super(RegexSearchDialog, self).__init__(parent, title=title_string)
-        mainSizer = wx.BoxSizer(wx.VERTICAL)
+        wx.BoxSizer(wx.VERTICAL)
         sHelper = gui.guiHelper.BoxSizerHelper(self, orientation=wx.VERTICAL)
         self.strEdit = gui.guiHelper.LabeledControlHelper(self, _("Go to line:"), wx.TextCtrl).control
         self.strEdit.Value = lastRegexSearch
@@ -67,7 +67,7 @@ class RegexSearchDialog(wx.Dialog):
     def onOk(self, evt):
         strVal = self.strEdit.Value
         try:
-            r = re.compile(strVal)
+            re.compile(strVal)
         except re.error:
             gui.messageBox(_("Invalid regular expression"),
                 _("Wrong regex"),
@@ -92,7 +92,7 @@ class EditTextDialog(wx.Dialog):
         self.text = text
         self.originalText = text
         self.onTextComplete = onTextComplete
-        mainSizer = wx.BoxSizer(wx.VERTICAL)
+        wx.BoxSizer(wx.VERTICAL)
         sHelper = gui.guiHelper.BoxSizerHelper(self, orientation=wx.VERTICAL)
 
         self.textCtrl = wx.TextCtrl(self, style=wx.TE_MULTILINE|wx.TE_DONTWRAP)
@@ -174,7 +174,7 @@ class EditTextDialog(wx.Dialog):
         control = event.ControlDown()
         shift = event.ShiftDown()
         alt = event.AltDown()
-        keyCode = event.GetKeyCode ()
+        event.GetKeyCode ()
         #mylog(f"vk={keyCode} a{alt} c{control} s{shift}")
         if event.GetKeyCode() in [10, 13]:
             # 13 means Enter
@@ -223,7 +223,7 @@ class EditTextDialog(wx.Dialog):
                     # Shift+Tab
                     curPos = self.textCtrl.GetInsertionPoint()
                     dummy, curCol, curLine = self.textCtrl.PositionToXY(curPos)
-                    beginLinePos = self.textCtrl.XYToPosition(0, curLine)
+                    self.textCtrl.XYToPosition(0, curLine)
                     allText = self.textCtrl.Value
                     allText = allText.replace("\r\n", "\n").replace("\r", "\n")
                     allLines = allText.split("\n")

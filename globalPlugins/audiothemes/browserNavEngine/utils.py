@@ -50,7 +50,6 @@ def executeAsynchronously(gen):
         value = gen.__next__()
     except StopIteration:
         return
-    l = lambda gen=gen: executeAsynchronously(gen)
     core.callLater(value, executeAsynchronously, gen)
 
 class Worker(Thread):
@@ -241,7 +240,7 @@ def getGeckoParagraphIndent(textInfo, documentHolder=None, oneLastAttempt=False)
         return None
     except LookupError:
         return None
-    except _ctypes.COMError as e:
+    except _ctypes.COMError:
         if oneLastAttempt or documentHolder is None:
             return None
         # This tends to happen when page changes dynamically.

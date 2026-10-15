@@ -572,7 +572,6 @@ class AudioRuleDialog(wx.Dialog):
                 self.durationTextCtrl.SetFocus()
                 return
         prosodyOffset = None
-        prosodyMultiplier = None
         if self.getType() == audioRuleProsody:
             good = False
             try:
@@ -774,8 +773,8 @@ class AudioRuleDialog(wx.Dialog):
         return cats[idx]
 
     def onBiwCategory(self, evt):
-        soundsPath = getSoundsPath()
-        category = self.getBiwCategory()
+        getSoundsPath()
+        self.getBiwCategory()
         self.biwList.control.SetItems(self.getBuiltInWaveFilesInCategory())
 
     def onType(self, evt):

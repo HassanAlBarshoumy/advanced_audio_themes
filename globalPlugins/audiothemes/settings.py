@@ -1225,7 +1225,6 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
     def setupMiscPage(self, page):
         """Tab 4: Miscellaneous — SentenceNav sentence/phrase navigation settings."""
-        from .sentenceNavEngine import getSNConfig, getCurrentLanguage
         sizer = wx.BoxSizer(wx.VERTICAL)
 
         # --- Sentence navigation group ---

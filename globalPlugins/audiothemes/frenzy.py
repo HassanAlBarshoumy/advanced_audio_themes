@@ -616,8 +616,6 @@ class FakeTextInfo:
         if formatConfig != self.formatConfig:
             #raise ValueError
             pass
-        stack = []
-        info = self.info
         skipSet = self.skipSet
         start = self.start
         end = self.end

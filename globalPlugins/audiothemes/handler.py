@@ -1399,7 +1399,7 @@ class AudioThemesHandler:
                 if not os.path.exists(target_theme_path):
                     try:
                         shutil.copytree(bundled_theme_path, target_theme_path)
-                    except Exception as e:
+                    except Exception:
                         log.debug("AudioThemes: swallowed Exception in handler.ensure_themes_dir")
                         
         default_theme_path = os.path.join(THEMES_DIR, "Default")
@@ -2006,7 +2006,7 @@ class AudioThemesHandler:
             self._set_play_gate("themes-disabled")
             return
         try:
-            player = self._ensure_player()
+            self._ensure_player()
         except Exception:
             # Invisible before (debugWarning is below INFO): this is the single
             # most important failure path - no player means NO theme sound at

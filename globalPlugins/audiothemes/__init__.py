@@ -27,7 +27,6 @@ import tones
 import wx
 import config
 import globalPluginHandler
-import keyboardHandler
 import re
 from keyboardHandler import KeyboardInputGesture
 
@@ -35,7 +34,6 @@ import scriptHandler
 from scriptHandler import script
 import NVDAObjects
 import gui
-import speech
 import eventHandler
 import controlTypes
 import globalCommands
@@ -603,7 +601,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     def script_openHelp(self, gesture):
         import os
         import languageHandler
-        import addonHandler
         lang = languageHandler.getLanguage()
         addonDir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         docPath = os.path.join(addonDir, "doc", lang, "readme.html")
@@ -2178,7 +2175,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             except Exception:
                 self._studioDialog = None
         from .studio import AudioThemesStudioStartupDialog
-        import wx
         with AudioThemesStudioStartupDialog(self, _("Audio Themes Studio")) as dlg:
             self._studioDialog = dlg
             dlg.Raise()

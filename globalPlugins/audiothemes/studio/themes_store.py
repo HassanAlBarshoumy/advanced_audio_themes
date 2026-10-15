@@ -98,7 +98,7 @@ class ThemesStoreDialog(wx.Dialog):
                 data = json.loads(response.read().decode('utf-8'))
                 if not self._closed:
                     wx.CallAfter(self.PopulateList, data)
-        except Exception as e:
+        except Exception:
             if not self._closed:
                 wx.CallAfter(self.statusLabel.SetLabel, _("Failed to connect to store. Check your internet connection."))
             
@@ -181,7 +181,7 @@ class ThemesStoreDialog(wx.Dialog):
                 f.write(pack_data)
                 
             wx.CallAfter(self.InstallFinished, tmp_path, pkg_type)
-        except Exception as e:
+        except Exception:
             if tmp_path and os.path.exists(tmp_path):
                 with suppress(Exception):
                     os.remove(tmp_path)
@@ -204,7 +204,7 @@ class ThemesStoreDialog(wx.Dialog):
                 else:
                     self.statusLabel.SetLabel(_("Installation failed."))
                     wx.MessageBox(_("The downloaded audio theme could not be installed.\nIt may be corrupted, unsafe, or not a valid theme package."), _("Error"), wx.ICON_ERROR)
-        except Exception as e:
+        except Exception:
             self.statusLabel.SetLabel(_("Error during installation."))
         finally:
             self.downloadBtn.Enable()
@@ -301,7 +301,7 @@ class ThemesStoreDialog(wx.Dialog):
                         
             if not self._closed:
                 wx.CallAfter(self.statusLabel.SetLabel, _("Preview finished."))
-        except Exception as e:
+        except Exception:
             if not self._closed:
                 wx.CallAfter(self.statusLabel.SetLabel, _("Audio preview failed."))
         finally:
