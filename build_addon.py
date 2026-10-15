@@ -64,6 +64,7 @@ EXCLUDE_FILES = {
 	"SConstruct",
 	"sconstruct",
 	"manifest.ini.tpl",
+	"prepareDefaultConfig.py",
 }
 EXCLUDE_SUFFIXES = (".nvda-addon", ".sha256", ".pyc", ".pyo", ".py~", ".log")
 
