@@ -2108,7 +2108,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.speakRoleCheckbox.SetValue(_b(conf.get("speak_roles", True)))
         self.useInSayAllCheckbox.SetValue(_b(conf.get("use_in_say_all", True)))
         self.useSynthVolumeCheckbox.SetValue(_b(conf.get("use_synth_volume", False)))
-        self.volumeSlider.SetValue(_i(conf.get("volume", 100)))
+        self.volumeSlider.SetValue(_i(conf.get("volume", 20)))
         self.disabledAppsEdit.SetValue(conf.get("disabled_apps", ""))
         self.blacklisted_roles = _get_blacklisted_roles()
         self.autoUpdateCheckbox.SetValue(_b(conf.get("check_for_updates_auto", True)))
@@ -2119,7 +2119,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             duck_val = duck_val.lower() == 'true'
         self.audioDuckingCheckbox.SetValue(_b(bool(duck_val)))
         
-        duck_cat_str = conf.get("ducking_categories", "")
+        duck_cat_str = conf.get("ducking_categories", '{"theme_sounds":true,"typing_sounds":true,"earcons":true,"browsernav":true,"sentencenav":true,"textnav":true,"ui_beeps":true}')
         if duck_cat_str:
             try:
                 self._ducking_categories = json.loads(duck_cat_str)
@@ -2128,7 +2128,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         else:
             self._ducking_categories = dict(_DEFAULT_DUCKING_CATEGORIES)
 
-        suppress_cat_str = conf.get("disabled_apps_suppress_categories", "")
+        suppress_cat_str = conf.get("disabled_apps_suppress_categories", '{"theme_sounds":true,"typing_sounds":true,"earcons":true,"browsernav":true,"sentencenav":true,"textnav":true,"ui_beeps":true}')
         if suppress_cat_str:
             try:
                 self._suppress_categories = json.loads(suppress_cat_str)
@@ -2227,7 +2227,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         pack = conf.get("typing_sound_pack", "1blueSwitch")
         if pack in self.typingPackChoices:
             self.typingPackCombobox.SetStringSelection(pack)
-        self.typingSoundsVolumeSlider.SetValue(_i(conf.get("typing_sounds_volume", 100)))
+        self.typingSoundsVolumeSlider.SetValue(_i(conf.get("typing_sounds_volume", 10)))
         self._update_typing_controls()
 
         # First/Last item fallback
@@ -2285,7 +2285,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
         fl_mode_map = {"smart": 0, "strict": 1, "any_sibling": 2}
         fl_mode_val = conf.get("fl_detection_mode", "strict")
         self.flModeChoice.SetSelection(fl_mode_map.get(fl_mode_val, 0))
-        fl_roles_raw = conf.get("fl_enabled_roles", "all")
+        fl_roles_raw = conf.get(
+            "fl_enabled_roles", '["listitem","treeviewitem","menuitem","tab"]'
+        )
         if fl_roles_raw == "all":
             self.flScopeAll.SetValue(True)
             self.flSelectRolesBtn.Enable(False)
@@ -2340,7 +2342,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.emojiDelayAfterSpin.SetValue(_i(conf.get("emoji_delay_after", 0)))
         self.emojiPrefixCheckbox.SetValue(_b(conf.get("emoji_prefix", True)))
         self.emojiPrefixTextCtrl.SetValue(conf.get("emoji_prefix_text", "emoji"))
-        self.emojiSuffixTextCtrl.SetValue(conf.get("emoji_suffix_text", ""))
+        self.emojiSuffixTextCtrl.SetValue(conf.get("emoji_suffix_text", "emoji"))
         pos_map = {"before": 0, "after": 1, "both": 2, "none": 3}
         pos_val = conf.get("emoji_position", "before")
         self.emojiPositionChoice.SetSelection(pos_map.get(pos_val, 0))
@@ -2388,10 +2390,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
         
         unspoken_conf = config.conf["unspoken"]
         self.enableReverbCheckbox.SetValue(_b(unspoken_conf.get("Reverb", False)))
-        self.roomSizeSlider.SetValue(_i(unspoken_conf.get("RoomSize", 50)))
-        self.dampingSlider.SetValue(_i(unspoken_conf.get("Damping", 50)))
-        self.wetLevelSlider.SetValue(_i(unspoken_conf.get("WetLevel", 50)))
-        self.dryLevelSlider.SetValue(_i(unspoken_conf.get("DryLevel", 50)))
+        self.roomSizeSlider.SetValue(_i(unspoken_conf.get("RoomSize", 100)))
+        self.dampingSlider.SetValue(_i(unspoken_conf.get("Damping", 0)))
+        self.wetLevelSlider.SetValue(_i(unspoken_conf.get("WetLevel", 0)))
+        self.dryLevelSlider.SetValue(_i(unspoken_conf.get("DryLevel", 30)))
         self.widthSlider.SetValue(_i(unspoken_conf.get("Width", 100)))
         self.onEnableReverbCheckboxChanged(DummyEvent(unspoken_conf.get("Reverb", False)))
         # Miscellaneous tab — SentenceNav settings
@@ -2702,7 +2704,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
         if self.flScopeSelected.GetValue() and not hasattr(self, '_fl_enabled_roles_list'):
             import json
             conf = config.conf["audiothemes"]
-            raw = conf.get("fl_enabled_roles", "all")
+            raw = conf.get(
+                "fl_enabled_roles", '["listitem","treeviewitem","menuitem","tab"]'
+            )
             if raw == "all":
                 self._fl_enabled_roles_list = ["listitem", "treeviewitem", "menuitem", "tab"]
             else:
@@ -3453,7 +3457,7 @@ class DuckingCategoriesDialog(wx.Dialog):
 
         self._checkboxes = {}
         conf = config.conf.get("audiothemes", {})
-        cat_str = conf.get("ducking_categories", "")
+        cat_str = conf.get("ducking_categories", '{"theme_sounds":true,"typing_sounds":true,"earcons":true,"browsernav":true,"sentencenav":true,"textnav":true,"ui_beeps":true}')
         if cat_str:
             try:
                 categories = json.loads(cat_str)
@@ -3502,7 +3506,7 @@ class SuppressCategoriesDialog(wx.Dialog):
 
         self._checkboxes = {}
         conf = config.conf.get("audiothemes", {})
-        cat_str = conf.get("disabled_apps_suppress_categories", "")
+        cat_str = conf.get("disabled_apps_suppress_categories", '{"theme_sounds":true,"typing_sounds":true,"earcons":true,"browsernav":true,"sentencenav":true,"textnav":true,"ui_beeps":true}')
         if cat_str:
             try:
                 categories = json.loads(cat_str)

@@ -577,7 +577,7 @@ def _load_suppressed_categories():
     try:
         handler = _handler_ref
         cc = getattr(handler, '_cached_config', None) if handler else None
-        raw = cc.get("disabled_apps_suppress_categories", "") if cc else ""
+        raw = cc.get("disabled_apps_suppress_categories", '{"theme_sounds":true,"typing_sounds":true,"earcons":true,"browsernav":true,"sentencenav":true,"textnav":true,"ui_beeps":true}') if cc else ""
         with _suppressed_categories_lock:
             if raw == _suppressed_categories_json:
                 return

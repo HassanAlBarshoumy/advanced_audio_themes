@@ -67,7 +67,7 @@ _DEFAULT_FRENZY_CONFIG = {
     "blacklisted_roles": "[19]",
     "audio_ducking_enabled": False,
     "audio_ducking_volume": 30,
-    "ducking_categories": "",
+    "ducking_categories": '{"theme_sounds":true,"typing_sounds":true,"earcons":true,"browsernav":true,"sentencenav":true,"textnav":true,"ui_beeps":true}',
 }
 
 _frenzy_cached_config = dict(_DEFAULT_FRENZY_CONFIG)
@@ -393,7 +393,7 @@ def get_ducking_factor(category="theme_sounds", cached_config=None):
             cached_config = _frenzy_cached_config
         if not cached_config.get("audio_ducking_enabled", False):
             return 1.0
-        dc_raw = cached_config.get("ducking_categories", "")
+        dc_raw = cached_config.get("ducking_categories", '{"theme_sounds":true,"typing_sounds":true,"earcons":true,"browsernav":true,"sentencenav":true,"textnav":true,"ui_beeps":true}')
         with _ducking_categories_lock:
             if dc_raw != _ducking_categories_json:
                 _ducking_categories_json = dc_raw

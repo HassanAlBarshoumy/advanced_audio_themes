@@ -132,7 +132,7 @@ audiotheme_changed = extensionPoints.Action()
 
 # Configuration spec
 audiothemes_config_defaults = {
-    "enable_audio_themes": "boolean(default=    True)",
+    "enable_audio_themes": "boolean(default=True)",
     "active_theme": 'string(default="Default")',
     "audio3d": "boolean(default=False)",
     "use_in_say_all": "boolean(default=True)",
@@ -1344,7 +1344,7 @@ class AudioThemesHandler:
                 self.player.use_in_say_all = conf_bool(user_config, "use_in_say_all", True)
                 self.player.speak_roles = conf_bool(user_config, "speak_roles", True)
                 self.player.use_synth_volume = conf_bool(user_config, "use_synth_volume", False)
-                self.player.volume = conf_int(user_config, "volume", 50)
+                self.player.volume = conf_int(user_config, "volume", 20)
                 try:
                     unspoken_config = config.conf["unspoken"]
                 except Exception:
@@ -1720,7 +1720,7 @@ class AudioThemesHandler:
             f"theme={self.active_theme.name if self.active_theme is not None else None} "
             f"ducking={conf_bool(user_config, 'audio_ducking_enabled', False)} "
             f"duckingVolume={conf_int(user_config, 'audio_ducking_volume', 30)} "
-            f"volume={conf_int(user_config, 'volume', 50)} "
+            f"volume={conf_int(user_config, 'volume', 20)} "
             f"mode={conf_str(user_config, 'output_mode', 'stereo')} "
             f"audio3d={conf_bool(user_config, 'audio3d', False)} "
             f"sayAll={conf_bool(user_config, 'use_in_say_all', True)}"
@@ -1736,7 +1736,9 @@ class AudioThemesHandler:
                     self.disabled_apps.append(p)
         # Cache ALL hot-path config values to avoid ~15-20 config.conf lookups per event cycle.
         # Refreshed on every configure() call (post_configSave, post_configProfileSwitch, etc.).
-        fl_roles_raw = user_config.get("fl_enabled_roles")
+        fl_roles_raw = user_config.get(
+            "fl_enabled_roles", '["listitem","treeviewitem","menuitem","tab"]'
+        )
         fl_enabled_roles_set = None
         if fl_roles_raw and fl_roles_raw != "all":
             try:
@@ -1783,13 +1785,13 @@ class AudioThemesHandler:
             "general_fallback_role_name": user_config.get("general_fallback_role_name", "listitem"),
             "blacklisted_roles": blr_parsed,
             # Theme/app hot-path config
-            "volume": user_config.get("volume", 50),
+            "volume": user_config.get("volume", 20),
             "typing_sounds": user_config.get("typing_sounds", False),
-            "typing_sounds_edit_only": user_config.get("typing_sounds_edit_only", False),
+            "typing_sounds_edit_only": user_config.get("typing_sounds_edit_only", True),
             "typing_sounds_volume": user_config.get("typing_sounds_volume", 10),
             "typing_sound_pack": user_config.get("typing_sound_pack", "1blueSwitch"),
-            "app_profiles_enabled": user_config.get("app_profiles_enabled", False),
-            "disabled_apps_suppress_categories": user_config.get("disabled_apps_suppress_categories", "{}"),
+            "app_profiles_enabled": user_config.get("app_profiles_enabled", True),
+            "disabled_apps_suppress_categories": user_config.get("disabled_apps_suppress_categories", '{"theme_sounds":true,"typing_sounds":true,"earcons":true,"browsernav":true,"sentencenav":true,"textnav":true,"ui_beeps":true}'),
             "clipboard_volume": user_config.get("clipboard_volume", 20),
             "clipboard_enabled": user_config.get("clipboard_enabled", True),
             "clipboard_announce_mode": user_config.get("clipboard_announce_mode", "both"),
@@ -1820,7 +1822,7 @@ class AudioThemesHandler:
             "clipboard_redo2_speech": user_config.get("clipboard_redo2_speech", True),
             "clipboard_custom_texts": user_config.get("clipboard_custom_texts", "{}"),
             # System sounds
-            "sys_status_enabled": user_config.get("sys_status_enabled", True),
+            "sys_status_enabled": user_config.get("sys_status_enabled", False),
             "sys_ac_enabled": user_config.get("sys_ac_enabled", True),
             "sys_battery_enabled": user_config.get("sys_battery_enabled", True),
             "sys_usb_enabled": user_config.get("sys_usb_enabled", True),
@@ -1838,7 +1840,7 @@ class AudioThemesHandler:
             # Audio ducking config
             "audio_ducking_enabled": user_config.get("audio_ducking_enabled", False),
             "audio_ducking_volume": user_config.get("audio_ducking_volume", 30),
-            "ducking_categories": user_config.get("ducking_categories", ""),
+            "ducking_categories": user_config.get("ducking_categories", '{"theme_sounds":true,"typing_sounds":true,"earcons":true,"browsernav":true,"sentencenav":true,"textnav":true,"ui_beeps":true}'),
             # Navigation Layer config
             "navLayerPassThrough": user_config.get("navLayerPassThrough", False),
             "navLayerTimeout": user_config.get("navLayerTimeout", False),
@@ -2097,7 +2099,7 @@ class AudioThemesHandler:
     def get_theme_for_app(self, app_name):
         # Lock-free fast path: no profiles enabled (covers ~90% of calls).
         # _cached_config is an atomic reference swap, safe to read without lock.
-        if not app_name or not self._cached_config.get("app_profiles_enabled", False):
+        if not app_name or not self._cached_config.get("app_profiles_enabled", True):
             return self.active_theme
         with self._config_lock:
             app_name = app_name.lower()
@@ -2161,7 +2163,7 @@ class AudioThemesHandler:
         try:
             self.player.play_file(
                 sound_path,
-                volume=self._cached_config.get("volume", 50),
+                volume=self._cached_config.get("volume", 20),
                 audio3d=bool(angle_x or angle_y),
                 angle_x=angle_x,
                 angle_y=angle_y
@@ -2231,7 +2233,7 @@ class AudioThemesHandler:
     def get_typing_pack_for_app(self, app_name):
         global_pack = self._cached_config.get("typing_sound_pack", "1blueSwitch")
         # Lock-free fast path: no profiles enabled (covers ~90% of calls).
-        if not app_name or not self._cached_config.get("app_profiles_enabled", False):
+        if not app_name or not self._cached_config.get("app_profiles_enabled", True):
             return global_pack
         with self._config_lock:
             app_name = app_name.lower()

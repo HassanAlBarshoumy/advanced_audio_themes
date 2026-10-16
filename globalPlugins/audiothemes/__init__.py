@@ -363,12 +363,18 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self._audio_beacon_desktop = None
         self._sonar_sweep_active = False
         self._last_focus_is_editable = False
+        # Set True in terminate() so deferred callbacks become no-ops after unload.
+        self._terminated = False
+        # Handles for deferred wx.CallLater work, all cancelled in terminate().
+        self._update_check_timer = None
+        self._init_browsernav_timer = None
+        self._tray_menu_timer = None
         # Defer menu item creation — the main window may not be ready yet
         wx.CallAfter(self._add_tray_menu_items)
 
         # Auto-check for updates (runs in background thread, respects config)
         # Delayed 15 seconds to let the add-on fully initialize first
-        wx.CallLater(15000, check_for_updates_auto)
+        self._update_check_timer = wx.CallLater(15000, check_for_updates_auto)
 
         # Browse-mode navigation: the primary source is now the vision
         # extension point `post_browseModeMove`, which NVDA fires on every
@@ -419,7 +425,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # QuickJump system, and URL tracking.
         # Deferred to avoid blocking startup with heavy imports.
         try:
-            wx.CallLater(1000, self.initBrowserNav)
+            self._init_browsernav_timer = wx.CallLater(1000, self.initBrowserNav)
         except Exception:
             try:
                 self.initBrowserNav()
@@ -477,12 +483,15 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             ui.message(_("Audio themes disabled"))
 
     def _add_tray_menu_items(self):
+        self._tray_menu_timer = None
+        if getattr(self, "_terminated", False):
+            return
         try:
             import gui
             import wx
             tray = gui.mainFrame.sysTrayIcon
             if not tray or not tray.menu:
-                wx.CallLater(500, self._add_tray_menu_items)
+                self._tray_menu_timer = wx.CallLater(500, self._add_tray_menu_items)
                 return
             menu = tray.menu
             self._tray_studio_item = menu.Append(
@@ -713,31 +722,33 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         wx.CallAfter(runDialog)
 
     def terminate(self):
-        import os, traceback, datetime
-        _crash_log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "shutdown_crash.log")
-        def _crash_log(msg):
-            try:
-                with open(_crash_log_path, "a", encoding="utf-8") as f:
-                    f.write(f"[{datetime.datetime.now().isoformat()}] {msg}\n")
-            except Exception:
-                log.debug("AudioThemes: swallowed Exception in __init__._crash_log")
-        def _crash_log_exc(step, exc):
-            _crash_log(f"ERROR in {step}: {exc}\n{traceback.format_exc()}")
-        _crash_log("=== terminate() called ===")
+        self._terminated = True
         with suppress(Exception):
             gui.settingsDialogs.NVDASettingsDialog.categoryClasses.remove(
                 AudioThemesSettingsPanel
             )
         with suppress(Exception):
             self._remove_tray_menu_items()
+        with suppress(Exception):
+            if self._tray_menu_timer is not None:
+                self._tray_menu_timer.Stop()
+                self._tray_menu_timer = None
+        with suppress(Exception):
+            if self._update_check_timer is not None:
+                self._update_check_timer.Stop()
+                self._update_check_timer = None
+        with suppress(Exception):
+            if self._init_browsernav_timer is not None:
+                self._init_browsernav_timer.Stop()
+                self._init_browsernav_timer = None
         try:
             self.restoreMonkeyPatches()
-        except Exception as e:
-            _crash_log_exc("restoreMonkeyPatches", e)
+        except Exception:
+            log.error("AudioThemes: restoreMonkeyPatches failed during shutdown", exc_info=True)
         try:
             self._unhook_keyboard()
-        except Exception as e:
-            _crash_log_exc("_unhook_keyboard", e)
+        except Exception:
+            log.error("AudioThemes: _unhook_keyboard failed during shutdown", exc_info=True)
         with suppress(Exception):
             if getattr(self, "_browse_move_ep", None) is not None and getattr(self, "_browse_move_handler", None) is not None:
                 self._browse_move_ep.unregister(self._browse_move_handler)
@@ -761,8 +772,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self.quicknav_interceptor.terminate()
         try:
             self.handler.close()
-        except Exception as e:
-            _crash_log_exc("handler.close", e)
+        except Exception:
+            log.error("AudioThemes: handler.close failed during shutdown", exc_info=True)
         GlobalPlugin._instance_handler = None
         with suppress(Exception):
             from .sentenceNavEngine import _unregister_sentence_nav_hooks
@@ -775,7 +786,6 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         # Ensure mixin classes (SentenceNavMixin, BrowserNavMixin) clean up properly.
         with suppress(Exception):
             super().terminate()
-        _crash_log("=== terminate() completed ===")
 
     def injectMonkeyPatches(self):
         pp.injectMonkeyPatches()
@@ -1446,7 +1456,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             if not injected and cfg.get("typing_sounds", False):
                 # Check edit only
                 play = True
-                if cfg.get("typing_sounds_edit_only", False):
+                if cfg.get("typing_sounds_edit_only", True):
                     play = getattr(self, "_last_focus_is_editable", True)
                 
                 if play:
@@ -1490,7 +1500,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 if cfg.get("typing_sounds", False):
                     vk = getattr(self, "_last_vkCode", None)
                     ext = getattr(self, "_last_extended", None)
-                    if cfg.get("typing_sounds_edit_only", False):
+                    if cfg.get("typing_sounds_edit_only", True):
                         if getattr(self, "_last_focus_is_editable", True):
                             handler.play_typing_sound(ch=ch, vkCode=vk, extended=ext)
                     else:
@@ -2144,7 +2154,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
 
     @script(description=_("Toggles app-specific audio profiles on and off."))
     def script_toggleAppProfiles(self, gesture):
-        enabled = conf_toggle(config.conf["audiothemes"], "app_profiles_enabled", False)
+        enabled = conf_toggle(config.conf["audiothemes"], "app_profiles_enabled", True)
         self.handler.configure()
         ui.message(_("App profiles enabled") if enabled else _("App profiles disabled"))
 

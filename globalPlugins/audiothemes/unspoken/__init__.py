@@ -256,7 +256,10 @@ unspoken_config_defaults = {
 		"Width": "integer(default=100, min=0, max=100)",
 		"AudioCache": "boolean(default=True)",
 		"SmartVolume": "boolean(default=False)",
+		"SmartVolumePeak": "float(default=0.8)",
 		"SmoothEnvelope": "boolean(default=False)",
+		"SmoothEnvelopeAttack": "integer(default=5, min=0, max=100)",
+		"SmoothEnvelopeRelease": "integer(default=50, min=0, max=500)",
 		"SmoothPanning": "boolean(default=False)",
 		"TrimSilence": "boolean(default=False)",
 		"TrimSilenceThreshold": "float(default=0.01)",
@@ -416,10 +419,10 @@ class UnspokenPlayer:
 			self._width = unspoken_cfg["Width"]
 		except Exception:
 			self._reverb = 0
-			self._room_size = 50
-			self._damping = 50
-			self._wet_level = 33
-			self._dry_level = 40
+			self._room_size = 100
+			self._damping = 0
+			self._wet_level = 0
+			self._dry_level = 30
 			self._width = 100
 
 	def _audio_worker(self):
