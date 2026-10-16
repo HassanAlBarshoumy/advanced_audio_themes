@@ -356,6 +356,48 @@ You can view the source code, report issues, or contribute to the project on Git
 
 ## Change Log
 
+### Version 9.45
+- **Studio "Import Folder" Fixed:** Importing a folder of sounds into the Audio Themes Studio did nothing - the handler raised `NameError` on the first file whose name matched a known role. The role name lookup is now imported correctly.
+- **Menu/Tray Toggle Fixed:** Turning the add-on on from its menu or tray item raised an error before the confirmation was spoken. Enabling and disabling now both announce correctly.
+- **Settings Data Loss Fixed:** Opening and saving the settings dialog silently reset five settings to their defaults: audio-ducking categories, disabled-apps suppressed categories, first/last detection roles, role announcement formats and app profiles. All five now keep the values you saved.
+- **Default Settings:** The configuration defaults shipped with the add-on now match the maintainer's tuned setup: volumes, audio ducking off by default, reverb defaults, typing-sound options and category lists.
+- **Smaller Download:** The add-on package is 51.7% smaller (30.6 MiB), thanks to LZMA compression, de-duplicated wave packs and removal of the unused 32-bit audio engine. No feature or sound was removed.
+- **Performance:** The 3D sonar sweep now runs on its own short-lived thread instead of occupying the only sound worker, so theme sounds are no longer delayed or dropped while a sweep is running.
+- **Build and Release:** Builds run only on GitHub Actions (the build script refuses to run locally), and every build on `master` publishes or refreshes its own GitHub Release automatically.
+
+### Version 9.44
+- **Native WAV Decoding for Every Format:** Theme and typing sounds now decode natively at any sample rate (11025, 22050, 48000, 96000 Hz) and any bit depth (8/16/24/32-bit PCM, IEEE float, MS ADPCM, A-law, mu-law). Before, only 16-bit 44100 Hz files played and every other file was silent.
+- **FLAC Support:** Any theme sound can be converted to FLAC or WAV from the Audio Formats tab, FLAC files play natively, and the settings previews handle FLAC too.
+- **Stereo and Reverb Fixed:** Enabling reverb no longer collapses sounds to the centre; left/right placement is preserved, and mono output mode now applies to the dry signal only, leaving the reverb stereo.
+- **Quick Navigation Sounds:** Quick-navigation sounds now match the element navigation actually lands on. E and F play the sound of the real landed control (search field, editable combo box, checkbox), B distinguishes toggle, menu, split and drop-down buttons, and the previously silent unvisited-link, non-heading, quote and annotation keys now play.
+- **Navigation Sounds (borrowed from NavigationSounds):** Added mouse-hover sounds with an adjustable delay, an arrow-navigation sound toggle, "speak states" suppression (a state that has its own sound is not also spoken) and event-driven browse-mode sounds played as you move, without the previous 250 ms polling delay.
+- **Say All:** Theme sounds now play during Say All, controlled by the "Speak roles during say all" option.
+- **Import Hardening:** Importing a theme, typing-sound pack or `.atcfg` configuration is now protected against path traversal and zip bombs (entry count, total size and per-file size limits).
+- **Emoji:** Emoji detection now covers basic-plane emoji such as the sun and heart symbols, custom per-emoji descriptions are applied again, and emoji-in-name role suppression works.
+- **Resilience:** Focus sounds are no longer lost when another add-on briefly stalls NVDA's main thread, and menu buttons keep their sound after such a stall.
+- **Configuration Robustness:** Settings edited outside the dialog (raw "True"/"False" strings, missing keys) no longer break or reset add-on options, and the advanced browser navigation (BrowserNav) volumes in the Misc tab are retained when the dialog is reopened.
+- **Build and Release:** The add-on is built on GitHub Actions and published as a GitHub Release from a single command.
+
+### Version 9.40
+- **Startup Stability:** Fixed an event handler registered at `postNvdaStartup` that could be registered more than once per session.
+- **Configuration Caching:** The system status monitor and the speech and sound hot paths now read cached configuration instead of touching the config file on every event.
+- **Performance and Thread Safety:** Cached the blacklisted-roles list, added locks around the typing-sound, audio-ducking and suppressed-category caches, cached the beeper output device, and cached the sentence-navigation chime volumes.
+
+### Version 9.39
+- **Command Layer Help:** Added (F1) to open the help file in the user's own language and (h) to list every command available in the command layer, plus an introductory message when the layer opens.
+- **Crash Fixes:** Fixed three failures where the format, role and "other" rule collections were treated as a single rule object instead of a list.
+- **File Handle Leak:** Fixed a leaked file handle when playing phonetic and pronunciation wave files.
+- **Typing Sounds:** Sped up typing-sound playback by caching the directory check and bounding the typing-sound cache.
+- **Performance and Stability:** A broad pass of hot-path caching, thread-safety, queueing and memory fixes.
+
+### Version 9.38
+- **NVDAExtensionGlobalPlugin Compatibility:** Resolved the "inputCore.manager.executeGesture manager has also been patched" warning by deferring the `executeGesture` patch to `postNVDAStartup`, so both add-ons coexist without conflict. Also patched `NVDAExtensionGlobalPlugin.speechEx._myGetTextInfoSpeech` and `SayAllHandler._getTextInfoSpeech` for blank detection during arrow-key and SayAll navigation.
+- **Blank Rule Fix:** Fixed the BLANK announcement rule (`OtherRule.BLANK` with `builtInWave`) to work during arrow-key text navigation in addition to Tab navigation. The comparison-based blank detection now properly identifies blank lines via `suppressBlanks=True/False` comparison instead of simple string stripping.
+- **Navigation Layer Sentence Fix:** Fixed the up-arrow in sentence navigation mode — `_suppressAllGestures` was blocking `getScript` from finding the sentence movement script during `_sendNormalKey`.
+- **BrowserNav Crash Guard:** Wrapped the `self.selection = selection` call in `caretMovementWithAutoSkip` in a `try/except RuntimeError` to prevent crashes when the underlying IAccessible object becomes invalid during DOM updates.
+- **Input Gestures:** Added direct keyboard shortcuts for Emoji toggle (`NVDA+Alt+E`) and Clipboard toggle (`NVDA+Alt+C`) — previously only accessible through the Audio Themes Command Layer.
+- **Performance:** Removed all debug logging from `commands.py` (PpWaveFileCommand/PpChainCommand) and `frenzy.py` (blank detection), eliminating WARNING-level spam from the NVDA log during normal usage.
+
 ### Version 9.34
 - **Critical Bug Fix — Gesture Binding Corruption:** Fixed a severe issue where all addon and user-assigned keyboard shortcuts (e.g. `NVDA+Alt+P` from NVDAExtensionGlobalPlugin) would break and disappear from the Input Gestures dialog after opening and closing either the Audio Themes Command Layer (`NVDA+Shift+A`) or the Navigation Layer (`NVDA+Win+N`). The root cause was `clearGestureBindings()` + `_rebindInstanceGestures()` being called on every layer deactivation, which wiped all entries from NVDA's internal `boundGestures` map. Replaced with targeted `removeGestureBinding()` calls per-layer and a suppression flag for gesture execution — `boundGestures` is never touched during layer open/close cycles.
 - **Navigation Layer Documentation:** Expanded the Navigation Layer section in this readme to include a complete reference table of all layer controls and a detailed list of all 27 navigation modes with descriptions.
