@@ -8,9 +8,17 @@ on:
 
 jobs:
   opencode:
-    if: |
-      contains(github.event.comment.body, '/oc') ||
-      contains(github.event.comment.body, '/opencode')
+    # Only the repository owner, members and collaborators may trigger the
+    # agent. Without this gate, ANY GitHub user able to comment on this public
+    # repository could start a run holding `contents: write` + `id-token: write`
+    # and the OPENCODE_API_KEY secret. The condition is fail-closed: if the
+    # association field is ever absent, the job simply does not run.
+    if: >-
+      (contains(github.event.comment.body, '/oc') ||
+      contains(github.event.comment.body, '/opencode')) &&
+      (github.event.comment.author_association == 'OWNER' ||
+      github.event.comment.author_association == 'MEMBER' ||
+      github.event.comment.author_association == 'COLLABORATOR')
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -19,13 +27,17 @@ jobs:
       issues: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        # Pinned to the commit of the v6 major tag (v6.1.0) at 2026-10-19.
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 1
           persist-credentials: false
 
       - name: Run OpenCode
-        uses: anomalyco/opencode/github@latest
+        # Pinned to the commit the previous `@latest` tag resolved to at
+        # 2026-10-19 (tag `latest` -> github-v1.2.19) so behaviour is unchanged;
+        # the mutable `@latest` ref is no longer accepted.
+        uses: anomalyco/opencode/github@77fc88c8ade8e5a620ebbe1197f3a572d29ae91a # github-v1.2.19
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
         with:

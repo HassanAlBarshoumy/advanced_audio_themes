@@ -356,6 +356,12 @@ You can view the source code, report issues, or contribute to the project on Git
 
 ## Change Log
 
+### Version 9.46
+- **Crash Fixes:** Fixed the phonetic-punctuation pass-through regex cache, which kept a stale pattern after loading rules; the update check, which compared version tags containing non-numeric parts (such as `9.46-beta`) as the oldest possible version and could pick an older release; and the pronunciation sound player, which could fail on a malformed request.
+- **Dead Code Removed:** Removed more than fifty unused imports, unused local variables and unused exception bindings, plus ten never-executed code branches, two unreachable dialog methods and one unused Windows UI Automation import in advanced browser navigation. No feature or gesture was removed.
+- **Default Settings:** The configuration defaults shipped with the add-on now match the configuration specification exactly: volumes, audio ducking, typing-sound options, category lists, first/last detection roles and the reverb defaults.
+- **Build and Release:** Builds run only on demand from GitHub Actions and always publish their own GitHub Release, and unused build files no longer ship inside the package.
+
 ### Version 9.45
 - **Studio "Import Folder" Fixed:** Importing a folder of sounds into the Audio Themes Studio did nothing - the handler raised `NameError` on the first file whose name matched a known role. The role name lookup is now imported correctly.
 - **Menu/Tray Toggle Fixed:** Turning the add-on on from its menu or tray item raised an error before the confirmation was spoken. Enabling and disabling now both announce correctly.

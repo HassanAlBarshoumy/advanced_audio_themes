@@ -2,7 +2,10 @@
 *.pyo
 *.nvda-addon
 __pycache__/
-AGENTS.md
 globalPlugins/shutdown_crash.log
 *.sha256
 dist/
+build/
+ai_changes.md
+project_analysis_report.md
+project_context.md

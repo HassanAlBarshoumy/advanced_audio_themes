@@ -1530,12 +1530,25 @@ class BrowserNavMixin:
                                 return
                             else:
                                 # Something else found in clipboard - likely user has already copied something there. So just exit without restoring state
-                                log.error(f"something else in clipboard!")
-                                log.error(f"text='{text}'")
-                                log.error(f"newText='{newText}'")
-                                log.error(f"firstChar='{firstChar}'")
+                                # Demoted from log.error: NVDA's logHandler beeps on ERROR records, and the
+                                # previous four lines wrote the full clipboard content into nvda.log.
+                                log.debug(
+                                    "AudioThemes: clipboard watch stopped - unexpected clipboard content "
+                                    "(edit text %d chars, clipboard %d chars); exiting without restoring state.",
+                                    len(text), len(newText),
+                                )
                                 return
-                        log.error(f"Timeout")
+                        # Demoted from log.error: this is a normal edge case (the first-character copy
+                        # confirmation simply never arrived), not a crash, and ERROR records beep.
+                        log.warning(
+                            "AudioThemes: clipboard watch timed out after 3 seconds waiting for the "
+                            "first-character copy confirmation."
+                        )
+                        # Timeout: the loop can only reach this point while the clipboard still holds
+                        # our injected text (any user copy or the first-character confirmation exits
+                        # earlier), so restore the user's original clipboard instead of leaving the
+                        # injected edit text behind.
+                        self.endInjectingKeystrokes()
                     utils.executeAsynchronously(watchAndRestoreClipboard())
                     
               # Step 4: send the original keystroke, e.g. Control+Enter
