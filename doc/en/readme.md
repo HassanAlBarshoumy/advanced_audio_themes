@@ -356,6 +356,12 @@ You can view the source code, report issues, or contribute to the project on Git
 
 ## Change Log
 
+### Version 9.48
+- **Critical Install Fix:** Fixed a crash that occurred during every installation and update. The installer checked a property that NVDA does not provide on add-ons (`isPendingRemove`), which raised an error. NVDA treats any such error as a failed installation and removes the add-on again, so the add-on could be uninstalled immediately after being installed. The check now uses the supported API and can never abort an install.
+- **Install Robustness:** Theme migration during installation is now fully protected. An unreadable theme folder, a read-only configuration directory or a failure while listing add-ons can no longer make the installation fail and undo itself.
+- **Conflict Detection Restored:** The add-on conflict warning (Navigation Sound Effects, SentenceNav, BrowserNav, Earcons and Speech Rules, and older Audio Themes versions) now works again, including the "Remove selected" button, which had been silently inactive.
+- **Cleanup:** Removed an unused import, an unused global declaration and a stray text-formatting prefix. No feature or gesture was removed.
+
 ### Version 9.46
 - **Crash Fixes:** Fixed the phonetic-punctuation pass-through regex cache, which kept a stale pattern after loading rules; the update check, which compared version tags containing non-numeric parts (such as `9.46-beta`) as the oldest possible version and could pick an older release; and the pronunciation sound player, which could fail on a malformed request.
 - **Dead Code Removed:** Removed more than fifty unused imports, unused local variables and unused exception bindings, plus ten never-executed code branches, two unreachable dialog methods and one unused Windows UI Automation import in advanced browser navigation. No feature or gesture was removed.

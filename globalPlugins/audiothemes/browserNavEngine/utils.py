@@ -3,7 +3,6 @@
 #This file is covered by the GNU General Public License.
 #See the file LICENSE  for more details.
 
-from .constants import *
 import controlTypes
 import core
 import _ctypes

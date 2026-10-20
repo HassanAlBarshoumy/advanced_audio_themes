@@ -2266,7 +2266,7 @@ def editOrCreateSite(self, site=None, url=None, domain=None):
             config = config.updateSites(sites)
             globalConfig = config
             saveConfig()
-            mylog(f"Config saved!")
+            mylog("Config saved!")
     finally:
         entryDialog.Destroy()
 def makeWebsiteSubmenu(self, frame):

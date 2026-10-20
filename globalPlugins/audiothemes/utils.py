@@ -200,7 +200,7 @@ def say_all_running():
     except Exception:
         running = False
     now = time.monotonic()
-    global _first_say_all_seen, _last_non_sayall_speech, _last_say_all_speech
+    global _first_say_all_seen
     with _say_all_state_lock:
         if not running:
             _first_say_all_seen = 0.0

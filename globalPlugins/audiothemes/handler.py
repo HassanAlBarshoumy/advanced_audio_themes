@@ -851,6 +851,23 @@ def migrate_theme_to_named_files(theme_directory):
 CONFLICT_PENDING_FILE = os.path.join(THEMES_DIR, ".pending_conflict.json")
 
 
+def _isPendingRemove(addon):
+    """Return True only when the add-on is definitely marked for removal.
+
+    ``addonHandler.Addon`` has no ``isPendingRemove`` attribute (only
+    ``isPendingInstall``); ``isPendingRemove`` lives on the Add-on Store
+    models in ``addonStore``. Reading it unconditionally raises
+    ``AttributeError`` and silently disables the whole conflict feature.
+    Probe both flags, defaulting to False.
+    """
+    try:
+        if getattr(addon, "isPendingInstall", False):
+            return True
+        return bool(getattr(addon, "isPendingRemove", False))
+    except Exception:
+        return False
+
+
 def showPendingConflicts():
     if config.conf["audiothemes"].get("dont_show_conflicts", False):
         return
@@ -865,9 +882,13 @@ def showPendingConflicts():
     try:
         found = [
             addon.name for addon in addonHandler.getAvailableAddons()
-            if addon.name in conflicting_ids and not addon.isPendingRemove
+            if addon.name in conflicting_ids and not _isPendingRemove(addon)
         ]
         if found:
+            try:
+                os.makedirs(os.path.dirname(CONFLICT_PENDING_FILE), exist_ok=True)
+            except OSError:
+                pass
             with open(CONFLICT_PENDING_FILE, "w") as f:
                 json.dump(found, f)
     except Exception:
@@ -928,7 +949,7 @@ def showPendingConflicts():
             for i, name in enumerate(found_ids):
                 if conflict_list.IsItemChecked(i):
                     for addon in addonHandler.getAvailableAddons():
-                        if addon.name == name and not addon.isPendingRemove:
+                        if addon.name == name and not _isPendingRemove(addon):
                             addon.requestRemove()
                             removed += 1
             if removed:

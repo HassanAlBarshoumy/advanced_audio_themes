@@ -854,3 +854,61 @@ Full add-on audit requested by the user ("افحص الاضافة باحثا ع�
 - **GitNexus FTS repaired (durable fix, proven by ablation)** - `query()` had been degraded by the recurring FTS extension load failure (Windows error 126: `libfts.lbug_extension` in `C:\Users\d\.lbdb\extension\0.18.1\win_amd64\fts\` needs OpenSSL 3 on the DLL search path; the VC++ runtime was confirmed present in System32, so it is NOT the missing dependency). `gitnexus analyze --repair-fts --skip-agents-md --skip-skills` with `C:\Program Files\Git\mingw64\bin` prepended to PATH and `GITNEXUS_STORAGE_ROOT=%TEMP%\opencode\gitnexus-storage` rebuilt the indexes ("FTS indexes repaired successfully"; `doctor` = **available**), but the durable fix is copying `libcrypto-3-x64.dll` + `libssl-3-x64.dll` (5.8 + 1.0 MB from Git's mingw64) into `C:\Users\d\nodejs\` - the node.exe application directory, the FIRST entry of the Windows dependent-DLL search order. Ablation proof: extension-dir copy ALONE still fails a fresh CLI query; removing the nodejs copy -> `HAS_FTS_WARNING=True`; restoring it -> `HAS_FTS_WARNING=False` with results (fresh process, no PATH changes). A redundant copy was also left next to the extension. Caveat: the still-running MCP gitnexus server process cached the load failure from before the fix, so its `query()` keeps warning until the next OpenCode/MCP restart - CLI is clean now. AGENTS.md untouched by the tool (skip flag).
 - **Changelog catch-up for 9.46 (done after the audit, with the user's go-ahead)** - README.md and doc/en/readme.md stopped at `### Version 9.45` even though v9.46 had been released (Round 77 + 78 + 79 content), repeating exactly the lag Round 79 was written to fix. A `### Version 9.46` entry was inserted in both files immediately before `### Version 9.45`, with content taken strictly from `git log --oneline --no-decorate v9.45..v9.46` (10 commits) and `git diff --stat v9.45..v9.46` (24 files), never invented: Crash Fixes (`e1ca2fd` - stale pass-through regex cache, non-numeric version tags in the update check, the `play()` guard), Dead Code Removed (`4438f99` + `4f809b5` - 58 dead names, the never-executed branches/methods and `UIAHandler`), Default Settings (`1a32ba2`), Build and Release (`e7c8fb4`).
 - Verified: `ast.parse` + pyflakes on the edited `browserNavEngine/__init__.py` (0 new issues beyond the known star-import blind spots); `git diff --stat` = exactly the intended files (opencode.yml, browserNavEngine/__init__.py, .gitignore + this file). No commit, no push, no local build (Rule 1).
+
+
+### Round 81 (uncommitted): CRITICAL install-time rollback defect - `addon.isPendingRemove` does not exist on `addonHandler.Addon`
+A repo-health audit of the released 9.47 package confirmed one defect that silently UNDOES EVERY installation
+and update of the add-on, plus one dead import, two unused `global` declarations and a stray f-string prefix.
+All five are fixed.
+- **Root cause (proven from NVDA source + the installed `C:\Program Files\NVDA\library.zip`, NVDA 2026.3.x)**
+  `addonHandler.Addon` provides only `isPendingInstall`, `requestRemove()` and `completeRemove()`; it has **no**
+  `isPendingRemove`. That name exists only on the Add-on Store models in `addonStore` (`models/status.pyc`,
+  `install.pyc`) on unrelated types. `installTasks.py:27` read `addon.isPendingRemove` inside a **list
+  comprehension that is evaluated BEFORE the `try`** (the `try` guarded only the file write), so
+  `AttributeError` escaped `_checkConflictingAddons()` into `onInstall()`. NVDA `installAddonBundle()` wraps
+  `runInstallTask("onInstall")` in `try/except` and, on ANY exception, logs
+  `task 'onInstall' on addon '...' failed`, drops the add-on from `_availableAddons` and calls
+  `addon.completeRemove(runUninstallTask=False)` - i.e. **it deletes the freshly installed add-on (rollback)**.
+  Consequence: installing or updating the add-on could leave the user with no add-on at all, on every attempt.
+- **`installTasks.py` (fix)** - new module-level `_isPendingRemove(addon)`: probes `getattr(addon,
+  "isPendingInstall", False)` first (True => pending), then `getattr(addon, "isPendingRemove", False)` for
+  Add-on Store style objects, wrapped in `try/except` returning False - so it is correct for today's NVDA and
+  safe against future API drift, and it can never raise. `_checkConflictingAddons()` now also wraps the whole
+  enumeration in `try/except` (returns early), and the write moved into a new best-effort
+  `_writeConflictFile(found)` that `os.makedirs(..., exist_ok=True)` the parent folder first (previously the
+  file silently failed to write when `audio-themes/` did not exist yet, because the write was inside the same
+  swallowed `except`).
+- **`installTasks.py` `onInstall` hardened against rollback** - the whole body is now inside `try/except`, each
+  theme migration is guarded with `(OSError, shutil.Error)`, `os.listdir(path)` has its own `OSError` guard,
+  the `Default` theme `copytree` is guarded, and the final `_checkConflictingAddons()` call has its own
+  `try/except`. NVDA's contract is that any exception means "installation failed -> roll back", so a
+  best-effort theme migration must never be able to trigger it.
+- **`handler.py` (same defect, non-fatal there)** - the identical bare `addon.isPendingRemove` appeared twice
+  (`showPendingConflicts` comprehension ~line 868 and the "Remove selected" loop ~line 931). Both sat inside
+  `try/except Exception`, so they did not crash - but they made conflict detection permanently inert and the
+  "Remove selected" button a silent no-op. Added the same `_isPendingRemove(addon)` helper and replaced both
+  uses; `showPendingConflicts` now also `os.makedirs()` the conflict-file folder before writing.
+- **Cleanup (proof-backed, zero behaviour change)** - `browserNavEngine/utils.py:6` `from .constants import *`
+  removed: `utils.py` uses no name from `constants`, and no module reads a constants name through
+  `utils.` (the only `utils.<X>` accesses are `utils.NVDA2021Role`, `utils.ExecutionAsynchronously`,
+  `utils.getSoundsPath`, etc., all defined in `utils.py` itself - `NVDA2021Role` is a class in `utils.py`,
+  separately confirmed absent from `constants.py`). `frenzy.py:305` lost the unused `last_speech_time` from its
+  `global` declaration (it is assigned under its own `global` in `_track_speech_time`, lines 380/384) and
+  `utils.py:203` lost the unused `_last_non_sayall_speech` / `_last_say_all_speech` (they are read there but
+  assigned in `note_say_all_speech`'s own `global` blocks at 175/179). `quickJump.py:2269`
+  `mylog(f"Config saved!")` -> `mylog("Config saved!")`.
+- **Verification** - `py_compile installTasks.py handler.py` OK; `compileall -q globalPlugins\audiothemes
+  installTasks.py build_addon.py scripts` OK; pyflakes diff vs HEAD (line/col + path normalised, 6 changed
+  files) = **0 NEW, 6 REMOVED**. Defect reproduction harness
+  `%TEMP%\opencode\r81\it_test2.py` (real `installTasks.py` + faithful NVDA stubs incl. an
+  `installAddonBundle` that records rollbacks, a `FakeAddon` **deliberately lacking** `isPendingRemove`, and a
+  hostile-filesystem case): **12/12 PASS** for the fixed file, while running the SAME harness against
+  `git show HEAD:installTasks.py` reproduces
+  `AttributeError: 'FakeAddon' object has no attribute 'isPendingRemove'` with the simulated
+  `installAddonBundle` reporting a **rollback** - i.e. the defect and its severity are demonstrated, not
+  assumed. The earlier harness `%TEMP%\opencode\it_test.py` = 5/5 PASS. Regression harnesses green:
+  `borrow3/test_states.py` 44/44, `borrow2/test_nav.py` 58/58, `round69/test_perf.py` 20/20.
+- **Changelog** - `### Version 9.48` inserted before `### Version 9.46` in `README.md` and
+  `doc/en/readme.md`; the two files remain **byte-identical** (41,508 bytes) and UTF-8 valid.
+- Working tree: 8 files (6 Python sources + the two identical readmes). No commit, no push, no local build
+  (Rule 1); the release itself goes through `gh workflow run release.yml -f version=9.48`.

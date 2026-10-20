@@ -302,7 +302,7 @@ def monkeyPatch():
         speech.speech._getTextInfoSpeech_considerSpelling = new_getTextInfoSpeech_considerSpelling
 
     # Track speech time for audio ducking
-    global _speech_time_handler, _original_speak, last_speech_time
+    global _speech_time_handler, _original_speak
     try:
         _speech_time_handler = speech.manager.pre_synthSpeak.register(_track_speech_time)
     except Exception:
