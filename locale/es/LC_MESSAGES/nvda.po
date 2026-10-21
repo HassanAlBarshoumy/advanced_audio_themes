@@ -4,14 +4,14 @@ msgstr ""
 "Project-Id-Version: advanced_audio_themes 1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-05-24 12:00+0000\n"
-"PO-Revision-Date: 2026-06-18 14:28-0500\n"
-"Last-Translator: Luis Carlos González >Morales <luiscarlosgonzalezmorales655@gmail.com>\n"
+"PO-Revision-Date: 2026-10-20 13:54-0500\n"
+"Last-Translator: Luis Carlos González Morales <luiscarlosgonzalezmorales655@gmail.com>\n"
 "Language-Team: es\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.5\n"
+"X-Generator: Poedit 3.10\n"
 
 msgid " - Copy"
 msgstr " - Copia"
@@ -232,12 +232,8 @@ msgstr "Todas las reglas activadas"
 msgid "Always"
 msgstr "Siempre"
 
-msgid ""
-"Another website with this name already exists. Please choose a different "
-"name."
-msgstr ""
-"Ya existe otro sitio web con este nombre. Por favor, elige un nombre "
-"diferente."
+msgid "Another website with this name already exists. Please choose a different name."
+msgstr "Ya existe otro sitio web con este nombre. Por favor, elige un nombre diferente."
 
 msgid "App Profiles"
 msgstr "Perfiles de aplicación"
@@ -260,12 +256,8 @@ msgstr "Modo de salida de audio:"
 msgid "Audio Sonar"
 msgstr "Sonar de audio"
 
-msgid ""
-"Audio Sonar: Sweeps the active window to create an audio map of its "
-"elements."
-msgstr ""
-"Sonar de audio: Barre la ventana activa para crear un mapa de audio de sus "
-"elementos."
+msgid "Audio Sonar: Sweeps the active window to create an audio map of its elements."
+msgstr "Sonar de audio: Barre la ventana activa para crear un mapa de audio de sus elementos."
 
 msgid "Audio Theme"
 msgstr "Tema de audio"
@@ -306,12 +298,8 @@ msgstr "La vista previa de audio falló."
 msgid "Audio rule Error"
 msgstr "Error en la regla de audio"
 
-msgid ""
-"Audio theme successfully installed. You can now select it from the themes "
-"menu."
-msgstr ""
-"Tema de audio instalado correctamente. Ahora puedes seleccionarlo en el menú"
-" de temas."
+msgid "Audio theme successfully installed. You can now select it from the themes menu."
+msgstr "Tema de audio instalado correctamente. Ahora puedes seleccionarlo en el menú de temas."
 
 msgid "Audio theme: {theme}"
 msgstr "Tema de audio: {theme}"
@@ -319,11 +307,8 @@ msgstr "Tema de audio: {theme}"
 msgid "Audio themes"
 msgstr "Temas de audio"
 
-msgid ""
-"Audio themes command layer. Press this then a command key (e.g. h for help)."
-msgstr ""
-"Capa de comandos de temas de audio. Pulsa esto y luego una tecla de comando "
-"(ej. h para ayuda)."
+msgid "Audio themes command layer. Press this then a command key (e.g. h for help)."
+msgstr "Capa de comandos de temas de audio. Pulsa esto y luego una tecla de comando (ej. h para ayuda)."
 
 msgid "Audio themes disabled"
 msgstr "Temas de audio desactivados"
@@ -337,26 +322,14 @@ msgstr "Volumen de los temas de audio"
 msgid "Audio themes volume:"
 msgstr "Volumen de los temas de audio:"
 
-msgid ""
-"AutoClick  according to BrowserNav AutoClick bookmark; please check "
-"browserNav configuration panel for the list of bookmarks."
-msgstr ""
-"Clic automático según el marcador AutoClick de BrowserNav; consulta el panel"
-" de configuración para ver la lista de marcadores."
+msgid "AutoClick  according to BrowserNav AutoClick bookmark; please check browserNav configuration panel for the list of bookmarks."
+msgstr "Clic automático según el marcador AutoClick de BrowserNav; consulta el panel de configuración para ver la lista de marcadores."
 
-msgid ""
-"AutoClick  according to BrowserNav AutoClick2 bookmark; please check "
-"browserNav configuration panel for the list of bookmarks."
-msgstr ""
-"Clic automático según el marcador AutoClick2 de BrowserNav; consulta el "
-"panel de configuración para ver la lista de marcadores."
+msgid "AutoClick  according to BrowserNav AutoClick2 bookmark; please check browserNav configuration panel for the list of bookmarks."
+msgstr "Clic automático según el marcador AutoClick2 de BrowserNav; consulta el panel de configuración para ver la lista de marcadores."
 
-msgid ""
-"AutoClick  according to BrowserNav AutoClick3 bookmark; please check "
-"browserNav configuration panel for the list of bookmarks."
-msgstr ""
-"Clic automático según el marcador AutoClick3 de BrowserNav; consulta el "
-"panel de configuración para ver la lista de marcadores."
+msgid "AutoClick  according to BrowserNav AutoClick3 bookmark; please check browserNav configuration panel for the list of bookmarks."
+msgstr "Clic automático según el marcador AutoClick3 de BrowserNav; consulta el panel de configuración para ver la lista de marcadores."
 
 msgid "AutoSpeak disabled"
 msgstr "Lectura automática desactivada"
@@ -370,12 +343,8 @@ msgstr "Detectar y leer automáticamente los cambios en este marcador"
 msgid "Available BrowserNav websites"
 msgstr "Sitios web de BrowserNav disponibles"
 
-msgid ""
-"Available attributes in current paragraph (press space to add to current "
-"bookmark):"
-msgstr ""
-"Atributos disponibles en el párrafo actual (pulsa espacio para añadir al "
-"marcador actual):"
+msgid "Available attributes in current paragraph (press space to add to current bookmark):"
+msgstr "Atributos disponibles en el párrafo actual (pulsa espacio para añadir al marcador actual):"
 
 msgid "Beep on every focus event"
 msgstr "Pitar en cada evento de foco"
@@ -393,9 +362,7 @@ msgid "Beeping volume (Beeping)"
 msgstr "Volumen de pitido (Beeping)"
 
 msgid "Blacklist applications for sentence navigation (comma separated):"
-msgstr ""
-"Lista negra de aplicaciones para navegación por oraciones (separadas por "
-"comas):"
+msgstr "Lista negra de aplicaciones para navegación por oraciones (separadas por comas):"
 
 msgid "Blank announcement"
 msgstr "Anuncio en blanco"
@@ -422,39 +389,22 @@ msgid "Bookmark entry error"
 msgstr "Error en la entrada del marcador"
 
 msgid "Bookmark points to non-focusable NVDA object, cannot click it."
-msgstr ""
-"El marcador apunta a un objeto de NVDA que no puede recibir el foco, no se "
-"puede hacer clic."
+msgstr "El marcador apunta a un objeto de NVDA que no puede recibir el foco, no se puede hacer clic."
 
 msgid "Bookmark store communication error"
 msgstr "Error de comunicación con el almacén de marcadores"
 
-msgid ""
-"Bookmarks that span across paragraphs is not supported by BrowserNav. Please"
-" clear the selection or select something within a single paragraph."
-msgstr ""
-"BrowserNav no admite marcadores que abarquen varios párrafos. Por favor, "
-"borra la selección o selecciona algo dentro de un solo párrafo."
+msgid "Bookmarks that span across paragraphs is not supported by BrowserNav. Please clear the selection or select something within a single paragraph."
+msgstr "BrowserNav no admite marcadores que abarquen varios párrafos. Por favor, borra la selección o selecciona algo dentro de un solo párrafo."
 
-msgid ""
-"Both hierarchical and numeric script bookmarks are configured for this "
-"website. This is not supported; please disable either hierarchical or "
-"numeric script bookmarks."
-msgstr ""
-"Se han configurado marcadores jerárquicos y de script numérico para este "
-"sitio web. Esto no es compatible; desactiva uno de los dos tipos."
+msgid "Both hierarchical and numeric script bookmarks are configured for this website. This is not supported; please disable either hierarchical or numeric script bookmarks."
+msgstr "Se han configurado marcadores jerárquicos y de script numérico para este sitio web. Esto no es compatible; desactiva uno de los dos tipos."
 
-msgid ""
-"Browser state has changed. Different element on the page is now focused."
-msgstr ""
-"El estado del navegador ha cambiado. Ahora tiene el foco un elemento "
-"diferente en la página."
+msgid "Browser state has changed. Different element on the page is now focused."
+msgstr "El estado del navegador ha cambiado. Ahora tiene el foco un elemento diferente en la página."
 
-msgid ""
-"Browser state has changed. Focused element is not an edit box. Role: %d."
-msgstr ""
-"El estado del navegador ha cambiado. El elemento enfocado no es un cuadro de"
-" edición. Rol: %d."
+msgid "Browser state has changed. Focused element is not an edit box. Role: %d."
+msgstr "El estado del navegador ha cambiado. El elemento enfocado no es un cuadro de edición. Rol: %d."
 
 msgid "BrowserNav"
 msgstr "BrowserNav"
@@ -465,12 +415,8 @@ msgstr "Sitios web y marcadores de QuickSearch de BrowserNav"
 msgid "BrowserNav Settings"
 msgstr "Configuración de BrowserNav"
 
-msgid ""
-"BrowserNav error: inconsistent indents in the document. Recomputing indents,"
-" please try again."
-msgstr ""
-"Error de BrowserNav: sangrías inconsistentes en el documento. Recalculando "
-"sangrías, inténtalo de nuevo."
+msgid "BrowserNav error: inconsistent indents in the document. Recomputing indents, please try again."
+msgstr "Error de BrowserNav: sangrías inconsistentes en el documento. Recalculando sangrías, inténtalo de nuevo."
 
 msgid "BrowserNav navigates by "
 msgstr "BrowserNav navega por "
@@ -478,12 +424,8 @@ msgstr "BrowserNav navega por "
 msgid "BrowserNav temporary action configured only for this website."
 msgstr "Acción temporal de BrowserNav configurada solo para este sitio web."
 
-msgid ""
-"BrowserNav warning: Two or more sites matching this URL are configured to "
-"perform autoClick on load. This is not supported."
-msgstr ""
-"Advertencia de BrowserNav: Dos o más sitios que coinciden con esta URL están"
-" configurados para hacer clic automático al cargar. Esto no es compatible."
+msgid "BrowserNav warning: Two or more sites matching this URL are configured to perform autoClick on load. This is not supported."
+msgstr "Advertencia de BrowserNav: Dos o más sitios que coinciden con esta URL están configurados para hacer clic automático al cargar. Esto no es compatible."
 
 msgid "BrowserNav website import conflict"
 msgstr "Conflicto de importación de sitio web en BrowserNav"
@@ -497,12 +439,8 @@ msgstr "Cancelar"
 msgid "Cannot combine tilde with digits for numeric script!"
 msgstr "¡No se puede combinar tilde con dígitos para el script numérico!"
 
-msgid ""
-"Cannot copy text out of edit box. Please make sure edit box is not empty and"
-" not read-only!"
-msgstr ""
-"No se puede copiar texto fuera del cuadro de edición. ¡Asegúrate de que no "
-"esté vacío y no sea de solo lectura!"
+msgid "Cannot copy text out of edit box. Please make sure edit box is not empty and not read-only!"
+msgstr "No se puede copiar texto fuera del cuadro de edición. ¡Asegúrate de que no esté vacío y no sea de solo lectura!"
 
 msgid "Cannot edit in this window."
 msgstr "No se puede editar en esta ventana."
@@ -550,12 +488,8 @@ msgstr "¡Importación completa realizada con éxito!"
 msgid "Concise state reporting"
 msgstr "Notificación de estado concisa"
 
-msgid ""
-"Configure specific audio themes to automatically activate when certain "
-"applications are focused."
-msgstr ""
-"Configura temas de audio específicos para que se activen automáticamente al "
-"enfocar ciertas aplicaciones."
+msgid "Configure specific audio themes to automatically activate when certain applications are focused."
+msgstr "Configura temas de audio específicos para que se activen automáticamente al enfocar ciertas aplicaciones."
 
 msgid "Confirm Quit"
 msgstr "Confirmar salida"
@@ -567,8 +501,7 @@ msgid "Copied to clipboard: {}"
 msgstr "Copiado al portapapeles: {}"
 
 msgid "Copy the last text from semi-accessible edit box to clipboard."
-msgstr ""
-"Copiar al portapapeles el último texto del cuadro de edición semi-accesible."
+msgstr "Copiar al portapapeles el último texto del cuadro de edición semi-accesible."
 
 msgid "Could not copy file {src} to directory {dst}."
 msgstr "No se pudo copiar el archivo {src} al directorio {dst}."
@@ -598,8 +531,7 @@ msgid "Create new website for domain %s"
 msgstr "Crear nuevo sitio web para el dominio %s"
 
 msgid "Create new website with custom URL matching options"
-msgstr ""
-"Crear nuevo sitio web con opciones personalizadas de coincidencia de URL"
+msgstr "Crear nuevo sitio web con opciones personalizadas de coincidencia de URL"
 
 msgid "Creating New Theme - {name}"
 msgstr "Creando nuevo tema - {name}"
@@ -686,12 +618,10 @@ msgid "Disable A&ll"
 msgstr "Desactivar t&odo"
 
 msgid "Disable Audio Themes in these applications (comma separated):"
-msgstr ""
-"Desactivar temas de audio en estas aplicaciones (separadas por comas):"
+msgstr "Desactivar temas de audio en estas aplicaciones (separadas por comas):"
 
 msgid "Disable PhoneticPuntuation in applications (comma-separated list)"
-msgstr ""
-"Desactivar Puntuación Fonética en aplicaciones (lista separada por comas)"
+msgstr "Desactivar Puntuación Fonética en aplicaciones (lista separada por comas)"
 
 msgid "Disable audio themes"
 msgstr "Desactivar temas de audio"
@@ -768,12 +698,8 @@ msgstr "Editar &script en una nueva ventana; pulsa Control+Intro al terminar."
 msgid "Edit audio rule"
 msgstr "Editar regla de audio"
 
-msgid ""
-"Edit bookmark {bookmark} of category {category} that doesn't match "
-"formatting for current paragraph from site {site}"
-msgstr ""
-"Editar marcador {bookmark} de la categoría {category} que no coincide con el"
-" formato del párrafo actual del sitio {site}"
+msgid "Edit bookmark {bookmark} of category {category} that doesn't match formatting for current paragraph from site {site}"
+msgstr "Editar marcador {bookmark} de la categoría {category} que no coincide con el formato del párrafo actual del sitio {site}"
 
 msgid "Edit bookmarks for %s"
 msgstr "Editar marcadores para %s"
@@ -784,12 +710,8 @@ msgstr "Editar marcador de browserNav"
 msgid "Edit existing website %s"
 msgstr "Editar sitio web existente %s"
 
-msgid ""
-"Edit perfect match bookmark {bookmark} of category {category} from site "
-"{site}"
-msgstr ""
-"Editar marcador de coincidencia exacta {bookmark} de la categoría {category}"
-" del sitio {site}"
+msgid "Edit perfect match bookmark {bookmark} of category {category} from site {site}"
+msgstr "Editar marcador de coincidencia exacta {bookmark} de la categoría {category} del sitio {site}"
 
 msgid "Edit semi-accessible edit box."
 msgstr "Editar cuadro de edición semi-accesible."
@@ -851,12 +773,8 @@ msgstr "Activar sonidos de escritura"
 msgid "Enabled"
 msgstr "Activado"
 
-msgid ""
-"End adjustment in millis - positive for early cut off, negative for extra "
-"pause in the end"
-msgstr ""
-"Ajuste final en milisegundos: positivo para corte anticipado, negativo para "
-"pausa extra al final"
+msgid "End adjustment in millis - positive for early cut off, negative for extra pause in the end"
+msgstr "Ajuste final en milisegundos: positivo para corte anticipado, negativo para pausa extra al final"
 
 msgid "End adjustment must be a number."
 msgstr "El ajuste final debe ser un número."
@@ -908,21 +826,13 @@ msgstr ""
 "Por favor, comprueba tu conexión a Internet e inténtalo de nuevo.\n"
 
 msgid ""
-"Error! Focused element on the page has changed while pasting updated text. "
-"Possibly content of a different edit box has changed. Please inspect edit "
-"boxes manually and undo if needed."
+"Error! Focused element on the page has changed while pasting updated text. Possibly content of a different edit box has changed. Please inspect edit boxes manually and undo if needed."
 msgstr ""
-"¡Error! El elemento enfocado en la página ha cambiado al pegar el texto "
-"actualizado. Posiblemente haya cambiado el contenido de un cuadro de edición"
-" diferente. Inspecciona los cuadros de edición manualmente y deshace si es "
-"necesario."
+"¡Error! El elemento enfocado en la página ha cambiado al pegar el texto actualizado. Posiblemente haya cambiado el contenido de un cuadro de edición diferente. Inspecciona los cuadros de "
+"edición manualmente y deshace si es necesario."
 
-msgid ""
-"Error! When switching back to browser window, a different edit box is "
-"focused."
-msgstr ""
-"¡Error! Al volver a la ventana del navegador, se enfocó un cuadro de edición"
-" diferente."
+msgid "Error! When switching back to browser window, a different edit box is focused."
+msgstr "¡Error! Al volver a la ventana del navegador, se enfocó un cuadro de edición diferente."
 
 msgid ""
 "Error: you have entered URL filter for this rule.\n"
@@ -946,11 +856,8 @@ msgstr "Coincidencia exacta de párrafo"
 msgid "Exceptional abbreviations (space separated):"
 msgstr "Abreviaturas excepcionales (separadas por espacio):"
 
-msgid ""
-"Experimental: go back to the previous location of cursor in current document"
-msgstr ""
-"Experimental: volver a la ubicación anterior del cursor en el documento "
-"actual"
+msgid "Experimental: go back to the previous location of cursor in current document"
+msgstr "Experimental: volver a la ubicación anterior del cursor en el documento actual"
 
 msgid "Export Audio Themes Configuration"
 msgstr "Exportar configuración de temas de audio"
@@ -962,16 +869,10 @@ msgid "Failed to connect to store. Check your internet connection."
 msgstr "Fallo al conectar con la tienda. Comprueba tu conexión a Internet."
 
 msgid "Failed to open settings. Please open through NVDA Preferences."
-msgstr ""
-"Fallo al abrir la configuración. Por favor, abre desde las Preferencias de "
-"NVDA."
+msgstr "Fallo al abrir la configuración. Por favor, abre desde las Preferencias de NVDA."
 
-msgid ""
-"Failed to read clipboard data. Please make sure clipboard is not empty - "
-"copy some text to clipboard."
-msgstr ""
-"Fallo al leer datos del portapapeles. Asegúrate de que no esté vacío: copia "
-"algo de texto al portapapeles."
+msgid "Failed to read clipboard data. Please make sure clipboard is not empty - copy some text to clipboard."
+msgstr "Fallo al leer datos del portapapeles. Asegúrate de que no esté vacío: copia algo de texto al portapapeles."
 
 msgid "File exists"
 msgstr "El archivo existe"
@@ -1052,8 +953,7 @@ msgid "I&mport Configuration..."
 msgstr "I&mportar configuración..."
 
 msgid "Ignore all focus events - good for websites that misuse focus events"
-msgstr ""
-"Ignorar todos los eventos de foco - útil para sitios que abusan de ellos"
+msgstr "Ignorar todos los eventos de foco - útil para sitios que abusan de ellos"
 
 msgid "Import Audio Themes Configuration"
 msgstr "Importar configuración de temas de audio"
@@ -1073,16 +973,11 @@ msgstr "Aumenta el volumen de los temas de audio en un 5 por ciento."
 msgid "Installation successful!"
 msgstr "¡Instalación completada con éxito!"
 
-msgid ""
-"Invalid keystroke %s: Cannot use keystrokes with shift modifier for "
-"quickJump bookmarks!"
-msgstr ""
-"Atajo no válido %s: ¡No se pueden usar modificadores Shift para marcadores "
-"quickJump!"
+msgid "Invalid keystroke %s: Cannot use keystrokes with shift modifier for quickJump bookmarks!"
+msgstr "Atajo no válido %s: ¡No se pueden usar modificadores Shift para marcadores quickJump!"
 
 msgid "Invalid keystroke %s: cannot overload essential  NVDA keystrokes!"
-msgstr ""
-"Atajo no válido %s: ¡no se pueden sobrecargar los atajos esenciales de NVDA!"
+msgstr "Atajo no válido %s: ¡no se pueden sobrecargar los atajos esenciales de NVDA!"
 
 msgid "Invalid level for numeric script: '{level}'"
 msgstr "Nivel no válido para el script numérico: '{level}'"
@@ -1106,27 +1001,17 @@ msgstr "Archivo wav no válido."
 msgid "Italic"
 msgstr "Cursiva"
 
-msgid ""
-"Jump to next hierarchical bookmark {levelStr}; please check browserNav "
-"configuration panel for hierarchical bookmark configuration."
-msgstr ""
-"Saltar al siguiente marcador jerárquico {levelStr}; consulta el panel de "
-"configuración de BrowserNav."
+msgid "Jump to next hierarchical bookmark {levelStr}; please check browserNav configuration panel for hierarchical bookmark configuration."
+msgstr "Saltar al siguiente marcador jerárquico {levelStr}; consulta el panel de configuración de BrowserNav."
 
-msgid ""
-"Jump to previous hierarchical bookmark {levelStr}; please check browserNav "
-"configuration panel for hierarchical bookmark configuration."
-msgstr ""
-"Saltar al marcador jerárquico anterior {levelStr}; consulta el panel de "
-"configuración de BrowserNav."
+msgid "Jump to previous hierarchical bookmark {levelStr}; please check browserNav configuration panel for hierarchical bookmark configuration."
+msgstr "Saltar al marcador jerárquico anterior {levelStr}; consulta el panel de configuración de BrowserNav."
 
 msgid "Keep default NVDA focus behavior"
 msgstr "Mantener el comportamiento de foco predeterminado de NVDA"
 
 msgid "Keep existing website definition, but overwrite all &bookmarks"
-msgstr ""
-"Mantener la definición del sitio web, pero sobrescribir todos los "
-"&marcadores"
+msgstr "Mantener la definición del sitio web, pero sobrescribir todos los &marcadores"
 
 msgid "Keep original text"
 msgstr "Mantener texto original"
@@ -1179,11 +1064,8 @@ msgstr "Desplazamiento máximo de prosodia"
 msgid "Minimum font size or heading level"
 msgstr "Tamaño mínimo de fuente o nivel de encabezado"
 
-msgid ""
-"Minimum numeric value must be strictly less than maximum numeric value."
-msgstr ""
-"El valor numérico mínimo debe ser estrictamente menor que el valor numérico "
-"máximo."
+msgid "Minimum numeric value must be strictly less than maximum numeric value."
+msgstr "El valor numérico mínimo debe ser estrictamente menor que el valor numérico máximo."
 
 msgid "Minimum prosody offset"
 msgstr "Desplazamiento mínimo de prosodia"
@@ -1253,11 +1135,8 @@ msgstr "Nuevo sonido de notificación"
 msgid "Next Audio Theme"
 msgstr "Siguiente tema de audio"
 
-msgid ""
-"Next paragraph not found: current position is at the end of the document."
-msgstr ""
-"No se encontró el siguiente párrafo: la posición actual está al final del "
-"documento."
+msgid "Next paragraph not found: current position is at the end of the document."
+msgstr "No se encontró el siguiente párrafo: la posición actual está al final del documento."
 
 msgid "No Audio Themes"
 msgstr "Sin temas de audio"
@@ -1280,20 +1159,11 @@ msgstr "No hay historial de cursor disponible"
 msgid "No heading level information"
 msgstr "Sin información de nivel de encabezado"
 
-msgid ""
-"No hierarchical quickJump bookmarks configured for current website. Please "
-"add QuickJump bookmarks in BrowserNav settings in NVDA settings window."
-msgstr ""
-"No hay marcadores de salto rápido jerárquico configurados. Añádelos en la "
-"configuración de BrowserNav."
+msgid "No hierarchical quickJump bookmarks configured for current website. Please add QuickJump bookmarks in BrowserNav settings in NVDA settings window."
+msgstr "No hay marcadores de salto rápido jerárquico configurados. Añádelos en la configuración de BrowserNav."
 
-msgid ""
-"No hierarchical quickJump bookmarks or numeric script bookmarks configured "
-"for current website. Please add QuickJump bookmarks in BrowserNav settings "
-"in NVDA settings window."
-msgstr ""
-"No hay marcadores de salto rápido jerárquico o de script numérico "
-"configurados. Añádelos en BrowserNav."
+msgid "No hierarchical quickJump bookmarks or numeric script bookmarks configured for current website. Please add QuickJump bookmarks in BrowserNav settings in NVDA settings window."
+msgstr "No hay marcadores de salto rápido jerárquico o de script numérico configurados. Añádelos en BrowserNav."
 
 msgid "No indent announcement"
 msgstr "Sin anuncio de sangría"
@@ -1310,12 +1180,8 @@ msgstr "Volumen de campanilla de 'no hay más oraciones':"
 msgid "No more text units chime volume:"
 msgstr "Volumen de campanilla de 'no hay más unidades de texto':"
 
-msgid ""
-"No next QuickJump result. To configure QuickJump rules, please go to "
-"BrowserNav settings in NVDA configuration window."
-msgstr ""
-"No hay siguiente resultado de QuickJump. Para configurar las reglas, ve a "
-"BrowserNav."
+msgid "No next QuickJump result. To configure QuickJump rules, please go to BrowserNav settings in NVDA configuration window."
+msgstr "No hay siguiente resultado de QuickJump. Para configurar las reglas, ve a BrowserNav."
 
 msgid "No next format change!"
 msgstr "¡No hay siguiente cambio de formato!"
@@ -1356,12 +1222,8 @@ msgstr "No hay frase anterior"
 msgid "No previous sentence"
 msgstr "No hay oración anterior"
 
-msgid ""
-"No quickJump bookmarks configured for current website. Please add QuickJump "
-"bookmarks in BrowserNav settings in NVDA settings window."
-msgstr ""
-"No hay marcadores quickJump configurados. Añádelos en la configuración de "
-"BrowserNav."
+msgid "No quickJump bookmarks configured for current website. Please add QuickJump bookmarks in BrowserNav settings in NVDA settings window."
+msgstr "No hay marcadores quickJump configurados. Añádelos en la configuración de BrowserNav."
 
 msgid "No sites are configured for current URL."
 msgstr "No hay sitios configurados para la URL actual."
@@ -1369,32 +1231,20 @@ msgstr "No hay sitios configurados para la URL actual."
 msgid "No typing sound packs available"
 msgstr "No hay paquetes de sonido de escritura disponibles"
 
-msgid ""
-"No {category} bookmarks configured for current website. Please add "
-"{category} bookmarks in BrowserNav settings in NVDA settings window."
-msgstr ""
-"No hay marcadores de la categoría {category} configurados. Añádelos en "
-"BrowserNav."
+msgid "No {category} bookmarks configured for current website. Please add {category} bookmarks in BrowserNav settings in NVDA settings window."
+msgstr "No hay marcadores de la categoría {category} configurados para el sitio web actual. Añade marcadores de la categoría {category} en la ventana de configuración de BrowserNav de NVDA."
 
 msgid "Not editable"
 msgstr "No editable"
 
-msgid ""
-"Note: These settings adjust the audio feedback for SentenceNav, TextNav, and"
-" BrowserNav integrations."
-msgstr ""
-"Nota: Estos ajustes configuran la respuesta de audio para las integraciones "
-"de SentenceNav, TextNav y BrowserNav."
+msgid "Note: These settings adjust the audio feedback for SentenceNav, TextNav, and BrowserNav integrations."
+msgstr "Nota: Estos ajustes configuran la respuesta de audio para las integraciones de SentenceNav, TextNav y BrowserNav."
 
 msgid "Numeric Script"
 msgstr "Script numérico"
 
-msgid ""
-"Numeric Script - script that can consume a numeric argument by pressing "
-"Alt+digits"
-msgstr ""
-"Script numérico: script que puede recibir un argumento numérico al pulsar "
-"Alt+dígitos"
+msgid "Numeric Script - script that can consume a numeric argument by pressing Alt+digits"
+msgstr "Script numérico: script que puede recibir un argumento numérico al pulsar Alt+dígitos"
 
 msgid "Numeric format"
 msgstr "Formato numérico"
@@ -1405,12 +1255,8 @@ msgstr "Formato de texto numérico"
 msgid "OK"
 msgstr "Aceptar"
 
-msgid ""
-"Offset in paragraphs - select a value to place the cursor on following or "
-"preceding paragraph from the bookmark match:"
-msgstr ""
-"Desplazamiento en párrafos: selecciona un valor para situar el cursor en el "
-"párrafo siguiente o anterior al marcador coincidente:"
+msgid "Offset in paragraphs - select a value to place the cursor on following or preceding paragraph from the bookmark match:"
+msgstr "Desplazamiento en párrafos: selecciona un valor para situar el cursor en el párrafo siguiente o anterior al marcador coincidente:"
 
 msgid "Ogg audio files"
 msgstr "Archivos de audio Ogg"
@@ -1436,12 +1282,8 @@ msgstr "Volumen de campanilla del límite de párrafo:"
 msgid "Paragraph crackle volume:"
 msgstr "Volumen de crujido del párrafo:"
 
-msgid ""
-"Pass raw text through to synth. Typically you want to enable this only for "
-"punctuation marks and disable for all other rules."
-msgstr ""
-"Pasar texto sin procesar al sintetizador. Normalmente solo se activa para "
-"signos de puntuación y se desactiva para el resto de reglas."
+msgid "Pass raw text through to synth. Typically you want to enable this only for punctuation marks and disable for all other rules."
+msgstr "Pasar texto sin procesar al sintetizador. Normalmente solo se activa para signos de puntuación y se desactiva para el resto de reglas."
 
 msgid "Pattern"
 msgstr "Patrón"
@@ -1471,9 +1313,7 @@ msgid "Phrase breakers:"
 msgstr "Separadores de frase:"
 
 msgid "Plain text not found: tried to search for '{text}' {direction}."
-msgstr ""
-"Texto plano no encontrado: se intentó buscar '{text}' en dirección "
-"{direction}."
+msgstr "Texto plano no encontrado: se intentó buscar '{text}' en dirección {direction}."
 
 msgid "Play chime when bookmark appears on the page"
 msgstr "Reproducir campanilla cuando el marcador aparezca en la página"
@@ -1482,8 +1322,7 @@ msgid "Play chime when bookmark disappears from the page"
 msgstr "Reproducir campanilla cuando el marcador desaparezca de la página"
 
 msgid "Play chime when text matched by bookmark changes"
-msgstr ""
-"Reproducir campanilla cuando cambie el texto coincidente con el marcador"
+msgstr "Reproducir campanilla cuando cambie el texto coincidente con el marcador"
 
 msgid "Play sounds in 3D mode"
 msgstr "Reproducir sonidos en modo 3D"
@@ -1492,8 +1331,7 @@ msgid "Play typing sounds only in edit boxes"
 msgstr "Reproducir sonidos de escritura solo en cuadros de edición"
 
 msgid "Please create a new site configuration in site submenu."
-msgstr ""
-"Por favor, crea una nueva configuración de sitio en el submenú de sitios."
+msgstr "Por favor, crea una nueva configuración de sitio en el submenú de sitios."
 
 msgid "Please enter a single character as pattern."
 msgstr "Por favor, introduce un solo carácter como patrón."
@@ -1511,12 +1349,8 @@ msgstr "Por favor, introduce el nombre del sitio web para exportarlo."
 msgid "Press desired keystroke now"
 msgstr "Pulsa el atajo de teclado deseado ahora"
 
-msgid ""
-"Pressing it once toggles audio themes on and off. Pressing twice toggles "
-"typing sounds."
-msgstr ""
-"Pulsarlo una vez activa o desactiva los temas de audio. Pulsarlo dos veces "
-"alterna los sonidos de escritura."
+msgid "Pressing it once toggles audio themes on and off. Pressing twice toggles typing sounds."
+msgstr "Pulsarlo una vez activa o desactiva los temas de audio. Pulsarlo dos veces alterna los sonidos de escritura."
 
 msgid "Preview finished."
 msgstr "Vista previa finalizada."
@@ -1524,12 +1358,8 @@ msgstr "Vista previa finalizada."
 msgid "Previous Audio Theme"
 msgstr "Tema de audio anterior"
 
-msgid ""
-"Previous paragraph not found: current position is at the beginning of the "
-"document."
-msgstr ""
-"No se encontró el párrafo anterior: la posición actual está al principio del"
-" documento."
+msgid "Previous paragraph not found: current position is at the beginning of the document."
+msgstr "No se encontró el párrafo anterior: la posición actual está al principio del documento."
 
 msgid "Prosody offset cannot be zero."
 msgstr "El desplazamiento de prosodia no puede ser cero."
@@ -1561,19 +1391,11 @@ msgstr "SaltoRápido (QuickJump)"
 msgid "QuickJump - assigned to J by default"
 msgstr "SaltoRápido (asignado a J de forma predeterminada)"
 
-msgid ""
-"QuickJump back according to BrowserNav QuickJump bookmarks; please check "
-"browserNav configuration panel for the list of bookmarks."
-msgstr ""
-"SaltoRápido hacia atrás según los marcadores de BrowserNav; consulta la "
-"configuración."
+msgid "QuickJump back according to BrowserNav QuickJump bookmarks; please check browserNav configuration panel for the list of bookmarks."
+msgstr "SaltoRápido hacia atrás según los marcadores de BrowserNav; consulta la configuración."
 
-msgid ""
-"QuickJump forward according to BrowserNav QuickJump bookmarks; please check "
-"browserNav configuration panel for the list of bookmarks."
-msgstr ""
-"SaltoRápido hacia adelante según los marcadores de BrowserNav; consulta la "
-"configuración."
+msgid "QuickJump forward according to BrowserNav QuickJump bookmarks; please check browserNav configuration panel for the list of bookmarks."
+msgstr "SaltoRápido hacia adelante según los marcadores de BrowserNav; consulta la configuración."
 
 msgid "QuickJump2"
 msgstr "SaltoRápido 2"
@@ -1582,18 +1404,13 @@ msgid "QuickJump3"
 msgstr "SaltoRápido 3"
 
 msgid "QuickNav item not found: tried to search for '{text}' {direction}."
-msgstr ""
-"Elemento de navegación rápida no encontrado: se intentó buscar '{text}' en "
-"dirección {direction}."
+msgstr "Elemento de navegación rápida no encontrado: se intentó buscar '{text}' en dirección {direction}."
 
 msgid "QuickSearch & Bookmarks"
 msgstr "BúsquedaRápida y Marcadores"
 
-msgid ""
-"QuickSpeak  according to BrowserNav QuickSpeak bookmark; please check "
-"browserNav configuration panel for the list of bookmarks."
-msgstr ""
-"LecturaRápida según el marcador de BrowserNav; consulta la configuración."
+msgid "QuickSpeak  according to BrowserNav QuickSpeak bookmark; please check browserNav configuration panel for the list of bookmarks."
+msgstr "LecturaRápida según el marcador de BrowserNav; consulta la configuración."
 
 msgid "Re&move rule"
 msgstr "E&liminar regla"
@@ -1617,23 +1434,16 @@ msgid "Regex search"
 msgstr "Búsqueda por expresión regular"
 
 msgid "Regexp text not found: tried to search for '{text}' {direction}."
-msgstr ""
-"Texto de exp. regular no encontrado: se buscó '{text}' en dirección "
-"{direction}."
+msgstr "Texto de exp. regular no encontrado: se buscó '{text}' en dirección {direction}."
 
-msgid ""
-"Regular expression pattern matches empty string. This is not allowed. Please"
-" change the pattern."
-msgstr ""
-"El patrón de la expresión regular coincide con una cadena vacía. Esto no "
-"está permitido. Por favor, cambia el patrón."
+msgid "Regular expression pattern matches empty string. This is not allowed. Please change the pattern."
+msgstr "El patrón de la expresión regular coincide con una cadena vacía. Esto no está permitido. Por favor, cambia el patrón."
 
 msgid "Remove Audio Theme"
 msgstr "Eliminar tema de audio"
 
 msgid "Report the object under the cursor with full 3D audio coordinates."
-msgstr ""
-"Informar del objeto bajo el cursor con coordenadas de audio 3D completas."
+msgstr "Informar del objeto bajo el cursor con coordenadas de audio 3D completas."
 
 msgid "Reverb"
 msgstr "Reverberación"
@@ -1693,12 +1503,10 @@ msgid "Scroll to all possible elements forward"
 msgstr "Desplazarse a todos los elementos posibles hacia adelante"
 
 msgid "Scrolling backward. This may load more elements on the page."
-msgstr ""
-"Desplazando hacia atrás. Esto puede cargar más elementos en la página."
+msgstr "Desplazando hacia atrás. Esto puede cargar más elementos en la página."
 
 msgid "Scrolling forward. This may load more elements on the page."
-msgstr ""
-"Desplazando hacia adelante. Esto puede cargar más elementos en la página."
+msgstr "Desplazando hacia adelante. Esto puede cargar más elementos en la página."
 
 msgid "Search for a role:"
 msgstr "Buscar un rol:"
@@ -1721,12 +1529,8 @@ msgstr "Selecciona un tema para editar o remezclar:"
 msgid "Select an audio themes command to execute:"
 msgstr "Selecciona un comando de temas de audio para ejecutar:"
 
-msgid ""
-"Select the roles you want NVDA to speak (if the global speak roles setting "
-"is enabled):"
-msgstr ""
-"Selecciona los roles que quieres que NVDA verbalice (si la configuración "
-"global está activada):"
+msgid "Select the roles you want NVDA to speak (if the global speak roles setting is enabled):"
+msgstr "Selecciona los roles que quieres que NVDA verbalice (si la configuración global está activada):"
 
 msgid "Select theme:"
 msgstr "Seleccionar tema:"
@@ -1740,12 +1544,8 @@ msgstr "Navegación por oraciones (Alt+Flechas)"
 msgid "Sentence breakers:"
 msgstr "Separadores de oración:"
 
-msgid ""
-"Sets an audio beacon at the current navigator object. Navigate around to "
-"hear a sonar ping relative to this beacon."
-msgstr ""
-"Coloca una baliza de audio en el objeto actual del navegador. Muévete para "
-"escuchar un ping de sonar relativo a esta baliza."
+msgid "Sets an audio beacon at the current navigator object. Navigate around to hear a sonar ping relative to this beacon."
+msgstr "Coloca una baliza de audio en el objeto actual del navegador. Muévete para escuchar un ping de sonar relativo a esta baliza."
 
 msgid "Show BrowserNav popup menu."
 msgstr "Mostrar menú emergente de BrowserNav."
@@ -1777,13 +1577,8 @@ msgstr "Activar Omitir desorden en navegación por párrafos"
 msgid "SkipClutter"
 msgstr "OmitirDesorden (SkipClutter)"
 
-msgid ""
-"SkipClutter - will automatically skip this paragraph or line when navigating"
-" via Control+Up/Down or Up/Down keystrokes; must match the whole paragraph. "
-"or "
-msgstr ""
-"OmitirDesorden - omitirá automáticamente este párrafo o línea al navegar con"
-" Control+Arriba/Abajo o Arriba/Abajo; debe coincidir con todo el párrafo."
+msgid "SkipClutter - will automatically skip this paragraph or line when navigating via Control+Up/Down or Up/Down keystrokes; must match the whole paragraph. or "
+msgstr "OmitirDesorden - omitirá automáticamente este párrafo o línea al navegar con Control+Arriba/Abajo o Arriba/Abajo; debe coincidir con todo el párrafo."
 
 msgid "Skippable punctuation:"
 msgstr "Puntuación que se puede omitir:"
@@ -1791,15 +1586,11 @@ msgstr "Puntuación que se puede omitir:"
 msgid "Smart Volume Normalization"
 msgstr "Normalización inteligente de volumen"
 
-msgid ""
-"Smart spatial positioning (maps characters to their exact physical keys)"
-msgstr ""
-"Posicionamiento espacial inteligente (asigna caracteres a sus teclas físicas"
-" exactas)"
+msgid "Smart spatial positioning (maps characters to their exact physical keys)"
+msgstr "Posicionamiento espacial inteligente (asigna caracteres a sus teclas físicas exactas)"
 
 msgid "Smooth 3D Panning (Glide effect for moving objects)"
-msgstr ""
-"Panorámica 3D suave (Efecto de deslizamiento para objetos en movimiento)"
+msgstr "Panorámica 3D suave (Efecto de deslizamiento para objetos en movimiento)"
 
 msgid "Smooth Envelope (Fade In/Out to prevent popping)"
 msgstr "Envolvente suave (Fundido de entrada/salida para evitar chasquidos)"
@@ -1870,12 +1661,8 @@ msgstr "Orden de voz: Estado, Nombre"
 msgid "Spoken &message when bookmark is found:"
 msgstr "Mensaje verbalizado cuando se encuentra el marcador:"
 
-msgid ""
-"Start adjustment in millis - positive to cut off start, negative for extra "
-"pause in the beginning."
-msgstr ""
-"Ajuste de inicio en milisegundos - positivo para acortar el inicio, negativo"
-" para pausa extra al principio."
+msgid "Start adjustment in millis - positive to cut off start, negative for extra pause in the beginning."
+msgstr "Ajuste de inicio en milisegundos - positivo para acortar el inicio, negativo para pausa extra al principio."
 
 msgid "Start adjustment must be a number."
 msgstr "El ajuste de inicio debe ser un número."
@@ -1908,12 +1695,10 @@ msgid "Success"
 msgstr "Éxito"
 
 msgid "Suppress aria label announcements for landmarks and regions"
-msgstr ""
-"Suprimir anuncios de etiquetas ARIA para puntos de referencia y regiones"
+msgstr "Suprimir anuncios de etiquetas ARIA para puntos de referencia y regiones"
 
 msgid "Suppress aria name announcements for editables and combo boxes"
-msgstr ""
-"Suprimir anuncios de nombres ARIA para campos editables y cuadros combinados"
+msgstr "Suprimir anuncios de nombres ARIA para campos editables y cuadros combinados"
 
 msgid "Suppress aria role text announcements"
 msgstr "Suprimir anuncios de texto de rol ARIA"
@@ -1975,10 +1760,8 @@ msgstr "Tienda de temas"
 msgid "Themes successfully fetched. Select a theme:"
 msgstr "Temas obtenidos con éxito. Selecciona un tema:"
 
-msgid ""
-"There is already a website with this name. Please enter a different name."
-msgstr ""
-"Ya existe un sitio web con este nombre. Por favor, introduce uno diferente."
+msgid "There is already a website with this name. Please enter a different name."
+msgstr "Ya existe un sitio web con este nombre. Por favor, introduce uno diferente."
 
 msgid ""
 "This can not be undone.\n"
@@ -2010,8 +1793,7 @@ msgid "Timed out during release modifiers stage"
 msgstr "Tiempo de espera agotado durante la fase de soltar modificadores"
 
 msgid "Timed out during single-character control+C stage"
-msgstr ""
-"Tiempo de espera agotado durante la fase de Control+C de un solo carácter"
+msgstr "Tiempo de espera agotado durante la fase de Control+C de un solo carácter"
 
 msgid "Timed out during switch to browser window stage"
 msgstr "Tiempo de espera agotado al cambiar a la ventana del navegador"
@@ -2020,8 +1802,7 @@ msgid "Timed out during switch to window stage"
 msgstr "Tiempo de espera agotado al cambiar a la ventana"
 
 msgid "Timeout while trying to focus current edit box."
-msgstr ""
-"Tiempo de espera agotado intentando enfocar el cuadro de edición actual."
+msgstr "Tiempo de espera agotado intentando enfocar el cuadro de edición actual."
 
 msgid "Toggle"
 msgstr "Alternar"
@@ -2122,42 +1903,23 @@ msgstr "Volumen de la campanilla de 'No hay texto siguiente'"
 msgid "Volume {vol}"
 msgstr "Volumen {vol}"
 
-msgid ""
-"Warning! While copying text out of edit box, focused elementon the page has "
-"changed. Please try again."
-msgstr ""
-"¡Advertencia! Mientras se copiaba el texto del cuadro de edición, el "
-"elemento enfocado en la página cambió. Inténtalo de nuevo."
+msgid "Warning! While copying text out of edit box, focused elementon the page has changed. Please try again."
+msgstr "¡Advertencia! Mientras se copiaba el texto del cuadro de edición, el elemento enfocado en la página cambió. Inténtalo de nuevo."
 
 msgid ""
-"Warning: you are about to create or update a skip clutter bookmark. If your "
-"pattern is too generic, it might hide significant part of your website. For "
-"example, if you specify a single whitespace as pattern and substring match, "
-"then all paragraphs containing at least a single whitespace would disappear."
-" Please make sure you understand how skip clutter works and how to undo this"
-" change if you have to. Would you like to continue?"
+"Warning: you are about to create or update a skip clutter bookmark. If your pattern is too generic, it might hide significant part of your website. For example, if you specify a single "
+"whitespace as pattern and substring match, then all paragraphs containing at least a single whitespace would disappear. Please make sure you understand how skip clutter works and how to "
+"undo this change if you have to. Would you like to continue?"
 msgstr ""
-"Advertencia: estás a punto de crear o actualizar un marcador para omitir "
-"desorden. Si tu patrón es demasiado genérico, puede ocultar partes "
-"significativas del sitio. Asegúrate de entender cómo funciona esto y cómo "
-"deshacer el cambio si es necesario. ¿Deseas continuar?"
+"Advertencia: estás a punto de crear o actualizar un marcador para omitir desorden. Si tu patrón es demasiado genérico, puede ocultar partes significativas del sitio. Asegúrate de entender "
+"cómo funciona esto y cómo deshacer el cambio si es necesario. ¿Deseas continuar?"
+
+msgid "Warning: you are about to move this bookmark to site %(new_site)s. This bookmark will disappear from the old site %(old_site)s. Would you like to proceed?"
+msgstr "Advertencia: estás a punto de mover este marcador al sitio %(new_site)s. Desaparecerá del sitio antiguo %(old_site)s. ¿Quieres continuar?"
 
 msgid ""
-"Warning: you are about to move this bookmark to site %(new_site)s. This "
-"bookmark will disappear from the old site %(old_site)s. Would you like to "
-"proceed?"
-msgstr ""
-"Advertencia: estás a punto de mover este marcador al sitio %(new_site)s. "
-"Desaparecerá del sitio antiguo %(old_site)s. ¿Quieres continuar?"
-
-msgid ""
-"Warning: you are trying to  move this bookmark to site %(new_site)s. However"
-" it already contains a bookmark with the same UUID. This is not supported. "
-"Please create a new bookmark instead."
-msgstr ""
-"Advertencia: intentas mover este marcador al sitio %(new_site)s. Sin "
-"embargo, ya contiene un marcador con el mismo UUID. Esto no es compatible. "
-"Por favor, crea un nuevo marcador."
+"Warning: you are trying to  move this bookmark to site %(new_site)s. However it already contains a bookmark with the same UUID. This is not supported. Please create a new bookmark instead."
+msgstr "Advertencia: intentas mover este marcador al sitio %(new_site)s. Sin embargo, ya contiene un marcador con el mismo UUID. Esto no es compatible. Por favor, crea un nuevo marcador."
 
 msgid "Wav file"
 msgstr "Archivo Wav"
@@ -2223,8 +1985,7 @@ msgstr ""
 "Por favor, instala o crea uno primero."
 
 msgid "You must specify blank domain for this match option."
-msgstr ""
-"Debes especificar un dominio en blanco para esta opción de coincidencia."
+msgstr "Debes especificar un dominio en blanco para esta opción de coincidencia."
 
 msgid "You must specify non-empty string as domain"
 msgstr "Debes especificar una cadena no vacía como dominio"
@@ -2312,9 +2073,7 @@ msgid "Check for &Updates..."
 msgstr "Buscar act&ualizaciones..."
 
 msgid "Could not check for updates. Please check your internet connection."
-msgstr ""
-"No se pudo buscar actualizaciones. Por favor, comprueba tu conexión a "
-"Internet."
+msgstr "No se pudo buscar actualizaciones. Por favor, comprueba tu conexión a Internet."
 
 msgid "Update Check"
 msgstr "Comprobación de actualizaciones"
@@ -2339,9 +2098,7 @@ msgid "Update Available"
 msgstr "Actualización disponible"
 
 msgid "Download complete. The add-on installation dialog will now open."
-msgstr ""
-"Descarga completa. El diálogo de instalación del complemento se abrirá "
-"ahora."
+msgstr "Descarga completa. El diálogo de instalación del complemento se abrirá ahora."
 
 msgid "Failed to download the update: {error}"
 msgstr "Error al descargar la actualización: {error}"
@@ -2450,19 +2207,15 @@ msgid "Detect as last item"
 msgstr "Detectar como último elemento"
 
 msgid "Select the roles that should have first/last item detection:"
-msgstr ""
-"Seleccione los roles que deben tener detección de primer/último elemento:"
+msgstr "Seleccione los roles que deben tener detección de primer/último elemento:"
 
 msgid "Solo item behavior"
 msgstr "Comportamiento de elemento único"
 
-msgid ""
-"Note: Fallback behavior when no first/last sound exists can be configured in"
-" the General tab under \"When no sound for first/last item\"."
+msgid "Note: Fallback behavior when no first/last sound exists can be configured in the General tab under \"When no sound for first/last item\"."
 msgstr ""
-"Nota: El comportamiento alternativo cuando no existe un sonido para el "
-"primer/último elemento se puede configurar en la pestaña \"General\" en "
-"\"Cuando no hay sonido para el primer/último elemento\"."
+"Nota: El comportamiento alternativo cuando no existe un sonido para el primer/último elemento se puede configurar en la pestaña \"General\" en \"Cuando no hay sonido para el primer/último "
+"elemento\"."
 
 msgid "Detection scope"
 msgstr "Alcance de detección"
@@ -2480,9 +2233,7 @@ msgid "Solo items"
 msgstr "Elementos únicos"
 
 msgid "Solo items are items that have no siblings of the same type."
-msgstr ""
-"Los elementos únicos son aquellos que no tienen elementos adyacentes del "
-"mismo tipo."
+msgstr "Los elementos únicos son aquellos que no tienen elementos adyacentes del mismo tipo."
 
 msgid "Behavior:"
 msgstr "Comportamiento:"
@@ -2573,8 +2324,7 @@ msgid "Blacklist applications"
 msgstr "Aplicaciones en la lista negra"
 
 msgid "Break sentences at element boundaries (links, separators, etc.)"
-msgstr ""
-"Romper frases en los límites de los elementos (enlaces, separadores, etc.)"
+msgstr "Romper frases en los límites de los elementos (enlaces, separadores, etc.)"
 
 msgid "BrowserNav sounds (indentation, navigation)"
 msgstr "Sonidos de BrowserNav (sangría, navegación)"
@@ -2661,9 +2411,7 @@ msgid "Enable Noise Gate (remove quiet background noise)"
 msgstr "Habilitar puerta de ruido (eliminar ruido de fondo silencioso)"
 
 msgid "Enters the navigation layer to move by various text and web units."
-msgstr ""
-"Entra en la capa de navegación para moverse por diversas unidades de texto y"
-" web."
+msgstr "Entra en la capa de navegación para moverse por diversas unidades de texto y web."
 
 msgid "Exceptional abbreviations"
 msgstr "Abreviaturas excepcionales"
@@ -2780,8 +2528,7 @@ msgid "Navigation Layer (NVDA+Windows+N)"
 msgstr "Capa de navegación (NVDA+Windows+N)"
 
 msgid "No matching audio files found in the selected folder."
-msgstr ""
-"No se encontraron archivos de audio coincidentes en la carpeta seleccionada."
+msgstr "No se encontraron archivos de audio coincidentes en la carpeta seleccionada."
 
 msgid "No more sentences chime volume"
 msgstr "Volumen del timbre de \"No hay más frases\""
@@ -2898,15 +2645,10 @@ msgid "Select theme"
 msgstr "Seleccionar tema"
 
 msgid "Select which sound categories should be ducked when NVDA speaks:"
-msgstr ""
-"Seleccione qué categorías de sonido deben atenuarse cuando NVDA habla:"
+msgstr "Seleccione qué categorías de sonido deben atenuarse cuando NVDA habla:"
 
-msgid ""
-"Select which sound categories to suppress when the foreground app is in the "
-"disabled list:"
-msgstr ""
-"Seleccione qué categorías de sonido suprimir cuando la aplicación en primer "
-"plano esté en la lista de deshabilitadas:"
+msgid "Select which sound categories to suppress when the foreground app is in the disabled list:"
+msgstr "Seleccione qué categorías de sonido suprimir cuando la aplicación en primer plano esté en la lista de deshabilitadas:"
 
 msgid "Sentence"
 msgstr "Frase"
@@ -2938,18 +2680,11 @@ msgstr "Tablas"
 msgid "TextNav sounds (Alt+Shift+Up/Down)"
 msgstr "Sonidos de TextNav (Alt+Shift+Arriba/Abajo)"
 
-msgid ""
-"The following add-ons are now included in Advanced Audio Themes. Select the "
-"ones you want to remove to prevent conflicts:"
-msgstr ""
-"Los siguientes complementos ahora están incluidos en Advanced Audio Themes. "
-"Seleccione los que desea eliminar para evitar conflictos:"
+msgid "The following add-ons are now included in Advanced Audio Themes. Select the ones you want to remove to prevent conflicts:"
+msgstr "Los siguientes complementos ahora están incluidos en Advanced Audio Themes. Seleccione los que desea eliminar para evitar conflictos:"
 
-msgid ""
-"The selected conflicting add-ons will be removed after you restart NVDA."
-msgstr ""
-"Los complementos en conflicto seleccionados se eliminarán después de "
-"reiniciar NVDA."
+msgid "The selected conflicting add-ons will be removed after you restart NVDA."
+msgstr "Los complementos en conflicto seleccionados se eliminarán después de reiniciar NVDA."
 
 msgid "Theme sounds (roles, states, focus)"
 msgstr "Sonidos del tema (roles, estados, foco)"
@@ -3057,8 +2792,7 @@ msgid "Low battery threshold (%):"
 msgstr "Umbral de batería baja (%):"
 
 msgid "Monitor all USB devices (keyboard, mouse, storage, etc.)"
-msgstr ""
-"Monitorear todos los dispositivos USB (teclado, ratón, almacenamiento, etc.)"
+msgstr "Monitorear todos los dispositivos USB (teclado, ratón, almacenamiento, etc.)"
 
 msgid "Network check interval (seconds):"
 msgstr "Intervalo de verificación de red (segundos):"
@@ -3114,11 +2848,8 @@ msgstr "Modo de detección"
 msgid "Controls how first/last items are identified."
 msgstr "Controla cómo se identifican los elementos primero/último."
 
-msgid ""
-"Smart (Recommended) – ignore separators, fall back to any adjacent item"
-msgstr ""
-"Inteligente (Recomendado) – ignorar separadores, recurrir a cualquier "
-"elemento adyacente"
+msgid "Smart (Recommended) – ignore separators, fall back to any adjacent item"
+msgstr "Inteligente (Recomendado) – ignorar separadores, recurrir a cualquier elemento adyacente"
 
 msgid "Strict – same role only"
 msgstr "Estricto – solo el mismo rol"
@@ -3435,3 +3166,787 @@ msgstr "Abrir archivo de ayuda"
 
 msgid "Help file not found."
 msgstr "Archivo de ayuda no encontrado."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "%d%%"
+msgstr "%d%%"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "&Case sensitive pattern matching"
+msgstr "Coincidencia de patrón con distinción entre &mayúsculas y minúsculas"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "&Convert all theme sounds now"
+msgstr "&Convertir ahora todos los sonidos de los temas"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "&Export emoji settings..."
+msgstr "&Exportar configuración de emojis..."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "&Export rules"
+msgstr "&Exportar reglas"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "&Import emoji settings..."
+msgstr "&Importar configuración de emojis..."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "&Import rules"
+msgstr "&Importar reglas"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "&Test"
+msgstr "&Probar"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Activities"
+msgstr "Actividades"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Advanced Settings"
+msgstr "Configuración avanzada"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "After"
+msgstr "Después"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "After emoji"
+msgstr "Después del emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "All files"
+msgstr "Todos los archivos"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Animals & Nature"
+msgstr "Animales y naturaleza"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Annotation"
+msgstr "Anotación"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Assign sounds for clipboard actions in the Audio Themes Studio.\n"
+msgstr "Asigna sonidos a las acciones del portapapeles desde el Estudio de temas de audio.\n"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Audio file not found."
+msgstr "No se ha encontrado el archivo de audio."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Audio files"
+msgstr "Archivos de audio"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Battery check interval"
+msgstr "Intervalo de comprobación de batería"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Before"
+msgstr "Antes"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Before and after"
+msgstr "Antes y después"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Before emoji"
+msgstr "Antes del emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Browser navigation engine"
+msgstr "Motor de navegación del navegador"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Browser navigation engine:"
+msgstr "Motor de navegación del navegador:"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Cannot parse attribute: {e}"
+msgstr "No se puede interpretar el atributo: {e}"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Caret move sounds"
+msgstr "Sonidos al mover el cursor de texto"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Clipboard"
+msgstr "Portapapeles"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Configure per-category prefix text, sound position, and volume.\n"
+msgstr "Configura el texto de prefijo, la posición del sonido y el volumen de cada categoría.\n"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Convert theme sounds:"
+msgstr "Convertir sonidos de temas:"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Copied"
+msgstr "Copiado"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Copy"
+msgstr "Copiar"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Critical battery threshold"
+msgstr "Umbral de batería crítica"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Custom descriptions (JSON format, e.g. {\"😊\": \"face smile\"}):"
+msgstr "Descripciones personalizadas (formato JSON; p. ej., {\"😊\": \"cara sonriente\"}):"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Custom emoji descriptions"
+msgstr "Descripciones personalizadas de emojis"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Cut"
+msgstr "Cortar"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Delay after emoji sound"
+msgstr "Retardo posterior al sonido de emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Delay after sound (ms):"
+msgstr "Retardo posterior al sonido (ms):"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Delay before emoji sound"
+msgstr "Retardo previo al sonido de emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Delay before sound (ms):"
+msgstr "Retardo previo al sonido (ms):"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Disable PhoneticPunctuation in applications (comma-separated list)"
+msgstr "Desactivar Earcons y reglas de voz en estas aplicaciones (lista separada por comas)"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Downloading... {progress}%"
+msgstr "Descargando... {progress}%"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Earcons and Speech Rules"
+msgstr "Señales sonoras y reglas de voz"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji"
+msgstr "Emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji Activities Sound"
+msgstr "Sonido de actividades"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji After Sound"
+msgstr "Sonido posterior al emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji Animals Sound"
+msgstr "Sonido de animales"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji Before Sound"
+msgstr "Sonido anterior al emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji Categories"
+msgstr "Categorías de emojis"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji Flags Sound"
+msgstr "Sonido de banderas"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji Food Sound"
+msgstr "Sonido de comida"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji Objects Sound"
+msgstr "Sonido de objetos"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji People Sound"
+msgstr "Sonido de personas"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji Smileys Sound"
+msgstr "Sonido de caritas y emociones"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji Sound"
+msgstr "Sonido de emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji Symbols Sound"
+msgstr "Sonido de símbolos"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji Travel Sound"
+msgstr "Sonido de viajes"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji blacklist"
+msgstr "Lista de exclusión de emojis"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji blacklist (type or paste emoji characters to exclude):"
+msgstr "Lista de exclusión de emojis (escribe o pega los caracteres que quieras excluir):"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji prefix repeat"
+msgstr "Repetición del prefijo de emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji prefix text"
+msgstr "Texto del prefijo de emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji settings exported successfully."
+msgstr "La configuración de emojis se ha exportado correctamente."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid ""
+"Emoji settings imported successfully.\n"
+"Close and reopen settings to see changes."
+msgstr ""
+"La configuración de emojis se ha importado correctamente.\n"
+"Cierra y vuelve a abrir la configuración para ver los cambios."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji sound position"
+msgstr "Posición del sonido de emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji sound repeat"
+msgstr "Repetición de sonido de emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji sound volume"
+msgstr "Volumen del sonido de emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji sounds can be assigned in your theme by creating sound files\n"
+msgstr "Puedes asignar sonidos de emoji en el tema creando archivos de sonido\n"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Emoji suffix text"
+msgstr "Texto del sufijo de emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Enable emoji sounds and speech prefix"
+msgstr "Activar los sonidos y el prefijo hablado de los emojis"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Error creating audio rule: {e}"
+msgstr "Error al crear la regla de audio: {e}"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid ""
+"Error exporting emoji settings:\n"
+"%s"
+msgstr ""
+"Error al exportar la configuración de emojis:\n"
+"%s"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid ""
+"Error importing emoji settings:\n"
+"%s"
+msgstr ""
+"Error al importar la configuración de emojis:\n"
+"%s"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Error initializing some text rules of Earcons and Speech Rules add-on since they contain URL filter.\n"
+msgstr "Error al inicializar algunas reglas de texto de Señales sonoras y reglas de voz porque contienen un filtro de URL.\n"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Error retrieving contents of BrowserNav bookmark store: {}.\n"
+msgstr "Error al obtener el contenido del almacén de marcadores de BrowserNav: {}.\n"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Error saving rules. Check file permissions."
+msgstr "Error al guardar las reglas. Comprueba los permisos del archivo."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Error: you have entered URL filter for this rule.\n"
+msgstr "Error: has introducido un filtro de URL para esta regla.\n"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Event-driven (recommended)"
+msgstr "Basado en eventos (recomendado)"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Export Earcons & Speech Rules"
+msgstr "Exportar señales sonoras y reglas de voz"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Export Emoji Settings"
+msgstr "Exportar configuración de emojis"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Export Error"
+msgstr "Error de exportación"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid ""
+"FFmpeg is required to play {ext} files but is not installed.\n"
+"Please install FFmpeg from the Audio Themes settings, or convert the file to WAV/MP3/OGG/FLAC."
+msgstr ""
+"Se necesita FFmpeg para reproducir archivos {ext}, pero no está instalado.\n"
+"Instala FFmpeg desde la configuración de Temas de audio o convierte el archivo a WAV, MP3, OGG o FLAC."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "FLAC (lossless, smaller)"
+msgstr "FLAC (sin pérdida y de menor tamaño)"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Failed to export rules: {}"
+msgstr "No se han podido exportar las reglas: {}"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Failed to import rules: {}"
+msgstr "No se han podido importar las reglas: {}"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid ""
+"Failed to load {count} audio rule(s). They may have invalid fields or be corrupted.\n"
+"Check the NVDA log for details."
+msgstr ""
+"No se han podido cargar {count} reglas de audio. Pueden tener campos no válidos o estar dañadas.\n"
+"Consulta el registro de NVDA para obtener más información."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Failed to test rule: {}"
+msgstr "No se ha podido probar la regla: {}"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "File does not contain a valid rules list"
+msgstr "El archivo no contiene una lista válida de reglas"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Flags"
+msgstr "Banderas"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Food & Drink"
+msgstr "Comida y bebida"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Format not found."
+msgstr "No se ha encontrado el formato."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid ""
+"Found {count} matching file(s):\n"
+"\n"
+msgstr ""
+"Se han encontrado {count} archivos coincidentes:\n"
+"\n"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Hello 😊 world 🌍!"
+msgstr "¡Hola 😊, mundo 🌍!"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Import Earcons & Speech Rules"
+msgstr "Importar señales sonoras y reglas de voz"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Import Emoji Settings"
+msgstr "Importar configuración de emojis"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Import Error"
+msgstr "Error de importación"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Import Rules"
+msgstr "Importar reglas"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Installation failed."
+msgstr "La instalación ha fallado."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Invalid WAV file."
+msgstr "El archivo WAV no es válido."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid ""
+"Invalid replacement pattern: {}\n"
+"Please use curly braces {} as a format placeholder; please don't use any other curly braces in replacement string."
+msgstr ""
+"Patrón de sustitución no válido: {}\n"
+"Utiliza llaves {} como marcador de formato; no emplees otras llaves en la cadena de sustitución."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "JSON files (*.json)|*.json"
+msgstr "Archivos JSON (*.json)|*.json"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Low battery threshold"
+msgstr "Umbral de batería baja"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Mouse hover delay"
+msgstr "Retardo al pasar el ratón por encima"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Mouse hover delay (ms):"
+msgstr "Retardo al pasar el ratón por encima (ms):"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Network check interval"
+msgstr "Intervalo de comprobación de red"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "No"
+msgstr "No"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "No focused application."
+msgstr "No hay ninguna aplicación con el foco."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "No prefix"
+msgstr "Sin prefijo"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "No sound"
+msgstr "Sin sonido"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Non-Heading Element"
+msgstr "Elemento distinto de un encabezado"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Note"
+msgstr "Nota"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Off"
+msgstr "Desactivado"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Once per emoji character"
+msgstr "Una vez por cada carácter emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Once per text block"
+msgstr "Una vez por bloque de texto"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Paste"
+msgstr "Pegar"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Paste Plain"
+msgstr "Pegar sin formato"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "People & Body"
+msgstr "Personas y cuerpo"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Per field"
+msgstr "Por campo"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Per field and line"
+msgstr "Por campo y línea"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Per-Category Emoji Settings"
+msgstr "Configuración de emojis por categoría"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Per-category prefix text, sound position, and volume..."
+msgstr "Texto de prefijo, posición del sonido y volumen por categoría..."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Phonetic punctuation add-on has been renamed to Earcons and Speech Rules.\n"
+msgstr "El complemento Puntuación fonética pasó a llamarse Señales sonoras y reglas de voz.\n"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Place .wav files in your theme folder with these names:\n"
+msgstr "Coloca archivos .wav con estos nombres en la carpeta de tu tema:\n"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Play sound when emoji is encountered"
+msgstr "Reproducir un sonido al encontrar un emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Play theme sounds during arrow navigation"
+msgstr "Reproducir sonidos del tema al navegar con las flechas"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Play theme sounds when hovering with the mouse"
+msgstr "Reproducir sonidos del tema al pasar el ratón por encima"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Please enter a version in order to  export this website.\n"
+msgstr "Introduce una versión para exportar este sitio web.\n"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Polling timer (legacy)"
+msgstr "Temporizador de sondeo (heredado)"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Prefix Text"
+msgstr "Texto del prefijo"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Prefix position"
+msgstr "Posición del prefijo"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Prefix position:"
+msgstr "Posición del prefijo:"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Prefix repeat:"
+msgstr "Repetición del prefijo:"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Prefix text for %s"
+msgstr "Texto del prefijo para %s"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Prefix text:"
+msgstr "Texto del prefijo:"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Quotation"
+msgstr "Cita"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Redo"
+msgstr "Rehacer"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Redo (Alt)"
+msgstr "Rehacer (alternativo)"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Role not found."
+msgstr "No se ha encontrado el rol."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Rule not found."
+msgstr "No se ha encontrado la regla."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Rules exported to {}"
+msgstr "Reglas exportadas a {}"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Rules imported successfully"
+msgstr "Las reglas se han importado correctamente"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Same-element sound suppression"
+msgstr "Supresión de sonidos del mismo elemento"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Select audio file:"
+msgstr "Seleccionar archivo de audio:"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Silence theme sounds for container elements (documents, panes, windows)"
+msgstr "Silenciar los sonidos del tema para elementos contenedores (documentos, paneles y ventanas)"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Silence theme sounds while selecting text (Shift + arrow keys)"
+msgstr "Silenciar los sonidos del tema al seleccionar texto (Mayús + flechas)"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Smileys & Emotion"
+msgstr "Caritas y emociones"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Sound Position"
+msgstr "Posición del sonido"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Sound Settings"
+msgstr "Configuración de sonidos"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Sound position for %s"
+msgstr "Posición del sonido para %s"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Sound position:"
+msgstr "Posición del sonido:"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Sound repeat:"
+msgstr "Repetición del sonido:"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Sounds when the caret moves in text fields:"
+msgstr "Sonidos al mover el cursor de texto en los campos de edición:"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Speak prefix text before emoji descriptions"
+msgstr "Anunciar un prefijo antes de las descripciones de los emojis"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Speak states such as checked, expanded, selected etc."
+msgstr "Anunciar estados como marcado, expandido, seleccionado, etc."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Speech Prefix Settings"
+msgstr "Configuración del prefijo hablado"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Suffix Text"
+msgstr "Texto del sufijo"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Suffix text for %s"
+msgstr "Texto del sufijo para %s"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Suffix text:"
+msgstr "Texto del sufijo:"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Suppress repeated sounds for the same element (ms, 0 = off):"
+msgstr "Suprimir sonidos repetidos del mismo elemento (ms; 0 = desactivado):"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Suppress role sound (e.g. \"list item\") when emoji is present"
+msgstr "Suprimir el sonido del rol (por ejemplo, «elemento de lista») cuando haya un emoji"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Symbols"
+msgstr "Símbolos"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "System status sounds volume"
+msgstr "Volumen de los sonidos de estado del sistema"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Target format:"
+msgstr "Formato de destino:"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Test Emoji Processing"
+msgstr "Probar el procesamiento de emojis"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Test Rule"
+msgstr "Probar regla"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Test emoji text"
+msgstr "Texto de prueba de emojis"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid ""
+"The downloaded audio theme could not be installed.\n"
+"It may be corrupted, unsafe, or not a valid theme package."
+msgstr ""
+"No se ha podido instalar el tema de audio descargado.\n"
+"Puede estar dañado, ser inseguro o no ser un paquete de temas válido."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid ""
+"The downloaded typing sound pack could not be installed.\n"
+"It may be corrupted, unsafe, or not a valid typing pack."
+msgstr ""
+"No se ha podido instalar el paquete de sonidos de escritura descargado.\n"
+"Puede estar dañado, ser inseguro o no ser un paquete válido."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "The following add-ons are now included in Advanced Audio Themes.\n"
+msgstr "Los siguientes complementos ahora están integrados en Advanced Audio Themes.\n"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "This rule type cannot be tested in isolation."
+msgstr "Este tipo de regla no se puede probar de manera aislada."
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid ""
+"This will replace ALL current rules with the imported rules.\n"
+"A backup of your current rules will be saved.\n"
+"\n"
+"Continue?"
+msgstr ""
+"Esta operación sustituirá TODAS las reglas actuales por las importadas.\n"
+"Se guardará una copia de seguridad de las reglas actuales.\n"
+"\n"
+"¿Deseas continuar?"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Travel & Places"
+msgstr "Viajes y lugares"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Type text with emoji to preview:"
+msgstr "Escribe texto con emojis para probarlo:"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Undo"
+msgstr "Deshacer"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Unvisited Link"
+msgstr "Enlace no visitado"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Use FFmpeg to play additional audio formats (M4A, AAC, OPUS, WMA, MP2, AC3)"
+msgstr "Usar FFmpeg para reproducir formatos de audio adicionales (M4A, AAC, OPUS, WMA, MP2, AC3)"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Volume (0-100)"
+msgstr "Volumen (0-100)"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Volume for %s"
+msgstr "Volumen para %s"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Volume:"
+msgstr "Volumen:"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "WAV (compatible with everything)"
+msgstr "WAV (compatible con todo)"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "WAV files"
+msgstr "Archivos WAV"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "WAV, OGG, MP3, and FLAC are supported natively.\n"
+msgstr "WAV, OGG, MP3 y FLAC son compatibles de forma nativa.\n"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Warning: you are about to move this bookmark to site %(new_site)s. "
+msgstr "Advertencia: estás a punto de trasladar este marcador al sitio %(new_site)s. "
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Warning: you are trying to  move this bookmark to site %(new_site)s. "
+msgstr "Advertencia: intentas trasladar este marcador al sitio %(new_site)s. "
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Welcome To The Audio Themes Studio:\n"
+msgstr "Te damos la bienvenida al Estudio de temas de audio:\n"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "Yes"
+msgstr "Sí"
+
+# 2026-10-14: nuevos mensajes propuestos
+msgid "You already have website {} in your BrowserNav configuration.\n"
+msgstr "El sitio web {} ya está en tu configuración de BrowserNav.\n"
