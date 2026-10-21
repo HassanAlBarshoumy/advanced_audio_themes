@@ -356,6 +356,13 @@ You can view the source code, report issues, or contribute to the project on Git
 
 ## Change Log
 
+### Version 9.49
+- **Speech Compatibility Fix:** Fixed an error that could stop speech when another NVDA component or add-on triggered speech while phonetic punctuation was active. The speech pass-through passed the symbol level in a way that conflicts with NVDA's own function signature, which raised an error instead of speaking. The symbol level is now passed positionally, exactly as NVDA expects.
+- **Sound Reliability Fix:** The theme, clipboard, typing and system-status sounds now create the audio player on demand, just like the main navigation sounds. If the player had not been created yet (for example when the add-on loaded without an active theme, or after the audio device had to be rebuilt), these four sounds stayed silent until a navigation sound happened to occur. Each of them now starts the player itself.
+- **Removal Safety:** Turning the add-on off now cancels every piece of work it had scheduled. Three timers (the navigation layer timeout, the deferred system-status monitor and the delayed clipboard announcement) could previously still fire after the add-on was unloaded, which could produce a late sound or message, or restart the system-status monitor after it had been stopped. They are all cancelled on unload, and the navigation-layer timer no longer keeps NVDA alive while it waits.
+- **Security Fix:** The FFmpeg download now validates the downloaded archive before extracting it, using the same protection as theme and sound-pack installation. A tampered archive could previously write files outside the download folder or fill the disk. It is now rejected.
+- **Cleanup:** Removed two unused imports from the installer. No feature or gesture was removed.
+
 ### Version 9.48
 - **Critical Install Fix:** Fixed a crash that occurred during every installation and update. The installer checked a property that NVDA does not provide on add-ons (`isPendingRemove`), which raised an error. NVDA treats any such error as a failed installation and removes the add-on again, so the add-on could be uninstalled immediately after being installed. The check now uses the supported API and can never abort an install.
 - **Install Robustness:** Theme migration during installation is now fully protected. An unreadable theme folder, a read-only configuration directory or a failure while listing add-ons can no longer make the installation fail and undo itself.

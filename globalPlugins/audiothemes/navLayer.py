@@ -126,7 +126,19 @@ class NavLayerMixin:
             
         if timeoutEnabled:
             self._navLayerTimer = threading.Timer(10.0, self._onNavLayerTimeoutThread)
+            # Daemon: a pending timeout must never keep the NVDA process alive,
+            # and it is cancelled on plugin termination anyway.
+            self._navLayerTimer.daemon = True
             self._navLayerTimer.start()
+
+    def _stopNavLayerTimer(self):
+        """Cancel the navigation-layer timeout timer (safe to call any time)."""
+        if getattr(self, "_navLayerTimer", None):
+            try:
+                self._navLayerTimer.cancel()
+            except Exception:
+                log.debug("AudioThemes: swallowed Exception in navLayer._stopNavLayerTimer")
+            self._navLayerTimer = None
 
     def _onNavLayerTimeoutThread(self):
         wx.CallAfter(self._onNavLayerTimeout)
@@ -243,9 +255,7 @@ class NavLayerMixin:
     def _doNavLayerExit(self):
         if not self._navLayerActive: return
         self._navLayerActive = False
-        if self._navLayerTimer:
-            self._navLayerTimer.cancel()
-            self._navLayerTimer = None
+        self._stopNavLayerTimer()
             
         for ident in self._navLayerGestures:
             try:

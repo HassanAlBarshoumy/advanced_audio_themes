@@ -2,8 +2,6 @@ import os
 import shutil
 import globalVars
 import addonHandler
-import gui
-import wx
 import config
 import json
 

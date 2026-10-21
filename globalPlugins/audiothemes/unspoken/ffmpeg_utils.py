@@ -134,12 +134,27 @@ def download_ffmpeg(progress_callback=None):
         os.makedirs(target_dir, exist_ok=True)
         exe_path = None
         with zipfile.ZipFile(zip_path, "r") as zf:
-            for member in zf.namelist():
-                if member.endswith("ffmpeg.exe"):
-                    zf.extract(member, target_dir)
-                    exe_path = os.path.join(target_dir, member)
-                    os.chmod(exe_path, 0o755)
+            # Same traversal / zip-bomb gate the theme and config importers use.
+            from ..handler import validate_archive, safe_extract_archive
+            validate_archive(zf)
+            member = None
+            for name in zf.namelist():
+                if name.endswith("ffmpeg.exe"):
+                    member = name
                     break
+            if member is None:
+                log.error("ffmpeg.exe not found in downloaded archive")
+                return None
+            if safe_extract_archive(zf, target_dir) == 0:
+                log.error("failed to extract ffmpeg.exe from the downloaded archive")
+                return None
+            exe_path = os.path.abspath(
+                os.path.join(target_dir, member.replace("\\", "/"))
+            )
+            if not os.path.isfile(exe_path):
+                log.error("ffmpeg.exe was not extracted from the downloaded archive")
+                return None
+            os.chmod(exe_path, 0o755)
         if not exe_path:
             log.error("ffmpeg.exe not found in downloaded archive")
             return None

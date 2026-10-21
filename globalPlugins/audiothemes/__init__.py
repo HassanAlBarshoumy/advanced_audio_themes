@@ -769,6 +769,10 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
             self._pending_dispatch_obj = None
             self._pending_dispatch_app = None
         with suppress(Exception):
+            self._stopNavLayerTimer()
+        with suppress(Exception):
+            self._clipboard_mgr.terminate()
+        with suppress(Exception):
             self.quicknav_interceptor.terminate()
         try:
             self.handler.close()

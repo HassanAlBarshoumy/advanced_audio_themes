@@ -503,6 +503,36 @@ def refreshCachedConfig():
         _cached_speech_symbolLevel = 100
     _utils_mod._reset_pp_enabled_cache()
 
+def _absorb_positional_symbolLevel(symbolLevel, args):
+    """Fold a positionally-passed ``symbolLevel`` out of ``*args``.
+
+    NVDA's real signature is
+    ``speak(speechSequence, symbolLevel, priority, speechViewer=..., inputCore=...)``
+    - ``symbolLevel`` is the second POSITIONAL parameter and there is no
+    ``*args``.  A caller (NVDA core or another add-on) that passes it
+    positionally makes it land inside our ``*args``; forwarding that with a
+    ``symbolLevel`` keyword plus ``*args`` then raises
+    ``TypeError: got multiple values for argument 'symbolLevel'``.
+    Returns ``(symbolLevel, remaining_args)``.
+    """
+    if symbolLevel is None and args:
+        return args[0], args[1:]
+    return symbolLevel, args
+
+
+def _call_original_speak(speechSequence, symbolLevel, args, kwargs):
+    """Call NVDA's original ``speak`` with positional arguments.
+
+    ``symbolLevel`` is passed POSITIONALLY to match NVDA's real signature and
+    to avoid ever binding it twice when ``args`` carries extra positionals.
+    """
+    if originalSpeechSpeechSpeak is None:
+        return None
+    if symbolLevel is None:
+        return originalSpeechSpeechSpeak(speechSequence, *args, **kwargs)
+    return originalSpeechSpeechSpeak(speechSequence, symbolLevel, *args, **kwargs)
+
+
 def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
     global speechCancelledFlag
     try:
@@ -511,7 +541,8 @@ def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
         log.debug("AudioThemes: swallowed Exception in phoneticPunctuation.preSpeak")
     try:
         if not isPhoneticPunctuationEnabled():
-            return originalSpeechSpeechSpeak(speechSequence, symbolLevel=symbolLevel, *args, **kwargs)
+            level, rest = _absorb_positional_symbolLevel(symbolLevel, args)
+            return _call_original_speak(speechSequence, level, rest, kwargs)
 
         if symbolLevel is None:
             symbolLevel = _cached_speech_symbolLevel
@@ -555,11 +586,12 @@ def preSpeak(speechSequence, symbolLevel=None, *args, **kwargs):
             newSequence = _processEmojiSequence(newSequence)
         newSequence.append(' ') # Otherwise v2024.2 throws weird Braille Exception
         
-        return originalSpeechSpeechSpeak(newSequence, symbolLevel=symbolLevel, *args, **kwargs)
+        return _call_original_speak(newSequence, symbolLevel, args, kwargs)
     except Exception as e:
         log.error(f"AudioThemes preSpeak error: {e}", exc_info=True)
         if originalSpeechSpeechSpeak is not None:
-            return originalSpeechSpeechSpeak(speechSequence, symbolLevel=symbolLevel, *args, **kwargs)
+            level, rest = _absorb_positional_symbolLevel(symbolLevel, args)
+            return _call_original_speak(speechSequence, level, rest, kwargs)
 
 class EmojiSoundCommand(speech.commands.BaseCallbackCommand):
     """Plays emoji sound at the correct position during speech.

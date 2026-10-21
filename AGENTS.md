@@ -856,7 +856,7 @@ Full add-on audit requested by the user ("افحص الاضافة باحثا ع�
 - Verified: `ast.parse` + pyflakes on the edited `browserNavEngine/__init__.py` (0 new issues beyond the known star-import blind spots); `git diff --stat` = exactly the intended files (opencode.yml, browserNavEngine/__init__.py, .gitignore + this file). No commit, no push, no local build (Rule 1).
 
 
-### Round 81 (uncommitted): CRITICAL install-time rollback defect - `addon.isPendingRemove` does not exist on `addonHandler.Addon`
+### Round 81 (committed d58ffa8, released v9.48): CRITICAL install-time rollback defect - `addon.isPendingRemove` does not exist on `addonHandler.Addon`
 A repo-health audit of the released 9.47 package confirmed one defect that silently UNDOES EVERY installation
 and update of the add-on, plus one dead import, two unused `global` declarations and a stray f-string prefix.
 All five are fixed.
@@ -912,3 +912,102 @@ All five are fixed.
   `doc/en/readme.md`; the two files remain **byte-identical** (41,508 bytes) and UTF-8 valid.
 - Working tree: 8 files (6 Python sources + the two identical readmes). No commit, no push, no local build
   (Rule 1); the release itself goes through `gh workflow run release.yml -f version=9.48`.
+
+### Round 82 (uncommitted): two real defects - the speech pass-through TypeError and four sound paths that never created the lazy player
+A defect-hunting pass over the add-on (GitNexus structural checks first, then ruff/pyflakes, then manual
+verification of every suspicious finding one by one). Two real defects were confirmed and fixed, plus two
+dead imports removed. The remaining analyzer output was proven to be known blind spots or style noise.
+- **`phoneticPunctuation.py` `preSpeak` (BUG - speech can stop)** - all three pass-through calls were
+  ``originalSpeechSpeechSpeak(speechSequence, symbolLevel=symbolLevel, *args, **kwargs)``. NVDA's real
+  signature (unmarshalled from ``library.zip`` -> ``speech/speech.pyc``) is
+  ``speak(speechSequence, symbolLevel, priority, speechViewer=..., inputCore=...)``: ``symbolLevel`` is the
+  second POSITIONAL parameter and there is no ``*args``. A caller that passes ``symbolLevel`` positionally
+  makes it land inside our ``*args``, and forwarding it as a keyword then raises
+  ``TypeError: got multiple values for argument 'symbolLevel'``. Two new helpers fix it:
+  ``_absorb_positional_symbolLevel(symbolLevel, args)`` folds a positional level back out of ``*args``, and
+  ``_call_original_speak(seq, level, args, kwargs)`` forwards it POSITIONALLY (matches NVDA exactly, can never
+  double-bind) and returns ``None`` when the original is not captured yet. All three call sites are
+  converted. The add-on's OWN callers only pass one argument today, so this is a compatibility fix for
+  NVDA core and other add-ons calling through - exactly the class of failure that is invisible until it hits.
+- **`handler.py` four sound paths (BUG - silent sounds)** - ``self.player`` is lazy (``None`` in ``__init__``
+  until ``_ensure_player()`` creates it), and ``_ensure_player()`` now returns the player. But four sound
+  paths gated on ``self.player is None`` and returned EARLY, never calling ``_ensure_player()``:
+  ``play_theme_sound``, ``play_clipboard_sound``, ``_play_system_sound`` and ``_play_typing_sound_inner``.
+  Only ``play()`` (the navigation path) created the player correctly. So when the player had not been built
+  yet - the add-on loaded without an active theme, or a device rebuild was pending - theme/clipboard/typing/
+  system-status sounds stayed silent until a navigation sound happened to run ``play()``. Each of the four
+  now calls ``_ensure_player()`` inside ``try/except`` (logging ``AudioThemes: failed to initialize player``
+  on failure) before any other gate, mirroring ``play()``.
+- **`installTasks.py` (cleanup)** - ``import gui`` and ``import wx`` were unused; removed (pyflakes confirmed).
+- **Verified** - ``py_compile`` + ``compileall`` exit 0. pyflakes diff vs HEAD (line-number normalised) over
+  the three changed files: **NEW=0, GONE=2** (the two dead imports); ``handler.py`` and
+  ``phoneticPunctuation.py`` exactly 0/0. Harness ``%TEMP%\opencode\r82\run_fix_harness.ps1`` -> **24/24 PASS**:
+  helpers extracted and executed against a fake ``speak`` matching NVDA's real signature (positional level
+  absorbed + forwarded without error, keyword level forwarded, missing level omitted, kwargs preserved,
+  ``None`` original returns safely), and the OLD form is shown raising ``TypeError`` while the NEW form does
+  not; source checks that no real ``symbolLevel=`` call site remains, all four handler paths call
+  ``_ensure_player()`` with the ``self.player is None`` guard gone, and the installer imports are removed.
+  Behavioural harness ``%TEMP%\opencode\r82\handler_paths_test.py`` (loads the REAL ``handler.py`` under NVDA
+  stubs) -> **5/5 PASS**: each of the four paths creates the player on demand, and a disabled handler creates
+  none. Regression harnesses green - ``borrow3/test_states.py`` 44/44, ``borrow2/test_nav.py`` 58/58,
+  ``round69/test_perf.py`` 20/20.
+- **Analyser findings reviewed and dismissed** - ``Undefined name '_'`` in the studio/GUI files is the
+  gettext ``initTranslation`` blind spot (by design); ``B007`` unused loop variables are mostly ``os.walk``
+  patterns; ``zip()`` without ``strict``, ``raise ... from`` and constant ``setattr`` are style suggestions;
+  the only import cycle left is the vendored ``pywinsdk`` tree, which is third-party and untouched.
+- **Changelog** - ``### Version 9.49`` inserted before ``### Version 9.48`` in ``README.md`` and
+  ``doc/en/readme.md``; the two files remain byte-identical (42,433 bytes).
+- Working tree: 3 Python files + the two identical readmes + this file. No commit, no push, no local build
+  (Rule 1); the release itself goes through ``gh workflow run release.yml -f version=9.49``.
+
+### Round 83 (uncommitted): four teardown / lifecycle defects - deferred work that could outlive the add-on, plus an unguarded archive extraction
+A follow-up pass over the shutdown path and the untrusted-input paths (GitNexus structural checks first, then
+a full sweep of every timer, thread and `CallLater` in the package). Four real defects were confirmed and
+fixed; the systemic-thread audit found 17 `daemon=True` threads (all correct) and exactly one non-daemon.
+- **`navLayer.py` navigation-layer timeout timer (BUG - fires after unload)** - `_resetNavLayerTimer` armed a
+  `threading.Timer(10.0, ...)` that was only ever cancelled by `_doNavLayerExit`. Nothing in
+  `GlobalPlugin.terminate()` referenced `_navLayerTimer`, so a pending 10-second timeout survived the add-on
+  being disabled and later ran `wx.CallAfter(self._onNavLayerTimeout)` against a torn-down plugin; it was
+  also a NON-daemon thread, so it kept the process alive until it fired. Fixed by extracting
+  `_stopNavLayerTimer()` (cancels and clears, never raises), calling it from both `_doNavLayerExit` and
+  `GlobalPlugin.terminate()`, and setting `daemon = True` on the timer.
+- **`handler.py` deferred system-status monitor (BUG - resurrects the monitor after close)** - `__init__` ran
+  `_wx.CallLater(3000, self._start_system_status_monitoring)` and kept no handle. If the add-on unloaded
+  within those 3 seconds the callback still fired: `close()` had already stopped and cleared
+  `_system_monitor`, and the late call assigned a brand-new live `SystemStatusMonitor` (Win32 window + thread
+  + registered window class) to a dead handler, which nothing would ever stop again. Fixed by storing the
+  handle as `self._system_monitor_timer`, stopping it in `close()`, and adding a `_closed` flag (set at the
+  top of `close()`) that makes `_start_system_status_monitoring` return immediately - so no callback path can
+  ever resurrect the monitor.
+- **`clipboard.py` delayed clipboard announcement (BUG - announces after unload)** - `announce()` used
+  `wx.CallLater(delay, self._do_announce, ...)` without keeping the handle, so a queued announcement could
+  still speak (and play a sound) after the plugin had been terminated. The handle is now stored as
+  `self._announce_timer` (cancelling any previous pending one first, so only the newest action is
+  announced), the new `ClipboardManager.terminate()` stops it, `GlobalPlugin.terminate()` calls that, and
+  `_do_announce` stands down when the handler is closed.
+- **`unspoken/ffmpeg_utils.py` `download_ffmpeg` (SECURITY - unguarded ZIP extraction)** - the FFmpeg
+  download extracted with a bare `zf.extract(member, target_dir)` and no validation, so a malicious or
+  tampered archive served from the download URL could write outside the target directory (path traversal)
+  or exhaust the disk (zip bomb). This is a network download triggered by a settings button, so it is
+  untrusted input. Extraction now goes through the same gate the theme and config importers use -
+  `validate_archive(zf)` (entry-count, traversal, per-file and total-size caps) followed by
+  `safe_extract_archive(zf, target_dir)` (re-caps the ACTUAL bytes while streaming, so a forged header
+  cannot bypass) - and the resolved `ffmpeg.exe` path is re-checked with `os.path.isfile` before use.
+  `ffmpeg.exe` is still found by scanning the archive names, so the download logic is unchanged.
+- **Verified** - `py_compile` + `compileall` over the whole package exit 0; pyflakes diff vs HEAD (line and
+  path normalised) over the seven changed files: **NEW=0, GONE=2** (the two Round-82 dead installer imports).
+  Source harness `%TEMP%\opencode\r83\test_fix.py` -> **23/23 PASS** (daemon flag, `_stopNavLayerTimer`
+  wired into both `_doNavLayerExit` and `terminate()`, timer handle declared/stored/stopped/guarded,
+  clipboard handle declared/stored/stopped and the closed-handler stand-down, and all four ffmpeg source
+  invariants). Behavioural harness `%TEMP%\opencode\r83\test_behavior.py` -> **14/14 PASS**, executing the
+  REAL methods against stubs: the timer is created as a daemon, `_stopNavLayerTimer` cancels and clears it,
+  `_doNavLayerExit` cancels it, a CLOSED handler creates NO monitor while an open one does, a closed handler
+  announces nothing while an open one speaks and plays, and a real hostile zip (`../../evil.exe`) is
+  rejected by `validate_archive` with nothing escaping the extraction root. Regression harnesses green -
+  `borrow3/test_states.py` 44/44, `borrow2/test_nav.py` 58/58, `round69/test_perf.py` 20/20,
+  `round_dedup/test_dedup_baseline.py` 91/91, `r82/handler_paths_test.py` 5/5, `round74fix/scan_shadow.py`
+  new=0.
+- **Changelog** - `### Version 9.49` in `README.md` and `doc/en/readme.md` extended with the four fixes
+  (the two changelogs stay byte-identical).
+- Working tree: 7 Python files + the two identical readmes + this file. No commit, no push, no local build
+  (Rule 1).

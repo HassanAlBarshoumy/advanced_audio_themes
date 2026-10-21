@@ -1206,6 +1206,8 @@ class AudioThemesHandler:
         self._frenzy_mod = None  # populated by configure()
         self._utils_mod_cache = None  # populated by configure()
         self._system_monitor = None
+        self._system_monitor_timer = None
+        self._closed = False
         try:
             self.ensure_themes_dir()
         except Exception as e:
@@ -1243,7 +1245,9 @@ class AudioThemesHandler:
         # System status monitor — deferred to avoid Win32 window + thread creation at startup.
         try:
             import wx as _wx
-            _wx.CallLater(3000, self._start_system_status_monitoring)
+            self._system_monitor_timer = _wx.CallLater(
+                3000, self._start_system_status_monitoring
+            )
         except Exception:
             try:
                 self._start_system_status_monitoring()
@@ -1447,6 +1451,13 @@ class AudioThemesHandler:
                 log.debug("AudioThemes: swallowed OSError in handler.ensure_themes_dir")
 
     def close(self):
+        self._closed = True
+        if self._system_monitor_timer is not None:
+            try:
+                self._system_monitor_timer.Stop()
+            except Exception:
+                log.debug("AudioThemes: swallowed Exception in handler.close (system monitor timer)")
+            self._system_monitor_timer = None
         if self.active_theme is not None:
             self.active_theme.deactivate()
             self.active_theme = None
@@ -1962,6 +1973,9 @@ class AudioThemesHandler:
             log.debug("AudioThemes: swallowed Exception in handler.configure")
 
     def _start_system_status_monitoring(self):
+        # A deferred CallLater may fire after close(); never resurrect the monitor.
+        if self._closed:
+            return
         try:
             from .systemStatus import SystemStatusMonitor
             self._system_monitor = SystemStatusMonitor(self._play_system_sound, self._cached_config)
@@ -1984,7 +1998,13 @@ class AudioThemesHandler:
     def _play_system_sound(self, sound_key):
         if not self._cached_config.get("sys_status_enabled", False):
             return
-        if not self.enabled or self.active_theme is None or self.player is None:
+        if not self.enabled or self.active_theme is None:
+            return
+        try:
+            if self._ensure_player() is None:
+                return
+        except Exception:
+            log.warning("AudioThemes: failed to initialize player", exc_info=True)
             return
         cfg = self._cached_config
         if sound_key == SpecialProps.sys_ac_plug or sound_key == SpecialProps.sys_ac_unplug:
@@ -2149,9 +2169,15 @@ class AudioThemesHandler:
         return self.active_theme
 
     def play_theme_sound(self, sound_name, angle_x=0, angle_y=0):
-        if not self.enabled or (self.active_theme is None) or self.player is None:
+        if not self.enabled or (self.active_theme is None):
             return False
-            
+        try:
+            if self._ensure_player() is None:
+                return False
+        except Exception:
+            log.warning("AudioThemes: failed to initialize player", exc_info=True)
+            return False
+
         if self._is_app_disabled_for_category("theme_sounds"):
             return False
 
@@ -2233,7 +2259,13 @@ class AudioThemesHandler:
             return 0.0, 0.0
 
     def play_clipboard_sound(self, special_prop, volume=None):
-        if not self.enabled or self.active_theme is None or self.player is None:
+        if not self.enabled or self.active_theme is None:
+            return False
+        try:
+            if self._ensure_player() is None:
+                return False
+        except Exception:
+            log.warning("AudioThemes: failed to initialize player", exc_info=True)
             return False
         theme = self.active_theme
         sound_obj = theme.sounds.get(special_prop)
@@ -2274,9 +2306,14 @@ class AudioThemesHandler:
     def _play_typing_sound_inner(self, ch=None, vkCode=None, extended=None):
         if not self._cached_config.get("typing_sounds", False):
             return
-        if not self.enabled or (self.active_theme is None) or self.player is None:
+        if not self.enabled or (self.active_theme is None):
             return
-            
+        try:
+            if self._ensure_player() is None:
+                return
+        except Exception:
+            log.warning("AudioThemes: failed to initialize player", exc_info=True)
+            return
         # Debounce: prevent same key sound from playing twice rapidly (keyDown + typedCharacter overlap)
         now = time.monotonic()
         if (now - self._last_typing_time) < 0.05 and self._last_typing_vk == vkCode:
