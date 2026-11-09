@@ -402,9 +402,6 @@ msgstr "Полужирный"
 msgid "Bookmark Entry Error"
 msgstr "Ошибка записи закладки"
 
-msgid "Bookmark Entry error"
-msgstr "Ошибка записи закладки"
-
 msgid "Bookmark Entry warning"
 msgstr "Предупреждение записи закладки"
 
@@ -413,9 +410,6 @@ msgstr "Ошибка закладки"
 
 msgid "Bookmark enabled"
 msgstr "Закладка включена"
-
-msgid "Bookmark entry error"
-msgstr "Ошибка записи закладки"
 
 msgid "Bookmark points to non-focusable NVDA object, cannot click it."
 msgstr "Закладка указывает на объект без фокуса, невозможно нажать."
@@ -818,9 +812,6 @@ msgstr "Кэширование в RAM (улучшает производител
 
 msgid "Enable Reverb"
 msgstr "Включить реверберацию"
-
-msgid "Enable audio themes"
-msgstr "Включить аудио темы"
 
 msgid "Enable experimental support for Word and WordPad"
 msgstr "Экспериментальная поддержка Word и WordPad"
@@ -2221,9 +2212,6 @@ msgstr "назад"
 msgid "duration must be an integer between 0 and 60000"
 msgstr "продолжительность должна быть целым числом от 0 до 60000"
 
-msgid "font size"
-msgstr "размер шрифта"
-
 msgid "font size and same style"
 msgstr "размер шрифта и тот же стиль"
 
@@ -2421,9 +2409,6 @@ msgstr "Применить ко всем ролям"
 msgid "Apply to selected roles only"
 msgstr "Применить только к выбранным ролям"
 
-msgid "Select roles..."
-msgstr "Выбрать роли..."
-
 msgid "Solo items"
 msgstr "Одиночные элементы"
 
@@ -2550,9 +2535,6 @@ msgstr "Выберите папку, содержащую файлы аудио 
 msgid "Combo boxes"
 msgstr "Комбинированные списки"
 
-msgid "Conflicting add-ons"
-msgstr "Конфликтующие дополнения"
-
 msgid "Crackling sound volume"
 msgstr "Громкость звука потрескивания"
 
@@ -2677,9 +2659,6 @@ msgstr "Импорт &папки..."
 
 msgid "Import &ZIP or .atp file..."
 msgstr "Импорт &ZIP или .atp файла..."
-
-msgid "Import &folder..."
-msgstr "Импорт &папки..."
 
 msgid "Import Folder"
 msgstr "Импортировать папку"
@@ -2903,14 +2882,8 @@ msgstr "Порог обрезки тишины"
 msgid "Typing pack installation successful!"
 msgstr "Установка пакета звуков ввода успешно завершена!"
 
-msgid "Typing sound pack"
-msgstr "Пакет звуков ввода"
-
 msgid "Typing sound pack successfully installed."
 msgstr "Пакет звуков ввода успешно установлен."
-
-msgid "Typing sounds"
-msgstr "Звуки ввода"
 
 msgid "Typing sounds volume"
 msgstr "Громкость звуков ввода"
@@ -3384,56 +3357,32 @@ msgstr "Открыть файл справки"
 msgid "Help file not found."
 msgstr "Файл справки не найден."
 
-msgid "Heading Level 1"
-msgstr "Заголовок уровня 1"
-
-msgid "Heading Level 2"
-msgstr "Заголовок уровня 2"
-
-msgid "Heading Level 3"
-msgstr "Заголовок уровня 3"
-
-msgid "Heading Level 4"
-msgstr "Заголовок уровня 4"
-
-msgid "Heading Level 5"
-msgstr "Заголовок уровня 5"
-
-msgid "Heading Level 6"
-msgstr "Заголовок уровня 6"
-
 msgid "Document Saved"
-msgstr "Документ сохранён"
+msgstr ""
 
 msgid "No theme found."
-msgstr "Тема не найдена."
+msgstr ""
 
 msgid "Theme folder missing."
-msgstr "Папка темы отсутствует."
+msgstr ""
 
 msgid "All roles/states have a sound."
-msgstr "Все роли/состояния имеют звук."
+msgstr ""
 
 msgid "The following roles/states have no sound in theme '{name}':"
-msgstr "Следующие роли/состояния не имеют звука в теме '{name}':"
+msgstr ""
 
 msgid " (and {n} more)"
-msgstr " (и ещё {n})"
+msgstr ""
 
 msgid "Missing sounds"
-msgstr "Отсутствующие звуки"
-
-msgid "OK"
-msgstr "ОК"
-
-msgid "Error"
-msgstr "Ошибка"
+msgstr ""
 
 msgid "Per-app sound overrides (JSON: {app: {sound_key: target_key_or_name}})"
-msgstr "Переопределения звуков per-app (JSON: {app: {sound_key: target_key_or_name}})"
+msgstr ""
 
 msgid "Apps that play the document-save (Ctrl+S) sound (JSON: {app: true/false})"
-msgstr "Приложения, воспроизводящие звук сохранения документа (Ctrl+S) (JSON: {app: true/false})"
+msgstr ""
 
 msgid "Report roles/states without a sound"
-msgstr "Сообщить о ролях/состояниях без звука"
+msgstr ""

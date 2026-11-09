@@ -401,9 +401,6 @@ msgstr "Grassetto"
 msgid "Bookmark Entry Error"
 msgstr "Errore Voce Segnalibro"
 
-msgid "Bookmark Entry error"
-msgstr "Errore voce segnalibro"
-
 msgid "Bookmark Entry warning"
 msgstr "Avviso voce segnalibro"
 
@@ -412,9 +409,6 @@ msgstr "Errore Segnalibro"
 
 msgid "Bookmark enabled"
 msgstr "Segnalibro abilitato"
-
-msgid "Bookmark entry error"
-msgstr "Errore voce segnalibro"
 
 msgid "Bookmark points to non-focusable NVDA object, cannot click it."
 msgstr ""
@@ -827,9 +821,6 @@ msgstr "Abilita cache RAM (Migliora prestazioni e latenza)"
 
 msgid "Enable Reverb"
 msgstr "Abilita Riverbero"
-
-msgid "Enable audio themes"
-msgstr "Abilita temi audio"
 
 msgid "Enable experimental support for Word and WordPad"
 msgstr "Abilita supporto sperimentale per Word e WordPad"
@@ -2252,9 +2243,6 @@ msgstr "indietro"
 msgid "duration must be an integer between 0 and 60000"
 msgstr "la durata deve essere un intero tra 0 e 60000"
 
-msgid "font size"
-msgstr "dimensione carattere"
-
 msgid "font size and same style"
 msgstr "dimensione carattere e stesso stile"
 
@@ -2432,9 +2420,6 @@ msgstr "Applica a tutti i ruoli"
 msgid "Apply to selected roles only"
 msgstr "Applica solo ai ruoli selezionati"
 
-msgid "Select roles..."
-msgstr "Seleziona ruoli..."
-
 msgid "Solo items"
 msgstr "Elementi singoli"
 
@@ -2560,9 +2545,6 @@ msgstr "Scegli una cartella contenente file del tema audio"
 msgid "Combo boxes"
 msgstr "Caselle combinate"
 
-msgid "Conflicting add-ons"
-msgstr "Componenti aggiuntivi in conflitto"
-
 msgid "Crackling sound volume"
 msgstr "Volume del crepitio"
 
@@ -2687,9 +2669,6 @@ msgstr "Importa &cartella..."
 
 msgid "Import &ZIP or .atp file..."
 msgstr "Importa file &ZIP o .atp..."
-
-msgid "Import &folder..."
-msgstr "Importa &cartella..."
 
 msgid "Import Folder"
 msgstr "Importa cartella"
@@ -2916,14 +2895,8 @@ msgstr "Soglia di ritaglio del silenzio"
 msgid "Typing pack installation successful!"
 msgstr "Installazione pacchetto di digitazione riuscita!"
 
-msgid "Typing sound pack"
-msgstr "Pacchetto suoni di digitazione"
-
 msgid "Typing sound pack successfully installed."
 msgstr "Pacchetto suoni di digitazione installato con successo."
-
-msgid "Typing sounds"
-msgstr "Suoni di digitazione"
 
 msgid "Typing sounds volume"
 msgstr "Volume suoni di digitazione"
@@ -3406,56 +3379,32 @@ msgstr "Apri file di aiuto"
 msgid "Help file not found."
 msgstr "File di aiuto non trovato."
 
-msgid "Heading Level 1"
-msgstr "Intestazione livello 1"
-
-msgid "Heading Level 2"
-msgstr "Intestazione livello 2"
-
-msgid "Heading Level 3"
-msgstr "Intestazione livello 3"
-
-msgid "Heading Level 4"
-msgstr "Intestazione livello 4"
-
-msgid "Heading Level 5"
-msgstr "Intestazione livello 5"
-
-msgid "Heading Level 6"
-msgstr "Intestazione livello 6"
-
 msgid "Document Saved"
-msgstr "Documento salvato"
+msgstr ""
 
 msgid "No theme found."
-msgstr "Tema non trovato."
+msgstr ""
 
 msgid "Theme folder missing."
-msgstr "Cartella del tema mancante."
+msgstr ""
 
 msgid "All roles/states have a sound."
-msgstr "Tutti i ruoli/stati hanno un suono."
+msgstr ""
 
 msgid "The following roles/states have no sound in theme '{name}':"
-msgstr "I seguenti ruoli/stati non hanno un suono nel tema '{name}':"
+msgstr ""
 
 msgid " (and {n} more)"
-msgstr " (e altri {n})"
+msgstr ""
 
 msgid "Missing sounds"
-msgstr "Suoni mancanti"
-
-msgid "OK"
-msgstr "OK"
-
-msgid "Error"
-msgstr "Errore"
+msgstr ""
 
 msgid "Per-app sound overrides (JSON: {app: {sound_key: target_key_or_name}})"
-msgstr "Sovrascritture suono per app (JSON: {app: {sound_key: target_key_or_name}})"
+msgstr ""
 
 msgid "Apps that play the document-save (Ctrl+S) sound (JSON: {app: true/false})"
-msgstr "App che riproducono il suono di salvataggio documento (Ctrl+S) (JSON: {app: true/false})"
+msgstr ""
 
 msgid "Report roles/states without a sound"
-msgstr "Segnala ruoli/stati senza suono"
+msgstr ""

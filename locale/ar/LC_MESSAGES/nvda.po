@@ -1,4 +1,4 @@
-#
+
 msgid ""
 msgstr ""
 "Project-Id-Version: advanced_audio_themes 1.0\n"
@@ -395,9 +395,6 @@ msgstr "عريض"
 msgid "Bookmark Entry Error"
 msgstr "خطأ في إدخال الإشارة المرجعية"
 
-msgid "Bookmark Entry error"
-msgstr "خطأ في إدخال الإشارة المرجعية"
-
 msgid "Bookmark Entry warning"
 msgstr "تحذير من إدخال الإشارة المرجعية"
 
@@ -407,11 +404,8 @@ msgstr "خطأ في الإشارة المرجعية"
 msgid "Bookmark enabled"
 msgstr "تم تمكين الإشارة المرجعية"
 
-msgid "Bookmark entry error"
-msgstr "خطأ في إدخال الإشارة المرجعية"
-
 msgid "Bookmark points to non-focusable NVDA object, cannot click it."
-msgstr "الإشارة تشير إلى كائن NVDA غير قابل للتركيز، لا يمكن النقر عليه."
+msgstr ""
 "المرجعية تشير إلى كائن لا يدعم التركيز، لا يمكن النقر عليه.الإشارة المرجعية "
 "تشير إلى كائن NVDA غير قابل للتركيز، ولا يمكن النقر عليه."
 
@@ -554,7 +548,7 @@ msgid "Copied to clipboard: {}"
 msgstr "تم النسخ إلى الحافظة: {}"
 
 msgid "Copy the last text from semi-accessible edit box to clipboard."
-msgstr "نسخ آخر نص من صندوق التحرير شبه قابل للوصول إلى الحافظة."
+msgstr ""
 "نسخ النص الأخير من مربع التحرير شبه القابل للوصول إلى الحافظة.انسخ النص "
 "الأخير من مربع التحرير شبه الذي يمكن الوصول إليه إلى الحافظة."
 
@@ -818,9 +812,6 @@ msgstr "تسريع الأداء (تخزين الأصوات في الذاكرة �
 msgid "Enable Reverb"
 msgstr "تمكين الصدى"
 
-msgid "Enable audio themes"
-msgstr "تمكين السمات الصوتية"
-
 msgid "Enable experimental support for Word and WordPad"
 msgstr "تمكين الدعم التجريبي لبرنامجي Word وWordPad"
 
@@ -858,7 +849,7 @@ msgid "Error during installation."
 msgstr "خطأ أثناء تثبيت الثيم."
 
 msgid "Error during switch to window stage, focused element role is %d"
-msgstr "خطأ أثناء التبديل إلى مرحلة النافذة، دور العنصر المُركّز هو %d"
+msgstr ""
 "خطأ أثناء مرحلة التبديل إلى النافذة، دور العنصر المحدد هو %dحدث خطأ أثناء "
 "التبديل إلى مرحلة النافذة، دور العنصر الذي تم التركيز عليه هو %d"
 
@@ -887,14 +878,14 @@ msgstr ""
 "تتطلب ميزة الكشف عن عنوان URL تثبيت BrowserNav v2.6.2 أو الوظيفة الإضافية الأحدث.\n"
 "ومع ذلك، إما أنه لم يتم تثبيته، أو أنه فشل في التهيئة.\n"
 "برجاء تثبيت أحدث إضافة BrowserNav من متجر الإضافات ثم إعادة تشغيل NVDA.\n"
-"في هذه الأثناء، سيتم تعطيل جميع قواعد النص التي تحتوي على مرشح URL."
+"في هذه الأثناء، سيتم تعطيل جميع قواعد النص التي تحتوي على مرشح URL.\n"
 
 msgid ""
 "Error retrieving contents of BrowserNav bookmark store: {}.\n"
 "Please check your Internet connectivity and try again.\n"
 msgstr ""
 "حدث خطأ أثناء استرداد محتويات مخزن الإشارات المرجعية لـ BrowserNav: {}.\n"
-"الرجاء التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى."
+"الرجاء التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.\n"
 
 msgid ""
 "Error! Focused element on the page has changed while pasting updated text. "
@@ -1036,7 +1027,7 @@ msgid "I&mport Configuration..."
 msgstr "ا&ستيراد الإعدادات..."
 
 msgid "Ignore all focus events - good for websites that misuse focus events"
-msgstr "تجاهل جميع أحداث التركيز - جيد للمواقع التي تسيء استخدام أحداث التركيز"
+msgstr ""
 "تجاهل جميع أحداث التركيز - مفيد لمواقع الويب التي تسيء استخدام أحداث "
 "التركيزتجاهل جميع أحداث التركيز - وهو أمر جيد لمواقع الويب التي تسيء استخدام"
 " أحداث التركيز"
@@ -1067,7 +1058,7 @@ msgstr ""
 "لإشارات QuickJump!"
 
 msgid "Invalid keystroke %s: cannot overload essential  NVDA keystrokes!"
-msgstr "ضغط غير صالح %s: لا يمكن تحميل ضغطات NVDA الأساسية!"
+msgstr ""
 "اختصار غير صالح %s: لا يمكن تجاوز اختصارات NVDA الأساسية!ضغطة مفتاح غير "
 "صالحة %s: لا يمكن تحميل ضغطات مفاتيح NVDA الأساسية بشكل زائد!"
 
@@ -1448,7 +1439,7 @@ msgid ""
 msgstr ""
 "تمت إعادة تسمية الوظيفة الإضافية لعلامات الترقيم الصوتية إلى Earcons وقواعد الكلام.\n"
 "لقد قمنا تلقائيًا بترحيل جميع قواعد علامات الترقيم الصوتية الخاصة بك إلى الوظيفة الإضافية Earcons وSpeech Rules، لذلك لا يلزم اتخاذ أي إجراء آخر.\n"
-"لا تتردد في استكشاف إعدادات الوظائف الإضافية لاكتشاف الميزات الجديدة."
+"لا تتردد في استكشاف إعدادات الوظائف الإضافية لاكتشاف الميزات الجديدة.\n"
 
 msgid "Phrase breakers:"
 msgstr "قواطع العبارات:"
@@ -1482,7 +1473,7 @@ msgid ""
 "We recommend to use date-based versions, like v2025.01.31.\n"
 msgstr ""
 "الرجاء إدخال نسخة لتصدير هذا الموقع.\n"
-"نوصي باستخدام الإصدارات المستندة إلى التاريخ، مثل v2025.01.31."
+"نوصي باستخدام الإصدارات المستندة إلى التاريخ، مثل v2025.01.31.\n"
 
 msgid "Please enter website name in order to export it."
 msgstr "الرجاء إدخال اسم الموقع من أجل تصديره."
@@ -1594,7 +1585,7 @@ msgid "Regex search"
 msgstr "بحث ريجكس"
 
 msgid "Regexp text not found: tried to search for '{text}' {direction}."
-msgstr "نص regexp غير موجود: تم البحث عن '{text}' {direction}."
+msgstr ""
 "لم يتم العثور على نص التعبير النمطي: تمت محاولة البحث عن '{text}' "
 "{direction}.لم يتم العثور على نص التعبير العادي: حاولت البحث عن '{text}' "
 "{direction}."
@@ -1672,7 +1663,7 @@ msgid "Scrolling backward. This may load more elements on the page."
 msgstr "التمرير للخلف. قد يؤدي هذا إلى تحميل المزيد من العناصر على الصفحة."
 
 msgid "Scrolling forward. This may load more elements on the page."
-msgstr "التمرير للأمام. قد يحمّل المزيد من العناصر في الصفحة."
+msgstr ""
 "التمرير للأمام. قد يؤدي هذا إلى تحميل المزيد من العناصر في الصفحة.التمرير "
 "إلى الأمام. قد يؤدي هذا إلى تحميل المزيد من العناصر على الصفحة."
 
@@ -1883,7 +1874,7 @@ msgid "Suppress aria label announcements for landmarks and regions"
 msgstr "منع إعلانات تصنيفات النغمات للمعالم والمناطق"
 
 msgid "Suppress aria name announcements for editables and combo boxes"
-msgstr "إيقاف إعلانات أسماء aria للحقول combo boxes."
+msgstr ""
 "كتم إعلانات أسماء Aria لحقول التحرير ومربعات التحرير والسردمنع إعلانات أسماء"
 " النغمات للعناصر القابلة للتحرير ومربعات التحرير والسرد"
 
@@ -2220,9 +2211,6 @@ msgstr "إلى الوراء"
 msgid "duration must be an integer between 0 and 60000"
 msgstr "يجب أن تكون المدة عددا صحيحا بين 0 و 60000"
 
-msgid "font size"
-msgstr "حجم الخط"
-
 msgid "font size and same style"
 msgstr "حجم الخط ونفس النمط"
 
@@ -2275,7 +2263,7 @@ msgstr ""
 "تتيح أصوات مخصصة للكلمات، أنواع العناصر، الحالات، ومعلومات جديدة.\n"
 "\n"
 "تم دمج اضافة SentenceNav للتنقل بالجمل (Alt+أسهم).\n"
-"تم دمج إضافة BrowserNav للتصفح المتقدم في المتصفح (NVDA+Alt+أسهم)."
+"تم دمج إضافة BrowserNav للتصفح المتقدم في المتصفح (NVDA+Alt+أسهم).\n"
 
 msgid "(Plays 3D sound even if 3D mode is disabled)"
 msgstr "(يُشغل الصوت بوضع 3D، حتى وإن كان معطلاً من الإعدادات)"
@@ -2439,9 +2427,6 @@ msgstr "تطبيق على جميع الأدوار"
 msgid "Apply to selected roles only"
 msgstr "تطبيق على الأدوار المحددة فقط"
 
-msgid "Select roles..."
-msgstr "تحديد الأدوار..."
-
 msgid "Solo items"
 msgstr "العناصر المنفردة"
 
@@ -2572,9 +2557,6 @@ msgstr "اختر مجلداً يحتوي على ملفات ثيمات صوتية
 msgid "Combo boxes"
 msgstr "مربعات التحرير والسرد (الخيارات المتعددة)"
 
-msgid "Conflicting add-ons"
-msgstr "الإضافات المتعارضة"
-
 msgid "Crackling sound volume"
 msgstr "مستوى صوت الطقطقة (الخشخشة)"
 
@@ -2700,9 +2682,6 @@ msgstr "استيراد م&جلد..."
 
 msgid "Import &ZIP or .atp file..."
 msgstr "استيراد ملف &ZIP أو .atp..."
-
-msgid "Import &folder..."
-msgstr "استيراد م&جلد..."
 
 msgid "Import Folder"
 msgstr "استيراد مجلد"
@@ -2922,14 +2901,8 @@ msgstr "عتبة قص الصمت"
 msgid "Typing pack installation successful!"
 msgstr "تم تثبيت حزمة الكتابة بنجاح!"
 
-msgid "Typing sound pack"
-msgstr "حزمة صوت الكتابة"
-
 msgid "Typing sound pack successfully installed."
 msgstr "تم تثبيت حزمة صوت الكتابة بنجاح."
-
-msgid "Typing sounds"
-msgstr "أصوات الكتابة"
 
 msgid "Typing sounds volume"
 msgstr "مستوى أصوات الكتابة"
@@ -3166,9 +3139,6 @@ msgstr "سفر وأماكن"
 
 msgid "Activities"
 msgstr "أنشطة"
-
-msgid "Objects"
-msgstr "أشياء"
 
 msgid "Symbols"
 msgstr "رموز"
@@ -3669,56 +3639,32 @@ msgstr "فتح ملف المساعدة"
 msgid "Help file not found."
 msgstr "ملف المساعدة غير موجود."
 
-msgid "Heading Level 1"
-msgstr "عنوان مستوى 1"
-
-msgid "Heading Level 2"
-msgstr "عنوان مستوى 2"
-
-msgid "Heading Level 3"
-msgstr "عنوان مستوى 3"
-
-msgid "Heading Level 4"
-msgstr "عنوان مستوى 4"
-
-msgid "Heading Level 5"
-msgstr "عنوان مستوى 5"
-
-msgid "Heading Level 6"
-msgstr "عنوان مستوى 6"
-
 msgid "Document Saved"
-msgstr "تم حفظ المستند"
+msgstr ""
 
 msgid "No theme found."
-msgstr "لم يُعثر على ثيم."
+msgstr ""
 
 msgid "Theme folder missing."
-msgstr "مجلد الثيم مفقود."
+msgstr ""
 
 msgid "All roles/states have a sound."
-msgstr "جميع الأدوار/الحالات لديها صوت."
+msgstr ""
 
 msgid "The following roles/states have no sound in theme '{name}':"
-msgstr "الأدوار/الحالات التالية ليس لها صوت في الثيم '{name}':"
+msgstr ""
 
 msgid " (and {n} more)"
-msgstr " (و{n} إضافية)"
+msgstr ""
 
 msgid "Missing sounds"
-msgstr "أصوات مفقودة"
-
-msgid "OK"
-msgstr "موافق"
-
-msgid "Error"
-msgstr "خطأ"
+msgstr ""
 
 msgid "Per-app sound overrides (JSON: {app: {sound_key: target_key_or_name}})"
-msgstr "تجاوزات صوت per-app (JSON: {app: {sound_key: target_key_or_name}})"
+msgstr ""
 
 msgid "Apps that play the document-save (Ctrl+S) sound (JSON: {app: true/false})"
-msgstr "التطبيقات التي تشغل صوت حفظ المستند (Ctrl+S) (JSON: {app: true/false})"
+msgstr ""
 
 msgid "Report roles/states without a sound"
-msgstr "الإبلاغ عن الأدوار/الحالات بدون صوت"
+msgstr ""

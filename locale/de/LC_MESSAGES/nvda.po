@@ -404,9 +404,6 @@ msgstr "Fett"
 msgid "Bookmark Entry Error"
 msgstr "Lesezeichen-Eintragsfehler"
 
-msgid "Bookmark Entry error"
-msgstr "Lesezeichen-Eintragsfehler"
-
 msgid "Bookmark Entry warning"
 msgstr "Lesezeichen-Eintragswarnung"
 
@@ -415,9 +412,6 @@ msgstr "Lesezeichenfehler"
 
 msgid "Bookmark enabled"
 msgstr "Lesezeichen aktiviert"
-
-msgid "Bookmark entry error"
-msgstr "Lesezeichen-Eintragsfehler"
 
 msgid "Bookmark points to non-focusable NVDA object, cannot click it."
 msgstr ""
@@ -831,9 +825,6 @@ msgstr "RAM-Caching aktivieren (Verbessert Leistung und Latenz)"
 
 msgid "Enable Reverb"
 msgstr "Hall (Reverb) aktivieren"
-
-msgid "Enable audio themes"
-msgstr "Audio-Themes aktivieren"
 
 msgid "Enable experimental support for Word and WordPad"
 msgstr "Experimentelle Unterstützung für Word und WordPad aktivieren"
@@ -2261,9 +2252,6 @@ msgstr "rückwärts"
 msgid "duration must be an integer between 0 and 60000"
 msgstr "Die Dauer muss eine ganze Zahl zwischen 0 und 60000 sein"
 
-msgid "font size"
-msgstr "Schriftgröße"
-
 msgid "font size and same style"
 msgstr "Schriftgröße und gleicher Stil"
 
@@ -2441,9 +2429,6 @@ msgstr "Auf alle Rollen anwenden"
 msgid "Apply to selected roles only"
 msgstr "Nur auf ausgewählte Rollen anwenden"
 
-msgid "Select roles..."
-msgstr "Rollen auswählen..."
-
 msgid "Solo items"
 msgstr "Einzelne Elemente"
 
@@ -2567,9 +2552,6 @@ msgstr "Wählen Sie einen Ordner mit Audio-Theme-Dateien"
 
 msgid "Combo boxes"
 msgstr "Ausklapplisten"
-
-msgid "Conflicting add-ons"
-msgstr "Konfliktbehaftete Add-ons"
 
 msgid "Crackling sound volume"
 msgstr "Lautstärke des Knisterns"
@@ -2695,9 +2677,6 @@ msgstr "&Ordner importieren..."
 
 msgid "Import &ZIP or .atp file..."
 msgstr "&ZIP- oder .atp-Datei importieren..."
-
-msgid "Import &folder..."
-msgstr "&Ordner importieren..."
 
 msgid "Import Folder"
 msgstr "Ordner importieren"
@@ -2924,14 +2903,8 @@ msgstr "Schwellenwert für das Entfernen von Stille"
 msgid "Typing pack installation successful!"
 msgstr "Tipp-Paket erfolgreich installiert!"
 
-msgid "Typing sound pack"
-msgstr "Tipp-Soundpaket"
-
 msgid "Typing sound pack successfully installed."
 msgstr "Tipp-Soundpaket erfolgreich installiert."
-
-msgid "Typing sounds"
-msgstr "Tipp-Sounds"
 
 msgid "Typing sounds volume"
 msgstr "Lautstärke der Tipp-Sounds"
@@ -3415,110 +3388,32 @@ msgstr "Hilfe-Datei öffnen"
 msgid "Help file not found."
 msgstr "Hilfe-Datei nicht gefunden."
 
-msgid "Heading Level 1"
-msgstr "Überschrift Ebene 1"
-
-msgid "Heading Level 2"
-msgstr "Überschrift Ebene 2"
-
-msgid "Heading Level 3"
-msgstr "Überschrift Ebene 3"
-
-msgid "Heading Level 4"
-msgstr "Überschrift Ebene 4"
-
-msgid "Heading Level 5"
-msgstr "Überschrift Ebene 5"
-
-msgid "Heading Level 6"
-msgstr "Überschrift Ebene 6"
-
 msgid "Document Saved"
-msgstr "Dokument gespeichert"
+msgstr ""
 
 msgid "No theme found."
-msgstr "Kein Theme gefunden."
+msgstr ""
 
 msgid "Theme folder missing."
-msgstr "Theme-Ordner fehlt."
+msgstr ""
 
 msgid "All roles/states have a sound."
-msgstr "Alle Rollen/Zustände haben einen Sound."
+msgstr ""
 
 msgid "The following roles/states have no sound in theme '{name}':"
-msgstr "Die folgenden Rollen/Zustände haben keinen Sound im Theme '{name}':"
+msgstr ""
 
 msgid " (and {n} more)"
-msgstr " (und {n} weitere)"
+msgstr ""
 
 msgid "Missing sounds"
-msgstr "Fehlende Sounds"
-
-msgid "OK"
-msgstr "OK"
-
-msgid "Error"
-msgstr "Fehler"
+msgstr ""
 
 msgid "Per-app sound overrides (JSON: {app: {sound_key: target_key_or_name}})"
-msgstr "Per-App-Sound-Überschreibungen (JSON: {app: {sound_key: target_key_or_name}})"
+msgstr ""
 
 msgid "Apps that play the document-save (Ctrl+S) sound (JSON: {app: true/false})"
-msgstr "Apps, die den Dokument-speichern-Sound (Strg+S) abspielen (JSON: {app: true/false})"
+msgstr ""
 
 msgid "Report roles/states without a sound"
-msgstr "Rollen/Zustände ohne Sound melden"
-
-msgid "Heading Level 1"
-msgstr "Überschrift Ebene 1"
-
-msgid "Heading Level 2"
-msgstr "Überschrift Ebene 2"
-
-msgid "Heading Level 3"
-msgstr "Überschrift Ebene 3"
-
-msgid "Heading Level 4"
-msgstr "Überschrift Ebene 4"
-
-msgid "Heading Level 5"
-msgstr "Überschrift Ebene 5"
-
-msgid "Heading Level 6"
-msgstr "Überschrift Ebene 6"
-
-msgid "Document Saved"
-msgstr "Dokument gespeichert"
-
-msgid "No theme found."
-msgstr "Kein Theme gefunden."
-
-msgid "Theme folder missing."
-msgstr "Theme-Ordner fehlt."
-
-msgid "All roles/states have a sound."
-msgstr "Alle Rollen/Zustände haben einen Sound."
-
-msgid "The following roles/states have no sound in theme '{name}':"
-msgstr "Die folgenden Rollen/Zustände haben keinen Sound im Theme '{name}':"
-
-msgid " (and {n} more)"
-msgstr " (und {n} weitere)"
-
-msgid "Missing sounds"
-msgstr "Fehlende Sounds"
-
-msgid "OK"
-msgstr "OK"
-
-msgid "Error"
-msgstr "Fehler"
-
-msgid "Per-app sound overrides (JSON: {app: {sound_key: target_key_or_name}})"
-msgstr "Per-App-Sound-Überschreibungen (JSON: {app: {sound_key: target_key_or_name}})"
-
-msgid "Apps that play the document-save (Ctrl+S) sound (JSON: {app: true/false})"
-msgstr "Apps, die den Dokument-speichern-Sound (Strg+S) abspielen (JSON: {app: true/false})"
-
-msgid "Report roles/states without a sound"
-msgstr "Rollen/Zustände ohne Sound melden"
+msgstr ""
