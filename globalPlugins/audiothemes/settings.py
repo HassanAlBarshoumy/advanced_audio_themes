@@ -653,6 +653,88 @@ class AudioThemesSettingsPanel(SettingsPanel):
             style=wx.ICON_INFORMATION
         )
 
+    def onReportMissingSounds(self, event):
+        try:
+            from .handler import AudioThemesHandler, role_int_to_name, theme_roles, SpecialProps, STATE_OFFSET
+            from .handler import state_int_to_name
+            handler = None
+            try:
+                from . import __init__ as _gp
+                handler = getattr(_gp.GlobalPlugin, "_instance_handler", None)
+            except Exception:
+                handler = None
+            themes = AudioThemesHandler.get_installed_themes()
+            # Pick the active theme if possible, else the first installed one.
+            theme = None
+            try:
+                active_folder = config.conf["audiothemes"].get("active_theme", "Default")
+                for t in themes:
+                    if t.folder == active_folder:
+                        theme = t
+                        break
+            except Exception:
+                pass
+            if theme is None and themes:
+                theme = themes[0]
+            if theme is None:
+                wx.MessageBox(_("No theme found."), _("Report"), wx.OK | wx.ICON_INFORMATION)
+                return
+            if not theme.exists():
+                wx.MessageBox(_("Theme folder missing."), _("Report"), wx.OK | wx.ICON_INFORMATION)
+                return
+            # Ensure sounds are loaded.
+            try:
+                player = getattr(handler, "player", None) if handler is not None else None
+                if player is None and handler is not None:
+                    try:
+                        player = handler._ensure_player()
+                    except Exception:
+                        player = None
+                if player is not None:
+                    theme.load(player)
+            except Exception:
+                pass
+            sounds = getattr(theme, "sounds", {}) or {}
+            # Build the full set of candidate keys.
+            candidates = set()
+            for k in role_int_to_name.keys():
+                candidates.add(k)
+            for st, _ in state_int_to_name.items():
+                candidates.add(st + STATE_OFFSET)
+            for member in SpecialProps:
+                candidates.add(member.value)
+            # Quick-nav pseudo roles.
+            try:
+                from .handler import QUICKNAV_PSEUDO_ROLES
+                for q in QUICKNAV_PSEUDO_ROLES:
+                    candidates.add(q)
+            except Exception:
+                pass
+            missing = []
+            for key in sorted(candidates):
+                if key in sounds:
+                    continue
+                label = theme_roles.get(key) or role_int_to_name.get(key) or str(key)
+                missing.append(f"{key}: {label}")
+            if not missing:
+                wx.MessageBox(_("All roles/states have a sound."), _("Report"), wx.OK | wx.ICON_INFORMATION)
+                return
+            text = _("The following roles/states have no sound in theme '{name}':").format(name=theme.name) + "\\n\\n" + "\\n".join(missing[:200])
+            if len(missing) > 200:
+                text += "\\n..." + _(" (and {n} more)").format(n=len(missing) - 200)
+            dlg = wx.Dialog(self, title=_("Missing sounds"), style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+            txt = wx.TextCtrl(dlg, value=text, style=wx.TE_MULTILINE | wx.TE_READONLY)
+            s = wx.BoxSizer(wx.VERTICAL)
+            s.Add(txt, 1, wx.EXPAND | wx.ALL, 10)
+            btn = wx.Button(dlg, wx.ID_OK, _("OK"))
+            s.Add(btn, 0, wx.ALIGN_CENTER | wx.ALL, 10)
+            dlg.SetSizer(s)
+            dlg.SetSize((500, 400))
+            dlg.ShowModal()
+            dlg.Destroy()
+        except Exception as e:
+            wx.MessageBox(str(e), _("Error"), wx.OK | wx.ICON_ERROR)
+
     def onBlenderTheme(self, event):
         from .studio.themes_blender import ThemeBlenderDialog
         themes = list(AudioThemesHandler.get_installed_themes())
@@ -1154,6 +1236,9 @@ class AudioThemesSettingsPanel(SettingsPanel):
         sizer.Add(saveAppsLabel, 0, wx.LEFT | wx.RIGHT | wx.TOP, 10)
         self.saveSoundAppsEdit = wx.TextCtrl(page, style=wx.TE_MULTILINE, size=(-1, 60))
         sizer.Add(self.saveSoundAppsEdit, 0, wx.EXPAND | wx.ALL, 10)
+        reportBtn = wx.Button(page, label=_("Report roles/states without a sound"))
+        sizer.Add(reportBtn, 0, wx.ALL, 10)
+        reportBtn.Bind(wx.EVT_BUTTON, self.onReportMissingSounds)
         
         # Add/Remove buttons
         btnSizer = wx.BoxSizer(wx.HORIZONTAL)
