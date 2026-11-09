@@ -2296,7 +2296,15 @@ class AudioThemesHandler:
             app = getattr(self, "_current_app_name", None)
             app_map = self._app_sound_overrides.get(str(app).lower(), {}) if app else {}
             if isinstance(app_map, dict):
-                raw = app_map.get(str(sound_key))
+                raw = None
+                _keys_to_try = [str(sound_key.value), str(sound_key), getattr(sound_key, "name", None)]
+                _rn = role_int_to_name.get(sound_key.value if hasattr(sound_key, "value") else sound_key)
+                if _rn:
+                    _keys_to_try.append(_rn)
+                for _k in _keys_to_try:
+                    if _k is not None and _k in app_map:
+                        raw = app_map[_k]
+                        break
                 target = None
                 if isinstance(raw, int) and not isinstance(raw, bool):
                     target = raw
@@ -2360,9 +2368,25 @@ class AudioThemesHandler:
             app = obj_info.get("foreground_app") or getattr(self, "_current_app_name", None)
             app_map = self._app_sound_overrides.get(str(app).lower(), {}) if app else {}
             if isinstance(app_map, dict):
-                raw = app_map.get(str(sound))
-                if raw is None and hasattr(sound, "name"):
-                    raw = app_map.get(getattr(sound, "name", None))
+                # Accept several key forms: the integer value, the role name,
+                # or the SpecialProps member name.
+                raw = None
+                _keys_to_try = []
+                if hasattr(sound, "value"):
+                    _keys_to_try.append(str(sound.value))
+                _keys_to_try.append(str(sound))
+                _name = getattr(sound, "name", None)
+                if _name:
+                    _keys_to_try.append(_name)
+                    _keys_to_try.append(_name.lower())
+                _rn = role_int_to_name.get(sound if isinstance(sound, int) else getattr(sound, "value", None))
+                if _rn:
+                    _keys_to_try.append(_rn)
+                    _keys_to_try.append(_rn.lower())
+                for _k in _keys_to_try:
+                    if _k in app_map:
+                        raw = app_map[_k]
+                        break
                 target = None
                 if isinstance(raw, bool):
                     target = None
