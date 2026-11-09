@@ -3668,3 +3668,57 @@ msgstr "فتح ملف المساعدة"
 
 msgid "Help file not found."
 msgstr "ملف المساعدة غير موجود."
+
+msgid "Heading Level 1"
+msgstr "عنوان مستوى 1"
+
+msgid "Heading Level 2"
+msgstr "عنوان مستوى 2"
+
+msgid "Heading Level 3"
+msgstr "عنوان مستوى 3"
+
+msgid "Heading Level 4"
+msgstr "عنوان مستوى 4"
+
+msgid "Heading Level 5"
+msgstr "عنوان مستوى 5"
+
+msgid "Heading Level 6"
+msgstr "عنوان مستوى 6"
+
+msgid "Document Saved"
+msgstr "تم حفظ المستند"
+
+msgid "No theme found."
+msgstr "لم يُعثر على ثيم."
+
+msgid "Theme folder missing."
+msgstr "مجلد الثيم مفقود."
+
+msgid "All roles/states have a sound."
+msgstr "جميع الأدوار/الحالات لديها صوت."
+
+msgid "The following roles/states have no sound in theme '{name}':"
+msgstr "الأدوار/الحالات التالية ليس لها صوت في الثيم '{name}':"
+
+msgid " (and {n} more)"
+msgstr " (و{n} إضافية)"
+
+msgid "Missing sounds"
+msgstr "أصوات مفقودة"
+
+msgid "OK"
+msgstr "موافق"
+
+msgid "Error"
+msgstr "خطأ"
+
+msgid "Per-app sound overrides (JSON: {app: {sound_key: target_key_or_name}})"
+msgstr "تجاوزات صوت per-app (JSON: {app: {sound_key: target_key_or_name}})"
+
+msgid "Apps that play the document-save (Ctrl+S) sound (JSON: {app: true/false})"
+msgstr "التطبيقات التي تشغل صوت حفظ المستند (Ctrl+S) (JSON: {app: true/false})"
+
+msgid "Report roles/states without a sound"
+msgstr "الإبلاغ عن الأدوار/الحالات بدون صوت"

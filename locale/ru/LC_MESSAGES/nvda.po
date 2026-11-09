@@ -3383,3 +3383,57 @@ msgstr "Открыть файл справки"
 
 msgid "Help file not found."
 msgstr "Файл справки не найден."
+
+msgid "Heading Level 1"
+msgstr "Заголовок уровня 1"
+
+msgid "Heading Level 2"
+msgstr "Заголовок уровня 2"
+
+msgid "Heading Level 3"
+msgstr "Заголовок уровня 3"
+
+msgid "Heading Level 4"
+msgstr "Заголовок уровня 4"
+
+msgid "Heading Level 5"
+msgstr "Заголовок уровня 5"
+
+msgid "Heading Level 6"
+msgstr "Заголовок уровня 6"
+
+msgid "Document Saved"
+msgstr "Документ сохранён"
+
+msgid "No theme found."
+msgstr "Тема не найдена."
+
+msgid "Theme folder missing."
+msgstr "Папка темы отсутствует."
+
+msgid "All roles/states have a sound."
+msgstr "Все роли/состояния имеют звук."
+
+msgid "The following roles/states have no sound in theme '{name}':"
+msgstr "Следующие роли/состояния не имеют звука в теме '{name}':"
+
+msgid " (and {n} more)"
+msgstr " (и ещё {n})"
+
+msgid "Missing sounds"
+msgstr "Отсутствующие звуки"
+
+msgid "OK"
+msgstr "ОК"
+
+msgid "Error"
+msgstr "Ошибка"
+
+msgid "Per-app sound overrides (JSON: {app: {sound_key: target_key_or_name}})"
+msgstr "Переопределения звуков per-app (JSON: {app: {sound_key: target_key_or_name}})"
+
+msgid "Apps that play the document-save (Ctrl+S) sound (JSON: {app: true/false})"
+msgstr "Приложения, воспроизводящие звук сохранения документа (Ctrl+S) (JSON: {app: true/false})"
+
+msgid "Report roles/states without a sound"
+msgstr "Сообщить о ролях/состояниях без звука"

@@ -3405,3 +3405,57 @@ msgstr "Apri file di aiuto"
 
 msgid "Help file not found."
 msgstr "File di aiuto non trovato."
+
+msgid "Heading Level 1"
+msgstr "Intestazione livello 1"
+
+msgid "Heading Level 2"
+msgstr "Intestazione livello 2"
+
+msgid "Heading Level 3"
+msgstr "Intestazione livello 3"
+
+msgid "Heading Level 4"
+msgstr "Intestazione livello 4"
+
+msgid "Heading Level 5"
+msgstr "Intestazione livello 5"
+
+msgid "Heading Level 6"
+msgstr "Intestazione livello 6"
+
+msgid "Document Saved"
+msgstr "Documento salvato"
+
+msgid "No theme found."
+msgstr "Tema non trovato."
+
+msgid "Theme folder missing."
+msgstr "Cartella del tema mancante."
+
+msgid "All roles/states have a sound."
+msgstr "Tutti i ruoli/stati hanno un suono."
+
+msgid "The following roles/states have no sound in theme '{name}':"
+msgstr "I seguenti ruoli/stati non hanno un suono nel tema '{name}':"
+
+msgid " (and {n} more)"
+msgstr " (e altri {n})"
+
+msgid "Missing sounds"
+msgstr "Suoni mancanti"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "Error"
+msgstr "Errore"
+
+msgid "Per-app sound overrides (JSON: {app: {sound_key: target_key_or_name}})"
+msgstr "Sovrascritture suono per app (JSON: {app: {sound_key: target_key_or_name}})"
+
+msgid "Apps that play the document-save (Ctrl+S) sound (JSON: {app: true/false})"
+msgstr "App che riproducono il suono di salvataggio documento (Ctrl+S) (JSON: {app: true/false})"
+
+msgid "Report roles/states without a sound"
+msgstr "Segnala ruoli/stati senza suono"

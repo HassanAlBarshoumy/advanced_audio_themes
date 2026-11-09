@@ -1,4 +1,4 @@
-#
+﻿#
 msgid ""
 msgstr ""
 "Project-Id-Version: advanced_audio_themes 1.0\n"
@@ -3342,3 +3342,57 @@ msgstr "打开帮助文件"
 
 msgid "Help file not found."
 msgstr "未找到帮助文件。"
+
+msgid "Heading Level 1"
+msgstr "标题级别 1"
+
+msgid "Heading Level 2"
+msgstr "标题级别 2"
+
+msgid "Heading Level 3"
+msgstr "标题级别 3"
+
+msgid "Heading Level 4"
+msgstr "标题级别 4"
+
+msgid "Heading Level 5"
+msgstr "标题级别 5"
+
+msgid "Heading Level 6"
+msgstr "标题级别 6"
+
+msgid "Document Saved"
+msgstr "文档已保存"
+
+msgid "No theme found."
+msgstr "未找到主题。"
+
+msgid "Theme folder missing."
+msgstr "主题文件夹缺失。"
+
+msgid "All roles/states have a sound."
+msgstr "所有角色/状态都有声音。"
+
+msgid "The following roles/states have no sound in theme '{name}':"
+msgstr "以下角色/状态在主题 '{name}' 中没有声音："
+
+msgid " (and {n} more)"
+msgstr "（还有 {n} 个）"
+
+msgid "Missing sounds"
+msgstr "缺失的声音"
+
+msgid "OK"
+msgstr "确定"
+
+msgid "Error"
+msgstr "错误"
+
+msgid "Per-app sound overrides (JSON: {app: {sound_key: target_key_or_name}})"
+msgstr "每应用声音覆盖 (JSON: {app: {sound_key: target_key_or_name}})"
+
+msgid "Apps that play the document-save (Ctrl+S) sound (JSON: {app: true/false})"
+msgstr "播放文档保存 (Ctrl+S) 声音的应用 (JSON: {app: true/false})"
+
+msgid "Report roles/states without a sound"
+msgstr "报告没有声音的角色/状态"
