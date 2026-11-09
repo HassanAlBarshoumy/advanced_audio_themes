@@ -3640,31 +3640,31 @@ msgid "Help file not found."
 msgstr "ملف المساعدة غير موجود."
 
 msgid "Document Saved"
-msgstr ""
+msgstr "تم حفظ المستند"
 
 msgid "No theme found."
-msgstr ""
+msgstr "لم يُعثر على ثيم."
 
 msgid "Theme folder missing."
-msgstr ""
+msgstr "مجلد الثيم مفقود."
 
 msgid "All roles/states have a sound."
-msgstr ""
+msgstr "جميع الأدوار/الحالات لديها صوت."
 
 msgid "The following roles/states have no sound in theme '{name}':"
-msgstr ""
+msgstr "الأدوار/الحالات التالية ليس لها صوت في الثيم '{name}':"
 
 msgid " (and {n} more)"
-msgstr ""
+msgstr " (و{n} إضافية)"
 
 msgid "Missing sounds"
-msgstr ""
+msgstr "أصوات مفقودة"
 
 msgid "Per-app sound overrides (JSON: {app: {sound_key: target_key_or_name}})"
-msgstr ""
+msgstr "تجاوزات صوت per-app (JSON: {app: {sound_key: target_key_or_name}})"
 
 msgid "Apps that play the document-save (Ctrl+S) sound (JSON: {app: true/false})"
-msgstr ""
+msgstr "التطبيقات التي تشغل صوت حفظ المستند (Ctrl+S) (JSON: {app: true/false})"
 
 msgid "Report roles/states without a sound"
-msgstr ""
+msgstr "الإبلاغ عن الأدوار/الحالات بدون صوت"

@@ -1,4 +1,4 @@
-#
+
 msgid ""
 msgstr ""
 "Project-Id-Version: advanced_audio_themes 1.0\n"
@@ -3922,31 +3922,31 @@ msgid "You already have website {} in your BrowserNav configuration.\n"
 msgstr "El sitio web {} ya está en tu configuración de BrowserNav.\n"
 
 msgid "Document Saved"
-msgstr ""
+msgstr "Documento guardado"
 
 msgid "No theme found."
-msgstr ""
+msgstr "No se encontró el tema."
 
 msgid "Theme folder missing."
-msgstr ""
+msgstr "Falta la carpeta del tema."
 
 msgid "All roles/states have a sound."
-msgstr ""
+msgstr "Todos los roles/estados tienen un sonido."
 
 msgid "The following roles/states have no sound in theme '{name}':"
-msgstr ""
+msgstr "Los siguientes roles/estados no tienen sonido en el tema '{name}':"
 
 msgid " (and {n} more)"
-msgstr ""
+msgstr " (y {n} más)"
 
 msgid "Missing sounds"
-msgstr ""
+msgstr "Sonidos faltantes"
 
 msgid "Per-app sound overrides (JSON: {app: {sound_key: target_key_or_name}})"
-msgstr ""
+msgstr "Sobrescrituras de sonido por app (JSON: {app: {sound_key: target_key_or_name}})"
 
 msgid "Apps that play the document-save (Ctrl+S) sound (JSON: {app: true/false})"
-msgstr ""
+msgstr "Apps que reproducen el sonido de guardar documento (Ctrl+S) (JSON: {app: true/false})"
 
 msgid "Report roles/states without a sound"
-msgstr ""
+msgstr "Informar roles/estados sin sonido"

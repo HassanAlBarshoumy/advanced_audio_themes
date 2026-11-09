@@ -1,4 +1,4 @@
-#
+
 msgid ""
 msgstr ""
 "Project-Id-Version: advanced_audio_themes 1.0\n"
@@ -3380,31 +3380,31 @@ msgid "Help file not found."
 msgstr "File di aiuto non trovato."
 
 msgid "Document Saved"
-msgstr ""
+msgstr "Documento salvato"
 
 msgid "No theme found."
-msgstr ""
+msgstr "Tema non trovato."
 
 msgid "Theme folder missing."
-msgstr ""
+msgstr "Cartella del tema mancante."
 
 msgid "All roles/states have a sound."
-msgstr ""
+msgstr "Tutti i ruoli/stati hanno un suono."
 
 msgid "The following roles/states have no sound in theme '{name}':"
-msgstr ""
+msgstr "I seguenti ruoli/stati non hanno un suono nel tema '{name}':"
 
 msgid " (and {n} more)"
-msgstr ""
+msgstr " (e altri {n})"
 
 msgid "Missing sounds"
-msgstr ""
+msgstr "Suoni mancanti"
 
 msgid "Per-app sound overrides (JSON: {app: {sound_key: target_key_or_name}})"
-msgstr ""
+msgstr "Sovrascritture suono per app (JSON: {app: {sound_key: target_key_or_name}})"
 
 msgid "Apps that play the document-save (Ctrl+S) sound (JSON: {app: true/false})"
-msgstr ""
+msgstr "App che riproducono il suono di salvataggio documento (Ctrl+S) (JSON: {app: true/false})"
 
 msgid "Report roles/states without a sound"
-msgstr ""
+msgstr "Segnala ruoli/stati senza suono"

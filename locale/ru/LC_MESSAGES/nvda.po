@@ -1,4 +1,4 @@
-#
+
 msgid ""
 msgstr ""
 "Project-Id-Version: advanced_audio_themes 1.0\n"
@@ -3358,31 +3358,31 @@ msgid "Help file not found."
 msgstr "Файл справки не найден."
 
 msgid "Document Saved"
-msgstr ""
+msgstr "Документ сохранён"
 
 msgid "No theme found."
-msgstr ""
+msgstr "Тема не найдена."
 
 msgid "Theme folder missing."
-msgstr ""
+msgstr "Папка темы отсутствует."
 
 msgid "All roles/states have a sound."
-msgstr ""
+msgstr "Все роли/состояния имеют звук."
 
 msgid "The following roles/states have no sound in theme '{name}':"
-msgstr ""
+msgstr "Следующие роли/состояния не имеют звука в теме '{name}':"
 
 msgid " (and {n} more)"
-msgstr ""
+msgstr " (и ещё {n})"
 
 msgid "Missing sounds"
-msgstr ""
+msgstr "Отсутствующие звуки"
 
 msgid "Per-app sound overrides (JSON: {app: {sound_key: target_key_or_name}})"
-msgstr ""
+msgstr "Переопределения звуков per-app (JSON: {app: {sound_key: target_key_or_name}})"
 
 msgid "Apps that play the document-save (Ctrl+S) sound (JSON: {app: true/false})"
-msgstr ""
+msgstr "Приложения, воспроизводящие звук сохранения документа (Ctrl+S) (JSON: {app: true/false})"
 
 msgid "Report roles/states without a sound"
-msgstr ""
+msgstr "Сообщить о ролях/состояниях без звука"
