@@ -22,6 +22,7 @@ from functools import lru_cache, wraps
 import ctypes
 import _ctypes
 import time
+import json
 import threading
 import tones
 import wx
@@ -75,6 +76,12 @@ _cached_desktop_location = None
 _cached_desktop_location_time = 0.0
 
 _HEADING_LEVEL_MAP = {
+    1: SpecialProps.heading1,
+    2: SpecialProps.heading2,
+    3: SpecialProps.heading3,
+    4: SpecialProps.heading4,
+    5: SpecialProps.heading5,
+    6: SpecialProps.heading6,
     7: SpecialProps.heading7,
     8: SpecialProps.heading8,
     9: SpecialProps.heading9,
@@ -174,7 +181,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                         heading_level = int(val)
                 except Exception:
                     log.debug("AudioThemes: swallowed Exception in __init__._snapshot_obj")
-            if heading_level is not None and heading_level >= 7:
+            if heading_level is not None and heading_level >= 1:
                 h_key = _HEADING_LEVEL_MAP.get(heading_level)
                 if h_key is not None:
                     info["role"] = h_key.value
@@ -1492,6 +1499,30 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                             self._clipboard_mgr.announce("redo")
             except Exception:
                 log.debug("AudioThemes: swallowed Exception in __init__._new_keyDownEvent")
+        # Document save (Ctrl+S) sound
+        if not injected and handler is not None:
+            try:
+                if cfg.get("save_sound_enabled", True):
+                    if winUser.getAsyncKeyState(winUser.VK_CONTROL) & 0x8000:
+                        if vkCode == 0x53:  # S
+                            app = getattr(handler, "_current_app_name", "") or ""
+                            try:
+                                save_apps = json.loads(cfg.get("save_sound_apps", "{}"))
+                            except Exception:
+                                save_apps = {}
+                            if save_apps.get(app, True):
+                                now = time.monotonic()
+                                if now - getattr(self, "_last_save_time", 0.0) >= 0.5:
+                                    self._last_save_time = now
+                                    try:
+                                        handler.play(
+                                            {"name": "document_saved", "role": 0},
+                                            SpecialProps.document_saved,
+                                        )
+                                    except Exception:
+                                        log.debug("AudioThemes: swallowed Exception playing document_saved sound")
+            except Exception:
+                log.debug("AudioThemes: swallowed Exception in __init__._new_keyDownEvent (save)")
         if self._original_keyDownEvent:
             return self._original_keyDownEvent(vkCode, scanCode, extended, injected)
         return True
@@ -1781,8 +1812,8 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
     def _unspoken_play_role(self, role_val, states, heading_level=None):
         """Play a sound for a role encountered during speech output."""
         try:
-            # Route heading level 7-9 to SpecialProps heading7/8/9
-            if heading_level is not None and heading_level >= 7:
+            # Route heading levels 1-9 to SpecialProps heading1..9
+            if heading_level is not None and heading_level >= 1:
                 h_key = _HEADING_LEVEL_MAP.get(heading_level)
                 if h_key is not None:
                     role_val = h_key.value

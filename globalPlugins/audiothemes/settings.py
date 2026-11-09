@@ -655,7 +655,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
     def onBlenderTheme(self, event):
         from .studio.themes_blender import ThemeBlenderDialog
-        themes = list(AudioThemesHandler().get_installed_themes())
+        themes = list(AudioThemesHandler.get_installed_themes())
         if not themes: return
         dlg = wx.SingleChoiceDialog(self, _("Select a theme to edit or remix:"), _("Theme Studio"), [t.name for t in themes])
         if dlg.ShowModal() == wx.ID_OK:
@@ -1146,6 +1146,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.appProfilesList.InsertColumn(1, _("Audio Theme"), width=150)
         self.appProfilesList.InsertColumn(2, _("Typing Sound Pack"), width=150)
         sizer.Add(self.appProfilesList, 1, wx.EXPAND | wx.ALL, 10)
+        overridesLabel = wx.StaticText(page, label=_("Per-app sound overrides (JSON: {app: {sound_key: target_key_or_name}})"))
+        sizer.Add(overridesLabel, 0, wx.LEFT | wx.RIGHT | wx.TOP, 10)
+        self.appSoundOverridesEdit = wx.TextCtrl(page, style=wx.TE_MULTILINE, size=(-1, 80))
+        sizer.Add(self.appSoundOverridesEdit, 0, wx.EXPAND | wx.ALL, 10)
         
         # Add/Remove buttons
         btnSizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -1172,7 +1176,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         
         themeLabel = wx.StaticText(dlg, -1, _("Audio Theme:"))
         dlgSizer.Add(themeLabel, 0, wx.LEFT | wx.RIGHT, 10)
-        themes = AudioThemesHandler().get_installed_themes()
+        themes = AudioThemesHandler.get_installed_themes()
         themeChoices = [t.name for t in themes]
         themeChoice = wx.Choice(dlg, -1, choices=themeChoices)
         if themeChoices:
@@ -1209,7 +1213,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
     def _updateAppProfilesList(self):
         self.appProfilesList.DeleteAllItems()
-        themes = AudioThemesHandler().get_installed_themes()
+        themes = AudioThemesHandler.get_installed_themes()
         folder_to_name = {t.folder: t.name for t in themes}
         for app, profile in self._app_profiles_cache.items():
             if isinstance(profile, str):
@@ -2382,6 +2386,14 @@ class AudioThemesSettingsPanel(SettingsPanel):
         except Exception:
             self._app_profiles_cache = {}
 
+        try:
+            self.appSoundOverridesEdit.SetValue(conf.get("app_sound_overrides", "{}"))
+        except Exception:
+            try:
+                self.appSoundOverridesEdit.SetValue("{}")
+            except Exception:
+                pass
+
         if hasattr(self, '_roleFormats'):
             for role, label in self._role_list:
                 role_key = str(role.value) if hasattr(role, 'value') else str(role)
@@ -3001,6 +3013,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
         # App Profiles
         if hasattr(self, "_app_profiles_cache"):
             conf["app_profiles"] = json.dumps(self._app_profiles_cache)
+        try:
+            # Validate JSON before saving; keep previous value on parse error.
+            json.loads(self.appSoundOverridesEdit.GetValue())
+            conf["app_sound_overrides"] = self.appSoundOverridesEdit.GetValue()
+        except Exception:
+            pass
         
         # Write audio-engine options into the BASE config (nvda.ini) directly.
         # NVDA redirects writes for a section missing from nvda.ini into the
@@ -3076,18 +3094,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
         regexCache.clear()
         # Clear phraseRegex if it's imported from the module
         
-        # Clear the audio cache so normalization/smoothing/mono changes apply immediately
-        from .unspoken import sounds, sounds_lock
-        with sounds_lock:
-            sounds.clear()
-        from .handler import AudioThemesHandler
-        player = AudioThemesHandler().player
-        if hasattr(player, "_play_cache"):
-            with getattr(player, "_play_cache_lock", threading.Lock()):
-                player._play_cache.clear()
-        if hasattr(player, "_play_file_cache"):
-            with getattr(player, "_cache_lock", threading.Lock()):
-                player._play_file_cache.clear()
+        # Audio caches are invalidated by AudioThemesHandler.configure() (run from
+        # postSave -> audiotheme_changed) and only when the audio-processing
+        # settings really changed.  Do not build a throw-away handler here: it
+        # used to create a full UnspokenPlayer (Steam Audio DLL + 6 WavePlayers)
+        # on every OK and never close it, which made repeated saves slower.
         
         # Miscellaneous tab — BrowserNav settings
         # Same base-config treatment as the audio-engine block above:

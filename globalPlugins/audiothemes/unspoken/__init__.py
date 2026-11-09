@@ -807,7 +807,7 @@ class UnspokenPlayer:
 		if use_cache:
 			with sounds_lock:
 				sounds[path] = result
-				if len(sounds) > 64:
+				if len(sounds) > 256:
 					sounds.pop(next(iter(sounds)))
 		return result
 

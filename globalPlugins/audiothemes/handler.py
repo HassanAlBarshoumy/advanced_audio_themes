@@ -156,6 +156,7 @@ audiothemes_config_defaults = {
     "roleAnnounceFormats": "string(default='{}')",
     "app_profiles": "string(default='{}')",
     "app_profiles_enabled": "boolean(default=True)",
+    "app_sound_overrides": "string(default='{}')",
     "navLayerPassThrough": "boolean(default=False)",
     "navLayerTimeout": "boolean(default=False)",
     "navLayerPlaySounds": "boolean(default=False)",
@@ -292,6 +293,9 @@ audiothemes_config_defaults = {
     "clipboard_redo2_speech": "boolean(default=True)",
     "clipboard_custom_texts": "string(default='{}')",
     "config_version": "integer(default=1)",
+    # Document save (Ctrl+S) sound.
+    "save_sound_enabled": "boolean(default=True)",
+    "save_sound_apps": "string(default='{}')",
 }
 
 # Current config schema version.  Increment when making backward-incompatible
@@ -378,6 +382,18 @@ class SpecialProps(IntEnum):
     clipboard_pasteplain = 2541
     clipboard_redo2 = 2542
 
+    # Document saved (Ctrl+S) -- 2549
+    document_saved = 2549
+
+    # Heading levels 1-6 (2543-2548).  Levels 7-9 keep their historical
+    # values above so themes that use numeric filenames keep working.
+    heading1 = 2543
+    heading2 = 2544
+    heading3 = 2545
+    heading4 = 2546
+    heading5 = 2547
+    heading6 = 2548
+
 
 theme_roles = copy.copy(controlTypes.roleLabels)
 theme_roles.update(
@@ -392,6 +408,18 @@ theme_roles.update(
         SpecialProps.notify: _("New Notification Sound"),
         # Translators: The label of the sound which will be played when a web page is loaded.
         SpecialProps.loaded: _("Web Page Loaded"),
+        # Translators: The label of the sound for heading level 1.
+        SpecialProps.heading1: _("Heading Level 1"),
+        # Translators: The label of the sound for heading level 2.
+        SpecialProps.heading2: _("Heading Level 2"),
+        # Translators: The label of the sound for heading level 3.
+        SpecialProps.heading3: _("Heading Level 3"),
+        # Translators: The label of the sound for heading level 4.
+        SpecialProps.heading4: _("Heading Level 4"),
+        # Translators: The label of the sound for heading level 5.
+        SpecialProps.heading5: _("Heading Level 5"),
+        # Translators: The label of the sound for heading level 6.
+        SpecialProps.heading6: _("Heading Level 6"),
         # Translators: The label of the sound for heading level 7.
         SpecialProps.heading7: _("Heading Level 7"),
         # Translators: The label of the sound for heading level 8.
@@ -464,6 +492,8 @@ theme_roles.update(
         SpecialProps.clipboard_pasteplain: _("Clipboard Paste Plain Text"),
         # Translators: The label of the sound for clipboard alternate redo.
         SpecialProps.clipboard_redo2: _("Clipboard Alternate Redo"),
+        # Translators: The label of the sound played when a document is saved (Ctrl+S).
+        SpecialProps.document_saved: _("Document Saved"),
     }
 )
 
@@ -686,6 +716,76 @@ for _qval, _qname in QUICKNAV_PSEUDO_ROLES.items():
 
 role_name_to_int = {v: k for k, v in role_int_to_name.items()}
 
+# Short heading aliases: "h1".."h9" resolve to the matching heading sound, so a
+# theme can ship h1.wav .. h9.wav (or heading1.wav .. heading9.wav) and have the
+# sound picked up for that heading level.
+for _level in range(1, 10):
+    _hkey = role_name_to_int.get(f"heading{_level}")
+    if _hkey is not None:
+        role_name_to_int[f"h{_level}"] = _hkey
+
+_SYSTEM_SOUND_ALIASES = {
+    # Battery
+    "battery": SpecialProps.sys_battery_low,
+    "battery_low": SpecialProps.sys_battery_low,
+    "low_battery": SpecialProps.sys_battery_low,
+    "battery_critical": SpecialProps.sys_battery_critical,
+    "critical_battery": SpecialProps.sys_battery_critical,
+    "battery_full": SpecialProps.sys_battery_full,
+    "full_battery": SpecialProps.sys_battery_full,
+    "battery_charged": SpecialProps.sys_battery_full,
+    # AC power
+    "ac": SpecialProps.sys_ac_plug,
+    "ac_power": SpecialProps.sys_ac_plug,
+    "power": SpecialProps.sys_ac_plug,
+    "power_plug": SpecialProps.sys_ac_plug,
+    "ac_plug": SpecialProps.sys_ac_plug,
+    "ac_unplug": SpecialProps.sys_ac_unplug,
+    "power_unplug": SpecialProps.sys_ac_unplug,
+    "ac_disconnect": SpecialProps.sys_ac_unplug,
+    # USB
+    "usb": SpecialProps.sys_usb_plug,
+    "usb_plug": SpecialProps.sys_usb_plug,
+    "usb_unplug": SpecialProps.sys_usb_unplug,
+    # Storage volumes
+    "volume": SpecialProps.sys_volume_plug,
+    "volume_plug": SpecialProps.sys_volume_plug,
+    "storage": SpecialProps.sys_volume_plug,
+    "storage_mount": SpecialProps.sys_volume_plug,
+    "volume_unplug": SpecialProps.sys_volume_unplug,
+    "storage_unmount": SpecialProps.sys_volume_unplug,
+    # Network
+    "network": SpecialProps.sys_network_connect,
+    "network_connect": SpecialProps.sys_network_connect,
+    "online": SpecialProps.sys_network_connect,
+    "network_disconnect": SpecialProps.sys_network_disconnect,
+    "offline": SpecialProps.sys_network_disconnect,
+    # Sleep / wake
+    "wake": SpecialProps.sys_wake,
+    "system_wake": SpecialProps.sys_wake,
+    "sleep": SpecialProps.sys_sleep,
+    "system_sleep": SpecialProps.sys_sleep,
+}
+
+# Friendly aliases for system-status sounds, so a theme can ship battery.wav,
+# ac.wav, usb.wav, network.wav, ... and have them picked up.
+for _alias, _target in _SYSTEM_SOUND_ALIASES.items():
+    role_name_to_int.setdefault(_alias, _target.value)
+
+
+def _drop_unspoken_sound_cache_entry(path):
+    """Drop one decoded-sound cache entry so a changed file is re-decoded.
+
+    ``UnspokenPlayer.make_sound_object`` caches by path only, so a file that was
+    replaced on disk would otherwise keep playing the old samples.
+    """
+    try:
+        from . import unspoken as _unspoken_mod
+        with _unspoken_mod.sounds_lock:
+            _unspoken_mod.sounds.pop(path, None)
+    except Exception:
+        log.debug("AudioThemes: swallowed Exception dropping the unspoken sound cache entry")
+
 
 @dataclass(order=True)
 class AudioTheme:
@@ -696,6 +796,14 @@ class AudioTheme:
     is_active: bool = False
     sounds: dict = field(default_factory=dict)
     available_files: set = field(default_factory=set)
+    # {path: ((mtime_ns, size), sound_object)} from the last load(), used to
+    # reuse already-decoded sounds instead of re-decoding every file on every
+    # settings save.  Not part of equality/ordering.
+    _loaded_sounds: dict = field(default_factory=dict, repr=False, compare=False)
+    # Audio-settings signature that _loaded_sounds was built with.  A sound
+    # object carries processed samples, so it may only be reused while the
+    # audio-processing settings are unchanged.
+    _loaded_audio_sig: object = field(default=None, repr=False, compare=False)
     _lock: threading.Lock = field(default_factory=threading.Lock, repr=False, compare=False)
 
     @property
@@ -726,10 +834,21 @@ class AudioTheme:
         controlTypes.Role.COMBOBOX,
         controlTypes.Role.TAB,
         controlTypes.Role.SLIDER,
+        controlTypes.Role.LINK,
+        controlTypes.Role.HEADING,
         QUICKNAV_OFFSET + 1,
         QUICKNAV_OFFSET + 2,
         QUICKNAV_OFFSET + 3,
         QUICKNAV_OFFSET + 4,
+    ) + tuple(
+        getattr(SpecialProps, f"heading{i}") for i in range(1, 10)
+    ) + tuple(
+        getattr(SpecialProps, name) for name in (
+            "sys_ac_plug", "sys_ac_unplug", "sys_battery_low", "sys_battery_critical",
+            "sys_battery_full", "sys_usb_plug", "sys_usb_unplug", "sys_volume_plug",
+            "sys_volume_unplug", "sys_network_connect", "sys_network_disconnect",
+            "sys_wake", "sys_sleep", "document_saved", "notify", "loaded",
+        )
     ) + tuple(
         role
         for role in (
@@ -764,15 +883,28 @@ class AudioTheme:
             created += 1
         return created
 
-    def load(self, player):
+    def load(self, player, reuse=False, audio_sig=None):
+        """Scan the theme folder and build ``self.sounds``.
+
+        ``reuse=True`` reuses sound objects that were already decoded and whose
+        file signature ``(mtime_ns, size)`` is unchanged, so a settings save no
+        longer re-decodes every file in the theme.  ``audio_sig`` is the
+        audio-processing settings signature; reuse is skipped when it differs
+        from the one the cached sounds were built with, because the decoded data
+        carries the processed samples.
+        """
         with self._lock:
             if hasattr(self, 'available_files'):
                 self.available_files.clear()
             else:
                 self.available_files = set()
+            previous = {}
+            if reuse and self._loaded_audio_sig == audio_sig:
+                previous = dict(self._loaded_sounds)
         if not os.path.isdir(self.directory):
             return
         new_sounds = {}
+        new_loaded = {}
         available = set()
         try:
             for filename in os.listdir(self.directory):
@@ -780,23 +912,65 @@ class AudioTheme:
                 path = os.path.join(self.directory, filename)
                 rep_role = self.is_valid_audio_file(path)
                 if rep_role is not None:
+                    signature = None
                     try:
-                        sound_obj = player.make_sound_object(path)
-                    except Exception:
-                        sound_obj = None
-                        log.warning(f"AudioThemes: failed to load sound for role {rep_role}: {path}")
+                        stat_result = os.stat(path)
+                        signature = (stat_result.st_mtime_ns, stat_result.st_size)
+                    except OSError:
+                        signature = None
+                    sound_obj = None
+                    if signature is not None:
+                        cached = previous.get(path)
+                        if cached is not None:
+                            if cached[0] == signature:
+                                sound_obj = cached[1]
+                            else:
+                                # The file changed on disk: the shared
+                                # module-level decode cache still holds the old
+                                # samples for this path, so drop that entry.
+                                _drop_unspoken_sound_cache_entry(path)
+                    if sound_obj is None:
+                        try:
+                            sound_obj = player.make_sound_object(path)
+                        except Exception:
+                            sound_obj = None
+                            log.warning(f"AudioThemes: failed to load sound for role {rep_role}: {path}")
                     if sound_obj is not None:
                         new_sounds[rep_role] = sound_obj
+                        if signature is not None:
+                            new_loaded[path] = (signature, sound_obj)
         except OSError:
             return
+        unmatched = []
+        try:
+            for filename in os.listdir(self.directory):
+                path = os.path.join(self.directory, filename)
+                if not os.path.isfile(path):
+                    continue
+                _ext = os.path.splitext(filename)[1].lstrip(".").lower()
+                if _ext not in SUPPORTED_FILE_TYPES:
+                    continue
+                if self.is_valid_audio_file(path) is None:
+                    unmatched.append(filename)
+        except OSError:
+            pass
+        if unmatched:
+            log.warning(
+                "AudioThemes: theme audio files that match no sound key (ignored): "
+                + ", ".join(sorted(unmatched))
+            )
         self._auto_create_missing_sounds(new_sounds, available, player)
         with self._lock:
             self.sounds = new_sounds
             self.available_files = available
+            self._loaded_sounds = new_loaded
+            self._loaded_audio_sig = audio_sig
 
     def unload(self):
         with self._lock:
             self.sounds = {}
+            self._loaded_sounds = {}
+            self._loaded_audio_sig = None
 
     def deactivate(self):
         """Deactivate this theme"""
@@ -1208,6 +1382,11 @@ class AudioThemesHandler:
         self._system_monitor = None
         self._system_monitor_timer = None
         self._closed = False
+        # Tuple of the audio-processing settings; only a real change may
+        # invalidate the decoded sound caches (previously every save did).
+        self._audio_settings_signature = None
+        # Per-app sound overrides: {app_lower: {sound_key: target_key_or_name}}
+        self._app_sound_overrides = {}
         try:
             self.ensure_themes_dir()
         except Exception as e:
@@ -1570,7 +1749,7 @@ class AudioThemesHandler:
             log.debug("get_active_theme: no theme found")
             return
         if theme.exists():
-            theme.load(self._ensure_player())
+            theme.load(self._ensure_player(), audio_sig=self._audio_settings_signature)
             theme.is_active = True
             return theme
 
@@ -1660,6 +1839,52 @@ class AudioThemesHandler:
                 log.debugWarning(f"Malformed app_profiles JSON: {e}")
                 self._app_profiles_cache = {}
 
+        # Audio-processing signature: only a real change to these values may
+        # invalidate the decoded-sound caches.  A plain settings save used to
+        # re-decode every file in the theme (91 files for the default theme).
+        try:
+            unspoken_cfg = config.conf["unspoken"]
+        except Exception:
+            unspoken_cfg = {}
+        audio_signature = (
+            conf_bool(user_config, "audio3d", False),
+            conf_bool(user_config, "use_synth_volume", False),
+            conf_int(user_config, "volume", 20),
+            conf_str(user_config, "output_mode", "stereo"),
+            conf_bool(unspoken_cfg, "Reverb", False),
+            conf_int(unspoken_cfg, "RoomSize", 100),
+            conf_int(unspoken_cfg, "Damping", 0),
+            conf_int(unspoken_cfg, "WetLevel", 0),
+            conf_int(unspoken_cfg, "DryLevel", 30),
+            conf_int(unspoken_cfg, "Width", 100),
+            conf_bool(unspoken_cfg, "TrimSilence", False),
+            conf_float(unspoken_cfg, "TrimSilenceThreshold", 0.01),
+            conf_bool(unspoken_cfg, "SmartVolume", False),
+            conf_bool(unspoken_cfg, "SmoothEnvelope", False),
+            conf_bool(unspoken_cfg, "NoiseGate", False),
+            conf_float(unspoken_cfg, "NoiseGateThreshold", 0.02),
+            conf_int(unspoken_cfg, "NoiseGateAttack", 5),
+            conf_int(unspoken_cfg, "NoiseGateRelease", 50),
+            conf_bool(unspoken_cfg, "BassBoost", False),
+            conf_float(unspoken_cfg, "BassBoostGain", 3),
+            conf_float(unspoken_cfg, "BassBoostCutoff", 200),
+            conf_bool(unspoken_cfg, "AudioCache", True),
+        )
+        audio_changed = audio_signature != self._audio_settings_signature
+        self._audio_settings_signature = audio_signature
+        if audio_changed:
+            # The decoded data carries the processed samples, so a real audio
+            # change must drop it.  The module-level cache is shared by every
+            # player (theme, preview, blender), so it is cleared here instead of
+            # in the settings dialog - and only when the values really changed.
+            try:
+                from .unspoken import sounds as _unspoken_sounds, sounds_lock as _unspoken_sounds_lock
+                with _unspoken_sounds_lock:
+                    _unspoken_sounds.clear()
+            except Exception:
+                log.debug("AudioThemes: swallowed Exception clearing the unspoken sound cache")
+            self._clear_player_caches()
+
         # Theme loading outside the lock — avoids blocking get_theme_for_app()
         if theme_changed:
             try:
@@ -1694,7 +1919,7 @@ class AudioThemesHandler:
             # are picked up even when the theme selection did not change.
             if self.player is not None:
                 try:
-                    self.active_theme.load(self.player)
+                    self.active_theme.load(self.player, reuse=True, audio_sig=self._audio_settings_signature)
                 except Exception:
                     log.warning(
                         "AudioThemes: failed to reload the active theme",
@@ -1740,6 +1965,17 @@ class AudioThemesHandler:
         # Rebuild the hot-path config caches (disabled_apps + _cached_config)
         # and republish them to the player/monitor instances.
         self._rebuild_hot_path_caches(user_config)
+        try:
+            raw = user_config.get("app_sound_overrides", "{}")
+            parsed = json.loads(raw) if isinstance(raw, str) else (raw or {})
+            if not isinstance(parsed, dict):
+                parsed = {}
+            self._app_sound_overrides = {
+                str(k).lower(): (v if isinstance(v, dict) else {})
+                for k, v in parsed.items()
+            }
+        except Exception:
+            self._app_sound_overrides = {}
         # Refresh every dependent submodule cache; each refresh is isolated
         # so one failure never skips the remaining refreshes.
         self._refresh_dependent_caches()
@@ -1757,6 +1993,26 @@ class AudioThemesHandler:
             f"audio3d={conf_bool(user_config, 'audio3d', False)} "
             f"sayAll={conf_bool(user_config, 'use_in_say_all', True)}"
         )
+
+    def _clear_player_caches(self):
+        """Drop the live player's processed-audio caches (audio settings changed)."""
+        player = self.player
+        if player is None:
+            return
+        try:
+            cache = getattr(player, "_play_cache", None)
+            if cache is not None:
+                with getattr(player, "_play_cache_lock", threading.Lock()):
+                    cache.clear()
+        except Exception:
+            log.debug("AudioThemes: swallowed Exception clearing the player play cache")
+        try:
+            cache = getattr(player, "_play_file_cache", None)
+            if cache is not None:
+                with getattr(player, "_cache_lock", threading.Lock()):
+                    cache.clear()
+        except Exception:
+            log.debug("AudioThemes: swallowed Exception clearing the player file cache")
 
     def _rebuild_hot_path_caches(self, user_config):
         self.disabled_apps = []
@@ -1823,6 +2079,7 @@ class AudioThemesHandler:
             "typing_sounds_volume": user_config.get("typing_sounds_volume", 10),
             "typing_sound_pack": user_config.get("typing_sound_pack", "1blueSwitch"),
             "app_profiles_enabled": user_config.get("app_profiles_enabled", True),
+            "app_sound_overrides": user_config.get("app_sound_overrides", "{}"),
             "disabled_apps_suppress_categories": user_config.get("disabled_apps_suppress_categories", '{"theme_sounds":true,"typing_sounds":true,"earcons":true,"browsernav":true,"sentencenav":true,"textnav":true,"ui_beeps":true}'),
             "clipboard_volume": user_config.get("clipboard_volume", 20),
             "clipboard_enabled": user_config.get("clipboard_enabled", True),
@@ -1861,6 +2118,9 @@ class AudioThemesHandler:
             "sys_volume_enabled": user_config.get("sys_volume_enabled", True),
             "sys_network_enabled": user_config.get("sys_network_enabled", True),
             "sys_wake_enabled": user_config.get("sys_wake_enabled", True),
+            # Document save (Ctrl+S) sound
+            "save_sound_enabled": user_config.get("save_sound_enabled", True),
+            "save_sound_apps": user_config.get("save_sound_apps", "{}"),
             "sys_status_volume": user_config.get("sys_status_volume", 20),
             "sys_all_usb": user_config.get("sys_all_usb", True),
             "sys_battery_low_threshold": user_config.get("sys_battery_low_threshold", 20),
@@ -2033,6 +2293,23 @@ class AudioThemesHandler:
         sounds = theme.sounds
         sound_obj = sounds.get(sound_key)
         if sound_obj is None:
+            app = getattr(self, "_current_app_name", None)
+            app_map = self._app_sound_overrides.get(str(app).lower(), {}) if app else {}
+            if isinstance(app_map, dict):
+                raw = app_map.get(str(sound_key))
+                target = None
+                if isinstance(raw, int) and not isinstance(raw, bool):
+                    target = raw
+                elif isinstance(raw, str):
+                    target = role_name_to_int.get(raw.lower())
+                    if target is None:
+                        try:
+                            target = int(raw)
+                        except (ValueError, TypeError):
+                            target = None
+                if target is not None:
+                    sound_obj = sounds.get(target)
+        if sound_obj is None:
             return
         try:
             self.player.play({"name": str(sound_key.value), "role": 0, "system_sound": True, "volume_override": cfg.get("sys_status_volume", 20) / 100.0}, sound_obj)
@@ -2076,10 +2353,51 @@ class AudioThemesHandler:
 
         sounds = theme.sounds
         sound_obj = sounds.get(sound)
+        # Per-app sound overrides (non-mutating overlay): an app may remap a
+        # sound key to another role key (int) or role name (str) without
+        # editing the theme's sounds dict.
+        if sound_obj is None and isinstance(obj_info, dict):
+            app = obj_info.get("foreground_app") or getattr(self, "_current_app_name", None)
+            app_map = self._app_sound_overrides.get(str(app).lower(), {}) if app else {}
+            if isinstance(app_map, dict):
+                raw = app_map.get(str(sound))
+                if raw is None and hasattr(sound, "name"):
+                    raw = app_map.get(getattr(sound, "name", None))
+                target = None
+                if isinstance(raw, bool):
+                    target = None
+                elif isinstance(raw, int):
+                    target = raw
+                elif isinstance(raw, str):
+                    target = role_name_to_int.get(raw.lower())
+                    if target is None:
+                        try:
+                            target = int(raw)
+                        except (ValueError, TypeError):
+                            target = None
+                if target is not None and target != sound:
+                    sound_obj = sounds.get(target)
         # System sounds must not fall back to any other sound
         if sound_obj is None and isinstance(obj_info, dict) and obj_info.get("system_sound"):
             self._set_play_gate("missing-sound")
             return
+        # Heading levels without a dedicated sound fall back to heading level 1,
+        # then to the generic HEADING sound, so a theme that ships only
+        # heading1.wav still voices every heading.
+        if sound_obj is None:
+            _heading_keys = (controlTypes.Role.HEADING,) + tuple(
+                getattr(SpecialProps, f"heading{i}").value for i in range(1, 10)
+            )
+            if isinstance(sound, int) and sound in _heading_keys:
+                sound_obj = sounds.get(SpecialProps.heading1)
+                if sound_obj is None:
+                    sound_obj = sounds.get(controlTypes.Role.HEADING)
+        # Document-saved sound falls back to the notification sound, then to any
+        # available sound, so a theme without document_saved.wav still voices it.
+        if sound_obj is None and isinstance(sound, int) and sound == SpecialProps.document_saved:
+            sound_obj = sounds.get(SpecialProps.notify)
+            if sound_obj is None and sounds:
+                sound_obj = next(iter(sounds.values()))
         fl_cfg = self._cached_config
         if sound_obj is None and isinstance(obj_info, dict):
             role = obj_info.get("role", 0)
@@ -2158,7 +2476,7 @@ class AudioThemesHandler:
         # Lock released before disk I/O / theme.load
         theme = self.get_theme_from_folder(target_folder)
         if theme and theme.exists():
-            theme.load(self._ensure_player())
+            theme.load(self._ensure_player(), reuse=True, audio_sig=self._audio_settings_signature)
             with self._config_lock:
                 # Re-check cache (another thread may have loaded it)
                 if target_folder not in self._theme_cache:
