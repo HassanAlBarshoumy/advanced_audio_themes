@@ -906,6 +906,7 @@ class AudioTheme:
         new_sounds = {}
         new_loaded = {}
         available = set()
+        unmatched = []
         try:
             for filename in os.listdir(self.directory):
                 available.add(filename.lower())
@@ -939,21 +940,13 @@ class AudioTheme:
                         new_sounds[rep_role] = sound_obj
                         if signature is not None:
                             new_loaded[path] = (signature, sound_obj)
+                else:
+                    if os.path.isfile(path):
+                        _ext = os.path.splitext(filename)[1].lstrip(".").lower()
+                        if _ext in SUPPORTED_FILE_TYPES:
+                            unmatched.append(filename)
         except OSError:
             return
-        unmatched = []
-        try:
-            for filename in os.listdir(self.directory):
-                path = os.path.join(self.directory, filename)
-                if not os.path.isfile(path):
-                    continue
-                _ext = os.path.splitext(filename)[1].lstrip(".").lower()
-                if _ext not in SUPPORTED_FILE_TYPES:
-                    continue
-                if self.is_valid_audio_file(path) is None:
-                    unmatched.append(filename)
-        except OSError:
-            pass
         if unmatched:
             log.warning(
                 "AudioThemes: theme audio files that match no sound key (ignored): "

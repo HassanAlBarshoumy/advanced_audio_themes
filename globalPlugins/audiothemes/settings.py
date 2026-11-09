@@ -1150,6 +1150,10 @@ class AudioThemesSettingsPanel(SettingsPanel):
         sizer.Add(overridesLabel, 0, wx.LEFT | wx.RIGHT | wx.TOP, 10)
         self.appSoundOverridesEdit = wx.TextCtrl(page, style=wx.TE_MULTILINE, size=(-1, 80))
         sizer.Add(self.appSoundOverridesEdit, 0, wx.EXPAND | wx.ALL, 10)
+        saveAppsLabel = wx.StaticText(page, label=_("Apps that play the document-save (Ctrl+S) sound (JSON: {app: true/false})"))
+        sizer.Add(saveAppsLabel, 0, wx.LEFT | wx.RIGHT | wx.TOP, 10)
+        self.saveSoundAppsEdit = wx.TextCtrl(page, style=wx.TE_MULTILINE, size=(-1, 60))
+        sizer.Add(self.saveSoundAppsEdit, 0, wx.EXPAND | wx.ALL, 10)
         
         # Add/Remove buttons
         btnSizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -2394,6 +2398,14 @@ class AudioThemesSettingsPanel(SettingsPanel):
             except Exception:
                 pass
 
+        try:
+            self.saveSoundAppsEdit.SetValue(conf.get("save_sound_apps", "{}"))
+        except Exception:
+            try:
+                self.saveSoundAppsEdit.SetValue("{}")
+            except Exception:
+                pass
+
         if hasattr(self, '_roleFormats'):
             for role, label in self._role_list:
                 role_key = str(role.value) if hasattr(role, 'value') else str(role)
@@ -3017,6 +3029,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
             # Validate JSON before saving; keep previous value on parse error.
             json.loads(self.appSoundOverridesEdit.GetValue())
             conf["app_sound_overrides"] = self.appSoundOverridesEdit.GetValue()
+        except Exception:
+            pass
+        try:
+            json.loads(self.saveSoundAppsEdit.GetValue())
+            conf["save_sound_apps"] = self.saveSoundAppsEdit.GetValue()
         except Exception:
             pass
         
