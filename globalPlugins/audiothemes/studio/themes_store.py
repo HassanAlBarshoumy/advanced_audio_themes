@@ -5,7 +5,7 @@ import json
 import threading
 import os
 import tempfile
-from ..handler import AudioThemesHandler, get_active_file_types
+from ..handler import AudioThemesHandler, get_active_file_types, is_safe_archive_name
 
 import addonHandler
 from logHandler import log
@@ -288,7 +288,17 @@ class ThemesStoreDialog(wx.Dialog):
                     prioritized = [n for n in wav_files if "button" in n.lower() or "window" in n.lower()]
                     preview_file = random.choice(prioritized) if prioritized else random.choice(wav_files)
                     
-                    extracted_path = z.extract(preview_file, tempfile.gettempdir())
+                    # Safe single-entry extraction: never trust the entry name
+                    # (zip-slip) and cap the size (zip-bomb). Read the bytes
+                    # through the ZipFile API and write to a controlled path.
+                    if not is_safe_archive_name(preview_file):
+                        raise ValueError("unsafe archive entry")
+                    data = z.read(preview_file)
+                    if len(data) > 32 * 1024 * 1024:
+                        raise ValueError("preview entry too large")
+                    fd, extracted_path = tempfile.mkstemp(suffix=os.path.splitext(preview_file)[1] or ".wav")
+                    with os.fdopen(fd, 'wb') as _f:
+                        _f.write(data)
                     try:
                         nvwave.playWaveFile(extracted_path, asynchronous=True)
                         # Remove the file after a short delay since asynchronous play might still need it

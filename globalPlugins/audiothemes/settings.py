@@ -2633,10 +2633,13 @@ class AudioThemesSettingsPanel(SettingsPanel):
         for root in roots:
             if not os.path.isdir(root):
                 continue
-            for _dirpath, _dirs, files in os.walk(root):
-                for name in files:
-                    if os.path.splitext(name)[1].lower() in candidate_exts:
-                        total += 1
+            try:
+                for _dirpath, _dirs, files in os.walk(root):
+                    for name in files:
+                        if os.path.splitext(name)[1].lower() in candidate_exts:
+                            total += 1
+            except OSError:
+                continue
         return total
 
     def onConvertThemeSounds(self, event):
@@ -3403,11 +3406,14 @@ class AudioThemesSettingsPanel(SettingsPanel):
         """Recursively add all files from source_dir into zipf under archive_prefix."""
         if not os.path.isdir(source_dir):
             return
-        for root, dirs, files in os.walk(source_dir):
-            for fname in files:
-                full_path = os.path.join(root, fname)
-                arc_name = os.path.join(archive_prefix, os.path.relpath(full_path, source_dir))
-                zipf.write(full_path, arc_name)
+        try:
+            for root, dirs, files in os.walk(source_dir):
+                for fname in files:
+                    full_path = os.path.join(root, fname)
+                    arc_name = os.path.join(archive_prefix, os.path.relpath(full_path, source_dir))
+                    zipf.write(full_path, arc_name)
+        except OSError:
+            pass
 
     def _extract_directory_from_zip(self, zipf, archive_prefix, dest_dir, skip_existing=False):
         """Extract all files matching archive_prefix/* from zipf into dest_dir.
@@ -3484,7 +3490,11 @@ class AudioThemesSettingsPanel(SettingsPanel):
                         files = zipf.namelist()
                         # 1. Rules
                         if "earconsAndSpeechRules.json" in files:
-                            zipf.extract("earconsAndSpeechRules.json", path=os.path.dirname(rulesFileName))
+                            # Write through the ZipFile API (no zip-slip, size capped by validate_archive).
+                            _rules_bytes = zipf.read("earconsAndSpeechRules.json")
+                            _rules_dest = os.path.join(os.path.dirname(rulesFileName), "earconsAndSpeechRules.json")
+                            with open(_rules_dest, "wb") as _rf:
+                                _rf.write(_rules_bytes)
                         # 2. Settings
                         if "audiothemes_settings.json" in files:
                             settings_data = json.loads(zipf.read("audiothemes_settings.json"))
