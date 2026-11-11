@@ -2611,3 +2611,1146 @@ msgstr ""
 
 msgid "Help file not found."
 msgstr ""
+
+msgid " (and {n} more)"
+msgstr ""
+
+msgid " (and {n} more; see the NVDA log)"
+msgstr ""
+
+msgid "%d dB"
+msgstr ""
+
+msgid "%d Hz"
+msgstr ""
+
+msgid "%d%%"
+msgstr ""
+
+msgid "%d°"
+msgstr ""
+
+msgid "&Cancel"
+msgstr ""
+
+msgid "&Case sensitive pattern matching"
+msgstr ""
+
+msgid "&Convert all theme sounds now"
+msgstr ""
+
+msgid "&Download and Install FFmpeg"
+msgstr ""
+
+msgid "&Export emoji settings..."
+msgstr ""
+
+msgid "&Export rules"
+msgstr ""
+
+msgid "&Import emoji settings..."
+msgstr ""
+
+msgid "&Import rules"
+msgstr ""
+
+msgid "&Test"
+msgstr ""
+
+msgid "\nDo you want to import them?"
+msgstr ""
+
+msgid "{summary}\n\n{detail}"
+msgstr ""
+
+msgid "0 (off)"
+msgstr ""
+
+msgid "A new version is available: {tag}\n\nCurrent version: {current}\n\nWould you like to download and install the update?"
+msgstr ""
+
+msgid "AAC audio files"
+msgstr ""
+
+msgid "AAC/M4A audio files"
+msgstr ""
+
+msgid "AC3 audio files"
+msgstr ""
+
+msgid "Action"
+msgstr ""
+
+msgid "Active Navigation Modes:"
+msgstr ""
+
+msgid "Add Audio Theme"
+msgstr ""
+
+msgid "Advanced Settings"
+msgstr ""
+
+msgid "After"
+msgstr ""
+
+msgid "All files"
+msgstr ""
+
+msgid "All roles/states have a sound."
+msgstr ""
+
+msgid "Annotation"
+msgstr ""
+
+msgid "Announcement delay (ms):"
+msgstr ""
+
+msgid "Announcement format"
+msgstr ""
+
+msgid "Announcement Mode"
+msgstr ""
+
+msgid "Application Profiles"
+msgstr ""
+
+msgid "Apps that play the document-save (Ctrl+S) sound (JSON: {app: true/false})"
+msgstr ""
+
+msgid "Articles"
+msgstr ""
+
+msgid "Assign sounds for clipboard actions in the Audio Themes Studio.\n"
+msgstr ""
+
+msgid "Attack (ms):"
+msgstr ""
+
+msgid "Audio Ducking Categories"
+msgstr ""
+
+msgid "Audio file not found."
+msgstr ""
+
+msgid "Audio files"
+msgstr ""
+
+msgid "Audio Formats"
+msgstr ""
+
+msgid "Audio Output Mode"
+msgstr ""
+
+msgid "Audio Theme Conversion"
+msgstr ""
+
+msgid "Auto-exit layer after 10 seconds of inactivity"
+msgstr ""
+
+msgid "Bass Boost"
+msgstr ""
+
+msgid "Bass boost cutoff"
+msgstr ""
+
+msgid "Bass boost gain"
+msgstr ""
+
+msgid "Battery check interval"
+msgstr ""
+
+msgid "Beeping sound volume"
+msgstr ""
+
+msgid "Before"
+msgstr ""
+
+msgid "Blacklist applications"
+msgstr ""
+
+msgid "Break sentences at element boundaries (links, separators, etc.)"
+msgstr ""
+
+msgid "Browser navigation engine"
+msgstr ""
+
+msgid "Browser navigation engine:"
+msgstr ""
+
+msgid "BrowserNav sounds (indentation, navigation)"
+msgstr ""
+
+msgid "Buttons"
+msgstr ""
+
+msgid "Capital letters"
+msgstr ""
+
+msgid "Caret move sounds"
+msgstr ""
+
+msgid "Categories to Suppress in Disabled Apps"
+msgstr ""
+
+msgid "Categories to suppress in disabled apps..."
+msgstr ""
+
+msgid "Check boxes"
+msgstr ""
+
+msgid "Check for updates &automatically"
+msgstr ""
+
+msgid "Checking for updates..."
+msgstr ""
+
+msgid "Choose a folder containing audio files to import"
+msgstr ""
+
+msgid "Choose a folder containing audio theme files"
+msgstr ""
+
+msgid "Clipboard"
+msgstr ""
+
+msgid "Clipboard actions"
+msgstr ""
+
+msgid "Clipboard Alternate Redo"
+msgstr ""
+
+msgid "Clipboard announcement delay"
+msgstr ""
+
+msgid "Clipboard announcement mode"
+msgstr ""
+
+msgid "Clipboard Copy"
+msgstr ""
+
+msgid "Clipboard Cut"
+msgstr ""
+
+msgid "Clipboard Paste"
+msgstr ""
+
+msgid "Clipboard Paste Plain Text"
+msgstr ""
+
+msgid "Clipboard Redo"
+msgstr ""
+
+msgid "Clipboard Select All"
+msgstr ""
+
+msgid "Clipboard sound volume"
+msgstr ""
+
+msgid "Clipboard Undo"
+msgstr ""
+
+msgid "Combo boxes"
+msgstr ""
+
+msgid "Configure each clipboard action individually:"
+msgstr ""
+
+msgid "Configure per-category prefix text, sound position, and volume.\n"
+msgstr ""
+
+msgid "Conflicting add-ons"
+msgstr ""
+
+msgid "Conversion done: {converted} converted, {skipped} skipped, "
+msgstr ""
+
+msgid "Conversion finished: {converted} converted, {skipped} skipped, "
+msgstr ""
+
+msgid "Convert theme sounds:"
+msgstr ""
+
+msgid "Converting theme sounds to {target}..."
+msgstr ""
+
+msgid "Converting theme sounds..."
+msgstr ""
+
+msgid "Copied"
+msgstr ""
+
+msgid "Copy"
+msgstr ""
+
+msgid "Crackling sound volume"
+msgstr ""
+
+msgid "Critical battery threshold"
+msgstr ""
+
+msgid "Custom Clipboard Speech Text"
+msgstr ""
+
+msgid "Custom descriptions (JSON format, e.g. {\"😊\": \"face smile\"}):"
+msgstr ""
+
+msgid "Custom emoji descriptions"
+msgstr ""
+
+msgid "Custom Sounds"
+msgstr ""
+
+msgid "Custom text for %s"
+msgstr ""
+
+msgid "Customize speech text..."
+msgstr ""
+
+msgid "Customize what NVDA speaks for each clipboard action.\nLeave empty to use defaults."
+msgstr ""
+
+msgid "Cut"
+msgstr ""
+
+msgid "Cutoff (Hz):"
+msgstr ""
+
+msgid "Delay after emoji sound"
+msgstr ""
+
+msgid "Delay after sound (ms):"
+msgstr ""
+
+msgid "Delay before emoji sound"
+msgstr ""
+
+msgid "Delay before sound (ms):"
+msgstr ""
+
+msgid "Disable in applications"
+msgstr ""
+
+msgid "Disable PhoneticPunctuation in applications (comma-separated list)"
+msgstr ""
+
+msgid "Document Saved"
+msgstr ""
+
+msgid "Don't play any sound"
+msgstr ""
+
+msgid "Don't show this dialog again"
+msgstr ""
+
+msgid "Downloading preview... {}%"
+msgstr ""
+
+msgid "Downloading the latest version..."
+msgstr ""
+
+msgid "Downloading Update"
+msgstr ""
+
+msgid "Downloading..."
+msgstr ""
+
+msgid "Downloading... {}%"
+msgstr ""
+
+msgid "Ducked Volume"
+msgstr ""
+
+msgid "Ducking categories..."
+msgstr ""
+
+msgid "Earcons and Speech Rules"
+msgstr ""
+
+msgid "Edit fields"
+msgstr ""
+
+msgid "Edit per-action settings..."
+msgstr ""
+
+msgid "Emoji Activities Sound"
+msgstr ""
+
+msgid "Emoji After Sound"
+msgstr ""
+
+msgid "Emoji Animals Sound"
+msgstr ""
+
+msgid "Emoji Before Sound"
+msgstr ""
+
+msgid "Emoji blacklist"
+msgstr ""
+
+msgid "Emoji blacklist (type or paste emoji characters to exclude):"
+msgstr ""
+
+msgid "Emoji Flags Sound"
+msgstr ""
+
+msgid "Emoji Food Sound"
+msgstr ""
+
+msgid "Emoji Objects Sound"
+msgstr ""
+
+msgid "Emoji People Sound"
+msgstr ""
+
+msgid "Emoji prefix repeat"
+msgstr ""
+
+msgid "Emoji settings exported successfully."
+msgstr ""
+
+msgid "Emoji settings imported successfully.\nClose and reopen settings to see changes."
+msgstr ""
+
+msgid "Emoji Smileys Sound"
+msgstr ""
+
+msgid "Emoji sound position"
+msgstr ""
+
+msgid "Emoji sound repeat"
+msgstr ""
+
+msgid "Emoji sounds can be assigned in your theme by creating sound files\n"
+msgstr ""
+
+msgid "Emoji suffix text"
+msgstr ""
+
+msgid "Emoji Symbols Sound"
+msgstr ""
+
+msgid "Emoji Travel Sound"
+msgstr ""
+
+msgid "Enable Bass Boost (enhance low frequencies)"
+msgstr ""
+
+msgid "Enable clipboard announcements"
+msgstr ""
+
+msgid "Enable Noise Gate (remove quiet background noise)"
+msgstr ""
+
+msgid "Enters the navigation layer to move by various text and web units."
+msgstr ""
+
+msgid "Error exporting emoji settings:\n%s"
+msgstr ""
+
+msgid "Error importing emoji settings:\n%s"
+msgstr ""
+
+msgid "Error initializing some text rules of Earcons and Speech Rules add-on since they contain URL filter.\n"
+msgstr ""
+
+msgid "Error retrieving contents of BrowserNav bookmark store: {}.\n"
+msgstr ""
+
+msgid "Error saving rules. Check file permissions."
+msgstr ""
+
+msgid "Error: you have entered URL filter for this rule.\n"
+msgstr ""
+
+msgid "Event-driven (recommended)"
+msgstr ""
+
+msgid "Exceptional abbreviations"
+msgstr ""
+
+msgid "Exited navigation layer"
+msgstr ""
+
+msgid "Export Earcons & Speech Rules"
+msgstr ""
+
+msgid "Export Emoji Settings"
+msgstr ""
+
+msgid "Export Error"
+msgstr ""
+
+msgid "Failed to export rules: {}"
+msgstr ""
+
+msgid "Failed to import rules: {}"
+msgstr ""
+
+msgid "Failed to load {count} audio rule(s). They may have invalid fields or be corrupted.\nCheck the NVDA log for details."
+msgstr ""
+
+msgid "Failed to open the update file: {error}"
+msgstr ""
+
+msgid "Failed to test rule: {}"
+msgstr ""
+
+msgid "Fallback sound:"
+msgstr ""
+
+msgid "FFmpeg download failed."
+msgstr ""
+
+msgid "FFmpeg is required to play {ext} files but is not installed.\nPlease install FFmpeg from the Audio Themes settings, or convert the file to WAV/MP3/OGG/FLAC."
+msgstr ""
+
+msgid "FFmpeg status: checking..."
+msgstr ""
+
+msgid "FFmpeg: available at {path}"
+msgstr ""
+
+msgid "FFmpeg: not available"
+msgstr ""
+
+msgid "FFmpeg: not installed"
+msgstr ""
+
+msgid "File does not contain a valid rules list"
+msgstr ""
+
+msgid "FLAC (lossless, smaller)"
+msgstr ""
+
+msgid "FLAC audio files"
+msgstr ""
+
+msgid "Form fields"
+msgstr ""
+
+msgid "Format not found."
+msgstr ""
+
+msgid "Found {count} matching file(s):\n\n"
+msgstr ""
+
+msgid "Frames"
+msgstr ""
+
+msgid "Full width phrase breakers"
+msgstr ""
+
+msgid "Full width sentence breakers"
+msgstr ""
+
+msgid "Gain (dB):"
+msgstr ""
+
+msgid "General fallback"
+msgstr ""
+
+msgid "General fallback role"
+msgstr ""
+
+msgid "Heading Level 1"
+msgstr ""
+
+msgid "Heading Level 2"
+msgstr ""
+
+msgid "Heading Level 3"
+msgstr ""
+
+msgid "Heading Level 4"
+msgstr ""
+
+msgid "Heading Level 5"
+msgstr ""
+
+msgid "Heading Level 6"
+msgstr ""
+
+msgid "Heading Level 7"
+msgstr ""
+
+msgid "Heading Level 8"
+msgstr ""
+
+msgid "Heading Level 9"
+msgstr ""
+
+msgid "Headings"
+msgstr ""
+
+msgid "Hello 😊 world 🌍!"
+msgstr ""
+
+msgid "Images"
+msgstr ""
+
+msgid "Import &Folder..."
+msgstr ""
+
+msgid "Import &folder..."
+msgstr ""
+
+msgid "Import &ZIP or .atp file..."
+msgstr ""
+
+msgid "Import Earcons & Speech Rules"
+msgstr ""
+
+msgid "Import Emoji Settings"
+msgstr ""
+
+msgid "Import Error"
+msgstr ""
+
+msgid "Import Folder"
+msgstr ""
+
+msgid "Import Rules"
+msgstr ""
+
+msgid "Include &pre-release (beta) versions"
+msgstr ""
+
+msgid "Installation failed."
+msgstr ""
+
+msgid "Invalid replacement pattern: {}\nPlease use curly braces {} as a format placeholder; please don't use any other curly braces in replacement string."
+msgstr ""
+
+msgid "Invalid WAV file."
+msgstr ""
+
+msgid "JSON files (*.json)|*.json"
+msgstr ""
+
+msgid "Jupyter cell update in progress!"
+msgstr ""
+
+msgid "Landmarks"
+msgstr ""
+
+msgid "Lines"
+msgstr ""
+
+msgid "Links"
+msgstr ""
+
+msgid "List items"
+msgstr ""
+
+msgid "Lists"
+msgstr ""
+
+msgid "Low battery threshold"
+msgstr ""
+
+msgid "Lower case letters"
+msgstr ""
+
+msgid "Missing sounds"
+msgstr ""
+
+msgid "Mouse hover delay"
+msgstr ""
+
+msgid "Mouse hover delay (ms):"
+msgstr ""
+
+msgid "MP2 audio files"
+msgstr ""
+
+msgid "MPEG audio files"
+msgstr ""
+
+msgid "Name: {name}\nAuthor: {author}\nNumber of sounds: {count}\n\n{summary}"
+msgstr ""
+
+msgid "Name: {name}\nAuthor: {author}\nNumber of sounds: {count}\nLocation: {path}"
+msgstr ""
+
+msgid "Navigation Layer (NVDA+Windows+N)"
+msgstr ""
+
+msgid "Network check interval"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "No focused application."
+msgstr ""
+
+msgid "No matching audio files found in the selected folder."
+msgstr ""
+
+msgid "No more sentences chime volume"
+msgstr ""
+
+msgid "No more text units chime volume"
+msgstr ""
+
+msgid "No sound"
+msgstr ""
+
+msgid "No theme found."
+msgstr ""
+
+msgid "No theme selected"
+msgstr ""
+
+msgid "Noise Gate"
+msgstr ""
+
+msgid "Noise gate attack"
+msgstr ""
+
+msgid "Noise gate release"
+msgstr ""
+
+msgid "Noise gate threshold"
+msgstr ""
+
+msgid "Non-Heading Element"
+msgstr ""
+
+msgid "Not supported here"
+msgstr ""
+
+msgid "Off"
+msgstr ""
+
+msgid "Open the Audio Theme Studio to create and edit themes"
+msgstr ""
+
+msgid "Opus audio files"
+msgstr ""
+
+msgid "Pan Mode:"
+msgstr ""
+
+msgid "Pan Range:"
+msgstr ""
+
+msgid "Paragraph"
+msgstr ""
+
+msgid "Paragraph boundary chime volume"
+msgstr ""
+
+msgid "Paragraph crackle volume"
+msgstr ""
+
+msgid "Pass-through unknown keys (Auto-exit on typing)"
+msgstr ""
+
+msgid "Paste"
+msgstr ""
+
+msgid "Paste Plain"
+msgstr ""
+
+msgid "Per field"
+msgstr ""
+
+msgid "Per field and line"
+msgstr ""
+
+msgid "Per-Action Clipboard Settings"
+msgstr ""
+
+msgid "Per-Action Settings"
+msgstr ""
+
+msgid "Per-app sound overrides (JSON: {app: {sound_key: target_key_or_name}})"
+msgstr ""
+
+msgid "Per-Category Emoji Settings"
+msgstr ""
+
+msgid "Per-category prefix text, sound position, and volume..."
+msgstr ""
+
+msgid "Phonetic punctuation add-on has been renamed to Earcons and Speech Rules.\n"
+msgstr ""
+
+msgid "Phonetic punctuation earcons (Alt+P)"
+msgstr ""
+
+msgid "Phrase breakers"
+msgstr ""
+
+msgid "Pitch shift with progress (higher pitch = more progress)"
+msgstr ""
+
+msgid "Place .wav files in your theme folder with these names:\n"
+msgstr ""
+
+msgid "Play Sound"
+msgstr ""
+
+msgid "Play sounds for layer actions"
+msgstr ""
+
+msgid "Play the first available sound"
+msgstr ""
+
+msgid "Play the item's role sound"
+msgstr ""
+
+msgid "Play the object's role sound"
+msgstr ""
+
+msgid "Play theme sounds during arrow navigation"
+msgstr ""
+
+msgid "Play theme sounds when hovering with the mouse"
+msgstr ""
+
+msgid "Please enter a version in order to  export this website.\n"
+msgstr ""
+
+msgid "Polling timer (legacy)"
+msgstr ""
+
+msgid "Prefix position"
+msgstr ""
+
+msgid "Prefix repeat:"
+msgstr ""
+
+msgid "Prefix Text"
+msgstr ""
+
+msgid "Prefix text for %s"
+msgstr ""
+
+msgid "Progress Bar Spatial Audio"
+msgstr ""
+
+msgid "Progress Pan Mode"
+msgstr ""
+
+msgid "Progress pan range"
+msgstr ""
+
+msgid "Progress-based (left to right)"
+msgstr ""
+
+msgid "Quotation"
+msgstr ""
+
+msgid "Quotes"
+msgstr ""
+
+msgid "Radio buttons"
+msgstr ""
+
+msgid "Reconstruct sentences across paragraphs"
+msgstr ""
+
+msgid "Redo"
+msgstr ""
+
+msgid "Redo (Alt)"
+msgstr ""
+
+msgid "Release (ms):"
+msgstr ""
+
+msgid "Remove selected"
+msgstr ""
+
+msgid "Report"
+msgstr ""
+
+msgid "Report roles/states without a sound"
+msgstr ""
+
+msgid "Restart Required"
+msgstr ""
+
+msgid "Role not found."
+msgstr ""
+
+msgid "Rule not found."
+msgstr ""
+
+msgid "Rules exported to {}"
+msgstr ""
+
+msgid "Rules imported successfully"
+msgstr ""
+
+msgid "Same-element sound suppression"
+msgstr ""
+
+msgid "Screen position (bar location on screen)"
+msgstr ""
+
+msgid "Search for a role"
+msgstr ""
+
+msgid "Search:"
+msgstr ""
+
+msgid "Searches"
+msgstr ""
+
+msgid "Select audio file:"
+msgstr ""
+
+msgid "Select theme"
+msgstr ""
+
+msgid "Select which sound categories should be ducked when NVDA speaks:"
+msgstr ""
+
+msgid "Select which sound categories to suppress when the foreground app is in the disabled list:"
+msgstr ""
+
+msgid "Sentence"
+msgstr ""
+
+msgid "Sentence breakers"
+msgstr ""
+
+msgid "SentenceNav sounds (Alt+Up/Down)"
+msgstr ""
+
+msgid "Separators"
+msgstr ""
+
+msgid "Silence theme sounds for container elements (documents, panes, windows)"
+msgstr ""
+
+msgid "Silence theme sounds while selecting text (Shift + arrow keys)"
+msgstr ""
+
+msgid "Skip Clutter chime volume"
+msgstr ""
+
+msgid "Skippable punctuation"
+msgstr ""
+
+msgid "Sound"
+msgstr ""
+
+msgid "Sound For"
+msgstr ""
+
+msgid "Sound only"
+msgstr ""
+
+msgid "Sound Position"
+msgstr ""
+
+msgid "Sound position for %s"
+msgstr ""
+
+msgid "Sound position:"
+msgstr ""
+
+msgid "Sound repeat:"
+msgstr ""
+
+msgid "Sound Settings"
+msgstr ""
+
+msgid "Sound volume:"
+msgstr ""
+
+msgid "Sounds when the caret moves in text fields:"
+msgstr ""
+
+msgid "Speak Message"
+msgstr ""
+
+msgid "Speak states such as checked, expanded, selected etc."
+msgstr ""
+
+msgid "Speech"
+msgstr ""
+
+msgid "Speech and Sound"
+msgstr ""
+
+msgid "Speech only"
+msgstr ""
+
+msgid "Speech Prefix Settings"
+msgstr ""
+
+msgid "State sounds suppress the role sound"
+msgstr ""
+
+msgid "Suffix Text"
+msgstr ""
+
+msgid "Suffix text for %s"
+msgstr ""
+
+msgid "Suffix text:"
+msgstr ""
+
+msgid "Suppress repeated sounds for the same element (ms, 0 = off):"
+msgstr ""
+
+msgid "Suppress role sound (e.g. \"list item\") when emoji is present"
+msgstr ""
+
+msgid "System status sounds volume"
+msgstr ""
+
+msgid "Tables"
+msgstr ""
+
+msgid "Target format:"
+msgstr ""
+
+msgid "Test Emoji Processing"
+msgstr ""
+
+msgid "Test emoji text"
+msgstr ""
+
+msgid "Test Rule"
+msgstr ""
+
+msgid "text blocks"
+msgstr ""
+
+msgid "TextNav sounds (Alt+Shift+Up/Down)"
+msgstr ""
+
+msgid "The downloaded audio theme could not be installed.\nIt may be corrupted, unsafe, or not a valid theme package."
+msgstr ""
+
+msgid "The downloaded typing sound pack could not be installed.\nIt may be corrupted, unsafe, or not a valid typing pack."
+msgstr ""
+
+msgid "The following add-ons are now included in Advanced Audio Themes. Select the ones you want to remove to prevent conflicts:"
+msgstr ""
+
+msgid "The following add-ons are now included in Advanced Audio Themes.\n"
+msgstr ""
+
+msgid "The following roles/states have no sound in theme '{name}':"
+msgstr ""
+
+msgid "The selected conflicting add-ons will be removed after you restart NVDA."
+msgstr ""
+
+msgid "The selected file could not be installed as an audio theme.\nIt may be corrupted, unsafe, or not a valid theme package."
+msgstr ""
+
+msgid "Theme folder missing."
+msgstr ""
+
+msgid "Theme sounds (roles, states, focus)"
+msgstr ""
+
+msgid "This rule type cannot be tested in isolation."
+msgstr ""
+
+msgid "This will replace ALL current rules with the imported rules.\nA backup of your current rules will be saved.\n\nContinue?"
+msgstr ""
+
+msgid "Threshold:"
+msgstr ""
+
+msgid "Toggle audio themes on or off"
+msgstr ""
+
+msgid "Trim silence threshold"
+msgstr ""
+
+msgid "Type text with emoji to preview:"
+msgstr ""
+
+msgid "Typing pack installation successful!"
+msgstr ""
+
+msgid "Typing sound pack"
+msgstr ""
+
+msgid "Typing sound pack successfully installed."
+msgstr ""
+
+msgid "Typing sounds"
+msgstr ""
+
+msgid "Typing sounds volume"
+msgstr ""
+
+msgid "UI feedback beeps (layer, error, beacon)"
+msgstr ""
+
+msgid "Undo"
+msgstr ""
+
+msgid "Unvisited Link"
+msgstr ""
+
+msgid "Unvisited links"
+msgstr ""
+
+msgid "Update Error"
+msgstr ""
+
+msgid "Use custom role sound"
+msgstr ""
+
+msgid "Use custom role sounds"
+msgstr ""
+
+msgid "Use FFmpeg to play additional audio formats (M4A, AAC, OPUS, WMA, MP2, AC3)"
+msgstr ""
+
+msgid "Visited links"
+msgstr ""
+
+msgid "Volume (0-100)"
+msgstr ""
+
+msgid "Volume for %s"
+msgstr ""
+
+msgid "Volume:"
+msgstr ""
+
+msgid "Warning: you are about to move this bookmark to site %(new_site)s. "
+msgstr ""
+
+msgid "Warning: you are trying to  move this bookmark to site %(new_site)s. "
+msgstr ""
+
+msgid "WAV (compatible with everything)"
+msgstr ""
+
+msgid "WAV files"
+msgstr ""
+
+msgid "WAV, OGG, MP3, and FLAC are supported natively.\n"
+msgstr ""
+
+msgid "Welcome To The Audio Themes Studio:\n"
+msgstr ""
+
+msgid "When no sound is found for a role or state:"
+msgstr ""
+
+msgid "WMA audio files"
+msgstr ""
+
+msgid "Word"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "You already have website {} in your BrowserNav configuration.\n"
+msgstr ""

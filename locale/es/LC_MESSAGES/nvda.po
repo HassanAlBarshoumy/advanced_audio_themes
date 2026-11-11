@@ -3998,3 +3998,33 @@ msgstr "Apps que reproducen el sonido de guardar documento (Ctrl+S) (JSON: {app:
 
 msgid "Report roles/states without a sound"
 msgstr "Informar roles/estados sin sonido"
+
+msgid " (and {n} more; see the NVDA log)"
+msgstr " (y {n} más; consulta el registro de NVDA)"
+
+msgid "{summary}\n\n{detail}"
+msgstr "{summary}\n\n{detail}"
+
+msgid "Audio Theme Conversion"
+msgstr "Conversión de tema de audio"
+
+msgid "Conversion done: {converted} converted, {skipped} skipped, "
+msgstr "Conversión realizada: {converted} convertidos, {skipped} omitidos, "
+
+msgid "Conversion finished: {converted} converted, {skipped} skipped, "
+msgstr "Conversión finalizada: {converted} convertidos, {skipped} omitidos, "
+
+msgid "Converting theme sounds to {target}..."
+msgstr "Convirtiendo los sonidos del tema a {target}..."
+
+msgid "Converting theme sounds..."
+msgstr "Convirtiendo los sonidos del tema..."
+
+msgid "No theme selected"
+msgstr "Ningún tema seleccionado"
+
+msgid "Report"
+msgstr "Informe"
+
+msgid "The selected file could not be installed as an audio theme.\nIt may be corrupted, unsafe, or not a valid theme package."
+msgstr "No se pudo instalar el archivo seleccionado como tema de audio.\nPuede estar dañado, no ser seguro o no ser un paquete de tema válido."

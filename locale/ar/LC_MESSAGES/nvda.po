@@ -3697,3 +3697,354 @@ msgstr "التطبيقات التي تشغل صوت حفظ المستند (Ctrl+
 
 msgid "Report roles/states without a sound"
 msgstr "الإبلاغ عن الأدوار/الحالات بدون صوت"
+
+msgid " (and {n} more; see the NVDA log)"
+msgstr " (و{n} أخرى؛ راجع سجل NVDA)"
+
+msgid "&Case sensitive pattern matching"
+msgstr "مطابقة &حساسة لحالة الأحرف"
+
+msgid "&Convert all theme sounds now"
+msgstr "&تحويل كل أصوات السمات الآن"
+
+msgid "&Export rules"
+msgstr "&تصدير القواعد"
+
+msgid "&Import rules"
+msgstr "&استيراد القواعد"
+
+msgid "{summary}\n\n{detail}"
+msgstr "{summary}\n\n{detail}"
+
+msgid "All files"
+msgstr "كل الملفات"
+
+msgid "Annotation"
+msgstr "تعليق توضيحي"
+
+msgid "Assign sounds for clipboard actions in the Audio Themes Studio.\n"
+msgstr "عيّن أصواتًا لإجراءات الحافظة في استوديو السمات الصوتية.\n"
+
+msgid "Audio file not found."
+msgstr "لم يُعثر على الملف الصوتي."
+
+msgid "Audio files"
+msgstr "ملفات صوتية"
+
+msgid "Audio Theme Conversion"
+msgstr "تحويل السمة الصوتية"
+
+msgid "Battery check interval"
+msgstr "الفاصل الزمني لفحص البطارية"
+
+msgid "Browser navigation engine"
+msgstr "محرك التنقل في المتصفح"
+
+msgid "Browser navigation engine:"
+msgstr "محرك التنقل في المتصفح:"
+
+msgid "Caret move sounds"
+msgstr "أصوات حركة المؤشر"
+
+msgid "Clipboard"
+msgstr "الحافظة"
+
+msgid "Configure per-category prefix text, sound position, and volume.\n"
+msgstr "اضبط نص البادئة وموضع الصوت ومستوى الصوت لكل فئة.\n"
+
+msgid "Conversion done: {converted} converted, {skipped} skipped, "
+msgstr "اكتمل التحويل: {converted} محوَّل، {skipped} متجاوَز، "
+
+msgid "Conversion finished: {converted} converted, {skipped} skipped, "
+msgstr "انتهى التحويل: {converted} محوَّل، {skipped} متجاوَز، "
+
+msgid "Convert theme sounds:"
+msgstr "تحويل أصوات السمات:"
+
+msgid "Converting theme sounds to {target}..."
+msgstr "جارٍ تحويل أصوات السمات إلى {target}..."
+
+msgid "Converting theme sounds..."
+msgstr "جارٍ تحويل أصوات السمات..."
+
+msgid "Copied"
+msgstr "تم النسخ"
+
+msgid "Copy"
+msgstr "نسخ"
+
+msgid "Critical battery threshold"
+msgstr "حد البطارية الحرج"
+
+msgid "Custom descriptions (JSON format, e.g. {\"😊\": \"face smile\"}):"
+msgstr "أوصاف مخصصة (بتنسيق JSON، مثال: {\"😊\": \"وجه مبتسم\"}):"
+
+msgid "Cut"
+msgstr "قص"
+
+msgid "Disable PhoneticPunctuation in applications (comma-separated list)"
+msgstr "تعطيل PhoneticPunctuation في التطبيقات (قائمة مفصولة بفواصل)"
+
+msgid "Earcons and Speech Rules"
+msgstr "الأيقونات الصوتية وقواعد الكلام"
+
+msgid "Emoji Activities Sound"
+msgstr "صوت إيموجي الأنشطة"
+
+msgid "Emoji Animals Sound"
+msgstr "صوت إيموجي الحيوانات"
+
+msgid "Emoji Flags Sound"
+msgstr "صوت إيموجي الأعلام"
+
+msgid "Emoji Food Sound"
+msgstr "صوت إيموجي الطعام"
+
+msgid "Emoji Objects Sound"
+msgstr "صوت إيموجي الأشياء"
+
+msgid "Emoji People Sound"
+msgstr "صوت إيموجي الأشخاص"
+
+msgid "Emoji Smileys Sound"
+msgstr "صوت إيموجي الوجوه المبتسمة"
+
+msgid "Emoji sounds can be assigned in your theme by creating sound files\n"
+msgstr "يمكن تعيين أصوات الإيموجي في سمتك بإنشاء ملفات صوتية\n"
+
+msgid "Emoji Symbols Sound"
+msgstr "صوت إيموجي الرموز"
+
+msgid "Emoji Travel Sound"
+msgstr "صوت إيموجي السفر"
+
+msgid "Error initializing some text rules of Earcons and Speech Rules add-on since they contain URL filter.\n"
+msgstr "خطأ في تهيئة بعض قواعد النص في إضافة الأيقونات الصوتية وقواعد الكلام لأنها تحتوي على مرشح عنوان URL.\n"
+
+msgid "Error retrieving contents of BrowserNav bookmark store: {}.\n"
+msgstr "خطأ في استرداد محتويات متجر إشارات التنقل في المتصفح: {}.\n"
+
+msgid "Error saving rules. Check file permissions."
+msgstr "خطأ في حفظ القواعد. تحقق من أذونات الملف."
+
+msgid "Error: you have entered URL filter for this rule.\n"
+msgstr "خطأ: لقد أدخلت مرشح عنوان URL لهذه القاعدة.\n"
+
+msgid "Event-driven (recommended)"
+msgstr "مدفوع بالأحداث (موصى به)"
+
+msgid "Export Earcons & Speech Rules"
+msgstr "تصدير الأيقونات الصوتية وقواعد الكلام"
+
+msgid "Export Error"
+msgstr "خطأ في التصدير"
+
+msgid "Failed to export rules: {}"
+msgstr "فشل تصدير القواعد: {}"
+
+msgid "Failed to import rules: {}"
+msgstr "فشل استيراد القواعد: {}"
+
+msgid "Failed to load {count} audio rule(s). They may have invalid fields or be corrupted.\nCheck the NVDA log for details."
+msgstr "فشل تحميل {count} قاعدة صوتية. قد تحتوي على حقول غير صالحة أو تكون تالفة.\nراجع سجل NVDA للتفاصيل."
+
+msgid "Failed to test rule: {}"
+msgstr "فشل اختبار القاعدة: {}"
+
+msgid "FFmpeg is required to play {ext} files but is not installed.\nPlease install FFmpeg from the Audio Themes settings, or convert the file to WAV/MP3/OGG/FLAC."
+msgstr "يلزم FFmpeg لتشغيل ملفات {ext} لكنه غير مثبَّت.\nيرجى تثبيت FFmpeg من إعدادات السمات الصوتية، أو تحويل الملف إلى WAV/MP3/OGG/FLAC."
+
+msgid "File does not contain a valid rules list"
+msgstr "الملف لا يحتوي على قائمة قواعد صالحة"
+
+msgid "FLAC (lossless, smaller)"
+msgstr "FLAC (بلا فقد، أصغر حجمًا)"
+
+msgid "Format not found."
+msgstr "لم يُعثر على التنسيق."
+
+msgid "Found {count} matching file(s):\n\n"
+msgstr "تم العثور على {count} ملف مطابق:\n\n"
+
+msgid "Import Earcons & Speech Rules"
+msgstr "استيراد الأيقونات الصوتية وقواعد الكلام"
+
+msgid "Import Error"
+msgstr "خطأ في الاستيراد"
+
+msgid "Import Rules"
+msgstr "استيراد القواعد"
+
+msgid "Installation failed."
+msgstr "فشل التثبيت."
+
+msgid "Invalid replacement pattern: {}\nPlease use curly braces {} as a format placeholder; please don't use any other curly braces in replacement string."
+msgstr "نمط استبدال غير صالح: {}\nيرجى استخدام الأقواس المعقوفة {} كعنصر نائب للتنسيق؛ لا تستخدم أي أقواس معقوفة أخرى في نص الاستبدال."
+
+msgid "Invalid WAV file."
+msgstr "ملف WAV غير صالح."
+
+msgid "JSON files (*.json)|*.json"
+msgstr "ملفات JSON (*.json)|*.json"
+
+msgid "Low battery threshold"
+msgstr "حد البطارية المنخفض"
+
+msgid "Mouse hover delay"
+msgstr "تأخير التحويم بالماوس"
+
+msgid "Mouse hover delay (ms):"
+msgstr "تأخير التحويم بالماوس (مللي ثانية):"
+
+msgid "Network check interval"
+msgstr "الفاصل الزمني لفحص الشبكة"
+
+msgid "No"
+msgstr "لا"
+
+msgid "No focused application."
+msgstr "لا يوجد تطبيق مركَّز عليه."
+
+msgid "No theme selected"
+msgstr "لم يتم اختيار أي سمة"
+
+msgid "Non-Heading Element"
+msgstr "عنصر غير عنوان"
+
+msgid "Off"
+msgstr "إيقاف"
+
+msgid "Paste"
+msgstr "لصق"
+
+msgid "Paste Plain"
+msgstr "لصق كنص عادي"
+
+msgid "Per field"
+msgstr "لكل حقل"
+
+msgid "Per field and line"
+msgstr "لكل حقل وسطر"
+
+msgid "Phonetic punctuation add-on has been renamed to Earcons and Speech Rules.\n"
+msgstr "أُعيدت تسمية إضافة علامات الترقيم الصوتية إلى الأيقونات الصوتية وقواعد الكلام.\n"
+
+msgid "Place .wav files in your theme folder with these names:\n"
+msgstr "ضع ملفات .wav في مجلد سمتك بهذه الأسماء:\n"
+
+msgid "Play theme sounds during arrow navigation"
+msgstr "تشغيل أصوات السمات أثناء التنقل بالأسهم"
+
+msgid "Play theme sounds when hovering with the mouse"
+msgstr "تشغيل أصوات السمات عند التحويم بالماوس"
+
+msgid "Please enter a version in order to  export this website.\n"
+msgstr "يرجى إدخال إصدار لتصدير هذا الموقع.\n"
+
+msgid "Polling timer (legacy)"
+msgstr "مؤقت الاستطلاع (قديم)"
+
+msgid "Quotation"
+msgstr "اقتباس"
+
+msgid "Redo"
+msgstr "إعادة"
+
+msgid "Redo (Alt)"
+msgstr "إعادة (Alt)"
+
+msgid "Report"
+msgstr "تقرير"
+
+msgid "Role not found."
+msgstr "لم يُعثر على الدور."
+
+msgid "Rule not found."
+msgstr "لم يُعثر على القاعدة."
+
+msgid "Rules exported to {}"
+msgstr "تم تصدير القواعد إلى {}"
+
+msgid "Rules imported successfully"
+msgstr "تم استيراد القواعد بنجاح"
+
+msgid "Same-element sound suppression"
+msgstr "كتم صوت العنصر نفسه"
+
+msgid "Select audio file:"
+msgstr "اختر ملفًا صوتيًا:"
+
+msgid "Silence theme sounds for container elements (documents, panes, windows)"
+msgstr "كتم أصوات السمات لعناصر الحاوية (المستندات والأجزاء والنوافذ)"
+
+msgid "Silence theme sounds while selecting text (Shift + arrow keys)"
+msgstr "كتم أصوات السمات أثناء تحديد النص (Shift + الأسهم)"
+
+msgid "Sounds when the caret moves in text fields:"
+msgstr "الأصوات عند تحرك المؤشر في حقول النص:"
+
+msgid "Speak states such as checked, expanded, selected etc."
+msgstr "نطق الحالات مثل محدَّد وموسَّع ومُنتقى وما إلى ذلك."
+
+msgid "Suppress repeated sounds for the same element (ms, 0 = off):"
+msgstr "كتم الأصوات المتكررة للعنصر نفسه (مللي ثانية، 0 = إيقاف):"
+
+msgid "System status sounds volume"
+msgstr "مستوى صوت حالة النظام"
+
+msgid "Target format:"
+msgstr "التنسيق الهدف:"
+
+msgid "Test Rule"
+msgstr "اختبار القاعدة"
+
+msgid "The downloaded audio theme could not be installed.\nIt may be corrupted, unsafe, or not a valid theme package."
+msgstr "تعذّر تثبيت السمة الصوتية التي تم تنزيلها.\nقد تكون تالفة أو غير آمنة أو ليست حزمة سمة صالحة."
+
+msgid "The downloaded typing sound pack could not be installed.\nIt may be corrupted, unsafe, or not a valid typing pack."
+msgstr "تعذّر تثبيت حزمة أصوات الكتابة التي تم تنزيلها.\nقد تكون تالفة أو غير آمنة أو ليست حزمة أصوات كتابة صالحة."
+
+msgid "The following add-ons are now included in Advanced Audio Themes.\n"
+msgstr "الإضافات التالية أصبحت الآن مضمَّنة في السمات الصوتية المتقدمة.\n"
+
+msgid "The selected file could not be installed as an audio theme.\nIt may be corrupted, unsafe, or not a valid theme package."
+msgstr "تعذّر تثبيت الملف المحدد كسمة صوتية.\nقد يكون تالفًا أو غير آمن أو ليس حزمة سمة صالحة."
+
+msgid "This rule type cannot be tested in isolation."
+msgstr "لا يمكن اختبار هذا النوع من القواعد بشكل منفصل."
+
+msgid "This will replace ALL current rules with the imported rules.\nA backup of your current rules will be saved.\n\nContinue?"
+msgstr "سيؤدي هذا إلى استبدال كل القواعد الحالية بالقواعد المستوردة.\nسيتم حفظ نسخة احتياطية من قواعدك الحالية.\n\nهل تريد المتابعة؟"
+
+msgid "Undo"
+msgstr "تراجع"
+
+msgid "Unvisited Link"
+msgstr "رابط غير مُزار"
+
+msgid "Use FFmpeg to play additional audio formats (M4A, AAC, OPUS, WMA, MP2, AC3)"
+msgstr "استخدام FFmpeg لتشغيل تنسيقات صوتية إضافية (M4A، AAC، OPUS، WMA، MP2، AC3)"
+
+msgid "Warning: you are about to move this bookmark to site %(new_site)s. "
+msgstr "تحذير: أنت على وشك نقل هذه الإشارة المرجعية إلى الموقع %(new_site)s. "
+
+msgid "Warning: you are trying to  move this bookmark to site %(new_site)s. "
+msgstr "تحذير: أنت تحاول نقل هذه الإشارة المرجعية إلى الموقع %(new_site)s. "
+
+msgid "WAV (compatible with everything)"
+msgstr "WAV (متوافق مع كل شيء)"
+
+msgid "WAV files"
+msgstr "ملفات WAV"
+
+msgid "WAV, OGG, MP3, and FLAC are supported natively.\n"
+msgstr "تنسيقات WAV وOGG وMP3 وFLAC مدعومة أصليًا.\n"
+
+msgid "Welcome To The Audio Themes Studio:\n"
+msgstr "مرحبًا بك في استوديو السمات الصوتية:\n"
+
+msgid "Yes"
+msgstr "نعم"
+
+msgid "You already have website {} in your BrowserNav configuration.\n"
+msgstr "لديك بالفعل الموقع {} في إعدادات التنقل في المتصفح.\n"

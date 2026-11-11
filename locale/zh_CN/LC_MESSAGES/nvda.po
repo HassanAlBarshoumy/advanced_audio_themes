@@ -3390,3 +3390,585 @@ msgstr "播放文档保存 (Ctrl+S) 声音的应用 (JSON: {app: true/false})"
 
 msgid "Report roles/states without a sound"
 msgstr "报告没有声音的角色/状态"
+
+msgid " (and {n} more; see the NVDA log)"
+msgstr " (以及另外 {n} 项；请查看 NVDA 日志)"
+
+msgid "%d%%"
+msgstr "%d%%"
+
+msgid "&Case sensitive pattern matching"
+msgstr "区分大小写匹配(&C)"
+
+msgid "&Convert all theme sounds now"
+msgstr "立即转换所有主题声音(&C)"
+
+msgid "&Export emoji settings..."
+msgstr "导出表情符号设置(&E)..."
+
+msgid "&Export rules"
+msgstr "导出规则(&E)"
+
+msgid "&Import emoji settings..."
+msgstr "导入表情符号设置(&I)..."
+
+msgid "&Import rules"
+msgstr "导入规则(&I)"
+
+msgid "&Test"
+msgstr "测试(&T)"
+
+msgid "{summary}\n\n{detail}"
+msgstr "{summary}\n\n{detail}"
+
+msgid "Activities"
+msgstr "活动"
+
+msgid "Advanced Settings"
+msgstr "高级设置"
+
+msgid "After"
+msgstr "之后"
+
+msgid "After emoji"
+msgstr "表情符号之后"
+
+msgid "All files"
+msgstr "所有文件"
+
+msgid "Animals & Nature"
+msgstr "动物与自然"
+
+msgid "Annotation"
+msgstr "注释"
+
+msgid "Assign sounds for clipboard actions in the Audio Themes Studio.\n"
+msgstr "在音效主题工作室中为剪贴板操作分配声音。\n"
+
+msgid "Audio file not found."
+msgstr "未找到音频文件。"
+
+msgid "Audio files"
+msgstr "音频文件"
+
+msgid "Audio Theme Conversion"
+msgstr "音效主题转换"
+
+msgid "Battery check interval"
+msgstr "电池检查间隔"
+
+msgid "Before"
+msgstr "之前"
+
+msgid "Before and after"
+msgstr "之前和之后"
+
+msgid "Before emoji"
+msgstr "表情符号之前"
+
+msgid "Browser navigation engine"
+msgstr "浏览器导航引擎"
+
+msgid "Browser navigation engine:"
+msgstr "浏览器导航引擎："
+
+msgid "Caret move sounds"
+msgstr "光标移动声音"
+
+msgid "Clipboard"
+msgstr "剪贴板"
+
+msgid "Configure per-category prefix text, sound position, and volume.\n"
+msgstr "按类别配置前缀文本、声音位置和音量。\n"
+
+msgid "Conversion done: {converted} converted, {skipped} skipped, "
+msgstr "转换完成：已转换 {converted} 个，已跳过 {skipped} 个，"
+
+msgid "Conversion finished: {converted} converted, {skipped} skipped, "
+msgstr "转换结束：已转换 {converted} 个，已跳过 {skipped} 个，"
+
+msgid "Convert theme sounds:"
+msgstr "转换主题声音："
+
+msgid "Converting theme sounds to {target}..."
+msgstr "正在将主题声音转换为 {target}..."
+
+msgid "Converting theme sounds..."
+msgstr "正在转换主题声音..."
+
+msgid "Copied"
+msgstr "已复制"
+
+msgid "Copy"
+msgstr "复制"
+
+msgid "Critical battery threshold"
+msgstr "电池严重不足阈值"
+
+msgid "Custom descriptions (JSON format, e.g. {\"😊\": \"face smile\"}):"
+msgstr "自定义描述（JSON 格式，例如 {\"😊\": \"笑脸\"}）："
+
+msgid "Custom emoji descriptions"
+msgstr "自定义表情符号描述"
+
+msgid "Cut"
+msgstr "剪切"
+
+msgid "Delay after emoji sound"
+msgstr "表情符号声音后延迟"
+
+msgid "Delay after sound (ms):"
+msgstr "声音后延迟（毫秒）："
+
+msgid "Delay before emoji sound"
+msgstr "表情符号声音前延迟"
+
+msgid "Delay before sound (ms):"
+msgstr "声音前延迟（毫秒）："
+
+msgid "Disable PhoneticPunctuation in applications (comma-separated list)"
+msgstr "在这些应用程序中禁用 PhoneticPunctuation（以逗号分隔的列表）"
+
+msgid "Earcons and Speech Rules"
+msgstr "提示音和语音规则"
+
+msgid "Emoji"
+msgstr "表情符号"
+
+msgid "Emoji Activities Sound"
+msgstr "表情符号活动声音"
+
+msgid "Emoji After Sound"
+msgstr "表情符号之后声音"
+
+msgid "Emoji Animals Sound"
+msgstr "表情符号动物声音"
+
+msgid "Emoji Before Sound"
+msgstr "表情符号之前声音"
+
+msgid "Emoji blacklist"
+msgstr "表情符号黑名单"
+
+msgid "Emoji blacklist (type or paste emoji characters to exclude):"
+msgstr "表情符号黑名单（输入或粘贴要排除的表情符号字符）："
+
+msgid "Emoji Categories"
+msgstr "表情符号类别"
+
+msgid "Emoji Flags Sound"
+msgstr "表情符号旗帜声音"
+
+msgid "Emoji Food Sound"
+msgstr "表情符号食物声音"
+
+msgid "Emoji Objects Sound"
+msgstr "表情符号物品声音"
+
+msgid "Emoji People Sound"
+msgstr "表情符号人物声音"
+
+msgid "Emoji prefix repeat"
+msgstr "表情符号前缀重复"
+
+msgid "Emoji prefix text"
+msgstr "表情符号前缀文本"
+
+msgid "Emoji settings exported successfully."
+msgstr "表情符号设置导出成功。"
+
+msgid "Emoji settings imported successfully.\nClose and reopen settings to see changes."
+msgstr "表情符号设置导入成功。\n关闭并重新打开设置以查看更改。"
+
+msgid "Emoji Smileys Sound"
+msgstr "表情符号笑脸声音"
+
+msgid "Emoji Sound"
+msgstr "表情符号声音"
+
+msgid "Emoji sound position"
+msgstr "表情符号声音位置"
+
+msgid "Emoji sound repeat"
+msgstr "表情符号声音重复"
+
+msgid "Emoji sound volume"
+msgstr "表情符号声音音量"
+
+msgid "Emoji sounds can be assigned in your theme by creating sound files\n"
+msgstr "可以通过创建声音文件在主题中分配表情符号声音\n"
+
+msgid "Emoji suffix text"
+msgstr "表情符号后缀文本"
+
+msgid "Emoji Symbols Sound"
+msgstr "表情符号符号声音"
+
+msgid "Emoji Travel Sound"
+msgstr "表情符号旅行声音"
+
+msgid "Enable emoji sounds and speech prefix"
+msgstr "启用表情符号声音和语音前缀"
+
+msgid "Error exporting emoji settings:\n%s"
+msgstr "导出表情符号设置时出错：\n%s"
+
+msgid "Error importing emoji settings:\n%s"
+msgstr "导入表情符号设置时出错：\n%s"
+
+msgid "Error initializing some text rules of Earcons and Speech Rules add-on since they contain URL filter.\n"
+msgstr "由于包含 URL 过滤器，无法初始化提示音和语音规则插件的一些文本规则。\n"
+
+msgid "Error retrieving contents of BrowserNav bookmark store: {}.\n"
+msgstr "获取 BrowserNav 书签存储内容时出错：{}。\n"
+
+msgid "Error saving rules. Check file permissions."
+msgstr "保存规则时出错。请检查文件权限。"
+
+msgid "Error: you have entered URL filter for this rule.\n"
+msgstr "错误：您为此规则输入了 URL 过滤器。\n"
+
+msgid "Event-driven (recommended)"
+msgstr "事件驱动（推荐）"
+
+msgid "Export Earcons & Speech Rules"
+msgstr "导出提示音和语音规则"
+
+msgid "Export Emoji Settings"
+msgstr "导出表情符号设置"
+
+msgid "Export Error"
+msgstr "导出错误"
+
+msgid "Failed to export rules: {}"
+msgstr "导出规则失败：{}"
+
+msgid "Failed to import rules: {}"
+msgstr "导入规则失败：{}"
+
+msgid "Failed to load {count} audio rule(s). They may have invalid fields or be corrupted.\nCheck the NVDA log for details."
+msgstr "无法加载 {count} 个音频规则。它们可能包含无效字段或已损坏。\n请查看 NVDA 日志了解详情。"
+
+msgid "Failed to test rule: {}"
+msgstr "测试规则失败：{}"
+
+msgid "FFmpeg is required to play {ext} files but is not installed.\nPlease install FFmpeg from the Audio Themes settings, or convert the file to WAV/MP3/OGG/FLAC."
+msgstr "播放 {ext} 文件需要 FFmpeg，但未安装。\n请从音效主题设置中安装 FFmpeg，或将文件转换为 WAV/MP3/OGG/FLAC。"
+
+msgid "File does not contain a valid rules list"
+msgstr "文件不包含有效的规则列表"
+
+msgid "FLAC (lossless, smaller)"
+msgstr "FLAC（无损，更小）"
+
+msgid "Flags"
+msgstr "旗帜"
+
+msgid "Food & Drink"
+msgstr "食物与饮品"
+
+msgid "Format not found."
+msgstr "未找到格式。"
+
+msgid "Found {count} matching file(s):\n\n"
+msgstr "找到 {count} 个匹配的文件：\n\n"
+
+msgid "Hello 😊 world 🌍!"
+msgstr "你好 😊 世界 🌍！"
+
+msgid "Import Earcons & Speech Rules"
+msgstr "导入提示音和语音规则"
+
+msgid "Import Emoji Settings"
+msgstr "导入表情符号设置"
+
+msgid "Import Error"
+msgstr "导入错误"
+
+msgid "Import Rules"
+msgstr "导入规则"
+
+msgid "Installation failed."
+msgstr "安装失败。"
+
+msgid "Invalid replacement pattern: {}\nPlease use curly braces {} as a format placeholder; please don't use any other curly braces in replacement string."
+msgstr "无效的替换模式：{}\n请使用花括号 {} 作为格式占位符；请勿在替换字符串中使用其他花括号。"
+
+msgid "Invalid WAV file."
+msgstr "无效的 WAV 文件。"
+
+msgid "JSON files (*.json)|*.json"
+msgstr "JSON 文件 (*.json)|*.json"
+
+msgid "Low battery threshold"
+msgstr "电池电量低阈值"
+
+msgid "Mouse hover delay"
+msgstr "鼠标悬停延迟"
+
+msgid "Mouse hover delay (ms):"
+msgstr "鼠标悬停延迟（毫秒）："
+
+msgid "Name: {name}\nAuthor: {author}\nNumber of sounds: {count}\n\n{summary}"
+msgstr "名称：{name}\n作者：{author}\n声音数量：{count}\n\n{summary}"
+
+msgid "Name: {name}\nAuthor: {author}\nNumber of sounds: {count}\nLocation: {path}"
+msgstr "名称：{name}\n作者：{author}\n声音数量：{count}\n位置：{path}"
+
+msgid "Network check interval"
+msgstr "网络检查间隔"
+
+msgid "No"
+msgstr "否"
+
+msgid "No focused application."
+msgstr "没有聚焦的应用程序。"
+
+msgid "No prefix"
+msgstr "无前缀"
+
+msgid "No sound"
+msgstr "无声音"
+
+msgid "No theme selected"
+msgstr "未选择主题"
+
+msgid "Non-Heading Element"
+msgstr "非标题元素"
+
+msgid "Note"
+msgstr "注意"
+
+msgid "Off"
+msgstr "关闭"
+
+msgid "Once per emoji character"
+msgstr "每个表情符号字符一次"
+
+msgid "Once per text block"
+msgstr "每个文本块一次"
+
+msgid "Paste"
+msgstr "粘贴"
+
+msgid "Paste Plain"
+msgstr "粘贴为纯文本"
+
+msgid "People & Body"
+msgstr "人物与身体"
+
+msgid "Per field"
+msgstr "每个字段"
+
+msgid "Per field and line"
+msgstr "每个字段和行"
+
+msgid "Per-Category Emoji Settings"
+msgstr "按类别的表情符号设置"
+
+msgid "Per-category prefix text, sound position, and volume..."
+msgstr "按类别的前缀文本、声音位置和音量..."
+
+msgid "Phonetic punctuation add-on has been renamed to Earcons and Speech Rules.\n"
+msgstr "语音标点插件已重命名为提示音和语音规则。\n"
+
+msgid "Place .wav files in your theme folder with these names:\n"
+msgstr "将具有这些名称的 .wav 文件放入主题文件夹：\n"
+
+msgid "Play sound when emoji is encountered"
+msgstr "遇到表情符号时播放声音"
+
+msgid "Play theme sounds during arrow navigation"
+msgstr "使用方向键导航时播放主题声音"
+
+msgid "Play theme sounds when hovering with the mouse"
+msgstr "鼠标悬停时播放主题声音"
+
+msgid "Please enter a version in order to  export this website.\n"
+msgstr "请输入版本以便导出此网站。\n"
+
+msgid "Polling timer (legacy)"
+msgstr "轮询计时器（旧版）"
+
+msgid "Prefix position"
+msgstr "前缀位置"
+
+msgid "Prefix position:"
+msgstr "前缀位置："
+
+msgid "Prefix repeat:"
+msgstr "前缀重复："
+
+msgid "Prefix Text"
+msgstr "前缀文本"
+
+msgid "Prefix text for %s"
+msgstr "%s 的前缀文本"
+
+msgid "Prefix text:"
+msgstr "前缀文本："
+
+msgid "Quotation"
+msgstr "引用"
+
+msgid "Redo"
+msgstr "重做"
+
+msgid "Redo (Alt)"
+msgstr "重做（Alt）"
+
+msgid "Report"
+msgstr "报告"
+
+msgid "Role not found."
+msgstr "未找到角色。"
+
+msgid "Rule not found."
+msgstr "未找到规则。"
+
+msgid "Rules exported to {}"
+msgstr "规则已导出到 {}"
+
+msgid "Rules imported successfully"
+msgstr "规则导入成功"
+
+msgid "Same-element sound suppression"
+msgstr "同一元素声音抑制"
+
+msgid "Select audio file:"
+msgstr "选择音频文件："
+
+msgid "Silence theme sounds for container elements (documents, panes, windows)"
+msgstr "对容器元素（文档、窗格、窗口）静音主题声音"
+
+msgid "Silence theme sounds while selecting text (Shift + arrow keys)"
+msgstr "选择文本时静音主题声音（Shift + 方向键）"
+
+msgid "Smileys & Emotion"
+msgstr "笑脸与情感"
+
+msgid "Sound Position"
+msgstr "声音位置"
+
+msgid "Sound position for %s"
+msgstr "%s 的声音位置"
+
+msgid "Sound position:"
+msgstr "声音位置："
+
+msgid "Sound repeat:"
+msgstr "声音重复："
+
+msgid "Sound Settings"
+msgstr "声音设置"
+
+msgid "Sounds when the caret moves in text fields:"
+msgstr "文本字段中光标移动时的声音："
+
+msgid "Speak prefix text before emoji descriptions"
+msgstr "在表情符号描述前朗读前缀文本"
+
+msgid "Speak states such as checked, expanded, selected etc."
+msgstr "朗读诸如已选中、已展开、已选择等状态。"
+
+msgid "Speech Prefix Settings"
+msgstr "语音前缀设置"
+
+msgid "Suffix Text"
+msgstr "后缀文本"
+
+msgid "Suffix text for %s"
+msgstr "%s 的后缀文本"
+
+msgid "Suffix text:"
+msgstr "后缀文本："
+
+msgid "Suppress repeated sounds for the same element (ms, 0 = off):"
+msgstr "抑制同一元素的重复声音（毫秒，0 = 关闭）："
+
+msgid "Suppress role sound (e.g. \"list item\") when emoji is present"
+msgstr "存在表情符号时抑制角色声音（例如 \"列表项\"）"
+
+msgid "Symbols"
+msgstr "符号"
+
+msgid "System status sounds volume"
+msgstr "系统状态声音音量"
+
+msgid "Target format:"
+msgstr "目标格式："
+
+msgid "Test Emoji Processing"
+msgstr "测试表情符号处理"
+
+msgid "Test emoji text"
+msgstr "测试表情符号文本"
+
+msgid "Test Rule"
+msgstr "测试规则"
+
+msgid "The downloaded audio theme could not be installed.\nIt may be corrupted, unsafe, or not a valid theme package."
+msgstr "无法安装下载的音效主题。\n它可能已损坏、不安全或不是有效的主题包。"
+
+msgid "The downloaded typing sound pack could not be installed.\nIt may be corrupted, unsafe, or not a valid typing pack."
+msgstr "无法安装下载的打字音效包。\n它可能已损坏、不安全或不是有效的打字音效包。"
+
+msgid "The following add-ons are now included in Advanced Audio Themes.\n"
+msgstr "以下插件现已包含在高级音频主题中。\n"
+
+msgid "The selected file could not be installed as an audio theme.\nIt may be corrupted, unsafe, or not a valid theme package."
+msgstr "无法将所选文件安装为音效主题。\n它可能已损坏、不安全或不是有效的主题包。"
+
+msgid "This rule type cannot be tested in isolation."
+msgstr "此规则类型无法单独测试。"
+
+msgid "This will replace ALL current rules with the imported rules.\nA backup of your current rules will be saved.\n\nContinue?"
+msgstr "这将用导入的规则替换所有当前规则。\n将保存当前规则的备份。\n\n继续？"
+
+msgid "Travel & Places"
+msgstr "旅行与地点"
+
+msgid "Type text with emoji to preview:"
+msgstr "输入包含表情符号的文本以预览："
+
+msgid "Undo"
+msgstr "撤销"
+
+msgid "Unvisited Link"
+msgstr "未访问的链接"
+
+msgid "Use FFmpeg to play additional audio formats (M4A, AAC, OPUS, WMA, MP2, AC3)"
+msgstr "使用 FFmpeg 播放其他音频格式（M4A、AAC、OPUS、WMA、MP2、AC3）"
+
+msgid "Volume (0-100)"
+msgstr "音量 (0-100)"
+
+msgid "Volume for %s"
+msgstr "%s 的音量"
+
+msgid "Volume:"
+msgstr "音量："
+
+msgid "Warning: you are about to move this bookmark to site %(new_site)s. "
+msgstr "警告：您即将将此书签移动到网站 %(new_site)s。 "
+
+msgid "Warning: you are trying to  move this bookmark to site %(new_site)s. "
+msgstr "警告：您正尝试将此书签移动到网站 %(new_site)s。 "
+
+msgid "WAV (compatible with everything)"
+msgstr "WAV（兼容所有格式）"
+
+msgid "WAV files"
+msgstr "WAV 文件"
+
+msgid "WAV, OGG, MP3, and FLAC are supported natively.\n"
+msgstr "原生支持 WAV、OGG、MP3 和 FLAC。\n"
+
+msgid "Welcome To The Audio Themes Studio:\n"
+msgstr "欢迎使用音效主题工作室：\n"
+
+msgid "Yes"
+msgstr "是"
+
+msgid "You already have website {} in your BrowserNav configuration.\n"
+msgstr "您的 BrowserNav 配置中已有网站 {}。\n"

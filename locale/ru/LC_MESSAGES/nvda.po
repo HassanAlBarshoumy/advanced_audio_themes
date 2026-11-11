@@ -3427,3 +3427,585 @@ msgstr "Приложения, воспроизводящие звук сохра
 
 msgid "Report roles/states without a sound"
 msgstr "Сообщить о ролях/состояниях без звука"
+
+msgid " (and {n} more; see the NVDA log)"
+msgstr " (и ещё {n}; см. журнал NVDA)"
+
+msgid "%d%%"
+msgstr "%d%%"
+
+msgid "&Case sensitive pattern matching"
+msgstr "&С учётом регистра"
+
+msgid "&Convert all theme sounds now"
+msgstr "&Преобразовать все звуки темы сейчас"
+
+msgid "&Export emoji settings..."
+msgstr "&Экспорт настроек эмодзи..."
+
+msgid "&Export rules"
+msgstr "&Экспорт правил"
+
+msgid "&Import emoji settings..."
+msgstr "&Импорт настроек эмодзи..."
+
+msgid "&Import rules"
+msgstr "&Импорт правил"
+
+msgid "&Test"
+msgstr "&Проверить"
+
+msgid "{summary}\n\n{detail}"
+msgstr "{summary}\n\n{detail}"
+
+msgid "Activities"
+msgstr "Занятия"
+
+msgid "Advanced Settings"
+msgstr "Дополнительные настройки"
+
+msgid "After"
+msgstr "После"
+
+msgid "After emoji"
+msgstr "После эмодзи"
+
+msgid "All files"
+msgstr "Все файлы"
+
+msgid "Animals & Nature"
+msgstr "Животные и природа"
+
+msgid "Annotation"
+msgstr "Аннотация"
+
+msgid "Assign sounds for clipboard actions in the Audio Themes Studio.\n"
+msgstr "Назначайте звуки для действий с буфером обмена в студии аудиотем.\n"
+
+msgid "Audio file not found."
+msgstr "Аудиофайл не найден."
+
+msgid "Audio files"
+msgstr "Аудиофайлы"
+
+msgid "Audio Theme Conversion"
+msgstr "Преобразование аудиотемы"
+
+msgid "Battery check interval"
+msgstr "Интервал проверки батареи"
+
+msgid "Before"
+msgstr "До"
+
+msgid "Before and after"
+msgstr "До и после"
+
+msgid "Before emoji"
+msgstr "Перед эмодзи"
+
+msgid "Browser navigation engine"
+msgstr "Движок навигации в браузере"
+
+msgid "Browser navigation engine:"
+msgstr "Движок навигации в браузере:"
+
+msgid "Caret move sounds"
+msgstr "Звуки перемещения курсора"
+
+msgid "Clipboard"
+msgstr "Буфер обмена"
+
+msgid "Configure per-category prefix text, sound position, and volume.\n"
+msgstr "Настройте текст префикса, позицию звука и громкость для каждой категории.\n"
+
+msgid "Conversion done: {converted} converted, {skipped} skipped, "
+msgstr "Преобразование выполнено: {converted} преобразовано, {skipped} пропущено, "
+
+msgid "Conversion finished: {converted} converted, {skipped} skipped, "
+msgstr "Преобразование завершено: {converted} преобразовано, {skipped} пропущено, "
+
+msgid "Convert theme sounds:"
+msgstr "Преобразовать звуки темы:"
+
+msgid "Converting theme sounds to {target}..."
+msgstr "Преобразование звуков темы в {target}..."
+
+msgid "Converting theme sounds..."
+msgstr "Преобразование звуков темы..."
+
+msgid "Copied"
+msgstr "Скопировано"
+
+msgid "Copy"
+msgstr "Копировать"
+
+msgid "Critical battery threshold"
+msgstr "Критический уровень батареи"
+
+msgid "Custom descriptions (JSON format, e.g. {\"😊\": \"face smile\"}):"
+msgstr "Пользовательские описания (формат JSON, напр. {\"😊\": \"улыбающееся лицо\"}):"
+
+msgid "Custom emoji descriptions"
+msgstr "Пользовательские описания эмодзи"
+
+msgid "Cut"
+msgstr "Вырезать"
+
+msgid "Delay after emoji sound"
+msgstr "Задержка после звука эмодзи"
+
+msgid "Delay after sound (ms):"
+msgstr "Задержка после звука (мс):"
+
+msgid "Delay before emoji sound"
+msgstr "Задержка перед звуком эмодзи"
+
+msgid "Delay before sound (ms):"
+msgstr "Задержка перед звуком (мс):"
+
+msgid "Disable PhoneticPunctuation in applications (comma-separated list)"
+msgstr "Отключить PhoneticPunctuation в приложениях (список через запятую)"
+
+msgid "Earcons and Speech Rules"
+msgstr "Ушные значки и речевые правила"
+
+msgid "Emoji"
+msgstr "Эмодзи"
+
+msgid "Emoji Activities Sound"
+msgstr "Звук эмодзи «Занятия»"
+
+msgid "Emoji After Sound"
+msgstr "Звук эмодзи «После»"
+
+msgid "Emoji Animals Sound"
+msgstr "Звук эмодзи «Животные»"
+
+msgid "Emoji Before Sound"
+msgstr "Звук эмодзи «До»"
+
+msgid "Emoji blacklist"
+msgstr "Чёрный список эмодзи"
+
+msgid "Emoji blacklist (type or paste emoji characters to exclude):"
+msgstr "Чёрный список эмодзи (введите или вставьте символы эмодзи для исключения):"
+
+msgid "Emoji Categories"
+msgstr "Категории эмодзи"
+
+msgid "Emoji Flags Sound"
+msgstr "Звук эмодзи «Флаги»"
+
+msgid "Emoji Food Sound"
+msgstr "Звук эмодзи «Еда»"
+
+msgid "Emoji Objects Sound"
+msgstr "Звук эмодзи «Предметы»"
+
+msgid "Emoji People Sound"
+msgstr "Звук эмодзи «Люди»"
+
+msgid "Emoji prefix repeat"
+msgstr "Повтор префикса эмодзи"
+
+msgid "Emoji prefix text"
+msgstr "Текст префикса эмодзи"
+
+msgid "Emoji settings exported successfully."
+msgstr "Настройки эмодзи успешно экспортированы."
+
+msgid "Emoji settings imported successfully.\nClose and reopen settings to see changes."
+msgstr "Настройки эмодзи успешно импортированы.\nЗакройте и снова откройте настройки, чтобы увидеть изменения."
+
+msgid "Emoji Smileys Sound"
+msgstr "Звук эмодзи «Смайлики»"
+
+msgid "Emoji Sound"
+msgstr "Звук эмодзи"
+
+msgid "Emoji sound position"
+msgstr "Позиция звука эмодзи"
+
+msgid "Emoji sound repeat"
+msgstr "Повтор звука эмодзи"
+
+msgid "Emoji sound volume"
+msgstr "Громкость звука эмодзи"
+
+msgid "Emoji sounds can be assigned in your theme by creating sound files\n"
+msgstr "Звуки эмодзи можно назначить в вашей теме, создав звуковые файлы\n"
+
+msgid "Emoji suffix text"
+msgstr "Текст суффикса эмодзи"
+
+msgid "Emoji Symbols Sound"
+msgstr "Звук эмодзи «Символы»"
+
+msgid "Emoji Travel Sound"
+msgstr "Звук эмодзи «Путешествия»"
+
+msgid "Enable emoji sounds and speech prefix"
+msgstr "Включить звуки эмодзи и речевой префикс"
+
+msgid "Error exporting emoji settings:\n%s"
+msgstr "Ошибка экспорта настроек эмодзи:\n%s"
+
+msgid "Error importing emoji settings:\n%s"
+msgstr "Ошибка импорта настроек эмодзи:\n%s"
+
+msgid "Error initializing some text rules of Earcons and Speech Rules add-on since they contain URL filter.\n"
+msgstr "Ошибка инициализации некоторых текстовых правил дополнения «Ушные значки и речевые правила», так как они содержат фильтр URL.\n"
+
+msgid "Error retrieving contents of BrowserNav bookmark store: {}.\n"
+msgstr "Ошибка получения содержимого магазина закладок BrowserNav: {}.\n"
+
+msgid "Error saving rules. Check file permissions."
+msgstr "Ошибка сохранения правил. Проверьте разрешения на файл."
+
+msgid "Error: you have entered URL filter for this rule.\n"
+msgstr "Ошибка: для этого правила указан фильтр URL.\n"
+
+msgid "Event-driven (recommended)"
+msgstr "На основе событий (рекомендуется)"
+
+msgid "Export Earcons & Speech Rules"
+msgstr "Экспорт ушных значков и речевых правил"
+
+msgid "Export Emoji Settings"
+msgstr "Экспорт настроек эмодзи"
+
+msgid "Export Error"
+msgstr "Ошибка экспорта"
+
+msgid "Failed to export rules: {}"
+msgstr "Не удалось экспортировать правила: {}"
+
+msgid "Failed to import rules: {}"
+msgstr "Не удалось импортировать правила: {}"
+
+msgid "Failed to load {count} audio rule(s). They may have invalid fields or be corrupted.\nCheck the NVDA log for details."
+msgstr "Не удалось загрузить аудиоправил: {count}. Возможно, они содержат недопустимые поля или повреждены.\nПодробности см. в журнале NVDA."
+
+msgid "Failed to test rule: {}"
+msgstr "Не удалось проверить правило: {}"
+
+msgid "FFmpeg is required to play {ext} files but is not installed.\nPlease install FFmpeg from the Audio Themes settings, or convert the file to WAV/MP3/OGG/FLAC."
+msgstr "Для воспроизведения файлов {ext} требуется FFmpeg, но он не установлен.\nУстановите FFmpeg в настройках аудиотем или преобразуйте файл в WAV/MP3/OGG/FLAC."
+
+msgid "File does not contain a valid rules list"
+msgstr "Файл не содержит допустимого списка правил"
+
+msgid "FLAC (lossless, smaller)"
+msgstr "FLAC (без потерь, меньший размер)"
+
+msgid "Flags"
+msgstr "Флаги"
+
+msgid "Food & Drink"
+msgstr "Еда и напитки"
+
+msgid "Format not found."
+msgstr "Формат не найден."
+
+msgid "Found {count} matching file(s):\n\n"
+msgstr "Найдено подходящих файлов: {count}:\n\n"
+
+msgid "Hello 😊 world 🌍!"
+msgstr "Привет 😊 мир 🌍!"
+
+msgid "Import Earcons & Speech Rules"
+msgstr "Импорт ушных значков и речевых правил"
+
+msgid "Import Emoji Settings"
+msgstr "Импорт настроек эмодзи"
+
+msgid "Import Error"
+msgstr "Ошибка импорта"
+
+msgid "Import Rules"
+msgstr "Импорт правил"
+
+msgid "Installation failed."
+msgstr "Установка не удалась."
+
+msgid "Invalid replacement pattern: {}\nPlease use curly braces {} as a format placeholder; please don't use any other curly braces in replacement string."
+msgstr "Недопустимый шаблон замены: {}\nИспользуйте фигурные скобки {} как заполнитель формата; не используйте другие фигурные скобки в строке замены."
+
+msgid "Invalid WAV file."
+msgstr "Недопустимый файл WAV."
+
+msgid "JSON files (*.json)|*.json"
+msgstr "Файлы JSON (*.json)|*.json"
+
+msgid "Low battery threshold"
+msgstr "Низкий уровень батареи"
+
+msgid "Mouse hover delay"
+msgstr "Задержка наведения мыши"
+
+msgid "Mouse hover delay (ms):"
+msgstr "Задержка наведения мыши (мс):"
+
+msgid "Name: {name}\nAuthor: {author}\nNumber of sounds: {count}\n\n{summary}"
+msgstr "Название: {name}\nАвтор: {author}\nКоличество звуков: {count}\n\n{summary}"
+
+msgid "Name: {name}\nAuthor: {author}\nNumber of sounds: {count}\nLocation: {path}"
+msgstr "Название: {name}\nАвтор: {author}\nКоличество звуков: {count}\nРасположение: {path}"
+
+msgid "Network check interval"
+msgstr "Интервал проверки сети"
+
+msgid "No"
+msgstr "Нет"
+
+msgid "No focused application."
+msgstr "Нет приложения в фокусе."
+
+msgid "No prefix"
+msgstr "Без префикса"
+
+msgid "No sound"
+msgstr "Без звука"
+
+msgid "No theme selected"
+msgstr "Тема не выбрана"
+
+msgid "Non-Heading Element"
+msgstr "Элемент, не являющийся заголовком"
+
+msgid "Note"
+msgstr "Примечание"
+
+msgid "Off"
+msgstr "Выкл."
+
+msgid "Once per emoji character"
+msgstr "Один раз на символ эмодзи"
+
+msgid "Once per text block"
+msgstr "Один раз на блок текста"
+
+msgid "Paste"
+msgstr "Вставить"
+
+msgid "Paste Plain"
+msgstr "Вставить как текст"
+
+msgid "People & Body"
+msgstr "Люди и тело"
+
+msgid "Per field"
+msgstr "Для каждого поля"
+
+msgid "Per field and line"
+msgstr "Для каждого поля и строки"
+
+msgid "Per-Category Emoji Settings"
+msgstr "Настройки эмодзи по категориям"
+
+msgid "Per-category prefix text, sound position, and volume..."
+msgstr "Текст префикса, позиция звука и громкость по категориям..."
+
+msgid "Phonetic punctuation add-on has been renamed to Earcons and Speech Rules.\n"
+msgstr "Дополнение «Фонетическая пунктуация» переименовано в «Ушные значки и речевые правила».\n"
+
+msgid "Place .wav files in your theme folder with these names:\n"
+msgstr "Поместите файлы .wav в папку темы с такими именами:\n"
+
+msgid "Play sound when emoji is encountered"
+msgstr "Воспроизводить звук при встрече эмодзи"
+
+msgid "Play theme sounds during arrow navigation"
+msgstr "Воспроизводить звуки темы при навигации стрелками"
+
+msgid "Play theme sounds when hovering with the mouse"
+msgstr "Воспроизводить звуки темы при наведении мыши"
+
+msgid "Please enter a version in order to  export this website.\n"
+msgstr "Введите версию, чтобы экспортировать этот сайт.\n"
+
+msgid "Polling timer (legacy)"
+msgstr "Таймер опроса (устаревший)"
+
+msgid "Prefix position"
+msgstr "Позиция префикса"
+
+msgid "Prefix position:"
+msgstr "Позиция префикса:"
+
+msgid "Prefix repeat:"
+msgstr "Повтор префикса:"
+
+msgid "Prefix Text"
+msgstr "Текст префикса"
+
+msgid "Prefix text for %s"
+msgstr "Текст префикса для %s"
+
+msgid "Prefix text:"
+msgstr "Текст префикса:"
+
+msgid "Quotation"
+msgstr "Цитата"
+
+msgid "Redo"
+msgstr "Повторить"
+
+msgid "Redo (Alt)"
+msgstr "Повторить (Alt)"
+
+msgid "Report"
+msgstr "Отчёт"
+
+msgid "Role not found."
+msgstr "Роль не найдена."
+
+msgid "Rule not found."
+msgstr "Правило не найдено."
+
+msgid "Rules exported to {}"
+msgstr "Правила экспортированы в {}"
+
+msgid "Rules imported successfully"
+msgstr "Правила успешно импортированы"
+
+msgid "Same-element sound suppression"
+msgstr "Подавление звука для того же элемента"
+
+msgid "Select audio file:"
+msgstr "Выберите аудиофайл:"
+
+msgid "Silence theme sounds for container elements (documents, panes, windows)"
+msgstr "Заглушать звуки темы для элементов-контейнеров (документы, панели, окна)"
+
+msgid "Silence theme sounds while selecting text (Shift + arrow keys)"
+msgstr "Заглушать звуки темы при выделении текста (Shift + стрелки)"
+
+msgid "Smileys & Emotion"
+msgstr "Смайлики и эмоции"
+
+msgid "Sound Position"
+msgstr "Позиция звука"
+
+msgid "Sound position for %s"
+msgstr "Позиция звука для %s"
+
+msgid "Sound position:"
+msgstr "Позиция звука:"
+
+msgid "Sound repeat:"
+msgstr "Повтор звука:"
+
+msgid "Sound Settings"
+msgstr "Настройки звука"
+
+msgid "Sounds when the caret moves in text fields:"
+msgstr "Звуки при перемещении курсора в текстовых полях:"
+
+msgid "Speak prefix text before emoji descriptions"
+msgstr "Произносить текст префикса перед описаниями эмодзи"
+
+msgid "Speak states such as checked, expanded, selected etc."
+msgstr "Произносить состояния, такие как установлен, развёрнут, выбран и т. д."
+
+msgid "Speech Prefix Settings"
+msgstr "Настройки речевого префикса"
+
+msgid "Suffix Text"
+msgstr "Текст суффикса"
+
+msgid "Suffix text for %s"
+msgstr "Текст суффикса для %s"
+
+msgid "Suffix text:"
+msgstr "Текст суффикса:"
+
+msgid "Suppress repeated sounds for the same element (ms, 0 = off):"
+msgstr "Подавлять повторяющиеся звуки для того же элемента (мс, 0 = выкл.):"
+
+msgid "Suppress role sound (e.g. \"list item\") when emoji is present"
+msgstr "Подавлять звук роли (например, \"элемент списка\"), если присутствует эмодзи"
+
+msgid "Symbols"
+msgstr "Символы"
+
+msgid "System status sounds volume"
+msgstr "Громкость звуков состояния системы"
+
+msgid "Target format:"
+msgstr "Целевой формат:"
+
+msgid "Test Emoji Processing"
+msgstr "Проверить обработку эмодзи"
+
+msgid "Test emoji text"
+msgstr "Тестовый текст с эмодзи"
+
+msgid "Test Rule"
+msgstr "Проверить правило"
+
+msgid "The downloaded audio theme could not be installed.\nIt may be corrupted, unsafe, or not a valid theme package."
+msgstr "Не удалось установить загруженную аудиотему.\nВозможно, она повреждена, небезопасна или не является допустимым пакетом темы."
+
+msgid "The downloaded typing sound pack could not be installed.\nIt may be corrupted, unsafe, or not a valid typing pack."
+msgstr "Не удалось установить загруженный пакет звуков набора.\nВозможно, он повреждён, небезопасен или не является допустимым пакетом набора."
+
+msgid "The following add-ons are now included in Advanced Audio Themes.\n"
+msgstr "Следующие дополнения теперь включены в Advanced Audio Themes.\n"
+
+msgid "The selected file could not be installed as an audio theme.\nIt may be corrupted, unsafe, or not a valid theme package."
+msgstr "Не удалось установить выбранный файл как аудиотему.\nВозможно, он повреждён, небезопасен или не является допустимым пакетом темы."
+
+msgid "This rule type cannot be tested in isolation."
+msgstr "Этот тип правила нельзя проверить отдельно."
+
+msgid "This will replace ALL current rules with the imported rules.\nA backup of your current rules will be saved.\n\nContinue?"
+msgstr "Это заменит ВСЕ текущие правила импортированными.\nРезервная копия текущих правил будет сохранена.\n\nПродолжить?"
+
+msgid "Travel & Places"
+msgstr "Путешествия и места"
+
+msgid "Type text with emoji to preview:"
+msgstr "Введите текст с эмодзи для предпросмотра:"
+
+msgid "Undo"
+msgstr "Отменить"
+
+msgid "Unvisited Link"
+msgstr "Непосещённая ссылка"
+
+msgid "Use FFmpeg to play additional audio formats (M4A, AAC, OPUS, WMA, MP2, AC3)"
+msgstr "Использовать FFmpeg для воспроизведения дополнительных аудиоформатов (M4A, AAC, OPUS, WMA, MP2, AC3)"
+
+msgid "Volume (0-100)"
+msgstr "Громкость (0–100)"
+
+msgid "Volume for %s"
+msgstr "Громкость для %s"
+
+msgid "Volume:"
+msgstr "Громкость:"
+
+msgid "Warning: you are about to move this bookmark to site %(new_site)s. "
+msgstr "Внимание: вы собираетесь переместить эту закладку на сайт %(new_site)s. "
+
+msgid "Warning: you are trying to  move this bookmark to site %(new_site)s. "
+msgstr "Внимание: вы пытаетесь переместить эту закладку на сайт %(new_site)s. "
+
+msgid "WAV (compatible with everything)"
+msgstr "WAV (совместим со всем)"
+
+msgid "WAV files"
+msgstr "Файлы WAV"
+
+msgid "WAV, OGG, MP3, and FLAC are supported natively.\n"
+msgstr "WAV, OGG, MP3 и FLAC поддерживаются изначально.\n"
+
+msgid "Welcome To The Audio Themes Studio:\n"
+msgstr "Добро пожаловать в студию аудиотем:\n"
+
+msgid "Yes"
+msgstr "Да"
+
+msgid "You already have website {} in your BrowserNav configuration.\n"
+msgstr "В вашей конфигурации BrowserNav уже есть сайт {}.\n"

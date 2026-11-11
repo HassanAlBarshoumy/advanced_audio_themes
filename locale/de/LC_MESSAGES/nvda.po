@@ -3462,3 +3462,588 @@ msgstr "Apps, die den Dokument-speichern-Sound (Strg+S) abspielen (JSON: {app: t
 
 msgid "Report roles/states without a sound"
 msgstr "Rollen/Zustände ohne Sound melden"
+
+msgid " (and {n} more; see the NVDA log)"
+msgstr " (und {n} weitere; siehe NVDA-Protokoll)"
+
+msgid "%d%%"
+msgstr "%d%%"
+
+msgid "&Case sensitive pattern matching"
+msgstr "&Groß-/Kleinschreibung beachten"
+
+msgid "&Convert all theme sounds now"
+msgstr "&Alle Theme-Klänge jetzt konvertieren"
+
+msgid "&Export emoji settings..."
+msgstr "&Emoji-Einstellungen exportieren..."
+
+msgid "&Export rules"
+msgstr "&Regeln exportieren"
+
+msgid "&Import emoji settings..."
+msgstr "&Emoji-Einstellungen importieren..."
+
+msgid "&Import rules"
+msgstr "&Regeln importieren"
+
+msgid "&Test"
+msgstr "&Testen"
+
+msgid "{summary}\n\n{detail}"
+msgstr "{summary}\n\n{detail}"
+
+msgid "A new version is available: {tag}\n\nCurrent version: {current}\n\nWould you like to download and install the update?"
+msgstr "Eine neue Version ist verfügbar: {tag}\n\nAktuelle Version: {current}\n\nMöchten Sie das Update herunterladen und installieren?"
+
+msgid "Activities"
+msgstr "Aktivitäten"
+
+msgid "Advanced Settings"
+msgstr "Erweiterte Einstellungen"
+
+msgid "After"
+msgstr "Danach"
+
+msgid "After emoji"
+msgstr "Nach Emoji"
+
+msgid "All files"
+msgstr "Alle Dateien"
+
+msgid "Animals & Nature"
+msgstr "Tiere & Natur"
+
+msgid "Annotation"
+msgstr "Anmerkung"
+
+msgid "Assign sounds for clipboard actions in the Audio Themes Studio.\n"
+msgstr "Weisen Sie im Audio-Themes-Studio Klänge für Zwischenablageaktionen zu.\n"
+
+msgid "Audio file not found."
+msgstr "Audiodatei nicht gefunden."
+
+msgid "Audio files"
+msgstr "Audiodateien"
+
+msgid "Audio Theme Conversion"
+msgstr "Audio-Theme-Konvertierung"
+
+msgid "Battery check interval"
+msgstr "Intervall für Akkustatusprüfung"
+
+msgid "Before"
+msgstr "Davor"
+
+msgid "Before and after"
+msgstr "Davor und danach"
+
+msgid "Before emoji"
+msgstr "Vor Emoji"
+
+msgid "Browser navigation engine"
+msgstr "Browser-Navigationsengine"
+
+msgid "Browser navigation engine:"
+msgstr "Browser-Navigationsengine:"
+
+msgid "Caret move sounds"
+msgstr "Klänge bei Cursor-Bewegung"
+
+msgid "Clipboard"
+msgstr "Zwischenablage"
+
+msgid "Configure per-category prefix text, sound position, and volume.\n"
+msgstr "Konfigurieren Sie Präfixtext, Klangposition und Lautstärke pro Kategorie.\n"
+
+msgid "Conversion done: {converted} converted, {skipped} skipped, "
+msgstr "Konvertierung abgeschlossen: {converted} konvertiert, {skipped} übersprungen, "
+
+msgid "Conversion finished: {converted} converted, {skipped} skipped, "
+msgstr "Konvertierung beendet: {converted} konvertiert, {skipped} übersprungen, "
+
+msgid "Convert theme sounds:"
+msgstr "Theme-Klänge konvertieren:"
+
+msgid "Converting theme sounds to {target}..."
+msgstr "Theme-Klänge werden nach {target} konvertiert..."
+
+msgid "Converting theme sounds..."
+msgstr "Theme-Klänge werden konvertiert..."
+
+msgid "Copied"
+msgstr "Kopiert"
+
+msgid "Copy"
+msgstr "Kopieren"
+
+msgid "Critical battery threshold"
+msgstr "Kritischer Akkustand"
+
+msgid "Custom descriptions (JSON format, e.g. {\"😊\": \"face smile\"}):"
+msgstr "Benutzerdefinierte Beschreibungen (JSON-Format, z. B. {\"😊\": \"Gesicht lächelt\"}):"
+
+msgid "Custom emoji descriptions"
+msgstr "Benutzerdefinierte Emoji-Beschreibungen"
+
+msgid "Cut"
+msgstr "Ausschneiden"
+
+msgid "Delay after emoji sound"
+msgstr "Verzögerung nach Emoji-Klang"
+
+msgid "Delay after sound (ms):"
+msgstr "Verzögerung nach Klang (ms):"
+
+msgid "Delay before emoji sound"
+msgstr "Verzögerung vor Emoji-Klang"
+
+msgid "Delay before sound (ms):"
+msgstr "Verzögerung vor Klang (ms):"
+
+msgid "Disable PhoneticPunctuation in applications (comma-separated list)"
+msgstr "PhoneticPunctuation in Anwendungen deaktivieren (kommagetrennte Liste)"
+
+msgid "Earcons and Speech Rules"
+msgstr "Earcons und Sprachregeln"
+
+msgid "Emoji"
+msgstr "Emoji"
+
+msgid "Emoji Activities Sound"
+msgstr "Emoji-Klang für Aktivitäten"
+
+msgid "Emoji After Sound"
+msgstr "Emoji-Klang danach"
+
+msgid "Emoji Animals Sound"
+msgstr "Emoji-Klang für Tiere"
+
+msgid "Emoji Before Sound"
+msgstr "Emoji-Klang davor"
+
+msgid "Emoji blacklist"
+msgstr "Emoji-Sperrliste"
+
+msgid "Emoji blacklist (type or paste emoji characters to exclude):"
+msgstr "Emoji-Sperrliste (Emoji-Zeichen zum Ausschließen eingeben oder einfügen):"
+
+msgid "Emoji Categories"
+msgstr "Emoji-Kategorien"
+
+msgid "Emoji Flags Sound"
+msgstr "Emoji-Klang für Flaggen"
+
+msgid "Emoji Food Sound"
+msgstr "Emoji-Klang für Essen"
+
+msgid "Emoji Objects Sound"
+msgstr "Emoji-Klang für Objekte"
+
+msgid "Emoji People Sound"
+msgstr "Emoji-Klang für Menschen"
+
+msgid "Emoji prefix repeat"
+msgstr "Emoji-Präfixwiederholung"
+
+msgid "Emoji prefix text"
+msgstr "Emoji-Präfixtext"
+
+msgid "Emoji settings exported successfully."
+msgstr "Emoji-Einstellungen erfolgreich exportiert."
+
+msgid "Emoji settings imported successfully.\nClose and reopen settings to see changes."
+msgstr "Emoji-Einstellungen erfolgreich importiert.\nSchließen und öffnen Sie die Einstellungen erneut, um die Änderungen zu sehen."
+
+msgid "Emoji Smileys Sound"
+msgstr "Emoji-Klang für Smileys"
+
+msgid "Emoji Sound"
+msgstr "Emoji-Klang"
+
+msgid "Emoji sound position"
+msgstr "Position des Emoji-Klangs"
+
+msgid "Emoji sound repeat"
+msgstr "Wiederholung des Emoji-Klangs"
+
+msgid "Emoji sound volume"
+msgstr "Lautstärke des Emoji-Klangs"
+
+msgid "Emoji sounds can be assigned in your theme by creating sound files\n"
+msgstr "Emoji-Klänge können in Ihrem Theme zugewiesen werden, indem Sie Klangdateien erstellen\n"
+
+msgid "Emoji suffix text"
+msgstr "Emoji-Suffixtext"
+
+msgid "Emoji Symbols Sound"
+msgstr "Emoji-Klang für Symbole"
+
+msgid "Emoji Travel Sound"
+msgstr "Emoji-Klang für Reisen"
+
+msgid "Enable emoji sounds and speech prefix"
+msgstr "Emoji-Klänge und Sprachpräfix aktivieren"
+
+msgid "Error exporting emoji settings:\n%s"
+msgstr "Fehler beim Exportieren der Emoji-Einstellungen:\n%s"
+
+msgid "Error importing emoji settings:\n%s"
+msgstr "Fehler beim Importieren der Emoji-Einstellungen:\n%s"
+
+msgid "Error initializing some text rules of Earcons and Speech Rules add-on since they contain URL filter.\n"
+msgstr "Fehler beim Initialisieren einiger Textregeln des Earcons-und-Sprachregeln-Add-ons, da sie einen URL-Filter enthalten.\n"
+
+msgid "Error retrieving contents of BrowserNav bookmark store: {}.\n"
+msgstr "Fehler beim Abrufen des Inhalts des BrowserNav-Lesezeichen-Shops: {}.\n"
+
+msgid "Error saving rules. Check file permissions."
+msgstr "Fehler beim Speichern der Regeln. Überprüfen Sie die Dateiberechtigungen."
+
+msgid "Error: you have entered URL filter for this rule.\n"
+msgstr "Fehler: Sie haben einen URL-Filter für diese Regel eingegeben.\n"
+
+msgid "Event-driven (recommended)"
+msgstr "Ereignisgesteuert (empfohlen)"
+
+msgid "Export Earcons & Speech Rules"
+msgstr "Earcons & Sprachregeln exportieren"
+
+msgid "Export Emoji Settings"
+msgstr "Emoji-Einstellungen exportieren"
+
+msgid "Export Error"
+msgstr "Exportfehler"
+
+msgid "Failed to export rules: {}"
+msgstr "Regeln konnten nicht exportiert werden: {}"
+
+msgid "Failed to import rules: {}"
+msgstr "Regeln konnten nicht importiert werden: {}"
+
+msgid "Failed to load {count} audio rule(s). They may have invalid fields or be corrupted.\nCheck the NVDA log for details."
+msgstr "{count} Audioregel(n) konnten nicht geladen werden. Sie enthalten möglicherweise ungültige Felder oder sind beschädigt.\nWeitere Details finden Sie im NVDA-Protokoll."
+
+msgid "Failed to test rule: {}"
+msgstr "Regel konnte nicht getestet werden: {}"
+
+msgid "FFmpeg is required to play {ext} files but is not installed.\nPlease install FFmpeg from the Audio Themes settings, or convert the file to WAV/MP3/OGG/FLAC."
+msgstr "FFmpeg wird benötigt, um {ext}-Dateien abzuspielen, ist aber nicht installiert.\nBitte installieren Sie FFmpeg in den Audio-Themes-Einstellungen oder konvertieren Sie die Datei in WAV/MP3/OGG/FLAC."
+
+msgid "File does not contain a valid rules list"
+msgstr "Die Datei enthält keine gültige Regelliste"
+
+msgid "FLAC (lossless, smaller)"
+msgstr "FLAC (verlustfrei, kleiner)"
+
+msgid "Flags"
+msgstr "Flaggen"
+
+msgid "Food & Drink"
+msgstr "Essen & Trinken"
+
+msgid "Format not found."
+msgstr "Format nicht gefunden."
+
+msgid "Found {count} matching file(s):\n\n"
+msgstr "{count} passende Datei(en) gefunden:\n\n"
+
+msgid "Hello 😊 world 🌍!"
+msgstr "Hallo 😊 Welt 🌍!"
+
+msgid "Import Earcons & Speech Rules"
+msgstr "Earcons & Sprachregeln importieren"
+
+msgid "Import Emoji Settings"
+msgstr "Emoji-Einstellungen importieren"
+
+msgid "Import Error"
+msgstr "Importfehler"
+
+msgid "Import Rules"
+msgstr "Regeln importieren"
+
+msgid "Installation failed."
+msgstr "Installation fehlgeschlagen."
+
+msgid "Invalid replacement pattern: {}\nPlease use curly braces {} as a format placeholder; please don't use any other curly braces in replacement string."
+msgstr "Ungültiges Ersetzungsmuster: {}\nBitte verwenden Sie geschweifte Klammern {} als Formatplatzhalter; verwenden Sie keine anderen geschweiften Klammern in der Ersetzungszeichenfolge."
+
+msgid "Invalid WAV file."
+msgstr "Ungültige WAV-Datei."
+
+msgid "JSON files (*.json)|*.json"
+msgstr "JSON-Dateien (*.json)|*.json"
+
+msgid "Low battery threshold"
+msgstr "Niedriger Akkustand"
+
+msgid "Mouse hover delay"
+msgstr "Verzögerung beim Mauszeiger-Verweilen"
+
+msgid "Mouse hover delay (ms):"
+msgstr "Verzögerung beim Mauszeiger-Verweilen (ms):"
+
+msgid "Name: {name}\nAuthor: {author}\nNumber of sounds: {count}\n\n{summary}"
+msgstr "Name: {name}\nAutor: {author}\nAnzahl der Klänge: {count}\n\n{summary}"
+
+msgid "Name: {name}\nAuthor: {author}\nNumber of sounds: {count}\nLocation: {path}"
+msgstr "Name: {name}\nAutor: {author}\nAnzahl der Klänge: {count}\nSpeicherort: {path}"
+
+msgid "Network check interval"
+msgstr "Intervall für Netzwerkprüfung"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "No focused application."
+msgstr "Keine fokussierte Anwendung."
+
+msgid "No prefix"
+msgstr "Kein Präfix"
+
+msgid "No sound"
+msgstr "Kein Klang"
+
+msgid "No theme selected"
+msgstr "Kein Theme ausgewählt"
+
+msgid "Non-Heading Element"
+msgstr "Nicht-Überschriften-Element"
+
+msgid "Note"
+msgstr "Hinweis"
+
+msgid "Off"
+msgstr "Aus"
+
+msgid "Once per emoji character"
+msgstr "Einmal pro Emoji-Zeichen"
+
+msgid "Once per text block"
+msgstr "Einmal pro Textblock"
+
+msgid "Paste"
+msgstr "Einfügen"
+
+msgid "Paste Plain"
+msgstr "Als reinen Text einfügen"
+
+msgid "People & Body"
+msgstr "Menschen & Körper"
+
+msgid "Per field"
+msgstr "Pro Feld"
+
+msgid "Per field and line"
+msgstr "Pro Feld und Zeile"
+
+msgid "Per-Category Emoji Settings"
+msgstr "Emoji-Einstellungen pro Kategorie"
+
+msgid "Per-category prefix text, sound position, and volume..."
+msgstr "Präfixtext, Klangposition und Lautstärke pro Kategorie..."
+
+msgid "Phonetic punctuation add-on has been renamed to Earcons and Speech Rules.\n"
+msgstr "Das Phonetische-Zeichensetzung-Add-on wurde in Earcons und Sprachregeln umbenannt.\n"
+
+msgid "Place .wav files in your theme folder with these names:\n"
+msgstr "Legen Sie .wav-Dateien mit diesen Namen in Ihrem Theme-Ordner ab:\n"
+
+msgid "Play sound when emoji is encountered"
+msgstr "Klang abspielen, wenn ein Emoji vorkommt"
+
+msgid "Play theme sounds during arrow navigation"
+msgstr "Theme-Klänge während der Pfeilnavigation abspielen"
+
+msgid "Play theme sounds when hovering with the mouse"
+msgstr "Theme-Klänge beim Verweilen mit der Maus abspielen"
+
+msgid "Please enter a version in order to  export this website.\n"
+msgstr "Bitte geben Sie eine Version ein, um diese Website zu exportieren.\n"
+
+msgid "Polling timer (legacy)"
+msgstr "Abfrage-Timer (veraltet)"
+
+msgid "Prefix position"
+msgstr "Präfixposition"
+
+msgid "Prefix position:"
+msgstr "Präfixposition:"
+
+msgid "Prefix repeat:"
+msgstr "Präfixwiederholung:"
+
+msgid "Prefix Text"
+msgstr "Präfixtext"
+
+msgid "Prefix text for %s"
+msgstr "Präfixtext für %s"
+
+msgid "Prefix text:"
+msgstr "Präfixtext:"
+
+msgid "Quotation"
+msgstr "Zitat"
+
+msgid "Redo"
+msgstr "Wiederholen"
+
+msgid "Redo (Alt)"
+msgstr "Wiederholen (Alt)"
+
+msgid "Report"
+msgstr "Bericht"
+
+msgid "Role not found."
+msgstr "Rolle nicht gefunden."
+
+msgid "Rule not found."
+msgstr "Regel nicht gefunden."
+
+msgid "Rules exported to {}"
+msgstr "Regeln exportiert nach {}"
+
+msgid "Rules imported successfully"
+msgstr "Regeln erfolgreich importiert"
+
+msgid "Same-element sound suppression"
+msgstr "Klangunterdrückung für dasselbe Element"
+
+msgid "Select audio file:"
+msgstr "Audiodatei auswählen:"
+
+msgid "Silence theme sounds for container elements (documents, panes, windows)"
+msgstr "Theme-Klänge für Containerelemente (Dokumente, Bereiche, Fenster) stummschalten"
+
+msgid "Silence theme sounds while selecting text (Shift + arrow keys)"
+msgstr "Theme-Klänge beim Auswählen von Text stummschalten (Umschalt + Pfeiltasten)"
+
+msgid "Smileys & Emotion"
+msgstr "Smileys & Emotionen"
+
+msgid "Sound Position"
+msgstr "Klangposition"
+
+msgid "Sound position for %s"
+msgstr "Klangposition für %s"
+
+msgid "Sound position:"
+msgstr "Klangposition:"
+
+msgid "Sound repeat:"
+msgstr "Klangwiederholung:"
+
+msgid "Sound Settings"
+msgstr "Klang-Einstellungen"
+
+msgid "Sounds when the caret moves in text fields:"
+msgstr "Klänge bei Cursor-Bewegung in Textfeldern:"
+
+msgid "Speak prefix text before emoji descriptions"
+msgstr "Präfixtext vor Emoji-Beschreibungen sprechen"
+
+msgid "Speak states such as checked, expanded, selected etc."
+msgstr "Zustände wie aktiviert, erweitert, ausgewählt usw. sprechen"
+
+msgid "Speech Prefix Settings"
+msgstr "Sprachpräfix-Einstellungen"
+
+msgid "Suffix Text"
+msgstr "Suffixtext"
+
+msgid "Suffix text for %s"
+msgstr "Suffixtext für %s"
+
+msgid "Suffix text:"
+msgstr "Suffixtext:"
+
+msgid "Suppress repeated sounds for the same element (ms, 0 = off):"
+msgstr "Wiederholte Klänge für dasselbe Element unterdrücken (ms, 0 = aus):"
+
+msgid "Suppress role sound (e.g. \"list item\") when emoji is present"
+msgstr "Rollenklang (z. B. \"Listeneintrag\") unterdrücken, wenn ein Emoji vorhanden ist"
+
+msgid "Symbols"
+msgstr "Symbole"
+
+msgid "System status sounds volume"
+msgstr "Lautstärke der Systemstatus-Klänge"
+
+msgid "Target format:"
+msgstr "Zielformat:"
+
+msgid "Test Emoji Processing"
+msgstr "Emoji-Verarbeitung testen"
+
+msgid "Test emoji text"
+msgstr "Emoji-Testtext"
+
+msgid "Test Rule"
+msgstr "Regel testen"
+
+msgid "The downloaded audio theme could not be installed.\nIt may be corrupted, unsafe, or not a valid theme package."
+msgstr "Das heruntergeladene Audio-Theme konnte nicht installiert werden.\nEs ist möglicherweise beschädigt, unsicher oder kein gültiges Theme-Paket."
+
+msgid "The downloaded typing sound pack could not be installed.\nIt may be corrupted, unsafe, or not a valid typing pack."
+msgstr "Das heruntergeladene Tipp-Klangpaket konnte nicht installiert werden.\nEs ist möglicherweise beschädigt, unsicher oder kein gültiges Tipp-Paket."
+
+msgid "The following add-ons are now included in Advanced Audio Themes.\n"
+msgstr "Die folgenden Add-ons sind jetzt in Advanced Audio Themes enthalten.\n"
+
+msgid "The selected file could not be installed as an audio theme.\nIt may be corrupted, unsafe, or not a valid theme package."
+msgstr "Die ausgewählte Datei konnte nicht als Audio-Theme installiert werden.\nSie ist möglicherweise beschädigt, unsicher oder kein gültiges Theme-Paket."
+
+msgid "This rule type cannot be tested in isolation."
+msgstr "Dieser Regeltyp kann nicht isoliert getestet werden."
+
+msgid "This will replace ALL current rules with the imported rules.\nA backup of your current rules will be saved.\n\nContinue?"
+msgstr "Dadurch werden ALLE aktuellen Regeln durch die importierten Regeln ersetzt.\nEine Sicherung Ihrer aktuellen Regeln wird gespeichert.\n\nFortfahren?"
+
+msgid "Travel & Places"
+msgstr "Reisen & Orte"
+
+msgid "Type text with emoji to preview:"
+msgstr "Text mit Emoji zur Vorschau eingeben:"
+
+msgid "Undo"
+msgstr "Rückgängig"
+
+msgid "Unvisited Link"
+msgstr "Nicht besuchter Link"
+
+msgid "Use FFmpeg to play additional audio formats (M4A, AAC, OPUS, WMA, MP2, AC3)"
+msgstr "FFmpeg zum Abspielen zusätzlicher Audioformate verwenden (M4A, AAC, OPUS, WMA, MP2, AC3)"
+
+msgid "Volume (0-100)"
+msgstr "Lautstärke (0-100)"
+
+msgid "Volume for %s"
+msgstr "Lautstärke für %s"
+
+msgid "Volume:"
+msgstr "Lautstärke:"
+
+msgid "Warning: you are about to move this bookmark to site %(new_site)s. "
+msgstr "Warnung: Sie sind dabei, dieses Lesezeichen zur Website %(new_site)s zu verschieben. "
+
+msgid "Warning: you are trying to  move this bookmark to site %(new_site)s. "
+msgstr "Warnung: Sie versuchen, dieses Lesezeichen zur Website %(new_site)s zu verschieben. "
+
+msgid "WAV (compatible with everything)"
+msgstr "WAV (mit allem kompatibel)"
+
+msgid "WAV files"
+msgstr "WAV-Dateien"
+
+msgid "WAV, OGG, MP3, and FLAC are supported natively.\n"
+msgstr "WAV, OGG, MP3 und FLAC werden nativ unterstützt.\n"
+
+msgid "Welcome To The Audio Themes Studio:\n"
+msgstr "Willkommen im Audio-Themes-Studio:\n"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "You already have website {} in your BrowserNav configuration.\n"
+msgstr "Sie haben bereits die Website {} in Ihrer BrowserNav-Konfiguration.\n"
