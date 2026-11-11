@@ -1350,7 +1350,7 @@ class BrowserNavMixin:
                 speech.speak,
                 [_("Cannot copy text out of edit box. Please make sure edit box is not empty and not read-only!")],
             )
-            raise e
+            raise
         finally:
             self.endInjectingKeystrokes()
         if (uniqueID is not None) and (uniqueID != 0):
@@ -1413,7 +1413,7 @@ class BrowserNavMixin:
                 try:
                     yield from utils.waitForModifiersToBeReleased(5)
                 except TimeoutError as e:
-                    raise EditBoxUpdateError(_("Timed out during release modifiers stage"), e)
+                    raise EditBoxUpdateError(_("Timed out during release modifiers stage"), e) from e
               # Step 2: switch back to that browser window
                 while  winUser.getForegroundWindow() != fg:
                     if time.time() > timeout:
@@ -1596,7 +1596,7 @@ class BrowserNavMixin:
                 speech.speak,
                 [_("Failed to read clipboard data. Please make sure clipboard is not empty - copy some text to clipboard.")],
             )
-            raise e
+            raise
 
     def endInjectingKeystrokes(self):
         self.copyToClip(self.clipboardBackup)
@@ -1616,7 +1616,7 @@ class BrowserNavMixin:
 
     def copyToClip(self, text):
         lastException = None
-        for i in range(10):
+        for _i in range(10):
             try:
                 clipboard.ephemeralCopyToClip(text)
                 return

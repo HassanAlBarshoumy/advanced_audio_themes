@@ -1176,7 +1176,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
                 continue
             code = self._roleFormats.get(role, "global")
             fmtName = self._gridFormatNames[0]
-            for i, (c, n) in enumerate(self._PER_ROLE_FORMATS):
+            for i, (c, _n) in enumerate(self._PER_ROLE_FORMATS):
                 if c == code:
                     fmtName = self._gridFormatNames[i]
                     break
@@ -1189,7 +1189,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         if role is None:
             return
         code = self._roleFormats.get(role, "global")
-        for i, (c, n) in enumerate(self._PER_ROLE_FORMATS):
+        for i, (c, _n) in enumerate(self._PER_ROLE_FORMATS):
             if c == code:
                 self.roleFormatChoice.SetSelection(i)
                 break
@@ -1757,7 +1757,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             ("emoji_cat_symbols", _("Symbols"), "symbols"),
             ("emoji_cat_flags", _("Flags"), "flags"),
         ]
-        for key, label, cat_name in cats:
+        for key, label, _cat_name in cats:
             cb = wx.CheckBox(page, -1, label)
             self.emojiCatCheckboxes[key] = cb
             catBox.Add(cb, 0, wx.ALL, 5)
@@ -1899,7 +1899,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             ("clipboard_pasteplain", _("Paste Plain"), "clipboard_pasteplain"),
             ("clipboard_redo2", _("Redo (Alt)"), "clipboard_redo2"),
         ]
-        for idx, (config_key, label, action_id) in enumerate(self._clipboard_actions):
+        for idx, (_config_key, label, _action_id) in enumerate(self._clipboard_actions):
             idx2 = self.clipboardActionList.InsertItem(self.clipboardActionList.GetItemCount(), label)
             self.clipboardActionList.SetItemData(idx2, idx)
 
@@ -1923,7 +1923,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         grid.Add(wx.StaticText(dlg, -1, _("Play Sound")), 0, wx.ALIGN_CENTER_VERTICAL)
         grid.Add(wx.StaticText(dlg, -1, _("Speak Message")), 0, wx.ALIGN_CENTER_VERTICAL)
         self._clipboard_action_cbs = {}
-        for config_key, label, action_id in self._clipboard_actions:
+        for config_key, label, _action_id in self._clipboard_actions:
             action_label = wx.StaticText(dlg, -1, label)
             enabled_cb = wx.CheckBox(dlg, -1, "")
             enabled_cb.SetValue(conf.get(config_key, True))
@@ -1964,7 +1964,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         from .clipboard import ACTION_MAP
         self._clipboard_text_ctrls = {}
         grid = wx.FlexGridSizer(len(ACTION_MAP), 2, 5, 10)
-        for action_id, (action_prop, action_cfg_key, default_text) in ACTION_MAP.items():
+        for action_id, (_action_prop, _action_cfg_key, _default_text) in ACTION_MAP.items():
             label = wx.StaticText(dlg, -1, action_id.capitalize())
             ctrl = wx.TextCtrl(dlg, -1, value=custom_texts.get(action_id, ""), name=_("Custom text for %s") % action_id)
             self._clipboard_text_ctrls[action_id] = ctrl
@@ -1987,7 +1987,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
     def _init_clipboard_action_list(self):
         conf = config.conf["audiothemes"]
-        for i, (config_key, label, action_id) in enumerate(self._clipboard_actions):
+        for i, (config_key, _label, _action_id) in enumerate(self._clipboard_actions):
             enabled = conf.get(config_key, True)
             sound_key = config_key + "_sound"
             speech_key = config_key + "_speech"
@@ -2359,7 +2359,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         self.speakStatesCheckbox.SetValue(_b(conf.get("speak_states", True)))
 
         # Mouse hover + arrow navigation switches
-        self.mouseSoundsCheckbox.SetValue(_b(conf.get("mouse_sounds_enabled", False)))
+        self.mouseSoundsCheckbox.SetValue(_b(conf.get("mouse_sounds_enabled", True)))
         self.mouseHoverDelaySpin.SetValue(_i(conf.get("mouse_hover_delay", 0), 0))
         self.arrowNavSoundsCheckbox.SetValue(_b(conf.get("arrow_nav_sounds", True)))
         _engine_map = {"auto": 0, "timer": 1}
@@ -2449,7 +2449,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
 
         # Speech Order
         fmt = conf.get("announceFormat", "0")
-        for i, (f, n) in enumerate(self.ANNOUNCE_FORMATS):
+        for i, (f, _n) in enumerate(self.ANNOUNCE_FORMATS):
             if f == fmt:
                 self.announceFormatChoice.SetSelection(i)
                 break
@@ -2492,7 +2492,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
                 pass
 
         if hasattr(self, '_roleFormats'):
-            for role, label in self._role_list:
+            for role, _label in self._role_list:
                 role_key = str(role.value) if hasattr(role, 'value') else str(role)
                 self._roleFormats[role] = roleFormatsDict.get(role_key, "global")
             self._populateRoleList()
@@ -2845,7 +2845,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             if r_name:
                 items.append((r_int, r_name, r_label))
         items.sort(key=lambda x: x[2].lower())
-        for i, (r_int, r_name, r_label) in enumerate(items):
+        for i, (_r_int, r_name, r_label) in enumerate(items):
             lst.InsertItem(i, r_label)
             if r_name in current:
                 lst.CheckItem(i, True)
@@ -2945,7 +2945,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         except Exception as e:
             log.debug(f"Could not load role formats: {e}")
             roleFormatsDict = {}
-        for role, label in self._role_list:
+        for role, _label in self._role_list:
             role_key = str(role.value) if hasattr(role, 'value') else str(role)
             saved_fmt = roleFormatsDict.get(role_key, "global")
             self._roleFormats[role] = saved_fmt
@@ -3407,7 +3407,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
         if not os.path.isdir(source_dir):
             return
         try:
-            for root, dirs, files in os.walk(source_dir):
+            for root, _dirs, files in os.walk(source_dir):
                 for fname in files:
                     full_path = os.path.join(root, fname)
                     arc_name = os.path.join(archive_prefix, os.path.relpath(full_path, source_dir))

@@ -173,13 +173,13 @@ class BrowseModeQuickNavInterceptor:
                     self._check_and_play_nav(itemType, new_selection)
 
         self._patched_script_ref = patched_quick_nav_script
-        setattr(BrowseModeTreeInterceptor, "_quickNavScript", patched_quick_nav_script)
+        BrowseModeTreeInterceptor._quickNavScript = patched_quick_nav_script
 
     def terminate(self) -> None:
         if self.orig_quick_nav_script and self._patched_script_ref:
             current_script = getattr(BrowseModeTreeInterceptor, "_quickNavScript", None)
             if current_script == self._patched_script_ref:
-                setattr(BrowseModeTreeInterceptor, "_quickNavScript", self.orig_quick_nav_script)
+                BrowseModeTreeInterceptor._quickNavScript = self.orig_quick_nav_script
 
     def _check_and_play_nav(self, itemType: str, new_selection=None) -> bool:
         played = False

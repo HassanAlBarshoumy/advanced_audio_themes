@@ -722,7 +722,7 @@ class AudioRuleDialog(wx.Dialog):
     def getBuiltInWaveFiles(self):
         soundsPath = getSoundsPath()
         result = []
-        for dirName, subdirList, fileList in os.walk(soundsPath, topdown=True):
+        for dirName, _subdirList, fileList in os.walk(soundsPath, topdown=True):
             relDirName = dirName[len(soundsPath):]
             if len(relDirName) > 0 and relDirName[0] == "\\":
                 relDirName = relDirName[1:]
@@ -1017,7 +1017,7 @@ class RulesDialog(SettingsPanel):
                 shutil.copy2(path, rulesFileName)
                 reloadRules()
                 self.allRules = []
-                for ft, rules in pp.rulesByFrenzy.items():
+                for _ft, rules in pp.rulesByFrenzy.items():
                     self.allRules.extend(rules)
                 self.allRules.sort(key=lambda r: r.getFrenzyType().value)
                 i = self.frenzyCategory.control.GetSelection()

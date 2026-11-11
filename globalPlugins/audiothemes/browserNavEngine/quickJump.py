@@ -315,13 +315,13 @@ class QJAttribute(QJImmutable):
             try:
                 object.__setattr__(self, 'attribute', ParagraphAttribute(tokens[0].lower()))
             except ValueError as e:
-                raise ValueError(f"Invalid attribute {tokens[0]}. User string='{userString}'.", e)
+                raise ValueError(f"Invalid attribute {tokens[0]}. User string='{userString}'.", e) from e
             if self.attribute == ParagraphAttribute.ROLE:
                 roleName = tokens[1].lower()
                 try:
                     value = controlTypes.role.Role.__getattr__(roleName.upper())
                 except AttributeError:
-                    raise ValueError(f"Invalid role '{roleName}'.")
+                    raise ValueError(f"Invalid role '{roleName}'.") from None
             else:
                 value = tokens[1]
             object.__setattr__(self, 'value', value)
@@ -1575,7 +1575,7 @@ def runScriptAndApplyOffset(textInfo, match, skipClutterBookmarks=None, level=No
             ):
                 e = QuickJumpScriptException(f"First argument of match() function (offset) must be either None, or int, or textInfo, or Paragraph, but got: {type(_offset)}. Please fix your quickJump script for bookmark {bookmark.getDisplayName()}.")
                 log.error(e)
-                raise e
+                raise e from None
 
             if not (
                 _message is None
@@ -1585,7 +1585,7 @@ def runScriptAndApplyOffset(textInfo, match, skipClutterBookmarks=None, level=No
             ):
                 e = QuickJumpScriptException(f"Second argument of match() function (message) must be either None, or string, or textInfo, or Paragraph, but got: {type(_message)}. Please fix your quickJump script for bookmark {bookmark.getDisplayName()}.")
                 log.error(e)
-                raise e
+                raise e from None
 
             if not (
                 _xLocation is None
@@ -1593,7 +1593,7 @@ def runScriptAndApplyOffset(textInfo, match, skipClutterBookmarks=None, level=No
             ):
                 e = QuickJumpScriptException(f"Third argument of match() function (message) must be either None, or int, or textInfo, or Paragraph, but got: {type(_message)}. Please fix your quickJump script for bookmark {bookmark.getDisplayName()}.")
                 log.error(e)
-                raise e
+                raise e from None
 
             if _offset is None:
                 _offset = 0
@@ -1607,7 +1607,7 @@ def runScriptAndApplyOffset(textInfo, match, skipClutterBookmarks=None, level=No
             if _message is not None and len(bookmark.message) > 0:
                 e = QuickJumpScriptException(f"Second argument of match() function (message) is not empty, while bookmark message is also set. Please either clear bookmark message, or change your script to not return any message. Error in bookmark {bookmark.getDisplayName()}.")
                 log.error(e)
-                raise e
+                raise e from None
 
             message = _message or bookmark.message
             xLocation = _xLocation or _offset
@@ -1715,7 +1715,7 @@ def caretMovementWithAutoSkip(self, gesture,unit, direction=None,posConstant=tex
         info.move(textInfos.UNIT_CHARACTER,-1)
     info.expand(unit)
     info.collapse()
-    for i in range(100):
+    for _i in range(100):
         result = info.move(unit,direction)
         if result == 0:
             break
@@ -2930,7 +2930,7 @@ class EditBookmarkDialog(wx.Dialog):
         soundsPath = utils.getSoundsPath()
         result = []
         try:
-            for dirName, subdirList, fileList in os.walk(soundsPath, topdown=True):
+            for dirName, _subdirList, fileList in os.walk(soundsPath, topdown=True):
                 relDirName = dirName[len(soundsPath):]
                 if len(relDirName) > 0 and relDirName[0] == "\\":
                     relDirName = relDirName[1:]

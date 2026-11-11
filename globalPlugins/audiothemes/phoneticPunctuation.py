@@ -1116,7 +1116,7 @@ def fixProsodyCommands(sequence):
         if not has_prosody:
             return sequence
         result = []
-        for i, command in enumerate(sequence):
+        for _i, command in enumerate(sequence):
             if isinstance(command, speech.commands.BaseProsodyCommand):
                 cls = type(command)
                 if command._multiplier != 1:

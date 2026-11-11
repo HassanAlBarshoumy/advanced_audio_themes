@@ -652,7 +652,7 @@ class FakeTextInfo:
                     if self.preventSpellingCharacters and isinstance(field, str):
                         field = field + '\n'
                     result.append(field)
-        for i in range(controlStackDepth):
+        for _i in range(controlStackDepth):
             # If we are just closing the previous controlStart without any content - drop that controlStart instead
             if (
                 len(result) > 0
@@ -903,7 +903,7 @@ def _new_getTextInfoSpeech_inner(
                 nestedHeadingIndices.add(i)
             lastHeadingEnd = headingEnds[i]
 
-        for i, (start, end) in enumerate(zip(headingStarts, headingEnds)):
+        for i, (start, end) in enumerate(zip(headingStarts, headingEnds, strict=False)):
             if i in nestedHeadingIndices:
                 continue
             level = fields[start].field.get('level', None)
@@ -1015,7 +1015,7 @@ def _new_getTextInfoSpeech_inner(
             lastHighlightedEnd = highlightedEnds[i]
         skipSet.update(highlightedStarts)
         skipSet.update(highlightedEnds)
-        for i, (start, end) in enumerate(zip(highlightedStarts, highlightedEnds)):
+        for i, (start, end) in enumerate(zip(highlightedStarts, highlightedEnds, strict=False)):
             if i in nestedHighlightedIndices:
                 continue
             if highlightedRule is not None:
@@ -1038,7 +1038,7 @@ def _new_getTextInfoSpeech_inner(
         # If configured to report heading levels and font size via same prosody  command, then skip headings to avoid interference
         skipHeadingsForFontSize = headingLevelRule is not None and isinstance(samplePreCommand, speech.commands.BaseProsodyCommand) and type(samplePreCommand) == type(firstHeadingLevelCommand)
         for begin, end in findAllFormatFieldBrackets(fields):
-            if skipHeadingsForFontSize and any(headingStart < begin < headingEnd for headingStart, headingEnd in zip(headingStarts, headingEnds)):
+            if skipHeadingsForFontSize and any(headingStart < begin < headingEnd for headingStart, headingEnd in zip(headingStarts, headingEnds, strict=False)):
                 continue
             try:
                 fontSizeStr = fields[begin].field['font-size']
@@ -1624,7 +1624,7 @@ def _new_getControlFieldSpeech_inner(
             new_states.remove(controlTypes.State.VISITED)
         patched_attrs['states'] = new_states
     
-    for i, utterance in enumerate(result):
+    for _i, utterance in enumerate(result):
         if isinstance(utterance, str):
             if m := PROPERTY_SPEECH_PATTERN.match(utterance):
                 # Replacing role speech with earcon

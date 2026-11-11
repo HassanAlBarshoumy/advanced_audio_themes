@@ -360,7 +360,7 @@ class ThemeBlenderDialog(BaseDialog):
         extensions = {".wav", ".ogg", ".mp3", ".flac"}
         existing_roles = {f.role for f in self.theme_state.state}
         matched = []
-        for root, dirs, files in os.walk(folder):
+        for root, _dirs, files in os.walk(folder):
             for fname in files:
                 name, ext = os.path.splitext(fname)
                 if ext.lower() not in extensions:

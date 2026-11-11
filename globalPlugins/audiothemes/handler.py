@@ -181,7 +181,7 @@ audiothemes_config_defaults = {
     "state_sounds_suppress_role": "boolean(default=True)",
     # Mouse hover + arrow navigation sound switches (borrowed from NavigationSounds).
     # Defaults preserve the pre-existing behaviour (sounds on, no hover delay).
-    "mouse_sounds_enabled": "boolean(default=False)",
+    "mouse_sounds_enabled": "boolean(default=True)",
     "mouse_hover_delay": "integer(default=0, min=0, max=2000)",
     "arrow_nav_sounds": "boolean(default=True)",
     # Event-driven browse-mode navigation: "auto" uses the NVDA
@@ -2050,7 +2050,7 @@ class AudioThemesHandler:
             "fl_solo_behavior": user_config.get("fl_solo_behavior", "none"),
             "state_sounds_suppress_role": user_config.get("state_sounds_suppress_role", True),
             "speak_states": user_config.get("speak_states", True),
-            "mouse_sounds_enabled": user_config.get("mouse_sounds_enabled", False),
+            "mouse_sounds_enabled": user_config.get("mouse_sounds_enabled", True),
             "mouse_hover_delay": user_config.get("mouse_hover_delay", 0),
             "arrow_nav_sounds": user_config.get("arrow_nav_sounds", True),
             "browse_nav_engine": user_config.get("browse_nav_engine", "auto"),

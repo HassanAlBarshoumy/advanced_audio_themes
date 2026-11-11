@@ -1618,7 +1618,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 cfg = self.handler._cached_config
                 if (cfg.get("enable_audio_themes", True)
                         and self.handler.active_theme
-                        and cfg.get("mouse_sounds_enabled", False)):
+                        and cfg.get("mouse_sounds_enabled", True)):
                     obj_info = self._snapshot_obj(obj, foreground_app=self.handler._current_app_name)
                     delay = cfg.get("mouse_hover_delay", 0) or 0
                     if delay > 0:
@@ -1655,7 +1655,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
         self._mouse_hover_obj = None
         try:
             cfg = self.handler._cached_config
-            if not cfg.get("mouse_sounds_enabled", False):
+            if not cfg.get("mouse_sounds_enabled", True):
                 return
             if not (cfg.get("enable_audio_themes", True) and self.handler.active_theme):
                 return

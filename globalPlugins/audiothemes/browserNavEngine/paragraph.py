@@ -161,7 +161,7 @@ class Paragraph(baseObject.AutoPropertyObject):
                         text=regexp,
                         direction=_("backward") if reverse else _("forward")
                     )
-                )
+                ) from None
             if regexp.search(p.text) is not None:
                 return p
             
@@ -183,7 +183,7 @@ class Paragraph(baseObject.AutoPropertyObject):
                     text=itemType,
                     direction=_("backward") if reverse else _("forward")
                 )
-            )
+            ) from None
             
     def _get_previousHeading(self):
         return self.findQuickNav(itemType="heading", reverse=True)
