@@ -1,4 +1,4 @@
-
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: advanced_audio_themes 1.0\n"
@@ -387,6 +387,9 @@ msgstr ""
 msgid "Bookmark Entry Error"
 msgstr ""
 
+msgid "Bookmark Entry error"
+msgstr ""
+
 msgid "Bookmark Entry warning"
 msgstr ""
 
@@ -394,6 +397,9 @@ msgid "Bookmark Error"
 msgstr ""
 
 msgid "Bookmark enabled"
+msgstr ""
+
+msgid "Bookmark entry error"
 msgstr ""
 
 msgid "Bookmark points to non-focusable NVDA object, cannot click it."
@@ -775,6 +781,9 @@ msgid "Enable RAM Caching (Improves performance and latency)"
 msgstr ""
 
 msgid "Enable Reverb"
+msgstr ""
+
+msgid "Enable audio themes"
 msgstr ""
 
 msgid "Enable experimental support for Word and WordPad"
@@ -2054,6 +2063,9 @@ msgstr ""
 msgid "duration must be an integer between 0 and 60000"
 msgstr ""
 
+msgid "font size"
+msgstr ""
+
 msgid "font size and same style"
 msgstr ""
 
@@ -2220,6 +2232,9 @@ msgid "Apply to all roles"
 msgstr ""
 
 msgid "Apply to selected roles only"
+msgstr ""
+
+msgid "Select roles..."
 msgstr ""
 
 msgid "Solo items"

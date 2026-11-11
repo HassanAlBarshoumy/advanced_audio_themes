@@ -1,4 +1,4 @@
-
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: advanced_audio_themes 1.0\n"
@@ -395,6 +395,9 @@ msgstr "عريض"
 msgid "Bookmark Entry Error"
 msgstr "خطأ في إدخال الإشارة المرجعية"
 
+msgid "Bookmark Entry error"
+msgstr "خطأ في إدخال الإشارة المرجعية"
+
 msgid "Bookmark Entry warning"
 msgstr "تحذير من إدخال الإشارة المرجعية"
 
@@ -404,10 +407,13 @@ msgstr "خطأ في الإشارة المرجعية"
 msgid "Bookmark enabled"
 msgstr "تم تمكين الإشارة المرجعية"
 
+msgid "Bookmark entry error"
+msgstr "خطأ في إدخال الإشارة المرجعية"
+
 msgid "Bookmark points to non-focusable NVDA object, cannot click it."
 msgstr ""
-"المرجعية تشير إلى كائن لا يدعم التركيز، لا يمكن النقر عليه.الإشارة المرجعية "
-"تشير إلى كائن NVDA غير قابل للتركيز، ولا يمكن النقر عليه."
+"الإشارة المرجعية تشير إلى كائن NVDA غير قابل للتركيز، ولا يمكن النقر "
+"عليه."
 
 msgid "Bookmark store communication error"
 msgstr "خطأ في الاتصال بمتجر الإشارة المرجعية"
@@ -523,8 +529,7 @@ msgid ""
 "Includes: settings, rules, themes, typing sounds, and earcon sounds."
 msgstr ""
 "تم التصدير الشامل بنجاح!\n"
-"يشمل: الإعدادات، القواعد، السمات، أصوات الكتابة، وأصوات الإشعارات.تم التصدير الشامل بنجاح!\n"
-"يشمل: الإعدادات، والقواعد، والسمات، وأصوات الكتابة، وأصوات الرموز."
+"يشمل: الإعدادات، القواعد، السمات، أصوات الكتابة، وأصوات الإشعارات."
 
 msgid "Comprehensive import completed successfully!"
 msgstr "تم الاستيراد الشامل بنجاح!"
@@ -548,9 +553,7 @@ msgid "Copied to clipboard: {}"
 msgstr "تم النسخ إلى الحافظة: {}"
 
 msgid "Copy the last text from semi-accessible edit box to clipboard."
-msgstr ""
-"نسخ النص الأخير من مربع التحرير شبه القابل للوصول إلى الحافظة.انسخ النص "
-"الأخير من مربع التحرير شبه الذي يمكن الوصول إليه إلى الحافظة."
+msgstr "نسخ النص الأخير من مربع التحرير شبه القابل للوصول إلى الحافظة."
 
 msgid "Could not copy file {src} to directory {dst}."
 msgstr "تعذر نسخ الملف {src} إلى الدليل {dst}."
@@ -743,8 +746,7 @@ msgstr "تحرير &الإشارات المرجعية"
 
 msgid "Edit &script in new window; press Control+Enter when Done."
 msgstr ""
-"تحرير البرنامج النصي (Script) في نافذة جديدة؛ اضغط Control+Enter عند "
-"الانتهاء.تحرير & البرنامج النصي في نافذة جديدة؛ اضغط على Control+Enter عند "
+"تحرير &البرنامج النصي (Script) في نافذة جديدة؛ اضغط Control+Enter عند "
 "الانتهاء."
 
 msgid "Edit audio rule"
@@ -812,6 +814,9 @@ msgstr "تسريع الأداء (تخزين الأصوات في الذاكرة �
 msgid "Enable Reverb"
 msgstr "تمكين الصدى"
 
+msgid "Enable audio themes"
+msgstr "تمكين السمات الصوتية"
+
 msgid "Enable experimental support for Word and WordPad"
 msgstr "تمكين الدعم التجريبي لبرنامجي Word وWordPad"
 
@@ -849,9 +854,7 @@ msgid "Error during installation."
 msgstr "خطأ أثناء تثبيت الثيم."
 
 msgid "Error during switch to window stage, focused element role is %d"
-msgstr ""
-"خطأ أثناء مرحلة التبديل إلى النافذة، دور العنصر المحدد هو %dحدث خطأ أثناء "
-"التبديل إلى مرحلة النافذة، دور العنصر الذي تم التركيز عليه هو %d"
+msgstr "خطأ أثناء التبديل إلى مرحلة النافذة، دور العنصر المُركّز هو %d"
 
 msgid ""
 "Error exporting configuration:\n"
@@ -1029,8 +1032,7 @@ msgstr "ا&ستيراد الإعدادات..."
 msgid "Ignore all focus events - good for websites that misuse focus events"
 msgstr ""
 "تجاهل جميع أحداث التركيز - مفيد لمواقع الويب التي تسيء استخدام أحداث "
-"التركيزتجاهل جميع أحداث التركيز - وهو أمر جيد لمواقع الويب التي تسيء استخدام"
-" أحداث التركيز"
+"التركيز"
 
 msgid "Import Audio Themes Configuration"
 msgstr "استيراد إعدادات السمات الصوتية"
@@ -1058,9 +1060,7 @@ msgstr ""
 "لإشارات QuickJump!"
 
 msgid "Invalid keystroke %s: cannot overload essential  NVDA keystrokes!"
-msgstr ""
-"اختصار غير صالح %s: لا يمكن تجاوز اختصارات NVDA الأساسية!ضغطة مفتاح غير "
-"صالحة %s: لا يمكن تحميل ضغطات مفاتيح NVDA الأساسية بشكل زائد!"
+msgstr "اختصار غير صالح %s: لا يمكن تجاوز اختصارات NVDA الأساسية!"
 
 msgid "Invalid level for numeric script: '{level}'"
 msgstr "مستوى غير صالح للبرنامج النصي الرقمي: '{level}'"
@@ -1485,8 +1485,7 @@ msgid ""
 "Pressing it once toggles audio themes on and off. Pressing twice toggles "
 "typing sounds."
 msgstr ""
-"الضغط عليه مرة واحدة يبدل تشغيل السمات الصوتية أو إيقافها. الضغط مرتين يبدل "
-"أصوات الكتابة.الضغط مرة واحدة يبدل تشغيل وإيقاف السمات الصوتية. الضغط مرتين "
+"الضغط عليه مرة واحدة يبدل تشغيل السمات الصوتية أو إيقافها. الضغط مرتين "
 "يبدل أصوات الكتابة."
 
 msgid "Preview finished."
@@ -1587,7 +1586,6 @@ msgstr "بحث ريجكس"
 msgid "Regexp text not found: tried to search for '{text}' {direction}."
 msgstr ""
 "لم يتم العثور على نص التعبير النمطي: تمت محاولة البحث عن '{text}' "
-"{direction}.لم يتم العثور على نص التعبير العادي: حاولت البحث عن '{text}' "
 "{direction}."
 
 msgid ""
@@ -1663,9 +1661,7 @@ msgid "Scrolling backward. This may load more elements on the page."
 msgstr "التمرير للخلف. قد يؤدي هذا إلى تحميل المزيد من العناصر على الصفحة."
 
 msgid "Scrolling forward. This may load more elements on the page."
-msgstr ""
-"التمرير للأمام. قد يؤدي هذا إلى تحميل المزيد من العناصر في الصفحة.التمرير "
-"إلى الأمام. قد يؤدي هذا إلى تحميل المزيد من العناصر على الصفحة."
+msgstr "التمرير للأمام. قد يؤدي هذا إلى تحميل المزيد من العناصر في الصفحة."
 
 msgid "Search for a role:"
 msgstr "البحث عن دور:"
@@ -1874,9 +1870,7 @@ msgid "Suppress aria label announcements for landmarks and regions"
 msgstr "منع إعلانات تصنيفات النغمات للمعالم والمناطق"
 
 msgid "Suppress aria name announcements for editables and combo boxes"
-msgstr ""
-"كتم إعلانات أسماء Aria لحقول التحرير ومربعات التحرير والسردمنع إعلانات أسماء"
-" النغمات للعناصر القابلة للتحرير ومربعات التحرير والسرد"
+msgstr "كتم إعلانات أسماء Aria لحقول التحرير ومربعات التحرير والسرد"
 
 msgid "Suppress aria role text announcements"
 msgstr "قمع الإعلانات النصية لدور الأغنية"
@@ -1954,8 +1948,7 @@ msgid ""
 "This package contains audio themes.\n"
 "Do you want to overwrite existing themes with the same name?"
 msgstr ""
-"هذه الحزمة تحتوي على سمات صوتية.\n"
-"هل تريد استبدال السمات الحالية التي تحمل نفس الاسم؟تحتوي هذه الحزمة على سمات صوتية.\n"
+"تحتوي هذه الحزمة على سمات صوتية.\n"
 "هل تريد استبدال السمات الموجودة بنفس الاسم؟"
 
 msgid "This site is a duplicate of another existing site %s"
@@ -2211,6 +2204,9 @@ msgstr "إلى الوراء"
 msgid "duration must be an integer between 0 and 60000"
 msgstr "يجب أن تكون المدة عددا صحيحا بين 0 و 60000"
 
+msgid "font size"
+msgstr "حجم الخط"
+
 msgid "font size and same style"
 msgstr "حجم الخط ونفس النمط"
 
@@ -2427,6 +2423,9 @@ msgstr "تطبيق على جميع الأدوار"
 msgid "Apply to selected roles only"
 msgstr "تطبيق على الأدوار المحددة فقط"
 
+msgid "Select roles..."
+msgstr "تحديد الأدوار..."
+
 msgid "Solo items"
 msgstr "العناصر المنفردة"
 
@@ -2557,6 +2556,9 @@ msgstr "اختر مجلداً يحتوي على ملفات ثيمات صوتية
 msgid "Combo boxes"
 msgstr "مربعات التحرير والسرد (الخيارات المتعددة)"
 
+msgid "Conflicting add-ons"
+msgstr "الإضافات المتعارضة"
+
 msgid "Crackling sound volume"
 msgstr "مستوى صوت الطقطقة (الخشخشة)"
 
@@ -2682,6 +2684,9 @@ msgstr "استيراد م&جلد..."
 
 msgid "Import &ZIP or .atp file..."
 msgstr "استيراد ملف &ZIP أو .atp..."
+
+msgid "Import &folder..."
+msgstr "استيراد م&جلد..."
 
 msgid "Import Folder"
 msgstr "استيراد مجلد"
@@ -2901,8 +2906,14 @@ msgstr "عتبة قص الصمت"
 msgid "Typing pack installation successful!"
 msgstr "تم تثبيت حزمة الكتابة بنجاح!"
 
+msgid "Typing sound pack"
+msgstr "حزمة صوت الكتابة"
+
 msgid "Typing sound pack successfully installed."
 msgstr "تم تثبيت حزمة صوت الكتابة بنجاح."
+
+msgid "Typing sounds"
+msgstr "أصوات الكتابة"
 
 msgid "Typing sounds volume"
 msgstr "مستوى أصوات الكتابة"
@@ -3638,6 +3649,24 @@ msgstr "فتح ملف المساعدة"
 
 msgid "Help file not found."
 msgstr "ملف المساعدة غير موجود."
+
+msgid "Heading Level 1"
+msgstr "عنوان مستوى 1"
+
+msgid "Heading Level 2"
+msgstr "عنوان مستوى 2"
+
+msgid "Heading Level 3"
+msgstr "عنوان مستوى 3"
+
+msgid "Heading Level 4"
+msgstr "عنوان مستوى 4"
+
+msgid "Heading Level 5"
+msgstr "عنوان مستوى 5"
+
+msgid "Heading Level 6"
+msgstr "عنوان مستوى 6"
 
 msgid "Document Saved"
 msgstr "تم حفظ المستند"

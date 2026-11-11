@@ -400,6 +400,9 @@ msgstr "粗体"
 msgid "Bookmark Entry Error"
 msgstr "书签条目错误"
 
+msgid "Bookmark Entry error"
+msgstr "书签条目错误"
+
 msgid "Bookmark Entry warning"
 msgstr "书签条目警告"
 
@@ -408,6 +411,9 @@ msgstr "书签错误"
 
 msgid "Bookmark enabled"
 msgstr "书签已启用"
+
+msgid "Bookmark entry error"
+msgstr "书签条目错误"
 
 msgid "Bookmark points to non-focusable NVDA object, cannot click it."
 msgstr "书签指向无法获取焦点的 NVDA 对象，无法点击。"
@@ -810,6 +816,9 @@ msgstr "启用内存缓存（提高性能并降低延迟）"
 
 msgid "Enable Reverb"
 msgstr "启用混响"
+
+msgid "Enable audio themes"
+msgstr "启用音效主题"
 
 msgid "Enable experimental support for Word and WordPad"
 msgstr "启用对 Word 和写字板的实验性支持"
@@ -2194,6 +2203,9 @@ msgstr "向后"
 msgid "duration must be an integer between 0 and 60000"
 msgstr "持续时间必须是 0 到 60000 之间的整数"
 
+msgid "font size"
+msgstr "字号"
+
 msgid "font size and same style"
 msgstr "字号和相同样式"
 
@@ -2384,6 +2396,9 @@ msgstr "应用于所有角色"
 msgid "Apply to selected roles only"
 msgstr "仅应用于选定的角色"
 
+msgid "Select roles..."
+msgstr "选择角色..."
+
 msgid "Solo items"
 msgstr "孤立项"
 
@@ -2507,6 +2522,9 @@ msgstr "选择包含音频主题文件的文件夹"
 msgid "Combo boxes"
 msgstr "组合框"
 
+msgid "Conflicting add-ons"
+msgstr "冲突的附加组件"
+
 msgid "Crackling sound volume"
 msgstr "劈啪声提示音量"
 
@@ -2629,6 +2647,9 @@ msgstr "导入文件夹(&F)..."
 
 msgid "Import &ZIP or .atp file..."
 msgstr "导入 &ZIP 或 .atp 文件..."
+
+msgid "Import &folder..."
+msgstr "导入文件夹(&F)..."
 
 msgid "Import Folder"
 msgstr "导入文件夹"
@@ -2845,8 +2866,14 @@ msgstr "修剪静音阈值"
 msgid "Typing pack installation successful!"
 msgstr "打字声音包安装成功！"
 
+msgid "Typing sound pack"
+msgstr "打字声音包"
+
 msgid "Typing sound pack successfully installed."
 msgstr "打字声音包成功安装。"
+
+msgid "Typing sounds"
+msgstr "打字声音"
 
 msgid "Typing sounds volume"
 msgstr "打字声音音量"
@@ -3315,6 +3342,24 @@ msgstr "打开帮助文件"
 
 msgid "Help file not found."
 msgstr "未找到帮助文件。"
+
+msgid "Heading Level 1"
+msgstr "标题级别 1"
+
+msgid "Heading Level 2"
+msgstr "标题级别 2"
+
+msgid "Heading Level 3"
+msgstr "标题级别 3"
+
+msgid "Heading Level 4"
+msgstr "标题级别 4"
+
+msgid "Heading Level 5"
+msgstr "标题级别 5"
+
+msgid "Heading Level 6"
+msgstr "标题级别 6"
 
 msgid "Document Saved"
 msgstr "文档已保存"

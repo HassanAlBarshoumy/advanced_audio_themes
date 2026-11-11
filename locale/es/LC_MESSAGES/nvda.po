@@ -1,4 +1,4 @@
-
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: advanced_audio_themes 1.0\n"
@@ -373,6 +373,9 @@ msgstr "Negrita"
 msgid "Bookmark Entry Error"
 msgstr "Error en la entrada del marcador"
 
+msgid "Bookmark Entry error"
+msgstr "Error en la entrada del marcador"
+
 msgid "Bookmark Entry warning"
 msgstr "Advertencia en la entrada del marcador"
 
@@ -381,6 +384,9 @@ msgstr "Error en el marcador"
 
 msgid "Bookmark enabled"
 msgstr "Marcador activado"
+
+msgid "Bookmark entry error"
+msgstr "Error en la entrada del marcador"
 
 msgid "Bookmark points to non-focusable NVDA object, cannot click it."
 msgstr "El marcador apunta a un objeto de NVDA que no puede recibir el foco, no se puede hacer clic."
@@ -745,6 +751,9 @@ msgstr "Activar caché en RAM (Mejora el rendimiento y la latencia)"
 
 msgid "Enable Reverb"
 msgstr "Activar reverberación"
+
+msgid "Enable audio themes"
+msgstr "Activar temas de audio"
 
 msgid "Enable experimental support for Word and WordPad"
 msgstr "Activar soporte experimental para Word y WordPad"
@@ -2000,6 +2009,9 @@ msgstr "hacia atrás"
 msgid "duration must be an integer between 0 and 60000"
 msgstr "la duración debe ser un entero entre 0 y 60000"
 
+msgid "font size"
+msgstr "tamaño de fuente"
+
 msgid "font size and same style"
 msgstr "tamaño de fuente y mismo estilo"
 
@@ -2214,6 +2226,9 @@ msgstr "Aplicar a todos los roles"
 msgid "Apply to selected roles only"
 msgstr "Aplicar solo a los roles seleccionados"
 
+msgid "Select roles..."
+msgstr "Seleccionar roles..."
+
 msgid "Solo items"
 msgstr "Elementos únicos"
 
@@ -2344,6 +2359,9 @@ msgstr "Elija una carpeta que contenga archivos de temas de audio"
 msgid "Combo boxes"
 msgstr "Cuadros combinados"
 
+msgid "Conflicting add-ons"
+msgstr "Complementos en conflicto"
+
 msgid "Crackling sound volume"
 msgstr "Volumen del sonido de crujido"
 
@@ -2469,6 +2487,9 @@ msgstr "Importar &carpeta..."
 
 msgid "Import &ZIP or .atp file..."
 msgstr "Importar archivo &ZIP o .atp..."
+
+msgid "Import &folder..."
+msgstr "Importar &carpeta..."
 
 msgid "Import Folder"
 msgstr "Importar carpeta"
@@ -2680,8 +2701,14 @@ msgstr "Umbral de recorte de silencio"
 msgid "Typing pack installation successful!"
 msgstr "¡Instalación del paquete de escritura exitosa!"
 
+msgid "Typing sound pack"
+msgstr "Paquete de sonido de escritura"
+
 msgid "Typing sound pack successfully installed."
 msgstr "Paquete de sonido de escritura instalado con éxito."
+
+msgid "Typing sounds"
+msgstr "Sonidos de escritura"
 
 msgid "Typing sounds volume"
 msgstr "Volumen de los sonidos de escritura"
@@ -3549,6 +3576,9 @@ msgid "Installation failed."
 msgstr "La instalación ha fallado."
 
 # 2026-10-14: nuevos mensajes propuestos
+msgid "Invalid WAV file."
+msgstr "El archivo WAV no es válido."
+
 # 2026-10-14: nuevos mensajes propuestos
 msgid ""
 "Invalid replacement pattern: {}\n"
@@ -3920,6 +3950,24 @@ msgstr "Sí"
 # 2026-10-14: nuevos mensajes propuestos
 msgid "You already have website {} in your BrowserNav configuration.\n"
 msgstr "El sitio web {} ya está en tu configuración de BrowserNav.\n"
+
+msgid "Heading Level 1"
+msgstr "Encabezado nivel 1"
+
+msgid "Heading Level 2"
+msgstr "Encabezado nivel 2"
+
+msgid "Heading Level 3"
+msgstr "Encabezado nivel 3"
+
+msgid "Heading Level 4"
+msgstr "Encabezado nivel 4"
+
+msgid "Heading Level 5"
+msgstr "Encabezado nivel 5"
+
+msgid "Heading Level 6"
+msgstr "Encabezado nivel 6"
 
 msgid "Document Saved"
 msgstr "Documento guardado"

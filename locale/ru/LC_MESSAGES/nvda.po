@@ -1,4 +1,4 @@
-
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: advanced_audio_themes 1.0\n"
@@ -402,6 +402,9 @@ msgstr "Полужирный"
 msgid "Bookmark Entry Error"
 msgstr "Ошибка записи закладки"
 
+msgid "Bookmark Entry error"
+msgstr "Ошибка записи закладки"
+
 msgid "Bookmark Entry warning"
 msgstr "Предупреждение записи закладки"
 
@@ -410,6 +413,9 @@ msgstr "Ошибка закладки"
 
 msgid "Bookmark enabled"
 msgstr "Закладка включена"
+
+msgid "Bookmark entry error"
+msgstr "Ошибка записи закладки"
 
 msgid "Bookmark points to non-focusable NVDA object, cannot click it."
 msgstr "Закладка указывает на объект без фокуса, невозможно нажать."
@@ -813,6 +819,9 @@ msgstr "Кэширование в RAM (улучшает производител
 msgid "Enable Reverb"
 msgstr "Включить реверберацию"
 
+msgid "Enable audio themes"
+msgstr "Включить аудио темы"
+
 msgid "Enable experimental support for Word and WordPad"
 msgstr "Экспериментальная поддержка Word и WordPad"
 
@@ -937,10 +946,7 @@ msgid "Failed to compile regular expression: %s"
 msgstr "Не удалось скомпилировать регулярное выражение: %s"
 
 msgid "Failed to connect to store. Check your internet connection."
-msgstr ""
-"Не удалось подключиться к магазину. Проверьте ваше подключение к "
-"интернету.Не удалось подключиться к магазину. Проверьте подключение к "
-"Интернету."
+msgstr "Не удалось подключиться к магазину. Проверьте подключение к Интернету."
 
 msgid "Failed to open settings. Please open through NVDA Preferences."
 msgstr "Не удалось открыть настройки. Откройте через параметры NVDA."
@@ -2212,6 +2218,9 @@ msgstr "назад"
 msgid "duration must be an integer between 0 and 60000"
 msgstr "продолжительность должна быть целым числом от 0 до 60000"
 
+msgid "font size"
+msgstr "размер шрифта"
+
 msgid "font size and same style"
 msgstr "размер шрифта и тот же стиль"
 
@@ -2271,9 +2280,8 @@ msgstr "Проверить &обновления..."
 
 msgid "Could not check for updates. Please check your internet connection."
 msgstr ""
-"Не удалось проверить наличие обновлений. Пожалуйста, проверьте ваше "
-"подключение к интернету.Не удалось проверить наличие обновлений. Пожалуйста,"
-" проверьте подключение к интернету."
+"Не удалось проверить наличие обновлений. Пожалуйста, проверьте "
+"подключение к интернету."
 
 msgid "Update Check"
 msgstr "Проверка обновлений"
@@ -2409,6 +2417,9 @@ msgstr "Применить ко всем ролям"
 msgid "Apply to selected roles only"
 msgstr "Применить только к выбранным ролям"
 
+msgid "Select roles..."
+msgstr "Выбрать роли..."
+
 msgid "Solo items"
 msgstr "Одиночные элементы"
 
@@ -2535,6 +2546,9 @@ msgstr "Выберите папку, содержащую файлы аудио 
 msgid "Combo boxes"
 msgstr "Комбинированные списки"
 
+msgid "Conflicting add-ons"
+msgstr "Конфликтующие дополнения"
+
 msgid "Crackling sound volume"
 msgstr "Громкость звука потрескивания"
 
@@ -2659,6 +2673,9 @@ msgstr "Импорт &папки..."
 
 msgid "Import &ZIP or .atp file..."
 msgstr "Импорт &ZIP или .atp файла..."
+
+msgid "Import &folder..."
+msgstr "Импорт &папки..."
 
 msgid "Import Folder"
 msgstr "Импортировать папку"
@@ -2882,8 +2899,14 @@ msgstr "Порог обрезки тишины"
 msgid "Typing pack installation successful!"
 msgstr "Установка пакета звуков ввода успешно завершена!"
 
+msgid "Typing sound pack"
+msgstr "Пакет звуков ввода"
+
 msgid "Typing sound pack successfully installed."
 msgstr "Пакет звуков ввода успешно установлен."
+
+msgid "Typing sounds"
+msgstr "Звуки ввода"
 
 msgid "Typing sounds volume"
 msgstr "Громкость звуков ввода"
@@ -3356,6 +3379,24 @@ msgstr "Открыть файл справки"
 
 msgid "Help file not found."
 msgstr "Файл справки не найден."
+
+msgid "Heading Level 1"
+msgstr "Заголовок уровня 1"
+
+msgid "Heading Level 2"
+msgstr "Заголовок уровня 2"
+
+msgid "Heading Level 3"
+msgstr "Заголовок уровня 3"
+
+msgid "Heading Level 4"
+msgstr "Заголовок уровня 4"
+
+msgid "Heading Level 5"
+msgstr "Заголовок уровня 5"
+
+msgid "Heading Level 6"
+msgstr "Заголовок уровня 6"
 
 msgid "Document Saved"
 msgstr "Документ сохранён"
