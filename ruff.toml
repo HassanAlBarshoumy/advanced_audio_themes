@@ -1,0 +1,13 @@
+# ruff configuration for the add-on.
+#
+# ``_`` is injected at runtime by ``addonHandler.initTranslation()`` in every
+# module of an NVDA add-on, so F821 (undefined name) is silenced for it; the
+# other F82x checks (F822, F823) stay active.
+
+exclude = [".gitnexus", "pywinsdk", "__pycache__", ".claude", ".git"]
+
+[lint]
+select = ["E9", "F63", "F7", "F82"]
+
+[lint.per-file-ignores]
+"*.py" = ["F821"]

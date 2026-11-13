@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>Erweiterte Audio-Themes (Advanced Audio Themes)</title>
+</head>
+<body>
+<h1>Erweiterte Audio-Themes (Advanced Audio Themes)</h1>
+<p>Dieses Add-on bietet ein immersives Audio-Erlebnis für Nutzer des NVDA-Screenreaders, indem es Klänge für verschiedene UI-Ereignisse abspielt. Es ermöglicht die Erstellung, Installation und Anpassung von Audio-Themes, was das akustische Feedback der Benutzeroberfläche verbessert.</p>
+<h2>Funktionen</h2>
+<ul>
+<li><strong>Audio-Effekte:</strong> Spielt Töne für UI-Ereignisse ab, wie z.B. beim Fokussieren von Steuerelementen, Navigieren in Listen und mehr.</li>
+<li><strong>3D-Audio:</strong> Nutzt Steam Audio, um positionsbezogenes 3D-Audio bereitzustellen, was ein Gefühl dafür vermittelt, wo sich die Steuerelemente auf dem Bildschirm befinden.</li>
+<li><strong>Fortschrittliche Audio-DSP:</strong> Echtzeit-Audioverarbeitung einschließlich Bassverstärkung, Noise Gate (Rauschunterdrückung), Stille-Zuschnitt, intelligenter Lautstärkenormalisierung und weicher Hüllkurven (Smooth Envelopes).</li>
+<li><strong>Audio-Ducking:</strong> Senkt automatisch die Theme-Lautstärke, wenn NVDA spricht, um die Sprachverständlichkeit zu gewährleisten.</li>
+<li><strong>Reverb (Hall):</strong> Fügt den Tönen Hall-Effekte hinzu, um ein noch immersiveres Erlebnis zu schaffen.</li>
+<li><strong>Anpassbare Themes:</strong> Ermöglicht Benutzern das Erstellen, Installieren und Wechseln zwischen verschiedenen Audio-Themes.</li>
+<li><strong>Audio Themes Studio V2:</strong> Ein integriertes Werkzeug, um neue Audio-Themes zu erstellen oder bestehende direkt über das Mikrofon oder per Drag &amp; Drop zu bearbeiten.</li>
+<li><strong>Erweiterte Audioformate:</strong> Integrierte FFmpeg-Unterstützung für MP3, FLAC, OGG, M4A und mehr.</li>
+<li><strong>Erweiterte Tippgeräusche:</strong> Simuliert physische Tastatureingaben mit räumlicher Audiopositionierung, dynamischer Lautstärkeanpassung nach Anschlagstärke und intelligenter Tastenbelegung für spezielle Tasten (Eingabe, Rücktaste, Leertaste, Umschalt, Strg, Alt).</li>
+<li><strong>Kontextbezogenes Tippen:</strong> Option, um Tippgeräusche nur innerhalb bearbeitbarer Textfelder abzuspielen.</li>
+<li><strong>Intelligente Fortschrittsbalken:</strong> Dynamische Tonhöhenverschiebung für Fortschrittsbalken (höhere Tonhöhe = höherer Prozentsatz).</li>
+<li><strong>Erkennung des ersten/letzten Elements:</strong> Spielt einen spezifischen Anschlagton ab, wenn die Grenze einer Liste oder eines Menüs erreicht wird.</li>
+<li><strong>Audio-Bake / Sonar:</strong> Platzieren Sie eine räumliche Audio-Bake an einer beliebigen Stelle auf dem Bildschirm und navigieren Sie herum, um Echtzeit-Sonar-Pings zu hören, die Sie relativ zur Bake führen.</li>
+<li><strong>Erweiterte Navigation:</strong> Integrierte SentenceNav- und BrowserNav-Engines für nahtlose Text- und Webnavigation ohne Konflikte bei den Pfeiltasten.</li>
+<li><strong>Navigationsebene:</strong> Drücken Sie NVDA+Win+N, um in einen schnellen Navigationsmodus zu wechseln, in dem Pfeiltasten nach Sätzen, Absätzen oder anderen Elementen navigieren, ohne dass Modifikatortasten gehalten werden müssen.</li>
+<li><strong>Cloud Theme Store:</strong> Laden Sie von der Community erstellte Themes direkt aus dem Audio Themes Studio herunter, hören Sie sie vor und installieren Sie sie.</li>
+<li><strong>App-spezifische Profile:</strong> Wechselt automatisch zu einem bestimmten Audio-Theme und Tippgeräusch-Paket basierend auf der aktiven Anwendung.</li>
+</ul>
+<ul>
+<li><strong>Systemstatus-Sounds:</strong> Spielt Audiohinweise für Ereignisse auf Systemebene ab, z. B. Änderungen der Stromversorgung, Akkustatus, USB-Geräteverbindung und Netzwerkkonnektivität.</li>
+<li><strong>Emoji-Verbesserung:</strong> Erweiterte Emoji-Unterstützung mit verbesserter Erkennung, Aussprache und akustischem Feedback für Emoji-Zeichen.</li>
+<li><strong>Zwischenablage-Benachrichtigungen:</strong> Akustische Benachrichtigungen beim Kopieren, Ausschneiden und Einfügen von Inhalten über die Zwischenablage.</li>
+</ul>
+<h2>Entwicklung &amp; Credits</h2>
+<p>Die Entwicklung und Konsolidierung dieses Add-ons begann Anfang Mai (genauer gesagt am 3. Mai 2026) exklusiv durch <strong>Hassan AlBarshoumy</strong>.</p>
+<p>Sämtliches Code-Refactoring, strukturelle Zusammenführungen und GUI-Integrationen (einschließlich des Audio Themes Studio V2 und der vereinheitlichten Einstellungsdialoge) wurden durchgeführt, um maximale Stabilität und Kompatibilität mit NVDA 2026.1+ zu gewährleisten.</p>
+<p><strong>Hauptentwickler und Konsolidator:</strong></p>
+<ul>
+<li>Hassan AlBarshoumy</li>
+</ul>
+<p><strong>Danksagungen:</strong> Dieses Add-on profitierte stark von der Zusammenführung und Entwicklung früherer Open-Source-Projekte in der NVDA-Community. Besonderer Dank geht an die ursprünglichen Entwickler:</p>
+<ul>
+<li><strong>Ahmed Sami:</strong> Ursprünglicher Entwickler des navSounds (Navigation Sound Effects) Add-ons und für seine Beiträge.</li>
+<li><strong>Musharraf Omer:</strong> Ursprünglicher Entwickler des Audio Themes 3D Add-ons.</li>
+<li><strong>Tony Malykh:</strong> Ursprünglicher Entwickler der Add-ons Earcons and Speech Rules, BrowserNav, SentenceNav und TextNav.</li>
+<li><strong>Austin Hicks &amp; Bryan Smart:</strong> Ursprüngliche Entwickler des Unspoken Add-ons.</li>
+</ul>
+<p><strong>Kontakt &amp; Updates:</strong> <a href="https://t.me/HassanAlBarshoumy">https://t.me/HassanAlBarshoumy</a></p>
+<h2>Installation</h2>
+<ol>
+<li>Laden Sie die neueste Version des Add-ons über Hassans offiziellen Kanal herunter.</li>
+<li>Öffnen Sie die heruntergeladene <code>.nvda-addon</code>-Datei.</li>
+<li>NVDA wird Sie bitten, die Installation zu bestätigen. Wählen Sie "Ja".</li>
+<li>Starten Sie NVDA neu, um die Installation abzuschließen.</li>
+</ol>
+<h2>Verwendung</h2>
+<h3>Audio-Themes aktivieren/deaktivieren</h3>
+<p>Sie können die Audio-Themes-Funktion in den NVDA-Einstellungen aktivieren oder deaktivieren:</p>
+<ol>
+<li>Öffnen Sie das NVDA-Menü (NVDA+N).</li>
+<li>Gehen Sie zu "Optionen" -&gt; "Einstellungen".</li>
+<li>Wählen Sie im Einstellungsdialog die Kategorie "Audio-Themes".</li>
+<li>Aktivieren oder deaktivieren Sie das Kontrollkästchen "Audio-Themes aktivieren".</li>
+</ol>
+<h3>Themes auswählen und verwalten</h3>
+<ul>
+<li><strong>Über ein Theme:</strong> Klicken Sie auf die Schaltfläche "Über", um Informationen zum ausgewählten Theme anzuzeigen.</li>
+</ul>
+<h3>Was ist neu</h3>
+<h3>Version 9.33</h3>
+<ul>
+<li><strong>Emoji-Engine:</strong> Neue Emoji-Verarbeitungs-Engine für verbesserte Erkennung und akustisches Feedback.</li>
+<li><strong>Zwischenablage-Benachrichtigungen:</strong> Akustische Benachrichtigungen beim Kopieren, Ausschneiden und Einfügen.</li>
+<li><strong>Neues Theme HAS Future Sound:</strong> Ein brandneues Audio-Theme mit futuristischen Klängen.</li>
+<li><strong>ZIP-Import-Fix:</strong> Behebung eines Fehlers beim Importieren von Themes aus ZIP-Dateien.</li>
+<li><strong>Systemstatus-Härtung:</strong> Verbesserte Stabilität und Zuverlässigkeit der Systemstatus-Überwachung.</li>
+<li><strong>Leistung:</strong> Allgemeine Leistungsoptimierungen für schnellere Reaktionszeiten.</li>
+<li><strong>Eingabegesten:</strong> Verbesserte Eingabegesten-Zuordnung und -Verwaltung.</li>
+</ul>
+<h3>Version 9.32</h3>
+<ul>
+<li><strong>Systemstatus-Töne:</strong> Einführung einer umfassenden Systemüberwachung für Akku, USB, Netzwerk und Stromversorgung.</li>
+<li><strong>DSP-Verbesserungen:</strong> Komplett überarbeitete Bass Boost- und Noise Gate-Filter.</li>
+<li><strong>3D-Audio:</strong> Behebung von Verzögerungen bei Fortschrittsbalken.</li>
+</ul>
+<h3>Version 9.30 - 9.31</h3>
+<ul>
+<li><strong>Erstes/Letztes Element:</strong> Universelle Erkennung für erstes/letztes Element.</li>
+</ul>
+<h3>Version 9.27 - 9.28</h3>
+<ul>
+<li><strong>Fallback-Töne:</strong> Fallback-Töne hinzugefügt.</li>
+<li><strong>Überschriften:</strong> Unterstützung für Überschriftenebenen 7, 8 und 9.</li>
+</ul>
+<h3>Version 9.23 - 9.26</h3>
+<ul>
+<li><strong>Fehlerbehebungen:</strong> Fehler bei Satznavigation und NVDA 2026.2-Kompatibilität behoben.</li>
+</ul>
+<h2>Übersicht der Einstellungs-Tabs</h2>
+<p>Das Einstellungsfeld "Erweiterte Audio-Themes" enthält mehrere Reiter (Tabs), um jeden Aspekt des Audioerlebnisses anzupassen. Im Folgenden finden Sie einen tiefen Einblick in jede verfügbare Option:</p>
+<h4>1. Navigationsschicht (Navigation Layer)</h4>
+<ul>
+<li><strong>Tastenkürzel:</strong> <code>NVDA+Win+N</code></li>
+<li><strong>Beschreibung:</strong> Eine hochoptimierte, isolierte Navigationsumgebung, die das Lesen von Texten und das Surfen im Internet beschleunigt. Sobald Sie sich darin befinden, müssen Sie keine Modifikatortasten wie <code>Alt</code> oder <code>Shift</code> mehr gedrückt halten. Sie können mühelos nur mit den Pfeiltasten navigieren, was die Finger entlastet.</li>
+<li><strong>Bedienung (innerhalb der Schicht):</strong></li>
+<li><strong>Links / Rechts Pfeiltasten:</strong> Wechseln Sie zwischen <strong>27 verschiedenen Navigationsmodi</strong> (Zeichen, Wort, Zeile, Satz, Absatz und Web-Elemente wie Überschriften, Links, Schaltflächen, Eingabefelder, Tabellen, Listen, Grafiken, Sprungmarken usw.).</li>
+<li><strong>Auf / Ab Pfeiltasten:</strong> Springen Sie basierend auf dem aktuell ausgewählten Modus zum vorherigen oder nächsten Element.</li>
+<li><strong>Drücken Sie <code>C</code>:</strong> Kopiert den Text der aktuellen Einheit sofort in die Zwischenablage.</li>
+<li><strong>Drücken Sie <code>S</code>:</strong> Buchstabiert den Text der aktuellen Einheit.</li>
+<li><strong>Drücken Sie <code>Escape</code>:</strong> Verlässt die Schicht und kehrt zum normalen Betrieb zurück.</li>
+<li><strong>Intelligente Funktionen &amp; Anpassung:</strong></li>
+<li><strong>Automatisches Beenden (Timeout):</strong> Wenn Sie 10 Sekunden lang nichts tun, wird die Schicht automatisch mit einem leisen akustischen Signal beendet.</li>
+<li><strong>Tasten-Passthrough (Durchreichen):</strong> Das Drücken einer Taste, die nicht an die Schicht gebunden ist, beendet die Schicht sofort und leitet den Tastendruck nahtlos an das Betriebssystem weiter.</li>
+<li><strong>Vollständige Anpassung (Einstellungen Tab 6):</strong> Sie können jeden der 27 Modi aktivieren oder deaktivieren, um den Modus-Wechsel übersichtlich zu halten, das Schicht-Timeout anpassen und Aktionssounds konfigurieren.</li>
+</ul>
+<h3>2. Reiter "Audio-Engine"</h3>
+<ul>
+<li><strong>Intelligente Lautstärkenormalisierung:</strong> Passt leise und laute Töne dynamisch an ein konstantes Niveau an.</li>
+<li><strong>Weiche Hüllkurve:</strong> Wendet Mikro-Fade-Ins und Fade-Outs an, um Audio-Knacksen oder -Klicken zu verhindern.</li>
+<li><strong>Weiches 3D-Panning:</strong> Erzeugt einen Gleiteffekt, wenn sich Objekte über den Bildschirm bewegen, anstatt sofort zu springen.</li>
+<li><strong>RAM-Caching:</strong> Lädt Töne für eine latenzfreie Wiedergabe in den Arbeitsspeicher.</li>
+<li><strong>Stille zuschneiden:</strong> Entfernt automatisch stille Pausen am Anfang und Ende von Audiodateien basierend auf einem anpassbaren Schwellenwert.</li>
+<li><strong>Noise Gate (Rauschunterdrückung):</strong> Beseitigt geringfügiges Hintergrundrauschen aus schlecht aufgenommenen Audio-Themes. Beinhaltet Schieberegler für Schwellenwert, Attack und Release.</li>
+<li><strong>Bassverstärkung:</strong> Verstärkt tiefe Frequenzen, um Klängen mehr Durchschlagskraft zu verleihen. Beinhaltet Schieberegler für Verstärkung (Gain) und Grenzfrequenz (Cutoff).</li>
+<li><strong>Audio-Ausgabemodus:</strong> Wechseln Sie zwischen vollem 3D-Raumklang (Stereo) und zentriertem (Mono) Audio.</li>
+<li><strong>Räumliches Audio für Fortschrittsbalken:</strong> Wählen Sie, ob Fortschrittsbalken basierend auf ihrem Fortschrittsprozentsatz oder ihrer physischen Position auf dem Bildschirm von links nach rechts schwenken. Enthält auch einen Schalter, um die Tonhöhe mit zunehmendem Fortschritt zu erhöhen.</li>
+</ul>
+<h4>3. Reiter "Reverb (Hall)"</h4>
+<p>Simuliert Umgebungsakustik, damit Klänge wirken, als würden sie in einem physischen Raum abgespielt.</p>
+<ul>
+<li><strong>Reverb aktivieren:</strong> Hauptschalter für Umgebungseffekte.</li>
+<li><strong>Raumgröße:</strong> Passt die wahrgenommene Größe des virtuellen Raums an.</li>
+<li><strong>Dämpfung (Damping):</strong> Steuert, wie schnell hohe Frequenzen absorbiert werden.</li>
+<li><strong>Wet Level / Dry Level:</strong> Balanciert die Menge an verarbeitetem Hall im Vergleich zum originalen sauberen Klang.</li>
+<li><strong>Breite (Width):</strong> Passt die Stereobreite des Hallfahne an.</li>
+</ul>
+<h4>4. Reiter "Audioformate"</h4>
+<ul>
+<li><strong>FFmpeg verwenden:</strong> Aktiviert die Unterstützung für komprimierte Audioformate wie MP3, FLAC, M4A und OGG.</li>
+<li><strong>FFmpeg-Status:</strong> Zeigt an, ob FFmpeg installiert ist. Falls nicht, steht eine Schaltfläche zum automatischen Herunterladen und Extrahieren zur Verfügung (~12MB).</li>
+</ul>
+<h4>5. Reiter "Earcons &amp; Sprachregeln"</h4>
+<p>Eine leistungsstarke Regel-Engine für phonetische Aussprache und benutzerdefinierte Status-Töne.</p>
+<ul>
+<li><strong>Regel-Liste:</strong> Zeigt alle aktiven Regeln, gefiltert nach Kategorie (Rolle, Status, Text, Zeichen usw.) an.</li>
+<li><strong>Regel-Editor:</strong> Beim Hinzufügen oder Bearbeiten einer Regel können Sie definieren:</li>
+<li><strong>Muster / Wert:</strong> Das Regex-Muster, die Rolle oder der Status, der übereinstimmen soll.</li>
+<li><strong>Aktionstyp:</strong> Wählen Sie aus, ob ein integriertes Wave, eine benutzerdefinierte WAV-Datei, ein Signalton, eine Prosodie-Anpassung (Tonhöhe/Geschwindigkeit), Textersetzung abgespielt oder nichts unternommen werden soll.</li>
+<li><strong>Sprachaktion:</strong> Entscheiden Sie, ob NVDA den Originaltext beibehalten, den gesprochenen Text bearbeiten oder vollständig verstummen soll, wenn die Regel zutrifft.</li>
+<li><strong>Audioanpassungen:</strong> Lautstärkeregler, Start-/End-Trimm-Offsets (in Millisekunden), Tonhöhe/Dauer für Signaltöne.</li>
+<li><strong>Filter:</strong> Beschränken Sie die Regel auf bestimmte Anwendungen, Fenstertitel oder Website-URLs (Regex unterstützt).</li>
+<li><strong>Stapelverarbeitung:</strong> Regel-Wörterbücher exportieren/importieren, alle Regeln aktivieren/deaktivieren oder Regeln direkt über die Benutzeroberfläche testen.</li>
+</ul>
+<h4>6. Reiter "Sonstiges"</h4>
+<p>Erweiterte Konfiguration für Navigationsmodule.</p>
+<ul>
+<li><strong>Satznavigation (Alt+Pfeiltasten):</strong> Lautstärke für Absatzgrenzen-Signale anpassen, Formatierungsansagen umschalten, Wikipedia-Referenz-Überspringen konfigurieren, Satzrekonstruktion über Absätze hinweg anpassen und benutzerdefinierte Satz-/Phrasen-Trennzeichen definieren.</li>
+<li><strong>Textnavigation (Alt+Umschalt+Pfeiltasten):</strong> Knisterlautstärke anpassen und das Verhalten der Signaltöne am Textende konfigurieren.</li>
+<li><strong>Erweiterte Browser-Navigation (BrowserNav):</strong> Lautstärke von Knistern und Piepen während der QuickSearch-Navigation anpassen und Lautstärke für das Überspringen von unübersichtlichen Bereichen (Skip Clutter) einstellen.</li>
+<li><strong>Navigationsebene (NVDA+Windows+N):</strong> Auto-Exit-Timeouts konfigurieren, Töne für Ebenenaktionen, durchzureichende Tasten (Pass-through) und bestimmte Navigationsmodi ein- oder ausschalten.</li>
+</ul>
+<h4>7. Reiter "Sprachreihenfolge"</h4>
+<ul>
+<li><strong>Globale Ansageformat:</strong> Ändern Sie global, wie NVDA Elemente vorliest (z.B. Standard: Name -&gt; Rolle -&gt; Status oder Status -&gt; Rolle -&gt; Name).</li>
+<li><strong>Rollen-spezifische Anpassung:</strong> Verwenden Sie das Suchfeld, um bestimmte Rollen (wie Kontrollkästchen oder Link) zu finden und ihnen ein individuelles Ansageformat zuzuweisen.</li>
+</ul>
+<h4>8. Reiter "App-Profile"</h4>
+<ul>
+<li>Wechseln Sie Audioerlebnisse automatisch basierend auf der aktiven Anwendung.</li>
+<li><strong>Profil hinzufügen:</strong> Geben Sie eine ausführbare Anwendungsdatei ein (z. B. <code>chrome.exe</code>) und weisen Sie ein spezifisches Audio-Theme und/oder Tippgeräusch-Paket zu, das sofort aktiviert wird, wenn Sie zu dieser App wechseln.</li>
+</ul>
+<h4>9. Reiter "QuickSearch &amp; Lesezeichen"</h4>
+<ul>
+<li>Verwalten Sie domänenspezifische Navigationsregeln für das Webbrowsing.</li>
+<li>Weisen Sie Tasten (wie J oder K) zu, um schnell zu bestimmten Elementen zu springen (QuickJump), unübersichtliche Menüs automatisch zu überspringen (SkipClutter) oder benutzerdefinierte Python-Skripte auf bestimmten Websites auszuführen.</li>
+</ul>
+<h4>10. Reiter "Erstes/Letztes Element"</h4>
+<ul>
+<li><strong>Erkennung des ersten/letzten Elements aktivieren:</strong> Spielt einen einzigartigen Anschlagton ab, wenn Sie den Anfang oder das Ende einer Liste, eines Menüs oder einer Baumansicht erreichen.</li>
+<li><strong>Erkennungsbereich:</strong> Wenden Sie dies universell auf alle Rollen an oder selektiv auf bestimmte Rollen (mithilfe der Schaltfläche "Rollen auswählen").</li>
+<li><strong>Verhalten bei einzelnen Elementen:</strong> Entscheiden Sie, ob Elemente, die das einzige in einer Liste sind, als erstes Element, letztes Element oder gar nicht behandelt werden sollen.</li>
+</ul>
+<h4>12. Zwischenablage-Registerkarte</h4>
+<ul>
+<li><strong>Zwischenablage-Benachrichtigungen aktivieren:</strong> Hauptschalter zum Ein- oder Ausschalten der akustischen Rückmeldungen bei Zwischenablage-Operationen.</li>
+<li><strong>Ereignisse:</strong> Individuelle Steuerung der Töne für Kopieren, Ausschneiden und Einfügen.</li>
+<li><strong>Lautstärke:</strong> Anpassung der Lautstärke für Zwischenablage-Benachrichtigungen.</li>
+</ul>
+<h4>13. Emoji-Registerkarte</h4>
+<ul>
+<li><strong>Emoji-Verbesserung aktivieren:</strong> Hauptschalter zum Ein- oder Ausschalten der erweiterten Emoji-Unterstützung.</li>
+<li><strong>Akustisches Feedback:</strong> Konfiguration der Töne, die beim Erkennen von Emoji-Zeichen abgespielt werden.</li>
+<li><strong>Aussprache:</strong> Einstellungen zur verbesserten Aussprache und Beschreibung von Emojis.</li>
+</ul>
+<h3>Verwendung des Audio Themes Studio V2</h3>
+<p>Mit dem Audio Themes Studio können Sie Audio-Themes erstellen und bearbeiten. So öffnen Sie das Studio:</p>
+<ol>
+<li>Öffnen Sie das NVDA-Menü (NVDA+N).</li>
+<li>Wählen Sie "Audio Themes Studio".</li>
+</ol>
+<p>Im Studio können Sie Folgendes tun:</p>
+<ul>
+<li><strong>Ein neues Audio-Theme erstellen:</strong> Dies führt Sie durch den Prozess der Erstellung eines neuen Themes von Grund auf.</li>
+<li><strong>Ein bestehendes Audio-Theme anpassen:</strong> Wählen Sie diese Option, um die Klänge eines installierten Themes zu ändern.</li>
+<li><strong>Vom Mikrofon aufnehmen:</strong> Sie können nun nativ Ihre Stimme oder jedes beliebige Geräusch direkt von Ihrem Mikrofon aufnehmen, um es einem UI-Ereignis zuzuweisen!</li>
+<li><strong>Drag &amp; Drop:</strong> Sie können Audiodateien direkt in das Studio-Fenster ziehen, um sie schnell zuzuweisen.</li>
+<li><strong>Cloud Theme Store:</strong> Durchsuchen, hören Sie vor und laden Sie von der Community erstellte Themes direkt im Studio herunter, ohne externe Browser zu benötigen.</li>
+</ul>
+<h3>Theme exportieren</h3>
+<p>Nach dem Erstellen oder Bearbeiten eines Themes können Sie es als <code>.atp</code>-Datei exportieren, um es mit anderen zu teilen. Die Exportoption finden Sie im Bearbeitungsbildschirm.</p>
+<h2>Erweiterte Regeln &amp; Phonetische Interpunktion</h2>
+<p>Earcons und Sprachregeln ermöglichen es NVDA, Earcons (Ohrsymbole) sowie andere Spracheffekte wie Prosodie-Änderungen abzuspielen.</p>
+<h3>Verwendung</h3>
+<ol>
+<li>Stellen Sie sicher, dass das Add-on aktiviert ist. Drücken Sie NVDA+Alt+P, um es umzuschalten.</li>
+<li>Regeln können über ein Dialogfeld im NVDA-Einstellungsmenü konfiguriert werden.</li>
+<li>Standardmäßig verfügen Sie über eine Reihe vordefinierter Audio-Regeln.</li>
+<li>Die Regeln werden in einer Datei namens <code>earconsAndSpeechRules.json</code> in Ihrem NVDA-Benutzerkonfigurationsverzeichnis gespeichert.</li>
+</ol>
+<h3>Status-Ausführlichkeit (Verbosity)</h3>
+<p>Das Add-on enthält eine Funktion, mit der Sie die Sprache oder Klänge für Statusmeldungen stummschalten und ausblenden können, die ständige Belästigung verursachen könnten (z. B. die Statusmeldungen "erweitert" oder "nicht ausgewählt"). Um diese Funktion zu nutzen:</p>
+<ol>
+<li>Gehen Sie zu den Sprachregel-Einstellungen und bearbeiten Sie den Status, den Sie stummschalten möchten.</li>
+<li>Aktivieren Sie die Option <strong>"Status-Unübersichtlichkeit unterdrücken" (Suppress state clutter)</strong>.</li>
+<li>Jetzt können Sie die schnelle Tastenkombination verwenden, um die Ausführlichkeitsstufe jederzeit umzuschalten.</li>
+</ol>
+<ul>
+<li>Sie können diese Option entweder über die Ebenen-Verknüpfung <strong>(NVDA+Umschalt+A dann s)</strong> oder über die direkte Verknüpfung <strong>(NVDA+Alt+[)</strong> umschalten.</li>
+<li>Wenn Sie die Ausführlichkeit reduzieren, wird jeder Status, für den Sie diese Option aktiviert haben, stummgeschaltet. Wenn Sie die Ausführlichkeit wieder erhöhen, kehrt das Add-on zum normalen Vorlesen aller Statusmeldungen zurück.</li>
+</ul>
+<h2>Erweiterte Funktionen &amp; Geheimnisse</h2>
+<p>In dieses Add-on ist eine Reihe hochgradig erweiterter Funktionen integriert, die auf den ersten Blick möglicherweise nicht offensichtlich sind:</p>
+<h3>1. Navigationsebene</h3>
+<ul>
+<li><strong>Verknüpfung:</strong> <code>NVDA+Win+N</code></li>
+<li><strong>Beschreibung:</strong> Sobald Sie diese Ebene betreten, müssen Sie <code>Alt</code>, <code>Umschalt</code> oder andere Modifikatortasten nicht mehr gedrückt halten, um zu navigieren. Sie können einfach die Pfeiltasten verwenden!</li>
+<li><strong>Verwendung:</strong></li>
+<li>Verwenden Sie den Links-/Rechtspfeil, um durch <strong>27 verschiedene Navigationsmodi</strong> zu blättern (Zeichen, Wort, Zeile, Satz, Absatz, Überschrift, Link, Schaltfläche, Eingabefeld, Tabelle usw.).</li>
+<li>Verwenden Sie den Auf-/Abwärtspfeil, um zum vorherigen/nächsten Element basierend auf dem aktuellen Modus zu springen.</li>
+<li>Drücken Sie <code>C</code>, um das aktuelle Element in die Zwischenablage zu kopieren.</li>
+<li>Drücken Sie <code>S</code>, um das aktuelle Element zu buchstabieren.</li>
+<li>Drücken Sie <code>R</code>, um beginnend beim aktuellen Element alles vorzulesen.</li>
+<li>Drücken Sie <code>Escape</code>, um die Ebene zu verlassen.</li>
+</ul>
+<h3>2. Audio-Sonar</h3>
+<ul>
+<li><strong>Verknüpfung:</strong> <code>NVDA+Alt+R</code> (oder <code>NVDA+Umschalt+A</code> dann <code>r</code>)</li>
+<li><strong>Beschreibung:</strong> Eine unglaubliche Funktion, die das gesamte aktive Fenster abtastet, alle darin enthaltenen Steuerelemente (Schaltflächen, Listen, Texte) sammelt und ihre zugehörigen Klänge schnell von links nach rechts im 3D-Raum abspielt. Dies gibt Ihnen ein klangliches "Bild" vom Layout des Fensters und davon, wie stark es gefüllt ist!</li>
+</ul>
+<h3>3. Audio-Bake (Beacon)</h3>
+<ul>
+<li><strong>Verknüpfung:</strong> <code>NVDA+Umschalt+B</code> (oder <code>NVDA+Umschalt+A</code> dann <code>a</code>)</li>
+<li><strong>Beschreibung:</strong> Sie können eine Audio-Bake an der Position des aktuellen Navigator-Objekts "abwerfen". Dies ist nützlich, um ein Objekt zu markieren und es während eines Audio-Sonar-Durchlaufs kontextuell zu verfolgen.</li>
+</ul>
+<h3>4. Befehlsebene für Audio-Themes</h3>
+<ul>
+<li><strong>Verknüpfung:</strong> <code>NVDA+Umschalt+A</code></li>
+<li><strong>Beschreibung:</strong> Anstatt Dutzende von Verknüpfungen auswendig zu lernen, betreten Sie diese Ebene und drücken Sie eine einzelne Taste, um einen Befehl auszuführen:</li>
+<li><code>t</code> : Audio-Themes ein-/ausschalten.</li>
+<li><code>p</code> : Earcons &amp; Sprachregeln umschalten.</li>
+<li><code>n</code> und <code>b</code> : Nächstes/Vorheriges Theme.</li>
+<li><code>Aufwärtspfeil</code> und <code>Abwärtspfeil</code> : Theme-Lautstärke erhöhen/verringern.</li>
+<li><code>s</code> : Status-Ausführlichkeit umschalten.</li>
+<li><code>o</code> : Sprachreihenfolge schnell durchschalten (z.B. Name dann Rolle oder Rolle dann Name).</li>
+<li><code>c</code> : Aktuelle Überschriftenebene ansagen.</li>
+<li><code>y</code> : Durch Themes blättern.</li>
+<li><code>i</code> : Durch Tippgeräusche blättern.</li>
+<li><code>u</code> : Tippgeräusche umschalten.</li>
+<li><code>h</code> : Hilfe.</li>
+</ul>
+<h3>5. 3D-Objektberichterstellung</h3>
+<ul>
+<li><strong>Verknüpfung:</strong> <code>NVDA+Tab</code></li>
+<li><strong>Beschreibung:</strong> Meldet das aktuelle Objekt unter dem Cursor, ordnet aber seine räumlichen 3D-Audiokoordinaten perfekt zu, sodass Sie seine genaue physische Position auf Ihrem Bildschirm relativ zum Zentrum hören können.</li>
+</ul>
+<h3>6. System-Tray-Integration</h3>
+<ul>
+<li><strong>Beschreibung:</strong> Das Add-on fügt Schnellzugriffsoptionen direkt in das NVDA-System-Tray-Menü ein. Sie können mit der rechten Maustaste auf das NVDA-Symbol neben der Uhr in Ihrer Taskleiste klicken, um sofort auf das "Audio Themes Studio" zuzugreifen oder die Themes ein- und auszuschalten, ohne den vollständigen Einstellungsdialog öffnen zu müssen.</li>
+</ul>
+<h3>7. Systemstatus-Sounds</h3>
+<ul>
+<li><strong>Beschreibung:</strong> Spielt Audiohinweise für Ereignisse auf Systemebene ab, z. B. USB-Geräte anschließen/entfernen, Änderungen der Stromversorgung, Akkustatus, Netzwerkkonnektivität und Systemruhezustand/-aufwachen. Alle Ereignisse werden durch native Windows-Benachrichtigungen überwacht (kein Polling).</li>
+<li><strong>Ereignisse:</strong></li>
+<li><strong>Netzstrom angeschlossen/getrennt:</strong> Spielt einen Ton ab, wenn Sie das Stromkabel Ihres Laptops anschließen oder abziehen.</li>
+<li><strong>Akku niedrig/kritisch/voll:</strong> Spielt schwellenwertbasierte Warnungen ab, wenn der Akkustand unter konfigurierbare Prozentsätze fällt oder wenn er vollständig aufgeladen ist.</li>
+<li><strong>USB-Gerät angeschlossen/getrennt:</strong> Erkennt jede Verbindung oder Entfernung eines USB-Geräts (Tastaturen, Mäuse, Flash-Laufwerke usw.).</li>
+<li><strong>Speichervolumen bereitgestellt/ausgeworfen:</strong> Erkennt die Zuweisung von Laufwerksbuchstaben für Flash-Laufwerke, externe Festplatten und SD-Karten.</li>
+<li><strong>Netzwerk verbunden/getrennt:</strong> Überprüft den Verbindungsstatus in konfigurierbaren Intervallen und spielt bei Statusänderungen einen Ton ab.</li>
+<li><strong>System aufwachen/Ruhezustand:</strong> Spielt Töne ab, wenn der Computer aus dem Ruhezustand zurückkehrt oder in diesen wechselt.</li>
+<li><strong>Benutzerdefinierte Sounds:</strong> Platzieren Sie <code>.wav</code>-Dateien mit diesen Namen in Ihrem Theme-Ordner: <code>sys_ac_plug.wav</code>, <code>sys_ac_unplug.wav</code>, <code>sys_battery_low.wav</code>, <code>sys_battery_critical.wav</code>, <code>sys_battery_full.wav</code>, <code>sys_usb_plug.wav</code>, <code>sys_usb_unplug.wav</code>, <code>sys_volume_plug.wav</code>, <code>sys_volume_unplug.wav</code>, <code>sys_network_connect.wav</code>, <code>sys_network_disconnect.wav</code>, <code>sys_wake.wav</code>, <code>sys_sleep.wav</code></li>
+<li><strong>Konfiguration:</strong> Öffnen Sie NVDA-Einstellungen -&gt; Erweiterte Audio-Themes -&gt; Registerkarte "Systemstatus", um einzelne Ereignisse zu aktivieren/deaktivieren, die Lautstärke anzupassen und Akkuschwellenwerte festzulegen.</li>
+</ul>
+<h2>Tastenkombinationen</h2>
+<table>
+<thead>
+<tr>
+<th>Taste</th>
+<th>Aktion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>NVDA+Alt+N</strong></td>
+<td>Audio-Themes ein-/ausschalten. Zweimal schnell drücken, um Tippgeräusche umzuschalten.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+T</strong></td>
+<td>Durch verfügbare Audio-Themes blättern.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+Y</strong></td>
+<td>Durch verfügbare Tipp-Soundpakete blättern.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+K</strong></td>
+<td>Tippgeräusche ein-/ausschalten.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+R</strong></td>
+<td>Audio-Sonar: Tastet das aktive Fenster ab, um eine Audio-Karte seiner Elemente zu erstellen.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Umschalt+B</strong></td>
+<td>Audio-Bake am aktuellen Navigator-Objekt ablegen/entfernen.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Umschalt+A</strong></td>
+<td>Befehlsebene für Audio-Themes betreten (dies drücken, dann: h für Hilfe, t zum Umschalten, p für Regeln, n/b für nächstes/vorheriges Theme, Auf-/Abwärtspfeile für Lautstärke, y/i/u zum Blättern/Umschalten von Themes/Tippen, a/r für Bake/Sonar, s für Ausführlichkeit, c für Überschrift, o für Reihenfolge).</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+P</strong></td>
+<td>Add-on Earcons und Sprachregeln umschalten.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+[</strong></td>
+<td>Präzisen Status-Berichtsmodus umschalten (Status-Ausführlichkeit).</td>
+</tr>
+<tr>
+<td><strong>NVDA+H</strong></td>
+<td>Aktuelle Überschriftenebene ansagen.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Tab</strong></td>
+<td>Das Objekt unter dem Cursor mit vollständigen 3D-Audiokoordinaten melden.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+S</strong></td>
+<td>Aktuellen Satz ansagen (SentenceNav).</td>
+</tr>
+<tr>
+<td><strong>Alt+Pfeiltasten</strong></td>
+<td>Erweiterte Satznavigation.</td>
+</tr>
+<tr>
+<td><strong>Alt+Win+Pfeiltasten</strong></td>
+<td>Erweiterte Phrasennavigation.</td>
+</tr>
+<tr>
+<td><strong>Alt+Umschalt+Pfeiltasten</strong></td>
+<td>Erweiterte Absatznavigation.</td>
+</tr>
+<tr>
+<td><strong>NVDA+Alt+Pfeiltasten</strong></td>
+<td>Erweiterte Webnavigation (BrowserNav).</td>
+</tr>
+<tr>
+<td><strong>Strg+Alt+J</strong></td>
+<td>QuickSpeak: liest gemäß der BrowserNav-QuickSpeak-Bookmark (nur im Lesemodus).</td>
+</tr>
+<tr>
+<td><strong>NVDA+Win+N</strong></td>
+<td>Navigationsebene umschalten (schnelle Navigation ohne Modifikatoren).</td>
+</tr>
+<tr>
+<td><strong>Strg+C / X / V</strong></td>
+<td>Kopieren, Ausschneiden und Einfügen mit akustischen Ansagen.</td>
+</tr>
+<tr>
+<td><strong>Strg+A</strong></td>
+<td>Alles auswählen mit akustischer Ansage.</td>
+</tr>
+<tr>
+<td><strong>Strg+Z / Y</strong></td>
+<td>Rückgängig und Wiederherstellen mit akustischen Ansagen.</td>
+</tr>
+<tr>
+<td><strong>Strg+Umschalt+V</strong></td>
+<td>Einfachen Text einfügen mit akustischer Ansage.</td>
+</tr>
+<tr>
+<td><strong>Strg+Umschalt+Z</strong></td>
+<td>Alternatives Wiederherstellen mit akustischer Ansage.</td>
+</tr>
+</tbody>
+</table>
+<h2>Compatibility &amp; Requirements</h2>
+<ul>
+<li><strong>NVDA Version:</strong> Requires NVDA 2026.1.0 or later.</li>
+<li><strong>Last Tested NVDA Version:</strong> 2026.2.0</li>
+<li><strong>Operating System:</strong> Windows 10 or Windows 11.</li>
+</ul>
+<h2>Source Code &amp; Repository</h2>
+<p>You can view the source code, report issues, or contribute to the project on GitHub: <a href="https://github.com/HassanAlBarshoumy/advanced_audio_themes">Advanced Audio Themes Repository</a></p>
+<h2>Change Log</h2>
+<h3>Version 9.33</h3>
+<ul>
+<li><strong>Emoji-Engine:</strong> Neue Emoji-Verarbeitungs-Engine für verbesserte Erkennung und akustisches Feedback.</li>
+<li><strong>Zwischenablage-Benachrichtigungen:</strong> Akustische Benachrichtigungen beim Kopieren, Ausschneiden und Einfügen.</li>
+<li><strong>Neues Theme HAS Future Sound:</strong> Ein brandneues Audio-Theme mit futuristischen Klängen.</li>
+<li><strong>ZIP-Import-Fix:</strong> Behebung eines Fehlers beim Importieren von Themes aus ZIP-Dateien.</li>
+<li><strong>Systemstatus-Härtung:</strong> Verbesserte Stabilität und Zuverlässigkeit der Systemstatus-Überwachung.</li>
+<li><strong>Leistung:</strong> Allgemeine Leistungsoptimierungen für schnellere Reaktionszeiten.</li>
+<li><strong>Eingabegesten:</strong> Verbesserte Eingabegesten-Zuordnung und -Verwaltung.</li>
+</ul>
+<h3>Version 9.32</h3>
+<ul>
+<li><strong>Systemstatus-Töne:</strong> Added a completely new module to monitor and play sounds for system-level events (USB plug/unplug, AC power changes, battery status, network connectivity, and system wake/sleep) using native Windows notifications for zero lag.</li>
+<li><strong>Audio DSP Enhancements:</strong> Completely rewrote the Bass Boost (Low-shelf filter) and Noise Gate algorithms to support correct attack/release times and improved sound quality. Added a full UI in the settings panel to control these DSP effects.</li>
+<li><strong>3D Spatial Audio Fixes:</strong> Resolved an issue causing lag in 3D audio playback for progress bars.</li>
+</ul>
+<h3>Version 9.30 - 9.31</h3>
+<ul>
+<li><strong>Universal First/Last Item Detection:</strong> Added support for first/last item detection for <em>all</em> NVDA roles, instead of just lists and menus.</li>
+<li><strong>Advanced Detection Modes:</strong> Introduced 3 detection modes (smart, strict, any_sibling) with multi-hop traversal to guarantee accurate detection of the first and last elements even in complex web layouts.</li>
+</ul>
+<h3>Version 9.27 - 9.28</h3>
+<ul>
+<li><strong>Role vs State Sounds Priority:</strong> Fixed an issue where state sounds (like "checked") were wrongly suppressing role sounds (like "checkbox").</li>
+<li><strong>Fallback Behaviors:</strong> Added custom fallback settings for first/last item sounds, allowing users to select custom sounds or bypass missing roles.</li>
+<li><strong>Heading Support:</strong> Added support for Heading levels 7, 8, and 9.</li>
+</ul>
+<h3>Version 9.23 - 9.26</h3>
+<ul>
+<li><strong>Sentence Navigation Fixes:</strong> Fixed a bug causing NVDA to endlessly repeat sentences when reading Arabic text in VirtualBuffers.</li>
+<li><strong>NVDA 2026.2 Compatibility:</strong> Migrated to the new <code>NVDAHelper.localLib.generateBeep</code> API to resolve deprecation warnings and ensure stability on future NVDA versions.</li>
+<li><strong>Auto-Update Fix:</strong> Resolved a critical freeze in NVDA during the auto-update download process.</li>
+</ul>
+<h2>Was ist neu</h2>
+<h3>Version 9.33</h3>
+<ul>
+<li><strong>Emoji-Engine:</strong> Neue Emoji-Verarbeitungs-Engine für verbesserte Erkennung und akustisches Feedback.</li>
+<li><strong>Zwischenablage-Benachrichtigungen:</strong> Akustische Benachrichtigungen beim Kopieren, Ausschneiden und Einfügen.</li>
+<li><strong>Neues Theme HAS Future Sound:</strong> Ein brandneues Audio-Theme mit futuristischen Klängen.</li>
+<li><strong>ZIP-Import-Fix:</strong> Behebung eines Fehlers beim Importieren von Themes aus ZIP-Dateien.</li>
+<li><strong>Systemstatus-Härtung:</strong> Verbesserte Stabilität und Zuverlässigkeit der Systemstatus-Überwachung.</li>
+<li><strong>Leistung:</strong> Allgemeine Leistungsoptimierungen für schnellere Reaktionszeiten.</li>
+<li><strong>Eingabegesten:</strong> Verbesserte Eingabegesten-Zuordnung und -Verwaltung.</li>
+</ul>
+<h3>Version 9.32</h3>
+<ul>
+<li><strong>Systemstatus-Töne:</strong> Einführung einer umfassenden Systemüberwachung für Akku, USB, Netzwerk und Stromversorgung.</li>
+<li><strong>DSP-Verbesserungen:</strong> Komplett überarbeitete Bass Boost- und Noise Gate-Filter.</li>
+<li><strong>3D-Audio:</strong> Behebung von Verzögerungen bei Fortschrittsbalken.</li>
+</ul>
+<h3>Version 9.30 - 9.31</h3>
+<ul>
+<li><strong>Erstes/Letztes Element:</strong> Universelle Erkennung für erstes/letztes Element.</li>
+</ul>
+<h3>Version 9.27 - 9.28</h3>
+<ul>
+<li><strong>Fallback-Töne:</strong> Fallback-Töne hinzugefügt.</li>
+<li><strong>Überschriften:</strong> Unterstützung für Überschriftenebenen 7, 8 und 9.</li>
+</ul>
+<h3>Version 9.23 - 9.26</h3>
+<ul>
+<li><strong>Fehlerbehebungen:</strong> Fehler bei Satznavigation und NVDA 2026.2-Kompatibilität behoben.</li>
+</ul>
+<h3>Version 9.21 - 9.22</h3>
+<ul>
+<li><strong>Importverbesserungen:</strong> Unterstützung für den Import entkomprimierter Ordner als Themen hinzugefügt sowie ein Dialog zur Auswahl zwischen Ordner oder ZIP/.atp-Datei.</li>
+<li><strong>Auto-Update &amp; Vorabversion:</strong> Kontrollkästchen im Tab "Allgemein" hinzugefügt, um Auto-Updates zu verwalten und Beta-Builds vor der Veröffentlichung zu nutzen.</li>
+</ul>
+<h3>Version 9.20</h3>
+<ul>
+<li><strong>Optimierung der Einstellungs-Benutzeroberfläche:</strong> Erhebliche Leistungsverbesserungen im Einstellungsdialog. Langsame Raster wurden durch schnelle ListCtrls ersetzt und Lazy-Loading für alle rechenintensiven Tabs implementiert.</li>
+<li><strong>Theme-Caching:</strong> Installierte Themen werden zwischengespeichert, um Datei-I/O beim Start zu reduzieren.</li>
+</ul>
+<h3>Version 9.11 - 9.13</h3>
+<ul>
+<li><strong>Konflikterkennung:</strong> Ein intelligenter Startdialog wurde hinzugefügt, der in Konflikt stehende NVDA-Add-ons (wie ältere Audio-Themes-Plugins) erkennt und es dem Benutzer ermöglicht, diese sicher zu deaktivieren oder zu deinstallieren.</li>
+</ul>
+<h3>Version 9.4 - 9.10</h3>
+<ul>
+<li><strong>Native MP3-Dekodierung:</strong> libmpg123 integriert für eine schnelle, native MP3-Dekodierung ohne vollständige Abhängigkeit von FFmpeg.</li>
+<li><strong>Audio-Verarbeitungspipeline:</strong> OGG RAM-Caching und 24-Bit-WAV-Unterstützung hinzugefügt und Audio-DSP-Funktionen (SmartVolume, Envelope, TrimSilence) vollständig auf die neue Pipeline umgestellt.</li>
+<li><strong>Übersetzungen:</strong> 100%ige Lokalisierung für Arabisch, Spanisch, Italienisch, Russisch, Deutsch und Chinesisch abgeschlossen.</li>
+</ul>
+<h2>Übersetzer</h2>
+<ul>
+<li><strong>Spanisch:</strong> Hassan AlBarshoumy, Luis Carlos González Morales</li>
+<li><strong>Italienisch:</strong> Christian Cantelmi, Ciro Cantelmi</li>
+<li><strong>Russisch:</strong> Valentin Kupriyanov</li>
+<li><strong>Chinesisch:</strong> Cary-rowen, Jerry</li>
+<li><strong>Deutsch:</strong> René L</li>
+</ul>
+<h2>Support</h2>
+<p>Für Probleme, Anfragen oder Fehlerberichte wenden Sie sich bitte an den offiziellen Kontaktpunkt: <strong><a href="https://t.me/HassanAlBarshoumy">Hassan AlBarshoumys Telegram</a></strong></p>
+</body>
+</html>

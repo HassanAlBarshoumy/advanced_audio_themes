@@ -673,7 +673,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
                         theme = t
                         break
             except Exception:
-                pass
+                log.debug("AudioThemes: could not locate the active theme", exc_info=True)
             if theme is None and themes:
                 theme = themes[0]
             if theme is None:
@@ -693,7 +693,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
                 if player is not None:
                     theme.load(player)
             except Exception:
-                pass
+                log.debug("AudioThemes: could not load the theme for preview", exc_info=True)
             sounds = getattr(theme, "sounds", {}) or {}
             # Build the full set of candidate keys.
             candidates = set()
@@ -709,7 +709,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
                 for q in QUICKNAV_PSEUDO_ROLES:
                     candidates.add(q)
             except Exception:
-                pass
+                log.debug("AudioThemes: could not load quick-nav pseudo roles", exc_info=True)
             missing = []
             for key in sorted(candidates):
                 if key in sounds:
@@ -2481,7 +2481,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             try:
                 self.appSoundOverridesEdit.SetValue("{}")
             except Exception:
-                pass
+                log.debug("AudioThemes: could not reset the app sound overrides field", exc_info=True)
 
         try:
             self.saveSoundAppsEdit.SetValue(conf.get("save_sound_apps", "{}"))
@@ -2489,7 +2489,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
             try:
                 self.saveSoundAppsEdit.SetValue("{}")
             except Exception:
-                pass
+                log.debug("AudioThemes: could not reset the save sound apps field", exc_info=True)
 
         if hasattr(self, '_roleFormats'):
             for role, _label in self._role_list:
@@ -3118,12 +3118,12 @@ class AudioThemesSettingsPanel(SettingsPanel):
             json.loads(self.appSoundOverridesEdit.GetValue())
             conf["app_sound_overrides"] = self.appSoundOverridesEdit.GetValue()
         except Exception:
-            pass
+            log.debug("AudioThemes: app_sound_overrides is not valid JSON; keeping the previous value", exc_info=True)
         try:
             json.loads(self.saveSoundAppsEdit.GetValue())
             conf["save_sound_apps"] = self.saveSoundAppsEdit.GetValue()
         except Exception:
-            pass
+            log.debug("AudioThemes: save_sound_apps is not valid JSON; keeping the previous value", exc_info=True)
         
         # Write audio-engine options into the BASE config (nvda.ini) directly.
         # NVDA redirects writes for a section missing from nvda.ini into the
@@ -3413,7 +3413,7 @@ class AudioThemesSettingsPanel(SettingsPanel):
                     arc_name = os.path.join(archive_prefix, os.path.relpath(full_path, source_dir))
                     zipf.write(full_path, arc_name)
         except OSError:
-            pass
+            log.debug("AudioThemes: could not add %s to the archive", source_dir, exc_info=True)
 
     def _extract_directory_from_zip(self, zipf, archive_prefix, dest_dir, skip_existing=False):
         """Extract all files matching archive_prefix/* from zipf into dest_dir.

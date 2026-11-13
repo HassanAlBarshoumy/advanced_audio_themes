@@ -911,7 +911,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     if landed_obj.role in _CONTAINER_ROLES:
                         return
                 except Exception:
-                    pass
+                    log.debug("AudioThemes: could not read the landed object role", exc_info=True)
             # Skip selection extensions (shift+arrows): sounds follow caret
             # moves only.
             if cfg.get("suppress_sounds_while_selecting", True) and ti is not None:
@@ -920,7 +920,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                     if _sel is not None and not _sel.isCollapsed:
                         return
                 except Exception:
-                    pass
+                    log.debug("AudioThemes: could not read the selection state", exc_info=True)
             if dedupe_mode == "browse":
                 if self._is_same_object_duplicate(landed_obj):
                     return
@@ -995,7 +995,7 @@ class GlobalPlugin(SentenceNavMixin, BrowserNavMixin, NavLayerMixin, globalPlugi
                 if eventHandler.isPendingEvents("gainFocus"):
                     return
             except Exception:
-                pass
+                log.debug("AudioThemes: could not query pending gainFocus events", exc_info=True)
             if not cfg.get("enable_audio_themes", True) or not self.handler.active_theme:
                 return
             # Tier 1: a new caret context (object identity change) -> role sound.

@@ -2240,27 +2240,6 @@ msgstr "بالعالم"
 msgid "{roleText} level {level}"
 msgstr "{roleText} المستوى {level}"
 
-msgid ""
-"استكمال العمل على إضافة سمات الصوت (Audio Themes)، مع إضافة دعم للإصدارات الأحدث من NVDA.\n"
-"تقوم هذه الإضافة بإنشاء عرض صوتي افتراضي يشغل أصواتاً عند التركيز أو التنقل بين العناصر.\n"
-"كما تتيح لك الإضافة تفعيل، تثبيت، إزالة، تحرير، إنشاء، وتوزيع حزم السمات الصوتية.\n"
-"\n"
-"تم دمجها مع إضافة Earcons and Speech rules:\n"
-"تسمح بإعداد أصوات مخصصة للكلمات، الأحرف، أنواع العناصر، الحالات، ومعلومات التنسيق.\n"
-"\n"
-"تم دمج إضافة SentenceNav للتنقل بالجمل (Alt+أسهم).\n"
-"تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).\n"
-msgstr ""
-"استكمال العمل على إضافة سمات الصوت (السمات الصوتية)، مع إضافة دعم لإصدارات LAN من NVDA.\n"
-"تقوم هذه الإضافة بعرض صوتي مختلف بشكل خاص عند التركيز أو الاستجابة بين العناصر.\n"
-"كما يضيف لك الإضافة تفعيل، تثبيت، إزالة، تحرير، إنشاء، تقسيم حزم العلامات الصوتية.\n"
-"\n"
-"تم دمجها مع إضافة رموز الأذن وقواعد الكلام:\n"
-"تتيح أصوات مخصصة للكلمات، أنواع العناصر، الحالات، ومعلومات جديدة.\n"
-"\n"
-"تم دمج اضافة SentenceNav للتنقل بالجمل (Alt+أسهم).\n"
-"تم دمج إضافة BrowserNav للتصفح المتقدم في المتصفح (NVDA+Alt+أسهم).\n"
-
 msgid "(Plays 3D sound even if 3D mode is disabled)"
 msgstr "(يُشغل الصوت بوضع 3D، حتى وإن كان معطلاً من الإعدادات)"
 
@@ -4048,3 +4027,36 @@ msgstr "نعم"
 
 msgid "You already have website {} in your BrowserNav configuration.\n"
 msgstr "لديك بالفعل الموقع {} في إعدادات التنقل في المتصفح.\n"
+
+msgid "Conversion done: {converted} converted, {skipped} skipped, {failed} failed."
+msgstr "اكتمل التحويل: {converted} محوّل، {skipped} متجاوز، {failed} فاشل."
+
+msgid "Conversion done: {converted} converted, {skipped} skipped, {failed} failed. Details in the NVDA log."
+msgstr "اكتمل التحويل: {converted} محوّل، {skipped} متجاوز، {failed} فاشل. التفاصيل في سجل NVDA."
+
+msgid "Conversion finished: {converted} converted, {skipped} skipped, {failed} failed."
+msgstr "انتهى التحويل: {converted} محوّل، {skipped} متجاوز، {failed} فاشل."
+
+msgid "Place .wav files in your theme folder with these names:\nsys_ac_plug.wav, sys_ac_unplug.wav, sys_battery_low.wav,\nsys_battery_critical.wav, sys_battery_full.wav, sys_usb_plug.wav,\nsys_usb_unplug.wav, sys_volume_plug.wav, sys_volume_unplug.wav,\nsys_network_connect.wav, sys_network_disconnect.wav,\nsys_wake.wav, sys_sleep.wav"
+msgstr "ضع ملفات .wav في مجلد السمة بهذه الأسماء:\nsys_ac_plug.wav, sys_ac_unplug.wav, sys_battery_low.wav,\nsys_battery_critical.wav, sys_battery_full.wav, sys_usb_plug.wav,\nsys_usb_unplug.wav, sys_volume_plug.wav, sys_volume_unplug.wav,\nsys_network_connect.wav, sys_network_disconnect.wav,\nsys_wake.wav, sys_sleep.wav"
+
+msgid "Revolutionize your screen reading experience with Advanced Audio Themes, the ultimate auditory powerhouse for NVDA.\n\nImmerse yourself in a dynamic 3D soundscape where every UI event—from navigating menus to tracking progress bars and typing—is brought to life with rich, customizable spatial audio. With the built-in Audio Themes Studio, you can effortlessly craft, edit, and explore a cloud-based library of community-driven themes.\n\nEmpower your workflow with groundbreaking features:\n- Studio-Grade Audio DSP: Elevate your audio with real-time Bass Boost, Noise Gate, and intelligent Audio Ducking.\n- System Status Sounds: Stay seamlessly connected to your PC with instant, native audio alerts for battery, USB, power, and network events.\n- Smart App Profiles: Enjoy a tailored experience as themes and typing soundscapes adapt automatically to your active application.\n- 3D Sonar & Beacons: Visualize your screen spatially by dropping audio beacons and sweeping windows with radar-like precision.\n- Lightning-Fast Navigation: Break free from complex keystrokes using the modifier-free Navigation Layer, alongside deeply integrated BrowserNav and SentenceNav engines.\n- Phonetic Punctuation: Take total control over speech feedback with pinpoint rules for words, states, and roles.\n\nStep beyond traditional screen reading and unleash a breathtaking auditory dimension to your daily tasks!\n"
+msgstr "أحدث ثورة في تجربة قراءة الشاشة مع Advanced Audio Themes، القوة السمعية المطلقة لـ NVDA.\n\nانغمس في مشهد صوتي ثلاثي الأبعاد ديناميكي حيث تُبعث الحياة في كل حدث واجهة — من التنقل في القوائم إلى تتبّع أشرطة التقدّم والكتابة — عبر صوت مكاني غني وقابل للتخصيص. وباستخدام Audio Themes Studio المدمج، يمكنك صنع السمات وتحريرها واستكشاف مكتبة سحابية من السمات التي يبتكرها المجتمع بسهولة تامة.\n\nعزّز سير عملك بميزات رائدة:\n- معالجة صوتية بمستوى الاستوديو: ارتقِ بصوتك مع تعزيز الجهير في الوقت الفعلي، وبوابة الضوضاء، وتخفيض الصوت الذكي.\n- أصوات حالة النظام: ابقَ على اتصال دائم بجهازك عبر تنبيهات صوتية فورية وأصلية للبطارية وUSB والطاقة وأحداث الشبكة.\n- ملفات تعريف ذكية للتطبيقات: استمتع بتجربة مخصّصة تتكيّف فيها السمات والمشاهد الصوتية للكتابة تلقائيًا مع التطبيق النشط.\n- السونار ثلاثي الأبعاد والمنارات: تصوّر شاشتك مكانيًا عبر إسقاط منارات صوتية ومسح النوافذ بدقة تشبه الرادار.\n- تنقل فائق السرعة: تحرّر من اختصارات لوحة المفاتيح المعقّدة باستخدام طبقة التنقل بلا مفاتيح تعديل، إلى جانب محرّكي BrowserNav وSentenceNav المدمجين بعمق.\n- الترقيم الصوتي: تحكّم كامل في التغذية الراجعة الكلامية بقواعد دقيقة للكلمات والحالات والأدوار.\n\nتجاوز قراءة الشاشة التقليدية وأطلق بُعدًا صوتيًا آسرًا لمهامك اليومية!\n"
+
+msgid "The downloaded file failed its integrity check."
+msgstr "فشل التحقق من سلامة الملف الذي تم تنزيله."
+
+msgid "The installed version could not be determined.\nThe latest published version is {tag}."
+msgstr "تعذّر تحديد الإصدار المثبّت.\nأحدث إصدار منشور هو {tag}."
+
+msgid "The published checksum could not be read."
+msgstr "تعذّرت قراءة البصمة المنشورة."
+
+msgid "The store address must start with https://"
+msgstr "يجب أن يبدأ عنوان المتجر بـ https://"
+
+msgid "This theme has an invalid download link."
+msgstr "رابط تنزيل هذه السمة غير صالح."
+
+msgid "WAV, OGG, MP3, and FLAC are supported natively.\nM4A, AAC, OPUS, WMA, MP2, and AC3 require FFmpeg to play.\nConversion permanently rewrites such files to WAV or FLAC inside\ntheir theme folder, so FFmpeg is no longer needed for them.\nFFmpeg is still required to decode the source during conversion.\nDownload size: ~50MB, extracted: ~12MB."
+msgstr "تُدعم صيغ WAV وOGG وMP3 وFLAC أصلاً.\nتتطلب M4A وAAC وOPUS وWMA وMP2 وAC3 وجود FFmpeg للتشغيل.\nيعيد التحويل كتابة هذه الملفات نهائيًا إلى WAV أو FLAC داخل\nمجلد السمة، لذا لن تحتاج إلى FFmpeg بعد ذلك.\nيظل FFmpeg مطلوبًا لفك ترميز المصدر أثناء التحويل.\nحجم التنزيل: نحو 50 ميغابايت، وبعد الاستخراج: نحو 12 ميغابايت."

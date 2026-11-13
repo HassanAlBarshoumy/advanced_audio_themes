@@ -9,3 +9,5 @@ build/
 ai_changes.md
 project_analysis_report.md
 project_context.md
+.claude/
+CLAUDE.md

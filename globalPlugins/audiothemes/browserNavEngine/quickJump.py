@@ -472,6 +472,32 @@ execGlobals = {
     'ui': ui,
 }
 
+# Bookmark snippets are user-authored code executed with a restricted
+# ``__builtins__``.  That alone is not a boundary: a snippet could climb to
+# ``object.__subclasses__`` through an attribute access and reach anything in
+# the process.  The AST below rejects the only routes to that traversal before
+# the code is ever compiled to bytecode.
+_FORMAT_DUNDER_RE = re.compile(r"\{[^{}]*__[^{}]*\}")
+_DUNDER_SCRIPT_ERROR = "dunder attribute access is not allowed in quick jump scripts"
+_IMPORT_SCRIPT_ERROR = "import statements are not allowed in quick jump scripts"
+
+
+def _validate_script_ast(tree):
+    """Reject snippet ASTs that could escape the restricted sandbox."""
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Import, ast.ImportFrom)):
+            raise SyntaxError(_IMPORT_SCRIPT_ERROR)
+        if isinstance(node, ast.Attribute) and node.attr.startswith("__"):
+            raise SyntaxError(_DUNDER_SCRIPT_ERROR)
+        if isinstance(node, ast.Name) and node.id.startswith("__"):
+            raise SyntaxError(_DUNDER_SCRIPT_ERROR)
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            # ``"{0.__class__}".format(obj)`` reaches an attribute by name
+            # inside the format string, so the AST check cannot see it.
+            if _FORMAT_DUNDER_RE.search(node.value):
+                raise SyntaxError(_DUNDER_SCRIPT_ERROR)
+
+
 EMPTY_PYTHON_LINE_REGEXP = re.compile(r"^\s*(#.*)?$")
 class QJBookmark(QJImmutable):
     enabled: bool
@@ -511,6 +537,7 @@ class QJBookmark(QJImmutable):
             execLocals = {}
             try:
                 compiled = compile(wrapPythonCode(self.snippet), "<bookmarkScript>", 'exec', ast.PyCF_ONLY_AST)
+                _validate_script_ast(compiled)
                 ast.increment_lineno(compiled, -1)
                 bytecode = compile(compiled, "<bookmarkScript>", 'exec', dont_inherit=True)
                 exec(bytecode, execGlobals, execLocals)

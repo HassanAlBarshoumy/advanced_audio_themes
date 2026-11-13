@@ -1033,7 +1033,7 @@ class UnspokenPlayer:
 				final_audio = _downmix_to_mono_bytes(final_audio)
 
 			with self._play_cache_lock:
-				if len(self._play_cache) > 100:
+				if len(self._play_cache) >= 100:
 					self._play_cache.popitem(last=False)
 				self._play_cache[cache_key] = final_audio
 

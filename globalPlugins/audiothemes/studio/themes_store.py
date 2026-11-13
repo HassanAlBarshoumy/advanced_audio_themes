@@ -17,10 +17,17 @@ import config
 
 STORE_URL = "https://raw.githubusercontent.com/HassanAlBarshoumy/AudioThemesStore/main/store.json"
 
+
+def _is_https_url(url):
+    """Only an HTTPS URL may be fetched; anything else is rejected."""
+    return isinstance(url, str) and url.strip().lower().startswith("https://")
+
+
 class ThemesStoreDialog(wx.Dialog):
     def __init__(self, parent):
         super().__init__(parent, title=_("Themes Store"), size=(500, 450))
         self._closed = False
+        self._cancelled = False
         self.themes_data = []
         self.filtered_themes = []
         
@@ -28,7 +35,10 @@ class ThemesStoreDialog(wx.Dialog):
         
         urlSizer = wx.BoxSizer(wx.HORIZONTAL)
         urlLabel = wx.StaticText(self, label=_("Store URL:"))
-        self.urlEdit = wx.TextCtrl(self, value=config.conf.get("audiothemes", {}).get("store_url", STORE_URL))
+        stored_url = config.conf.get("audiothemes", {}).get("store_url", STORE_URL)
+        if not _is_https_url(stored_url):
+            stored_url = STORE_URL
+        self.urlEdit = wx.TextCtrl(self, value=stored_url)
         self.refreshBtn = wx.Button(self, label=_("&Refresh"))
         urlSizer.Add(urlLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
         urlSizer.Add(self.urlEdit, 1, wx.EXPAND | wx.ALL, 5)
@@ -76,6 +86,7 @@ class ThemesStoreDialog(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnPreview, self.previewBtn)
         self.Bind(wx.EVT_BUTTON, self.OnRefresh, self.refreshBtn)
         self.Bind(wx.EVT_BUTTON, self.OnClose, self.closeBtn)
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
         
         # Start fetch
         self.OnRefresh(None)
@@ -83,6 +94,9 @@ class ThemesStoreDialog(wx.Dialog):
     def OnRefresh(self, event):
         url = self.urlEdit.GetValue().strip()
         if not url: return
+        if not _is_https_url(url):
+            self.statusLabel.SetLabel(_("The store address must start with https://"))
+            return
         config.conf["audiothemes"]["store_url"] = url
         self.statusLabel.SetLabel(_("Connecting to store..."))
         self.themesList.Clear()
@@ -104,9 +118,17 @@ class ThemesStoreDialog(wx.Dialog):
             
     def PopulateList(self, data):
         if isinstance(data, list):
-            self.themes_data = data
+            raw = data
+        elif isinstance(data, dict):
+            raw = data.get("themes", [])
         else:
-            self.themes_data = data.get("themes", [])
+            raw = []
+        # Only well-formed entries are kept: a hostile or broken store must not
+        # be able to crash the dialog or smuggle a non-HTTPS download link.
+        self.themes_data = [
+            t for t in raw
+            if isinstance(t, dict) and isinstance(t.get("name"), str) and t.get("name")
+        ]
         self.filtered_themes = list(self.themes_data)
         self.statusLabel.SetLabel(_("Themes successfully fetched. Select a theme:"))
         self.UpdateThemesList()
@@ -148,7 +170,9 @@ class ThemesStoreDialog(wx.Dialog):
         t = self.filtered_themes[idx]
         url = t.get("url")
         if not url: return
-        
+        if not _is_https_url(url):
+            self.statusLabel.SetLabel(_("This theme has an invalid download link."))
+            return
         self.downloadBtn.Disable()
         self.statusLabel.SetLabel(_("Downloading... Please wait"))
         pkg_type = t.get("type", "theme")
@@ -165,6 +189,8 @@ class ThemesStoreDialog(wx.Dialog):
                 pack_data = bytearray()
                 
                 while True:
+                    if self._closed or self._cancelled:
+                        return
                     chunk = response.read(8192)
                     if not chunk:
                         break
@@ -172,10 +198,17 @@ class ThemesStoreDialog(wx.Dialog):
                     downloaded += len(chunk)
                     if total_size:
                         percent = int((downloaded / total_size) * 100)
-                        wx.CallAfter(self.progressBar.SetValue, percent)
-                        wx.CallAfter(self.statusLabel.SetLabel, _("Downloading... {}%").format(percent))
-                        
-            wx.CallAfter(self.progressBar.SetValue, 0)
+                        if not self._closed:
+                            wx.CallAfter(self.progressBar.SetValue, percent)
+                            wx.CallAfter(self.statusLabel.SetLabel, _("Downloading... {}%").format(percent))
+                            
+            # The dialog may have been closed while the download was running:
+            # writing a temp file and firing wx.CallAfter on dead widgets would
+            # raise after Destroy, so stop quietly instead.
+            if self._closed or self._cancelled:
+                return
+            if not self._closed:
+                wx.CallAfter(self.progressBar.SetValue, 0)
             fd, tmp_path = tempfile.mkstemp(suffix=".zip")
             with os.fdopen(fd, 'wb') as f:
                 f.write(pack_data)
@@ -185,10 +218,15 @@ class ThemesStoreDialog(wx.Dialog):
             if tmp_path and os.path.exists(tmp_path):
                 with suppress(Exception):
                     os.remove(tmp_path)
-            wx.CallAfter(self.statusLabel.SetLabel, _("Download failed."))
-            wx.CallAfter(self.downloadBtn.Enable)
+            if not self._closed:
+                wx.CallAfter(self.statusLabel.SetLabel, _("Download failed."))
+                wx.CallAfter(self.downloadBtn.Enable)
             
     def InstallFinished(self, tmp_path, pkg_type):
+        if self._closed or self._cancelled:
+            with suppress(Exception):
+                os.remove(tmp_path)
+            return
         try:
             if pkg_type == "typing_pack":
                 if AudioThemesHandler.install_typing_soundPackage(tmp_path):
@@ -327,4 +365,5 @@ class ThemesStoreDialog(wx.Dialog):
                 log.debug("AudioThemes: swallowed Exception in studio.themes_store.DownloadAndPreview")
     def OnClose(self, event):
         self._closed = True
+        self._cancelled = True
         self.Destroy()

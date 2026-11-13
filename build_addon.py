@@ -53,12 +53,17 @@ def enforce_ci_only_build():
 	raise LocalBuildRefused(LOCAL_BUILD_REFUSAL)
 
 # Development-only files and folders: never shipped inside the package.
-EXCLUDE_DIRS = {".git", ".github", "__pycache__", "scripts", "dist", "build"}
+# ".gitnexus" is a local code-intelligence index (hundreds of MB of cache) and
+# ".claude" holds the agent skill notes; neither is read by the add-on at
+# runtime, and both are git-ignored, so they must never inflate the package.
+EXCLUDE_DIRS = {".git", ".github", ".gitnexus", ".claude", "__pycache__", "scripts", "dist", "build"}
 EXCLUDE_FILES = {
 	".gitignore",
 	".gitattributes",
 	".gitmodules",
 	"AGENTS.md",
+	"AGENTS-HISTORY.md",
+	"CLAUDE.md",
 	"build_addon.py",
 	"buildVars.py",
 	"SConstruct",

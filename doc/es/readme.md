@@ -264,6 +264,7 @@ En este complemento están integradas una serie de funciones muy avanzadas que p
 | **Alt+Win+Flechas** | Navegación avanzada por cláusulas. |
 | **Alt+Shift+Flechas** | Navegación avanzada por párrafos. |
 | **NVDA+Alt+Flechas** | Navegación Web avanzada (BrowserNav). |
+| **Ctrl+Alt+J** | QuickSpeak: lectura rápida según el marcador QuickSpeak de BrowserNav (solo en modo lectura). |
 | **NVDA+Win+N** | Alternar la Capa de Navegación (navegación rápida sin modificadores). |
 | **Ctrl+C / X / V** | Copiar, Cortar y Pegar con anuncios de audio. |
 | **Ctrl+A** | Seleccionar todo con anuncio de audio. |
@@ -272,7 +273,7 @@ En este complemento están integradas una serie de funciones muy avanzadas que p
 | **Ctrl+Shift+Z** | Rehacer alternativo con anuncio de audio. |
 
 ## Compatibility & Requirements
-- **NVDA Version:** Requires NVDA 2024.1.0 or later.
+- **NVDA Version:** Requires NVDA 2026.1.0 or later.
 - **Last Tested NVDA Version:** 2026.2.0
 - **Operating System:** Windows 10 or Windows 11.
 

@@ -264,6 +264,7 @@
 | **Alt+Win+Стрелки** | Расширенная навигация по фразам. |
 | **Alt+Shift+Стрелки** | Расширенная навигация по абзацам. |
 | **NVDA+Alt+Стрелки** | Расширенная веб-навигация (BrowserNav). |
+| **Ctrl+Alt+J** | QuickSpeak: быстрое чтение по закладке QuickSpeak BrowserNav (только в режиме чтения). |
 | **NVDA+Win+N** | Включить/выключить Слой навигации (быстрарая навигация без модификаторов). |
 | **Ctrl+C / X / V** | Копировать, Вырезать и Вставить со звуковыми уведомлениями. |
 | **Ctrl+A** | Выбрать все со звуковым уведомлением. |
@@ -272,7 +273,7 @@
 | **Ctrl+Shift+Z** | Альтернативный повтор со звуковым уведомлением. |
 
 ## Compatibility & Requirements
-- **NVDA Version:** Requires NVDA 2024.1.0 or later.
+- **NVDA Version:** Requires NVDA 2026.1.0 or later.
 - **Last Tested NVDA Version:** 2026.2.0
 - **Operating System:** Windows 10 or Windows 11.
 

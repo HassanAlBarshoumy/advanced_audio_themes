@@ -60,7 +60,7 @@ def _say_all_running():
         try:
             return u.say_all_running()
         except Exception:
-            pass
+            log.debug("AudioThemes: say_all_running probe failed", exc_info=True)
     try:
         return SayAllHandler.isRunning()
     except Exception:
@@ -173,6 +173,7 @@ audiothemes_config_defaults = {
     "disabled_apps_suppress_categories": "string(default='{\"theme_sounds\":true,\"typing_sounds\":true,\"earcons\":true,\"browsernav\":true,\"sentencenav\":true,\"textnav\":true,\"ui_beeps\":true}')",
     "check_for_updates_auto": "boolean(default=True)",
     "check_for_updates_prerelease": "boolean(default=False)",
+    "store_url": "string(default='https://raw.githubusercontent.com/HassanAlBarshoumy/AudioThemesStore/main/store.json')",
     "firstlast_fallback": "string(default='role')",
     "first_fallback_role_name": "string(default='listitem')",
     "last_fallback_role_name": "string(default='listitem')",
@@ -675,7 +676,7 @@ def safe_extract_archive(pack, dest_dir, allowed_prefix=None, skip_existing=Fals
             try:
                 os.remove(target)
             except OSError:
-                pass
+                log.debug("AudioThemes: could not remove the partial file %s", target, exc_info=True)
             raise
         written += 1
     return written
@@ -1055,7 +1056,7 @@ def showPendingConflicts():
             try:
                 os.makedirs(os.path.dirname(CONFLICT_PENDING_FILE), exist_ok=True)
             except OSError:
-                pass
+                log.debug("AudioThemes: could not create the conflict directory", exc_info=True)
             with open(CONFLICT_PENDING_FILE, "w") as f:
                 json.dump(found, f)
     except Exception:
@@ -1494,6 +1495,10 @@ class AudioThemesHandler:
                     suppress = True
 
                 blacklisted_roles = cfg.get("blacklisted_roles", [19])
+                if isinstance(blacklisted_roles, str):
+                    # Defensive: _cached_config normally stores the parsed list,
+                    # but a stale/raw value must never be compared as string.
+                    blacklisted_roles = _get_blacklisted_roles()
                 if role in blacklisted_roles:
                     suppress = True
 

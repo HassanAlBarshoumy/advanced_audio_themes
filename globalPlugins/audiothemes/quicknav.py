@@ -169,7 +169,7 @@ class BrowseModeQuickNavInterceptor:
                             if not new_selection.isCollapsed:
                                 return
                         except Exception:
-                            pass
+                            log.debug("AudioThemes: selection state probe failed in quicknav", exc_info=True)
                     self._check_and_play_nav(itemType, new_selection)
 
         self._patched_script_ref = patched_quick_nav_script

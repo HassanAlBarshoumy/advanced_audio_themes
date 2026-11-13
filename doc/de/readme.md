@@ -294,6 +294,7 @@ In dieses Add-on ist eine Reihe hochgradig erweiterter Funktionen integriert, di
 | **Alt+Win+Pfeiltasten** | Erweiterte Phrasennavigation. |
 | **Alt+Umschalt+Pfeiltasten** | Erweiterte Absatznavigation. |
 | **NVDA+Alt+Pfeiltasten** | Erweiterte Webnavigation (BrowserNav). |
+| **Strg+Alt+J** | QuickSpeak: liest gemäß der BrowserNav-QuickSpeak-Bookmark (nur im Lesemodus). |
 | **NVDA+Win+N** | Navigationsebene umschalten (schnelle Navigation ohne Modifikatoren). |
 | **Strg+C / X / V** | Kopieren, Ausschneiden und Einfügen mit akustischen Ansagen. |
 | **Strg+A** | Alles auswählen mit akustischer Ansage. |
@@ -302,7 +303,7 @@ In dieses Add-on ist eine Reihe hochgradig erweiterter Funktionen integriert, di
 | **Strg+Umschalt+Z** | Alternatives Wiederherstellen mit akustischer Ansage. |
 
 ## Compatibility & Requirements
-- **NVDA Version:** Requires NVDA 2024.1.0 or later.
+- **NVDA Version:** Requires NVDA 2026.1.0 or later.
 - **Last Tested NVDA Version:** 2026.2.0
 - **Operating System:** Windows 10 or Windows 11.
 

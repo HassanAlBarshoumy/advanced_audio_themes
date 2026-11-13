@@ -338,6 +338,7 @@ The 27 modes are split into two groups: **text modes** (navigate by reading unit
 | **Alt+Windows+Arrows** | Advanced Phrase Navigation. |
 | **Alt+Shift+Arrows** | Advanced Paragraph Navigation. |
 | **NVDA+Alt+Arrows** | Advanced Web Navigation (BrowserNav). |
+| **Ctrl+Alt+J** | QuickSpeak: speaks according to the BrowserNav QuickSpeak bookmark (browse mode only). |
 | **NVDA+Win+N** | Toggle Navigation Layer (fast navigation without modifiers). |
 | **Ctrl+C / X / V** | Copy, Cut, and Paste with audio announcements. |
 | **Ctrl+A** | Select All with audio announcement. |
@@ -346,7 +347,7 @@ The 27 modes are split into two groups: **text modes** (navigate by reading unit
 | **Ctrl+Shift+Z** | Alternate redo with audio announcement. |
 
 ## Compatibility & Requirements
-- **NVDA Version:** Requires NVDA 2024.1.0 or later.
+- **NVDA Version:** Requires NVDA 2026.1.0 or later.
 - **Last Tested NVDA Version:** 2026.2.0
 - **Operating System:** Windows 10 or Windows 11.
 

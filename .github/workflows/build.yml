@@ -49,6 +49,14 @@ jobs:
       - name: Syntax-check every Python source
         run: python -m compileall -q installTasks.py build_addon.py scripts globalPlugins
 
+      - name: Run the repository test suite
+        run: python -m unittest discover -s tests
+
+      - name: Lint for real errors (undefined names, syntax, __all__)
+        run: |
+          python -m pip install --quiet ruff
+          ruff check .
+
       - name: Build the package
         id: build
         run: python build_addon.py

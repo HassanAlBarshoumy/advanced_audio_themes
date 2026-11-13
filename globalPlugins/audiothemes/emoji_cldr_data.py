@@ -34,8 +34,18 @@ _emoji_to_name = {}
 _emoji_to_category = {}
 _emoji_set = set()
 _loaded = False
-_load_attempted = False
-_load_lock = threading.Lock()
+# True once the on-disk cache has been looked at (found or not).  Kept so the
+# file is read at most once per process instead of on every detection call.
+_cache_checked = False
+# Guards every mutation of the module state above, and the download trigger.
+_load_lock = threading.RLock()
+# A download is started in a daemon thread: the hot path must never block on
+# unicode.org.  These two fields rate-limit it so a failed download is retried
+# at most once every DOWNLOAD_RETRY_SECONDS.
+_downloading = False
+_last_attempt_time = 0.0
+DOWNLOAD_RETRY_SECONDS = 6 * 60 * 60
+CACHE_MAX_AGE_SECONDS = CACHE_MAX_AGE_DAYS * 24 * 60 * 60
 
 
 def _get_cache_dir():
@@ -48,6 +58,8 @@ def _get_cache_path():
 
 def _hex_to_emoji(hex_str):
     try:
+        if not hex_str or not hex_str.strip():
+            return None
         return "".join(chr(int(p, 16)) for p in hex_str.strip().split())
     except (ValueError, OverflowError):
         return None
@@ -97,6 +109,11 @@ def _build_category_map(emoji_to_group):
 
 
 def _load_from_cache():
+    """Return ``(emoji_to_group, emoji_to_name, timestamp)`` from the cache.
+
+    Any failure (missing, unreadable or malformed file) yields
+    ``(None, None, None)`` so the caller falls back to a background download.
+    """
     path = _get_cache_path()
     try:
         with open(path, "r", encoding="utf-8") as f:
@@ -111,14 +128,25 @@ def _load_from_cache():
             if emoji_str and group:
                 emoji_to_group[emoji_str] = group
                 emoji_to_name[emoji_str] = name or ""
-        return emoji_to_group, emoji_to_name
+        if not emoji_to_group:
+            return None, None, None
+        return emoji_to_group, emoji_to_name, data.get("timestamp")
     except Exception as e:
         logHandler.log.debug(f"Could not load emoji CLDR cache: {e}")
-        return None, None
+        return None, None, None
+
+
+def _cache_is_stale(timestamp):
+    try:
+        age = time.time() - float(timestamp)
+    except (TypeError, ValueError):
+        return True
+    return age > CACHE_MAX_AGE_SECONDS
 
 
 def _save_to_cache(emoji_to_group, emoji_to_name):
     path = _get_cache_path()
+    tmp_path = None
     try:
         d = os.path.dirname(path)
         if not os.path.exists(d):
@@ -136,10 +164,20 @@ def _save_to_cache(emoji_to_group, emoji_to_name):
             "timestamp": time.time(),
             "emoji": entries,
         }
-        with open(path, "w", encoding="utf-8") as f:
+        # Write then rename: a crash mid-write must never leave a half-written
+        # cache that would be re-read on the next start.
+        tmp_path = path + ".tmp"
+        with open(tmp_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False)
+        os.replace(tmp_path, path)
     except Exception as e:
         logHandler.log.debug(f"Could not save emoji CLDR cache: {e}")
+        if tmp_path is not None:
+            try:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+            except OSError:
+                logHandler.log.debug("Could not remove the temporary emoji cache file", exc_info=True)
 
 
 def _download_and_parse():
@@ -157,37 +195,91 @@ def _download_and_parse():
     return None, None
 
 
-def load(force_refresh=False):
-    global _emoji_to_group, _emoji_to_name, _emoji_to_category, _emoji_set, _loaded, _load_attempted
-    with _load_lock:
-        if _loaded and not force_refresh:
-            return True
-        _load_attempted = True
-        emoji_to_group = None
-        emoji_to_name = None
-        if not force_refresh:
-            emoji_to_group, emoji_to_name = _load_from_cache()
-        if emoji_to_group is None:
-            emoji_to_group, emoji_to_name = _download_and_parse()
-            if emoji_to_group:
-                _save_to_cache(emoji_to_group, emoji_to_name)
+def _apply_data(emoji_to_group, emoji_to_name):
+    global _emoji_to_group, _emoji_to_name, _emoji_to_category, _emoji_set, _loaded
+    _emoji_to_group = emoji_to_group
+    _emoji_to_name = emoji_to_name
+    _emoji_to_category = _build_category_map(emoji_to_group)
+    _emoji_set = set(emoji_to_group.keys())
+    # Set last: readers treat a True ``_loaded`` as "all four are in place".
+    _loaded = True
+
+
+def _background_download():
+    global _downloading, _last_attempt_time
+    try:
+        emoji_to_group, emoji_to_name = _download_and_parse()
         if emoji_to_group:
-            _emoji_to_group = emoji_to_group
-            _emoji_to_name = emoji_to_name
-            _emoji_to_category = _build_category_map(emoji_to_group)
-            _emoji_set = set(emoji_to_group.keys())
-            _loaded = True
+            _save_to_cache(emoji_to_group, emoji_to_name)
+            with _load_lock:
+                _apply_data(emoji_to_group, emoji_to_name)
             logHandler.log.info(f"Loaded {len(emoji_to_group)} emoji from CLDR data")
-            return True
-        logHandler.log.warning("Could not load CLDR emoji data — using fallback")
-        _loaded = False
-        return False
+        else:
+            # A stale cache stays in use: only the refresh failed.
+            logHandler.log.warning("Could not refresh CLDR emoji data; keeping the cached copy")
+    finally:
+        with _load_lock:
+            _downloading = False
+            _last_attempt_time = time.monotonic()
+
+
+def _maybe_start_download(force=False):
+    global _downloading
+    with _load_lock:
+        if _downloading:
+            return
+        if not force and (time.monotonic() - _last_attempt_time) < DOWNLOAD_RETRY_SECONDS:
+            return
+        _downloading = True
+    threading.Thread(
+        target=_background_download,
+        name="AudioThemesEmojiCldr",
+        daemon=True,
+    ).start()
+
+
+def _read_cache_once():
+    global _cache_checked
+    with _load_lock:
+        if _cache_checked:
+            return None, None, False
+        emoji_to_group, emoji_to_name, timestamp = _load_from_cache()
+        _cache_checked = True
+    if not emoji_to_group:
+        return None, None, False
+    return emoji_to_group, emoji_to_name, _cache_is_stale(timestamp)
+
+
+def load(force_refresh=False):
+    """Load emoji data without ever blocking on the network.
+
+    The on-disk cache is read synchronously (it is a small local file); a
+    missing or older-than-60-days cache only schedules a background download.
+    ``force_refresh`` keeps the current data and schedules a refresh.
+    """
+    if _loaded and not force_refresh:
+        return True
+    emoji_to_group = None
+    emoji_to_name = None
+    stale = False
+    if not force_refresh:
+        emoji_to_group, emoji_to_name, stale = _read_cache_once()
+    if emoji_to_group:
+        with _load_lock:
+            _apply_data(emoji_to_group, emoji_to_name)
+        if stale:
+            _maybe_start_download()
+        return True
+    _maybe_start_download(force=force_refresh)
+    return _loaded
 
 
 def ensure_loaded():
-    if not _load_attempted:
-        return load()
-    return _loaded
+    """Fast, non-blocking check used on the speech hot path."""
+    if _loaded:
+        return True
+    return load()
+
 
 
 

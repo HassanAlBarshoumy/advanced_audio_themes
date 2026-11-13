@@ -264,6 +264,7 @@ In questo componente aggiuntivo sono integrate una serie di funzionalità altame
 | **Alt+Win+Frecce** | Navigazione avanzata per proposizioni. |
 | **Alt+Maiusc+Frecce** | Navigazione avanzata per paragrafi. |
 | **NVDA+Alt+Frecce** | Navigazione web avanzata (BrowserNav). |
+| **Ctrl+Alt+J** | QuickSpeak: lettura rapida secondo il segnalibro QuickSpeak di BrowserNav (solo in modalità lettura). |
 | **NVDA+Win+N** | Attiva il livello di navigazione (navigazione veloce senza modificatori). |
 | **Ctrl+C / X / V** | Copia, Taglia e Incolla con annunci audio. |
 | **Ctrl+A** | Seleziona Tutto con annuncio audio. |
@@ -272,7 +273,7 @@ In questo componente aggiuntivo sono integrate una serie di funzionalità altame
 | **Ctrl+Shift+Z** | Ripeti alternativo con annuncio audio. |
 
 ## Compatibility & Requirements
-- **NVDA Version:** Requires NVDA 2024.1.0 or later.
+- **NVDA Version:** Requires NVDA 2026.1.0 or later.
 - **Last Tested NVDA Version:** 2026.2.0
 - **Operating System:** Windows 10 or Windows 11.
 

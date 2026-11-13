@@ -1799,7 +1799,7 @@ class BrowserNavMixin:
                 ))
       # quick_speak
         self.injectBrowseModeKeystroke(
-            "kb:Control+J",
+            "kb:Control+Alt+J",
             "quickSpeak",
             script=lambda selfself, gesture: quickJump.autoClick(selfself, gesture, quickJump.BookmarkCategory.QUICK_SPEAK),
             doc=_("QuickSpeak  according to BrowserNav QuickSpeak bookmark; please check browserNav configuration panel for the list of bookmarks."))

@@ -4,11 +4,12 @@ import globalVars
 import addonHandler
 import config
 import json
+from logHandler import log
 
 try:
     addonHandler.initTranslation()
 except AttributeError:
-    pass
+    log.debug("AudioThemes: initTranslation failed in installTasks", exc_info=True)
 
 
 CONFLICT_PENDING_FILE = os.path.join(
@@ -44,7 +45,7 @@ def _writeConflictFile(found):
 		with open(CONFLICT_PENDING_FILE, "w") as f:
 			json.dump(found, f)
 	except Exception:
-		pass
+		log.debug("AudioThemes: could not write the pending conflict file", exc_info=True)
 
 
 def _checkConflictingAddons():
@@ -119,16 +120,16 @@ def onInstall():
 				try:
 					shutil.copytree(addon_default_theme_path, dest_default_theme_path)
 				except (OSError, shutil.Error):
-					pass
+					log.debug("AudioThemes: could not copy the Default theme", exc_info=True)
 
 		# If the active theme in config doesn't exist, reset to Default
 		active = config.conf.get("audiothemes", {}).get("active_theme", "Default")
 		if active and not os.path.exists(os.path.join(new_path, active)):
 			config.conf["audiothemes"]["active_theme"] = "Default"
 	except Exception:
-		pass
+		log.debug("AudioThemes: install-time theme migration failed", exc_info=True)
 
 	try:
 		_checkConflictingAddons()
 	except Exception:
-		pass
+		log.debug("AudioThemes: conflict check failed in installTasks", exc_info=True)

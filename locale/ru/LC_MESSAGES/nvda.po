@@ -2254,27 +2254,6 @@ msgstr "мир"
 msgid "{roleText} level {level}"
 msgstr "{roleText} уровень {level}"
 
-msgid ""
-"استكمال العمل على إضافة سمات الصوت (Audio Themes)، مع إضافة دعم للإصدارات الأحدث من NVDA.\n"
-"تقوم هذه الإضافة بإنشاء عرض صوتي افتراضي يشغل أصواتاً عند التركيز أو التنقل بين العناصر.\n"
-"كما تتيح لك الإضافة تفعيل، تثبيت، إزالة، تحرير، إنشاء، وتوزيع حزم السمات الصوتية.\n"
-"\n"
-"تم دمجها مع إضافة Earcons and Speech rules:\n"
-"تسمح بإعداد أصوات مخصصة للكلمات، الأحرف، أنواع العناصر، الحالات، ومعلومات التنسيق.\n"
-"\n"
-"تم دمج إضافة SentenceNav للتنقل بالجمل (Alt+أسهم).\n"
-"تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).\n"
-msgstr ""
-"استكمال العمل على إضافة سمات الصوت (Audio Themes)، مع إضافة دعم للإصدارات الأحدث من NVDA.\n"
-"تقوم هذه الإضافة بإنشاء عرض صوتي افتراضي يشغل أصواتاً عند التركيز أو التنقل بين العناصر.\n"
-"كما تتيح لك الإضافة تفعيل، تثبيت، إزالة، تحرير، إنشاء، وتوزيع حزم السمات الصوتية.\n"
-"\n"
-"تم دمجها مع إضافة Earcons and Speech rules:\n"
-"تسمح بإعداد أصوات مخصصة للكلمات، الأحرف، أنواع العناصر، الحالات، ومعلومات التنسيق.\n"
-"\n"
-"تم دمج إضافة SentenceNav للتنقل بالجمل (Alt+أسهم).\n"
-"تم دمج إضافة BrowserNav للتنقل المتقدم في المتصفح (NVDA+Alt+أسهم).\n"
-
 msgid "Check for &Updates..."
 msgstr "Проверить &обновления..."
 
@@ -4009,3 +3988,42 @@ msgstr "Да"
 
 msgid "You already have website {} in your BrowserNav configuration.\n"
 msgstr "В вашей конфигурации BrowserNav уже есть сайт {}.\n"
+
+msgid "Configure per-category prefix text, sound position, and volume.\nLeave a field empty to use the global setting."
+msgstr ""
+
+msgid "Conversion done: {converted} converted, {skipped} skipped, {failed} failed."
+msgstr ""
+
+msgid "Conversion done: {converted} converted, {skipped} skipped, {failed} failed. Details in the NVDA log."
+msgstr ""
+
+msgid "Conversion finished: {converted} converted, {skipped} skipped, {failed} failed."
+msgstr ""
+
+msgid "Emoji sounds can be assigned in your theme by creating sound files\nnamed emoji.wav, emoji_smileys.wav, emoji_people.wav, etc.\nPer-category files take priority over the general emoji.wav."
+msgstr ""
+
+msgid "Place .wav files in your theme folder with these names:\nsys_ac_plug.wav, sys_ac_unplug.wav, sys_battery_low.wav,\nsys_battery_critical.wav, sys_battery_full.wav, sys_usb_plug.wav,\nsys_usb_unplug.wav, sys_volume_plug.wav, sys_volume_unplug.wav,\nsys_network_connect.wav, sys_network_disconnect.wav,\nsys_wake.wav, sys_sleep.wav"
+msgstr ""
+
+msgid "Revolutionize your screen reading experience with Advanced Audio Themes, the ultimate auditory powerhouse for NVDA.\n\nImmerse yourself in a dynamic 3D soundscape where every UI event—from navigating menus to tracking progress bars and typing—is brought to life with rich, customizable spatial audio. With the built-in Audio Themes Studio, you can effortlessly craft, edit, and explore a cloud-based library of community-driven themes.\n\nEmpower your workflow with groundbreaking features:\n- Studio-Grade Audio DSP: Elevate your audio with real-time Bass Boost, Noise Gate, and intelligent Audio Ducking.\n- System Status Sounds: Stay seamlessly connected to your PC with instant, native audio alerts for battery, USB, power, and network events.\n- Smart App Profiles: Enjoy a tailored experience as themes and typing soundscapes adapt automatically to your active application.\n- 3D Sonar & Beacons: Visualize your screen spatially by dropping audio beacons and sweeping windows with radar-like precision.\n- Lightning-Fast Navigation: Break free from complex keystrokes using the modifier-free Navigation Layer, alongside deeply integrated BrowserNav and SentenceNav engines.\n- Phonetic Punctuation: Take total control over speech feedback with pinpoint rules for words, states, and roles.\n\nStep beyond traditional screen reading and unleash a breathtaking auditory dimension to your daily tasks!\n"
+msgstr ""
+
+msgid "The downloaded file failed its integrity check."
+msgstr ""
+
+msgid "The installed version could not be determined.\nThe latest published version is {tag}."
+msgstr ""
+
+msgid "The published checksum could not be read."
+msgstr ""
+
+msgid "The store address must start with https://"
+msgstr ""
+
+msgid "This theme has an invalid download link."
+msgstr ""
+
+msgid "WAV, OGG, MP3, and FLAC are supported natively.\nM4A, AAC, OPUS, WMA, MP2, and AC3 require FFmpeg to play.\nConversion permanently rewrites such files to WAV or FLAC inside\ntheir theme folder, so FFmpeg is no longer needed for them.\nFFmpeg is still required to decode the source during conversion.\nDownload size: ~50MB, extracted: ~12MB."
+msgstr ""

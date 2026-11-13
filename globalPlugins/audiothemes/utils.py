@@ -90,7 +90,7 @@ def report_dropped_task(pool_name, func, tasks):
     try:
         pending = tasks.qsize()
     except Exception:
-        pass
+        log.debug("AudioThemes: could not read the worker queue size", exc_info=True)
     log.warning(
         "%s: queue full - sound task %s dropped (%d dropped so far, %d still queued)"
         % (pool_name, name, count, pending)
@@ -133,7 +133,7 @@ def write_config_to_base(section, key, value):
                 root = config.conf.rootSection
                 root._cache.pop(section, None)
             except Exception:
-                pass
+                log.debug("AudioThemes: could not invalidate the config cache for %s", section, exc_info=True)
             return True
         except Exception:
             try:
